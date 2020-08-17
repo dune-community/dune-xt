@@ -14,9 +14,8 @@
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
-#include <dune/xt/functions/type_traits.hh>
 
-#include "combined-element-functions.hh"
+#include "combined.hh"
 
 namespace Dune {
 namespace XT {
@@ -69,19 +68,22 @@ Difference<IndicatorType, IndicatorType> stupid_difference()
  *
  * \todo Implement custom local function to hold a copy of this!
  */
-template <class LeftType, class RightType, CombinationType combination>
+template <class LeftType, class RightType, CombinationType comb>
 class CombinedGridFunction
-  : public GridFunctionInterface<typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::E,
-                                 internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::r,
-                                 internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::rC,
-                                 typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::R>
+  : public GridFunctionInterface<typename LeftType::E,
+                                 internal::CombinedHelper<LeftType, RightType, comb>::r,
+                                 internal::CombinedHelper<LeftType, RightType, comb>::rC,
+                                 typename internal::CombinedHelper<LeftType, RightType, comb>::R>
 {
+  static_assert(is_grid_function<LeftType>::value, "");
+  static_assert(is_grid_function<RightType>::value, "");
+  static_assert(std::is_same<typename LeftType::E, typename RightType::E>::value, "");
+
   using ThisType = CombinedGridFunction;
-  using BaseType =
-      GridFunctionInterface<typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::E,
-                            internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::r,
-                            internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::rC,
-                            typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::R>;
+  using BaseType = GridFunctionInterface<typename LeftType::E,
+                                         internal::CombinedHelper<LeftType, RightType, comb>::r,
+                                         internal::CombinedHelper<LeftType, RightType, comb>::rC,
+                                         typename internal::CombinedHelper<LeftType, RightType, comb>::R>;
 
 public:
   using ElementType = typename BaseType::ElementType;
@@ -92,14 +94,14 @@ public:
                        const std::string nm = "",
                        const std::string& logging_prefix = "")
     : BaseType(left.parameter_type() + right.parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
+               logging_prefix.empty() ? Common::to_camel_case(GetCombination<comb>::name() + "GridFunction")
                                       : logging_prefix,
                logging_prefix.empty())
     , left_(left.copy_as_grid_function())
     , right_(right.copy_as_grid_function())
-    , name_(nm.empty() ? "(" + left_->name() + GetCombination<combination>::symbol() + right_->name() + ")" : nm)
+    , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") << "(left=" << &left
+    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") << "(left=" << &left
                 << ", right=" << &right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
@@ -108,14 +110,14 @@ public:
                        const std::string nm = "",
                        const std::string& logging_prefix = "")
     : BaseType(left->parameter_type() + right->parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
+               logging_prefix.empty() ? Common::to_camel_case(GetCombination<comb>::name() + "GridFunction")
                                       : logging_prefix,
                logging_prefix.empty())
     , left_(std::move(left))
     , right_(std::move(right))
-    , name_(nm.empty() ? "(" + left_->name() + GetCombination<combination>::symbol() + right_->name() + ")" : nm)
+    , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") << "(left=" << left
+    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") << "(left=" << left
                 << ", right=" << right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
@@ -130,12 +132,12 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") + "::local_function()"
+    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") + "::local_function()"
                 << std::endl;
     using LeftLF = typename LeftType::LocalFunctionType;
     using RightLF = typename RightType::LocalFunctionType;
-    return std::make_unique<CombinedElementFunction<LeftLF, RightLF, combination>>(std::move(left_->local_function()),
-                                                                                   std::move(right_->local_function()));
+    return std::make_unique<CombinedElementFunction<LeftLF, RightLF, comb>>(std::move(left_->local_function()),
+                                                                            std::move(right_->local_function()));
   } // ... local_function(...)
 
   std::unique_ptr<BaseType> copy_as_grid_function() const override final
@@ -215,10 +217,10 @@ public:
  *
  * \see CombinedGridFunction
  */
-template <class LeftSummandType, class RightSummandType>
-class ProductGridFunction : public CombinedGridFunction<LeftSummandType, RightSummandType, CombinationType::product>
+template <class LeftFactorType, class RightFactorType>
+class ProductGridFunction : public CombinedGridFunction<LeftFactorType, RightFactorType, CombinationType::product>
 {
-  using BaseType = CombinedGridFunction<LeftSummandType, RightSummandType, CombinationType::product>;
+  using BaseType = CombinedGridFunction<LeftFactorType, RightFactorType, CombinationType::product>;
 
 public:
   template <class... Args>
@@ -226,86 +228,6 @@ public:
     : BaseType(std::forward<Args>(args)...)
   {}
 }; // class ProductGridFunction
-
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceGridFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
-{
-  return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceGridFunction<T1, T2>>
-make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
-{
-  return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceGridFunction<T1, T2>> make_difference(T1*&& left, T2*&& right, Args&&... args)
-{
-  return std::make_shared<DifferenceGridFunction<T1, T2>>(
-      std::move(left), std::move(right), std::forward<Args>(args)...);
-}
-
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<SumGridFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
-{
-  return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<SumGridFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
-{
-  return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<SumGridFunction<T1, T2>> make_sum(T1*&& left, T2*&& right, Args&&... args)
-{
-  return std::make_shared<SumGridFunction<T1, T2>>(std::move(left), std::move(right), std::forward<Args>(args)...);
-}
-
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<FractionGridFunction<T1, T2>> make_fraction(const T1& left, const T2& right, Args&&... args)
-{
-  return std::make_shared<FractionGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<FractionGridFunction<T1, T2>>
-make_fraction(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
-{
-  return std::make_shared<FractionGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<FractionGridFunction<T1, T2>> make_fraction(T1*&& left, T2*&& right, Args&&... args)
-{
-  return std::make_shared<FractionGridFunction<T1, T2>>(std::move(left), std::move(right), std::forward<Args>(args)...);
-}
-
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<ProductGridFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
-{
-  return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<ProductGridFunction<T1, T2>>
-make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
-{
-  return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<ProductGridFunction<T1, T2>> make_product(T1*&& left, T2*&& right, Args&&... args)
-{
-  return std::make_shared<ProductGridFunction<T1, T2>>(std::move(left), std::move(right), std::forward<Args>(args)...);
-}
 
 
 } // namespace Functions

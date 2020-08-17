@@ -40,6 +40,9 @@ class spe10_data_file_missing : public Dune::IOError
 class element_function_error : public Dune::Exception
 {};
 
+class combined_error : public Dune::Exception
+{};
+
 class function_error : public Dune::Exception
 {};
 

@@ -31,15 +31,28 @@ namespace XT {
 namespace Functions {
 
 
-// forwards, required in operator+-*
-template <class MinuendType, class SubtrahendType>
+// forwards, required in operator+-*, includes are below
+namespace internal {
+
+
+template <class, class, CombinationType>
+struct CombinedHelper;
+
+
+} // namespace internal
+
+
+template <class, class>
 class DifferenceFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class SumFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class ProductFunction;
+
+template <class, class>
+class FractionFunction;
 
 // forward, required in FunctionInterface::as_grid_function
 template <class E, size_t r, size_t rC, class R>
@@ -182,27 +195,46 @@ public:
     return "dune.xt.functions.function";
   }
 
+  /// \}
+  /// \name Operators emulating numeric types.
+  /// \{
+
+  Functions::DifferenceFunction<ThisType, ThisType> operator-(const ThisType& other) const
+  {
+    return Functions::DifferenceFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " - " + other.name() + ")");
+  }
+
+  Functions::SumFunction<ThisType, ThisType> operator+(const ThisType& other) const
+  {
+    return Functions::SumFunction<ThisType, ThisType>(*this, other, "(" + this->name() + " + " + other.name() + ")");
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::product>::available,
+                   Functions::ProductFunction<ThisType, as_function_interface_t<OtherType>>>
+  operator*(const OtherType& other) const
+  {
+    return Functions::ProductFunction<ThisType, as_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "*" + other.name() + ")");
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::fraction>::available,
+                   Functions::FractionFunction<ThisType, as_function_interface_t<OtherType>>>
+  operator/(const OtherType& other) const
+  {
+    return Functions::FractionFunction<ThisType, as_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "/" + other.name() + ")");
+  }
+
   /**
    * \}
    * \name ´´These methods are default implemented and should be overridden to improve their performance.''
    * \{
    **/
-
-  DifferenceType operator-(const ThisType& other) const
-  {
-    return DifferenceType(*this, other);
-  }
-
-  SumType operator+(const ThisType& other) const
-  {
-    return SumType(*this, other);
-  }
-
-  template <class OtherType>
-  auto operator*(const OtherType& other) const
-  {
-    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
-  }
 
   virtual R evaluate(const DomainType& point_in_global_coordinates,
                      const size_t row,
