@@ -83,31 +83,38 @@ struct GridFunctionInterface_for_all_grids
       static void addbind(pybind11::module& /*m*/) {}
     };
 
-    static void bind(pybind11::module& m)
+    static void bind_interface(pybind11::module& m)
+    {
+      using Dune::XT::Functions::bindings::GridFunctionInterface;
+      using Dune::XT::Grid::bindings::grid_name;
+
+      GridFunctionInterface<G, E, r, rC>::bind(m, grid_name<G>::value());
+
+      for_all_rC<r, typename Dims::tail_type>::bind_interface(m);
+    }
+
+    static void bind_combined(pybind11::module& m)
     {
       using Dune::XT::Functions::bindings::DifferenceGridFunction;
-      using Dune::XT::Functions::bindings::GridFunctionInterface;
       using Dune::XT::Functions::bindings::ProductGridFunction;
       using Dune::XT::Functions::bindings::SumGridFunction;
       using Dune::XT::Grid::bindings::grid_name;
 
-      GridFunctionInterface<G, E, r, rC>::bind(m, grid_name<G>::value());
       DifferenceGridFunction<G, E, r, rC>::bind(m, grid_name<G>::value());
       SumGridFunction<G, E, r, rC>::bind(m, grid_name<G>::value());
-      // we can always multiply with a scalar from the right ...
-      ProductGridFunction<G, E, r, rC, 1, 1>::bind(m, grid_name<G>::value());
-      // .. and with lots of other dims
       product_helper<>::addbind(m);
       fraction_helper<>::addbind(m);
 
-      for_all_rC<r, typename Dims::tail_type>::bind(m);
+      for_all_rC<r, typename Dims::tail_type>::bind_combined(m);
     }
   };
 
   template <size_t r>
   struct for_all_rC<r, boost::tuples::null_type>
   {
-    static void bind(pybind11::module& /*m*/) {}
+    static void bind_interface(pybind11::module& /*m*/) {}
+
+    static void bind_combined(pybind11::module& /*m*/) {}
   };
 
 
@@ -116,36 +123,50 @@ struct GridFunctionInterface_for_all_grids
   {
     static const constexpr size_t r = Dims::head_type::value;
 
-    static void bind(pybind11::module& m)
+    static void bind_interface(pybind11::module& m)
     {
-      for_all_rC<r>::bind(m);
+      for_all_rC<r>::bind_interface(m);
 
-      for_all_r_and_rC<typename Dims::tail_type>::bind(m);
+      for_all_r_and_rC<typename Dims::tail_type>::bind_interface(m);
+    }
+
+    static void bind_combined(pybind11::module& m)
+    {
+      for_all_rC<r>::bind_combined(m);
+
+      for_all_r_and_rC<typename Dims::tail_type>::bind_combined(m);
     }
   };
 
   template <bool a>
   struct for_all_r_and_rC<boost::tuples::null_type, a>
   {
-    static void bind(pybind11::module& /*m*/) {}
+    static void bind_interface(pybind11::module& /*m*/) {}
+
+    static void bind_combined(pybind11::module& /*m*/) {}
   };
 
-
-  static void bind(pybind11::module& m)
+  static void bind_interface(pybind11::module& m)
   {
-    using Dune::XT::Functions::bindings::FractionGridFunction;
-    using Dune::XT::Grid::bindings::grid_name;
+    for_all_r_and_rC<>::bind_interface(m);
 
-    for_all_r_and_rC<>::bind(m);
+    GridFunctionInterface_for_all_grids<typename GridTypes::tail_type>::bind_interface(m);
+  }
 
-    GridFunctionInterface_for_all_grids<typename GridTypes::tail_type>::bind(m);
+  static void bind_combined(pybind11::module& m)
+  {
+    for_all_r_and_rC<>::bind_combined(m);
+
+    GridFunctionInterface_for_all_grids<typename GridTypes::tail_type>::bind_combined(m);
   }
 };
 
 template <>
 struct GridFunctionInterface_for_all_grids<boost::tuples::null_type>
 {
-  static void bind(pybind11::module& /*m*/) {}
+  static void bind_interface(pybind11::module& /*m*/) {}
+
+  static void bind_combined(pybind11::module& /*m*/) {}
 };
 
 

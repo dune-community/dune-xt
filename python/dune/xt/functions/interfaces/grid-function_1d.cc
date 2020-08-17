@@ -22,5 +22,8 @@ PYBIND11_MODULE(_functions_interfaces_grid_function_1d, m)
   py::module::import("dune.xt.grid");
   py::module::import("dune.xt.la");
 
-  GridFunctionInterface_for_all_grids<boost::tuple<ONED_1D>>::bind(m);
+  // All of these need to be there ...
+  GridFunctionInterface_for_all_grids<boost::tuple<ONED_1D>>::bind_interface(m);
+  // ... before we start binding those.
+  GridFunctionInterface_for_all_grids<boost::tuple<ONED_1D>>::bind_combined(m);
 } // PYBIND11_MODULE(...)
