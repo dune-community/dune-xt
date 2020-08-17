@@ -46,7 +46,6 @@ auto bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& 
       "function_to_grid_function",
       [](XT::Functions::FunctionInterface<d, r, rC, R>& func,
          const XT::Grid::GridProvider<G>& /*only_here_to_select_grid_type*/) { return std::make_unique<C>(func); },
-      py::keep_alive<0, 1>(),
       "function"_a,
       "grid_provider"_a);
 

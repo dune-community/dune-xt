@@ -72,8 +72,7 @@ public:
           return new type(grid_function, name);
         },
         "grid_function"_a,
-        "name"_a = "DivergenceGridFunction",
-        py::keep_alive<0, 1>());
+        "name"_a = "DivergenceGridFunction");
     m.def(
         "divergence",
         [](GF grid_function, const std::string& name) { return new type(grid_function, name); },

@@ -158,8 +158,7 @@ void addbind_FunctionInterface_combined_op(C& c)
   c.def(
       internal::get_combined<S, O, comb>::op().c_str(),
       [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
-      py::keep_alive<0, 1>(),
-      py::keep_alive<0, 2>());
+      py::is_operator());
 } // ... addbind_FunctionInterface_combined_op(...)
 
 

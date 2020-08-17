@@ -78,8 +78,7 @@ public:
         },
         "grid_function"_a,
         "order"_a,
-        "name"_a = "InverseGridFunction",
-        py::keep_alive<0, 1>());
+        "name"_a = "InverseGridFunction");
     m.def(
         "inverse",
         [](GF grid_function, const int order, const std::string& name) { return new type(grid_function, order, name); },

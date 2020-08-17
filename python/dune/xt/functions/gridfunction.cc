@@ -63,12 +63,10 @@ private:
             "logging_prefix"_a = "");
       c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
             "matrix_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
       c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
             "matrix_grid_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -94,8 +92,7 @@ private:
           },
           "grid"_a,
           "matrix_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -103,16 +100,14 @@ private:
              const std::string& logging_prefix) { return new type(matrix_grid_function, logging_prefix); },
           "grid"_a,
           "matrix_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GridFunctionInterface<E, r, rC, R>& matrix_grid_function, const std::string& logging_prefix) {
             return new type(matrix_grid_function, logging_prefix);
           },
           "matrix_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // and with dimRange
       m.def(
           FactoryName.c_str(),
@@ -135,8 +130,7 @@ private:
           "grid"_a,
           "matrix_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -146,8 +140,7 @@ private:
           "grid"_a,
           "matrix_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r, rC, anything>, the general case, neither scalar nor square matrix
 
@@ -169,12 +162,10 @@ private:
             "logging_prefix"_a = "");
       c.def(py::init<const FunctionInterface<d, 1, 1, R>&, const std::string&>(),
             "scalar_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
       c.def(py::init<const GridFunctionInterface<E, 1, 1, R>&, const std::string&>(),
             "scalar_grid_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -211,8 +202,7 @@ private:
           },
           "grid"_a,
           "scalar_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -220,16 +210,14 @@ private:
              const std::string& logging_prefix) { return new type(scalar_grid_function, logging_prefix); },
           "grid"_a,
           "scalar_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function, const std::string& logging_prefix) {
             return new type(scalar_grid_function, logging_prefix);
           },
           "scalar_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // and with dimRange, to distinguish from the square matrix case
       m.def(
           FactoryName.c_str(),
@@ -266,8 +254,7 @@ private:
           "grid"_a,
           "scalar_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -277,8 +264,7 @@ private:
           "grid"_a,
           "scalar_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       // and with dimRange x dimRangeCols
       m.def(
           FactoryName.c_str(),
@@ -315,8 +301,7 @@ private:
           "grid"_a,
           "scalar_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -326,8 +311,7 @@ private:
           "grid"_a,
           "scalar_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<1, 1, anything> the scalar case
 
@@ -345,12 +329,10 @@ private:
             "logging_prefix"_a = "");
       c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
             "vector_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
       c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
             "vector_grid_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -376,8 +358,7 @@ private:
           },
           "grid"_a,
           "vector_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -385,16 +366,14 @@ private:
              const std::string& logging_prefix) { return new type(vector_grid_function, logging_prefix); },
           "grid"_a,
           "vector_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GridFunctionInterface<E, r, rC, R>& vector_grid_function, const std::string& logging_prefix) {
             return new type(vector_grid_function, logging_prefix);
           },
           "vector_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // with dimRange
       m.def(
           FactoryName.c_str(),
@@ -417,8 +396,7 @@ private:
           "grid"_a,
           "vector_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -428,8 +406,7 @@ private:
           "grid"_a,
           "vector_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       // with dimRange x 1
       m.def(
           FactoryName.c_str(),
@@ -452,8 +429,7 @@ private:
           "grid"_a,
           "vector_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -463,8 +439,7 @@ private:
           "grid"_a,
           "vector_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r, 1, anything>, the non scalar vector case
 
@@ -486,12 +461,10 @@ private:
             "logging_prefix"_a = "");
       c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
             "square_matrix_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
       c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
             "square_matrix_grid_function"_a,
-            "logging_prefix"_a = "",
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -520,8 +493,7 @@ private:
              const std::string& logging_prefix) { return new type(square_matrix_function, logging_prefix); },
           "grid"_a,
           "square_matrix_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -529,16 +501,14 @@ private:
              const std::string& logging_prefix) { return new type(square_matrix_grid_function, logging_prefix); },
           "grid"_a,
           "square_matrix_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function, const std::string& logging_prefix) {
             return new type(square_matrix_grid_function, logging_prefix);
           },
           "square_matrix_grid_function"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // .. and with dimRange
       m.def(
           FactoryName.c_str(),
@@ -561,8 +531,7 @@ private:
           "grid"_a,
           "square_matrix_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
@@ -572,8 +541,7 @@ private:
           "grid"_a,
           "square_matrix_grid_function"_a,
           "dim_range"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r_, r_, anything> the square matrix (but not scalar) case
 

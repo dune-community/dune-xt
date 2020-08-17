@@ -70,8 +70,7 @@ public:
         FactoryName.c_str(),
         [](const GP&, const std::string& name) { return new type(name); },
         "grid"_a,
-        "name"_a = "ElementwiseDiameterFunction",
-        py::keep_alive<0, 1>());
+        "name"_a = "ElementwiseDiameterFunction");
 
     return c;
   }

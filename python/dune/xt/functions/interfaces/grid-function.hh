@@ -1,7 +1,8 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
 // Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
-// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License
+// (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
@@ -13,8 +14,8 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <python/dune/xt/common/parameter.hh>
 
@@ -30,6 +31,52 @@ class GridFunctionInterface
   using GP = XT::Grid::GridProvider<G>;
   static const constexpr size_t d = G::dimension;
 
+  template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
+  struct product_helper // <true, false, ...>
+  {
+    template <class T, typename... options>
+    static void addbind(pybind11::class_<T, options...>& c)
+    {
+      namespace py = pybind11;
+
+      c.def(
+          "__mul__",
+          [](const T& self, const Functions::GridFunctionInterface<E, r, 1, R>& other) {
+            return std::make_unique<decltype(self * other)>(self * other);
+          },
+          py::is_operator());
+    }
+  };
+
+  template <bool anything>
+  struct product_helper<false, true, anything>
+  {
+    template <class T, typename... options>
+    static void addbind(pybind11::class_<T, options...>& c)
+    {
+      namespace py = pybind11;
+
+      c.def(
+          "__mul__",
+          [](const T& self, const Functions::GridFunctionInterface<E, rC, 1, R>& other) {
+            return std::make_unique<decltype(self * other)>(self * other);
+          },
+          py::is_operator());
+      c.def(
+          "__mul__",
+          [](const T& self, const Functions::GridFunctionInterface<E, rC, 2, R>& other) {
+            return std::make_unique<decltype(self * other)>(self * other);
+          },
+          py::is_operator());
+      c.def(
+          "__mul__",
+          [](const T& self, const Functions::GridFunctionInterface<E, rC, 3, R>& other) {
+            return std::make_unique<decltype(self * other)>(self * other);
+          },
+          py::is_operator());
+    }
+  };
+
   template <bool scalar = (r == 1 && rC == 1), bool anything = false>
   struct fraction_helper // <true, ...>
   {
@@ -41,8 +88,6 @@ class GridFunctionInterface
       c.def(
           "__truediv__",
           [](const T& self, const type& other) { return std::make_unique<decltype(other / self)>(other / self); },
-          py::keep_alive<0, 1>(),
-          py::keep_alive<0, 2>(),
           py::is_operator());
     }
   };
@@ -93,31 +138,26 @@ public:
     c.def(
         "__add__",
         [](const T& self, const type& other) { return std::make_unique<decltype(self + other)>(self + other); },
-        py::keep_alive<0, 1>(),
-        py::keep_alive<0, 2>(),
         py::is_operator());
     c.def(
         "__sub__",
         [](const T& self, const type& other) { return std::make_unique<decltype(self - other)>(self - other); },
-        py::keep_alive<0, 1>(),
-        py::keep_alive<0, 2>(),
         py::is_operator());
+    // we can always multiply with a scalar from the right ...
     c.def(
         "__mul__",
         [](const T& self, const Functions::GridFunctionInterface<E, 1, 1, R>& other) {
-          return std::make_unique<decltype(other * self)>(other * self);
+          return std::make_unique<decltype(self * other)>(self * other);
         },
-        py::keep_alive<0, 1>(),
-        py::keep_alive<0, 2>(),
         py::is_operator());
-    if (r > 1 || rC > 1)
+    // .. and with lots of other dims
+    product_helper<>::addbind(c);
+    fraction_helper<>::addbind(c);
+
+    if constexpr (r == 1 && rC == 1)
       c.def(
-          "__rmul__",
-          [](const T& self, const Functions::GridFunctionInterface<E, 1, 1, R>& other) {
-            return std::make_unique<decltype(other * self)>(other * self);
-          },
-          py::keep_alive<0, 1>(),
-          py::keep_alive<0, 2>(),
+          "__pow__",
+          [](const T& self) { return std::make_unique<decltype(self * self)>(self * self); },
           py::is_operator());
 
     // ParametricInterface methods
@@ -158,6 +198,5 @@ public:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_INTERFACES_GRID_FUNCTION_HH

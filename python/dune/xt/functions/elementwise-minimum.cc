@@ -88,8 +88,7 @@ public:
            const std::string& name) { return new type(grid_function, search_quadrature_order, name); },
         "grid_function"_a,
         "search_quadrature_order"_a,
-        "name"_a = "ElementwiseMinimumFunction",
-        py::keep_alive<0, 1>());
+        "name"_a = "ElementwiseMinimumFunction");
 
     return c;
   }

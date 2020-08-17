@@ -37,6 +37,34 @@ struct GridFunctionInterface_for_all_grids
   {
     static const constexpr size_t rC = Dims::head_type::value;
 
+    template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
+    struct product_helper // <true, false, ...>
+    {
+      static void addbind(pybind11::module& m)
+      {
+        using Dune::XT::Functions::bindings::ProductGridFunction;
+        using Dune::XT::Grid::bindings::grid_name;
+
+        // special case: vector * vector
+        ProductGridFunction<G, E, r, 1, r, 1>::bind(m, grid_name<G>::value());
+      }
+    };
+
+    template <bool anything>
+    struct product_helper<false, true, anything>
+    {
+      static void addbind(pybind11::module& m)
+      {
+        using Dune::XT::Functions::bindings::ProductGridFunction;
+        using Dune::XT::Grid::bindings::grid_name;
+
+        // general case: matrix * matrix or vector
+        ProductGridFunction<G, E, r, rC, rC, 1>::bind(m, grid_name<G>::value());
+        ProductGridFunction<G, E, r, rC, rC, 2>::bind(m, grid_name<G>::value());
+        ProductGridFunction<G, E, r, rC, rC, 3>::bind(m, grid_name<G>::value());
+      }
+    };
+
     template <bool scalar = (r == 1 && rC == 1), bool anything = true>
     struct fraction_helper
     {
@@ -66,7 +94,10 @@ struct GridFunctionInterface_for_all_grids
       GridFunctionInterface<G, E, r, rC>::bind(m, grid_name<G>::value());
       DifferenceGridFunction<G, E, r, rC>::bind(m, grid_name<G>::value());
       SumGridFunction<G, E, r, rC>::bind(m, grid_name<G>::value());
-      ProductGridFunction<G, E, r, rC>::bind(m, grid_name<G>::value());
+      // we can always multiply with a scalar from the right ...
+      ProductGridFunction<G, E, r, rC, 1, 1>::bind(m, grid_name<G>::value());
+      // .. and with lots of other dims
+      product_helper<>::addbind(m);
       fraction_helper<>::addbind(m);
 
       for_all_rC<r, typename Dims::tail_type>::bind(m);
