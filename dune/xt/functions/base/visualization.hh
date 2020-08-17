@@ -314,4 +314,6 @@ private:
 } // namespace XT
 } // namespace Dune
 
+#include <dune/xt/functions/interfaces/grid-function.hh>
+
 #endif // DUNE_XT_FUNCTIONS_VISUALIZATION_HH

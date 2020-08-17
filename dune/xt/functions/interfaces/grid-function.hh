@@ -34,9 +34,9 @@
 #include <dune/xt/grid/view/from-part.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+#include <dune/xt/functions/base/visualization.hh>
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
-#include <dune/xt/functions/base/visualization.hh>
 
 #include "element-functions.hh"
 
@@ -375,6 +375,5 @@ public:
 } // namespace Dune
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
-#include <dune/xt/functions/base/visualization.hh>
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_GRID_FUNCTION_HH
