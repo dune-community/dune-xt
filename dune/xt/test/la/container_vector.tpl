@@ -20,7 +20,7 @@ using namespace Dune::XT;
 static const size_t dim = 4;
 
 {% for T_NAME, V_TYPE in config.testtypes %}
-struct VectorTest_{{T_NAME}} : public ::testing::Test
+struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
 {
   typedef {{V_TYPE}} VectorImp;
 
@@ -294,13 +294,21 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
 
     // test sup_norm()
     RealType sup_norm = zeros.sup_norm();
-    EXPECT_DOUBLE_EQ(RealType(0), sup_norm);
+    RealType sup_norm2 = XT::Common::sup_norm(zeros);
+    EXPECT_EQ(RealType(0), sup_norm);
+    EXPECT_EQ(sup_norm, sup_norm2);
     sup_norm = ones.sup_norm();
-    EXPECT_DOUBLE_EQ(RealType(1), sup_norm);
+    sup_norm2 = XT::Common::sup_norm(ones);
+    EXPECT_EQ(RealType(1), sup_norm);
+    EXPECT_EQ(sup_norm, sup_norm2);
     sup_norm = countingup.sup_norm();
+    sup_norm2 = XT::Common::sup_norm(countingup);
     EXPECT_DOUBLE_EQ(RealType(3), sup_norm);
+    EXPECT_EQ(sup_norm, sup_norm2);
     sup_norm = testvector_1.sup_norm();
+    sup_norm2 = XT::Common::sup_norm(testvector_1);
     EXPECT_DOUBLE_EQ(RealType(2), sup_norm);
+    EXPECT_EQ(sup_norm, sup_norm2);
     sup_norm = testvector_2.sup_norm();
     EXPECT_DOUBLE_EQ(RealType(2), sup_norm);
     sup_norm = testvector_3.sup_norm();
@@ -308,7 +316,9 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     sup_norm = testvector_4.sup_norm();
     EXPECT_DOUBLE_EQ(RealType(3), sup_norm);
     sup_norm = testvector_5.sup_norm();
+    sup_norm2 = XT::Common::sup_norm(testvector_5);
     EXPECT_DOUBLE_EQ(RealType(3.5), sup_norm);
+    EXPECT_EQ(sup_norm, sup_norm2);
 
     // test dot(), operator*
     ScalarType dot = ones.dot(zeros);
@@ -630,14 +640,14 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
       EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones.get_entry(ii))) << "check copy-on-write";
     }
   } // void produces_correct_results() const
-}; // struct VectorTest
+}; // struct LaContainerVectorTest
 
 
-TEST_F(VectorTest_{{T_NAME}}, fulfills_interface)
+TEST_F(LaContainerVectorTest_{{T_NAME}}, fulfills_interface)
 {
   this->fulfills_interface();
 }
-TEST_F(VectorTest_{{T_NAME}}, produces_correct_results)
+TEST_F(LaContainerVectorTest_{{T_NAME}}, produces_correct_results)
 {
   this->produces_correct_results();
 }

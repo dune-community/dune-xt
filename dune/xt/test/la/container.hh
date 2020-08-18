@@ -49,6 +49,27 @@ public:
 };
 
 template <class S>
+class ContainerFactory<Dune::DynamicVector<S>>
+{
+public:
+  static Dune::DynamicVector<S> create(const size_t size)
+  {
+    return Dune::DynamicVector<S>(size, S(1));
+  }
+};
+
+template <class S>
+class ContainerFactory<Dune::XT::Common::FieldVector<S, 4>>
+{
+public:
+  static Dune::XT::Common::FieldVector<S, 4> create(const size_t size)
+  {
+    DUNE_THROW_IF(size != 4, Dune::NotImplemented, "");
+    return Dune::XT::Common::FieldVector<S, 4>(S(1));
+  }
+};
+
+template <class S>
 class ContainerFactory<Dune::XT::Common::FieldVector<S, 10>>
 {
 public:
