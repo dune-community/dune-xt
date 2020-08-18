@@ -39,8 +39,7 @@ if(EXISTS ${ClangTidy_EXECUTABLE})
                  ${clang_out})
 endif()
 
-find_program(RunTidy_EXECUTABLE
-NAMES run-clang-tidy-${ClangTidy_VERSION})
+find_program(RunTidy_EXECUTABLE NAMES run-clang-tidy-${ClangTidy_VERSION})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ClangTidy REQUIRED_VARS ClangTidy_EXECUTABLE VERSION_VAR ClangTidy_VERSION)

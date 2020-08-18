@@ -99,7 +99,10 @@ macro(add_tidy glob_dir)
     dune_symlink_to_source_files(FILES .clang-tidy)
     message(STATUS "adding tidy target")
     set(TIDY_ARGS -config= -style=file -p=${CMAKE_CURRENT_BINARY_DIR} -j ${DXT_TEST_PROCS})
-    add_custom_target("tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes)
+    add_custom_target("tidy"
+                      ${RunTidy_EXECUTABLE}
+                      ${TIDY_ARGS}
+                      -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes)
     add_custom_target("fix_tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -fix)
   else()
     message(WARNING "not adding tidy target because clang-tidy is missing or"

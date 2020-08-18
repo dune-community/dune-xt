@@ -24,7 +24,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include  <boost/algorithm/string/constants.hpp>
+#include <boost/algorithm/string/constants.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/xt/common/debug.hh>
