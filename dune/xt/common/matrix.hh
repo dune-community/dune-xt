@@ -328,12 +328,13 @@ template <class MatrixType,
           size_t COLS = MatrixAbstraction<MatrixType>::static_cols,
           class FieldType = typename MatrixAbstraction<MatrixType>::S,
           class SparsityPatternType = FullPattern>
-auto create(const size_t rows,
-            const size_t cols,
-            const FieldType& val = 0,
-            const SparsityPatternType& pattern = SparsityPatternType())
+typename std::enable_if_t<is_matrix<MatrixType>::value,
+                          typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>
+create(const size_t rows,
+       const size_t cols,
+       const FieldType& val = 0,
+       const SparsityPatternType& pattern = SparsityPatternType())
 {
-  static_assert(is_matrix<MatrixType>::value);
   return MatrixAbstraction<
       typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>::create(rows,
                                                                                                           cols,
@@ -343,18 +344,17 @@ auto create(const size_t rows,
 
 
 template <class TargetMatrixType, class SourceMatrixType>
-auto zeros_like(const SourceMatrixType& source)
+typename std::enable_if_t<is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value, TargetMatrixType>
+zeros_like(const SourceMatrixType& source)
 {
-  static_assert(is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value);
   return create<TargetMatrixType>(
       get_matrix_rows(source), get_matrix_cols(source), typename MatrixAbstraction<TargetMatrixType>::S(0));
 }
 
 
 template <class MatrixType>
-auto zeros_like(const MatrixType& source)
+typename std::enable_if_t<is_matrix<MatrixType>::value, MatrixType> zeros_like(const MatrixType& source)
 {
-  static_assert(is_matrix<MatrixType>::value);
   return zeros_like<MatrixType, MatrixType>(source);
 }
 
@@ -393,7 +393,7 @@ void mv(const FieldMatrix<F, ROWS, COLS>& A, const FieldVector<F, COLS>& x, Fiel
 
 
 template <class MatrixType>
-typename std::enable_if<is_matrix<MatrixType>::value, typename MatrixAbstraction<MatrixType>::ScalarType*>::type
+typename std::enable_if_t<is_matrix<MatrixType>::value, typename MatrixAbstraction<MatrixType>::ScalarType*>
 data(MatrixType& source)
 {
   return MatrixAbstraction<MatrixType>::data(source);
@@ -401,7 +401,7 @@ data(MatrixType& source)
 
 
 template <class MatrixType>
-typename std::enable_if<is_matrix<MatrixType>::value, typename MatrixAbstraction<MatrixType>::ScalarType*>::type
+typename std::enable_if_t<is_matrix<MatrixType>::value, typename MatrixAbstraction<MatrixType>::ScalarType*>
 data(const MatrixType& source)
 {
   return MatrixAbstraction<MatrixType>::data(source);
@@ -409,7 +409,7 @@ data(const MatrixType& source)
 
 
 template <class T, class M>
-typename std::enable_if<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>::type
+typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>
 serialize_rowwise(const M& mat)
 {
   using Mat = MatrixAbstraction<M>;
@@ -429,7 +429,7 @@ serialize_rowwise(const M& mat)
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>::type
+typename std::enable_if_t<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>
 serialize_rowwise(const M& mat)
 {
   return serialize_rowwise<typename MatrixAbstraction<M>::ScalarType>(mat);
@@ -437,7 +437,7 @@ serialize_rowwise(const M& mat)
 
 
 template <class T, class M>
-typename std::enable_if<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>::type
+typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>
 serialize_colwise(const M& mat)
 {
   using Mat = MatrixAbstraction<M>;
@@ -457,7 +457,7 @@ serialize_colwise(const M& mat)
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>::type
+typename std::enable_if_t<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>
 serialize_colwise(const M& mat)
 {
   return serialize_colwise<typename MatrixAbstraction<M>::ScalarType>(mat);
@@ -465,7 +465,7 @@ serialize_colwise(const M& mat)
 
 
 template <class RangeType, class SourceType>
-typename std::enable_if<is_matrix<SourceType>::value && is_matrix<RangeType>::value, RangeType>::type
+typename std::enable_if_t<is_matrix<SourceType>::value && is_matrix<RangeType>::value, RangeType>
 convert_to(const SourceType& source)
 {
   const size_t rows = get_matrix_rows(source);
@@ -489,8 +489,8 @@ convert_to(const SourceType& source)
 
 
 template <class MatrixType, class M = MatrixAbstraction<MatrixType>>
-typename std::enable_if<is_matrix<MatrixType>::value,
-                        typename M::template MatrixTypeTemplate<M::static_cols, M::static_rows>>::type
+typename std::enable_if_t<is_matrix<MatrixType>::value,
+                          typename M::template MatrixTypeTemplate<M::static_cols, M::static_rows>>
 transposed(const MatrixType& mat)
 {
   auto ret = create<MatrixType, M::static_cols, M::static_rows>(M::cols(mat), M::rows(mat), typename M::S(0.));

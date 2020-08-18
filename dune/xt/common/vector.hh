@@ -266,8 +266,8 @@ struct VectorAbstraction<Dune::DenseVector<V>> : public VectorAbstraction<typena
 
 
 template <class VectorType, size_t SIZE = VectorAbstraction<VectorType>::static_size>
-typename std::enable_if<is_vector<VectorType>::value,
-                        typename VectorAbstraction<VectorType>::template VectorTypeTemplate<SIZE>>::type
+typename std::enable_if_t<is_vector<VectorType>::value,
+                          typename VectorAbstraction<VectorType>::template VectorTypeTemplate<SIZE>>
 create(const size_t sz, const typename VectorAbstraction<VectorType>::ScalarType& val = 0)
 {
   return VectorAbstraction<VectorType>::template create<SIZE>(sz, val);
