@@ -11,7 +11,7 @@
 #   Tobias Leibner  (2015 - 2017, 2019 - 2020)
 # ~~~
 
-from matrices import latype
+from matrices import commontype, latype
 from dune.xt.codegen import have_eigen, have_istl, typeid_to_typedef_name as safe_name
 
 types = [
@@ -25,6 +25,7 @@ types = [
         'EigenDenseMatrix_EigenMappedDenseVector_EigenMappedDenseVector_double',
         'EigenRowMajorSparseMatrix_EigenDenseVector_EigenDenseVector_complex',
         'EigenRowMajorSparseMatrix_EigenDenseVector_EigenDenseVector_double',
+        'FieldMatrix_FieldVector_FieldVector_complex', 'FieldMatrix_FieldVector_FieldVector_double',
         'IstlRowMajorSparseMatrix_IstlDenseVector_IstlDenseVector_double'
     ]
 ]
@@ -34,7 +35,12 @@ def test_tuple(args):
     o, r, s, f = args
     if f == 'complex':
         f = 'std::complex<double>'
-    return (safe_name('{}_{}_{}_{}'.format(o, r, s, f)), latype(o, f), latype(r, f), latype(s, f))
+    if o == 'FieldMatrix':
+        fm = '{}, 10, 10'.format(f)
+        fv = '{}, 10'.format(f)
+        return (safe_name('{}_{}_{}_{}'.format(o, r, s, f)), commontype(o, fm), commontype(r, fv), commontype(s, fv))
+    else:
+        return (safe_name('{}_{}_{}_{}'.format(o, r, s, f)), latype(o, f), latype(r, f), latype(s, f))
 
 
 def type_ok(t):
