@@ -12,6 +12,8 @@
 #ifndef PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH
 #define PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH
 
+#include <algorithm>
+
 #include <dune/geometry/type.hh>
 #include <dune/grid/common/mcmgmapper.hh>
 
@@ -20,13 +22,15 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
 #include <dune/xt/common/ranges.hh>
-#include <dune/xt/functions/generic/grid-function.hh>
+#include <dune/xt/la/container/common/vector/dense.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/element.hh>
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/filters/intersection.hh>
 #include <dune/xt/grid/mapper.hh>
+#include <dune/xt/functions/generic/grid-function.hh>
 
 #include <python/dune/xt/common/configuration.hh>
 #include <python/dune/xt/common/fvector.hh>
@@ -44,6 +48,8 @@ class GridProvider
 public:
   using type = Grid::GridProvider<G>;
   using bound_type = pybind11::class_<type>;
+
+  using GV = typename type::LeafGridViewType;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "grid_provider",
@@ -97,6 +103,111 @@ public:
           return centers;
         },
         "codim"_a = 0,
+        py::call_guard<py::gil_scoped_release>());
+    c.def(
+        "inner_intersection_indices",
+        [](type& self) {
+          DUNE_THROW_IF(!G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids!");
+          auto grid_view = self.leaf_view();
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), mcmgLayout(Codim<1>()));
+          std::set<size_t> global_indices;
+          Grid::ApplyOn::InnerIntersections<GV> filter;
+          for (auto&& element : elements(grid_view)) {
+            for (auto&& intersection : intersections(grid_view, element)) {
+              if (filter.contains(grid_view, intersection)) {
+                const auto intersection_entity = element.template subEntity<1>(intersection.indexInInside());
+                global_indices.insert(Common::numeric_cast<size_t>(mapper.index(intersection_entity)));
+              }
+            }
+          }
+          LA::CommonDenseVector<size_t> ret(global_indices.size());
+          size_t ii = 0;
+          for (const auto& index : global_indices) {
+            ret[ii] = index;
+            ++ii;
+          }
+          return ret;
+        },
+        py::call_guard<py::gil_scoped_release>());
+    c.def(
+        "inside_element_indices",
+        [](type& self) {
+          DUNE_THROW_IF(!G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids!");
+          auto grid_view = self.leaf_view();
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> element_mapper(self.grid(), mcmgElementLayout());
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> intersection_mapper(self.grid(), mcmgLayout(Codim<1>()));
+          LA::CommonDenseVector<size_t> element_indices(intersection_mapper.size(), std::numeric_limits<size_t>::max());
+          Grid::ApplyOn::AllIntersectionsOnce<GV> filter;
+          for (auto&& element : elements(grid_view)) {
+            const auto element_index = Common::numeric_cast<size_t>(element_mapper.index(element));
+            for (auto&& intersection : intersections(grid_view, element)) {
+              if (filter.contains(grid_view, intersection)) {
+                const auto intersection_entity = element.template subEntity<1>(intersection.indexInInside());
+                const auto intersection_index =
+                    Common::numeric_cast<size_t>(intersection_mapper.index(intersection_entity));
+                element_indices[intersection_index] = element_index;
+              }
+            }
+          }
+          return element_indices;
+        },
+        py::call_guard<py::gil_scoped_release>());
+    c.def(
+        "outside_element_indices",
+        [](type& self) {
+          DUNE_THROW_IF(!G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids!");
+          auto grid_view = self.leaf_view();
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> element_mapper(self.grid(), mcmgElementLayout());
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> intersection_mapper(self.grid(), mcmgLayout(Codim<1>()));
+          LA::CommonDenseVector<size_t> element_indices(intersection_mapper.size(), std::numeric_limits<size_t>::max());
+          Grid::ApplyOn::InnerIntersectionsOnce<GV> filter;
+          for (auto&& element : elements(grid_view)) {
+            for (auto&& intersection : intersections(grid_view, element)) {
+              if (filter.contains(grid_view, intersection)) {
+                const auto intersection_entity = element.template subEntity<1>(intersection.indexInInside());
+                const auto intersection_index =
+                    Common::numeric_cast<size_t>(intersection_mapper.index(intersection_entity));
+                const auto outside_element_index =
+                    Common::numeric_cast<size_t>(element_mapper.index(intersection.outside()));
+                element_indices[intersection_index] = outside_element_index;
+              }
+            }
+          }
+          return element_indices;
+        },
+        py::call_guard<py::gil_scoped_release>());
+    c.def(
+        "boundary_intersection_indices",
+        [](type& self, const Grid::IntersectionFilter<GV>& filter) {
+          DUNE_THROW_IF(!G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids!");
+          auto grid_view = self.leaf_view();
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), mcmgLayout(Codim<1>()));
+          std::set<size_t> global_indices;
+          for (auto&& element : elements(grid_view)) {
+            for (auto&& intersection : intersections(grid_view, element)) {
+              if (filter.contains(grid_view, intersection)) {
+                const auto intersection_entity = element.template subEntity<1>(intersection.indexInInside());
+                global_indices.insert(Common::numeric_cast<size_t>(mapper.index(intersection_entity)));
+              }
+            }
+          }
+          LA::CommonDenseVector<size_t> ret(global_indices.size());
+          size_t ii = 0;
+          for (const auto& index : global_indices) {
+            ret[ii] = index;
+            ++ii;
+          }
+          return ret;
+        },
+        "intersection_filter"_a = Grid::ApplyOn::BoundaryIntersections<GV>(),
         py::call_guard<py::gil_scoped_release>());
     c.def(
         "visualize",

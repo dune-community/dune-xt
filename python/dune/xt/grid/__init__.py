@@ -26,7 +26,6 @@ for mod_name in (
         '_grid_boundaryinfo_types',
         '_grid_filters_base',
         '_grid_filters_element',
-        '_grid_filters_intersection',
         '_grid_functors_boundary_detector',
      # '_grid_functors_bounding_box',
         '_grid_functors_interfaces',
