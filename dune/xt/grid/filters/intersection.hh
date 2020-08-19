@@ -16,7 +16,9 @@
 
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/timedlogging.hh>
+
 #include <dune/xt/grid/boundaryinfo.hh>
+#include <dune/xt/grid/print.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 #include <dune/grid/common/partitionset.hh>
@@ -465,7 +467,7 @@ public:
 
   bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
-    LOG_(debug) << "contains(intersection=" << intersection
+    LOG_(debug) << "contains(intersection=" << print(intersection)
                 << "):\n  boundary_info_.type(intersection) = " << boundary_info_.type(intersection)
                 << ", *boundary_type_ = " << *boundary_type_ << ", returning "
                 << (boundary_info_.type(intersection) == *boundary_type_) << std::endl;
