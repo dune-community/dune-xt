@@ -67,30 +67,30 @@ macro(add_format glob_dir)
     list(FILTER _files EXCLUDE REGEX ".*gtest.h$")
     add_custom_target("format_${fn}" ${ClangFormat_EXECUTABLE} -i -style=file -fallback-style=none ${_files})
     add_dependencies(format "format_${fn}")
+    file(GLOB_RECURSE _pyfiles "${glob_dir}/*.py")
+    add_custom_target("pyformat_${fn}"
+                      ${CMAKE_CURRENT_BINARY_DIR}/run-in-dune-env
+                      yapf
+                      -i
+                      --style=${CMAKE_CURRENT_SOURCE_DIR}/python/.style.yapf
+                      ${_pyfiles})
+    add_dependencies(format "pyformat_${fn}")
+    file(GLOB_RECURSE _files "${glob_dir}/*.cmake" "${glob_dir}/CMakeLists.txt")
+    file(GLOB_RECURSE _exclude_files "${glob_dir}/*builder_definitions.cmake")
+    list(REMOVE_ITEM _files "${glob_dir}/config.h.cmake")
+    list(REMOVE_ITEM _files "${_exclude_files}")
+    add_custom_target("format_${fn}_cmake"
+                      ${CMAKE_BINARY_DIR}/run-in-dune-env
+                      cmake-format
+                      -i
+                      -c
+                      ${glob_dir}/.cmake_format.py
+                      ${_files})
+    add_dependencies(format "format_${fn}_cmake")
   else()
     message(WARNING "not adding format target because clang-format is missing or "
                     "wrong version: ${ClangFormat_EXECUTABLE} ${ClangFormat_VERSION}")
   endif(ClangFormat_FOUND)
-  file(GLOB_RECURSE _pyfiles "${glob_dir}/*.py")
-  add_custom_target("pyformat_${fn}"
-                    ${CMAKE_CURRENT_BINARY_DIR}/run-in-dune-env
-                    yapf
-                    -i
-                    --style=${CMAKE_CURRENT_SOURCE_DIR}/python/.style.yapf
-                    ${_pyfiles})
-  add_dependencies(format "pyformat_${fn}")
-  file(GLOB_RECURSE _files "${glob_dir}/*.cmake" "${glob_dir}/CMakeLists.txt")
-  file(GLOB_RECURSE _exclude_files "${glob_dir}/*builder_definitions.cmake")
-  list(REMOVE_ITEM _files "${glob_dir}/config.h.cmake")
-  list(REMOVE_ITEM _files "${_exclude_files}")
-  add_custom_target("format_${fn}_cmake"
-                    ${CMAKE_BINARY_DIR}/run-in-dune-env
-                    cmake-format
-                    -i
-                    -c
-                    ${glob_dir}/.cmake_format.py
-                    ${_files})
-  add_dependencies(format "format_${fn}_cmake")
 endmacro(add_format)
 
 find_package(ClangTidy 8)
