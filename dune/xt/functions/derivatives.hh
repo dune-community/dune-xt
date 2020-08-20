@@ -24,6 +24,13 @@ namespace Functions {
 
 template <class E, class R>
 DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>
+divergence(ElementFunctionInterface<E, E::dimension, 1, R>& func)
+{
+  return DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>(func);
+}
+
+template <class E, class R>
+DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>
 divergence(const ElementFunctionInterface<E, E::dimension, 1, R>& func)
 {
   return DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>(func);
@@ -31,7 +38,7 @@ divergence(const ElementFunctionInterface<E, E::dimension, 1, R>& func)
 
 template <class E, class R>
 DivergenceGridFunction<GridFunctionInterface<E, E::dimension, 1, R>>
-divergence(const GridFunctionInterface<E, r, 1, R>& func)
+divergence(const GridFunctionInterface<E, E::dimension, 1, R>& func)
 {
   return DivergenceGridFunction<GridFunctionInterface<E, E::dimension, 1, R>>(func);
 }
