@@ -52,7 +52,7 @@ auto u_primitive = XT::Functions::make_transformed_function<d + 2, 1, R>(u_conse
 template <class GF, size_t r = GF::r, size_t rC = GF::rC, class R = typename GF::R>
 class TransformedGridFunction : public XT::Functions::GridFunctionInterface<typename GF::E, r, rC, R>
 {
-  static_assert(is_grid_function<LF>::value, "");
+  static_assert(is_grid_function<GF>::value, "");
 
   using ThisType = TransformedGridFunction;
   using BaseType = XT::Functions::GridFunctionInterface<typename GF::E, r, rC, R>;
@@ -72,7 +72,7 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     using typename BaseType::RangeType;
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
-    TransformedLocalFunction(const LF& function, const Transformation& transformation)
+    TransformedLocalFunction(const GF& function, const Transformation& transformation)
       : BaseType(function.paramter_type())
       , function_(function.copy_as_grid_function())
       , local_function_(function_->local_function())

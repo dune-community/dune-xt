@@ -65,8 +65,7 @@ class SlicedGridFunction<GF, r, 1> : public XT::Functions::GridFunctionInterface
     using typename BaseType::RangeReturnType;
     using typename BaseType::RangeType;
 
-
-    SlicedLocalFunction(const LF& function, const std::array<size_t, r>& dims)
+    SlicedLocalFunction(const GF& function, const std::array<size_t, r>& dims)
       : BaseType(function.parameter_type())
       , function_(function.copy_as_grid_function())
       , local_function_(function_->local_function())
@@ -101,7 +100,7 @@ class SlicedGridFunction<GF, r, 1> : public XT::Functions::GridFunctionInterface
     }
 
   private:
-    std::unique_ptr<GridFunctionInterface<typename GF::E, GF::e, GF::rC, typename GF::R, >> function_;
+    std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
     std::unique_ptr<typename GF::LocalFunctionType> local_function_;
     const std::array<size_t, r> dims_;
   }; // class SlicedLocalFunction
@@ -110,7 +109,7 @@ public:
   using typename BaseType::E;
   using typename BaseType::LocalFunctionType;
 
-  SlicedGridFunction(const LF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
+  SlicedGridFunction(const GF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
     : BaseType(function.parameter_type())
     , function_(function.copy_as_grid_function())
     , dims_(dims)
@@ -147,7 +146,7 @@ public:
   }
 
 private:
-  std::unique_ptr<GridFunctionInterface<typename GF::E, GF::e, GF::rC, typename GF::R, >> function_;
+  std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
   const std::array<size_t, r> dims_;
   const std::string& name_;
 }; // class SlicedGridFunction
