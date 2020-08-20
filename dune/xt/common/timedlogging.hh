@@ -102,7 +102,7 @@ public:
 
 
 #ifdef LOG_
-#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt-common/issues/new !
+#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt/issues/new !
 #else
 #  define LOG_(type)                                                                                                   \
     if (this->logger.type##_enabled)                                                                                   \

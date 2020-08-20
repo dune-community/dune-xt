@@ -32,7 +32,7 @@ else(DEFINED dune-xt_DIR)
 endif(DEFINED dune-xt_DIR)
 if(DEFINED dune-xt_MODULE_PATH) # dependent modules
   set(dune-xt-module-path ${dune-xt_MODULE_PATH})
-else(DEFINED dune-xt_MODULE_PATH) # xt-common itself
+else(DEFINED dune-xt_MODULE_PATH) # dune-xt itself
   set(dune-xt-module-path ${PROJECT_SOURCE_DIR}/cmake/modules)
 endif(DEFINED dune-xt_MODULE_PATH)
 
