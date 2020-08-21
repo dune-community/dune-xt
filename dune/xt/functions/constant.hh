@@ -65,9 +65,16 @@ public:
 
   ConstantFunction(ThisType&) = default;
 
-  std::unique_ptr<BaseType> copy_as_function() const override final
+private:
+  ThisType* copy_as_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final
@@ -101,7 +108,7 @@ template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class ConstantGridFunction : public FunctionAsGridFunctionWrapper<E, r, rC, R>
 {
   using ThisType = ConstantGridFunction;
-  using BaseType = GridFunctionInterface<E, r, rC, R>;
+  using BaseType = FunctionAsGridFunctionWrapper<E, r, rC, R>;
 
 public:
   using typename BaseType::LocalFunctionType;
@@ -113,6 +120,17 @@ public:
                                           : "ConstantGridFunction")
                    : nm))
   {}
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
 }; // class ConstantGridFunction
 
 

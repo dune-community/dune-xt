@@ -152,11 +152,21 @@ public:
 
   /**
    * \brief Returns a (shallow) copy of the function.
+   * actual implementation work is delegated to the private `copy_as_function_impl`
+   * combined with hiding `copy_as_function` in dervived classes, this allows us the a
+   * unique_ptr with correct type at all levels of the polymorphic hierarchy
    *
    * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
    */
-  virtual std::unique_ptr<ThisType> copy_as_function() const = 0;
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
+  }
 
+private:
+  virtual ThisType* copy_as_function_impl() const = 0;
+
+public:
   virtual int order(const XT::Common::Parameter& /*param*/ = {}) const = 0;
 
   /**

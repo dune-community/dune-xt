@@ -152,9 +152,17 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
 
   IndicatorGridFunction(ThisType&&) = default;
 
-  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
   std::string name() const override final
@@ -221,9 +229,16 @@ public:
 
   IndicatorFunction(ThisType&&) = default;
 
-  std::unique_ptr<BaseType> copy_as_function() const override final
+private:
+  ThisType* copy_as_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final

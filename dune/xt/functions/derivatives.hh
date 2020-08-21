@@ -24,7 +24,7 @@ namespace Functions {
 
 template <class E, class R>
 DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>
-divergence(ElementFunctionInterface<E, E::dimension, 1, R>& func)
+    divergence(ElementFunctionInterface<E, E::dimension, 1, R>& func)
 {
   return DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>(func);
 }

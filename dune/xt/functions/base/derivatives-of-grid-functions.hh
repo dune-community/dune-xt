@@ -72,9 +72,17 @@ public:
         grid_function_->local_function());
   }
 
-  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
   std::string name() const override final

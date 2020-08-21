@@ -172,11 +172,18 @@ public:
 
   ElementwiseMinimumFunction(ThisType&&) = default;
 
-  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
   }
 
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalFunction>(*some_func_, search_quadrature_order_);

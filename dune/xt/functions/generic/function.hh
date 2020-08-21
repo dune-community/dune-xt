@@ -116,9 +116,16 @@ public:
 
   GenericFunction(ThisType&&) = default;
 
-  std::unique_ptr<BaseType> copy_as_function() const override final
+private:
+  ThisType* copy_as_function_impl() const override
   {
-    return std::make_unique<ThisType>(*this);
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
   int order(const Common::Parameter& param = {}) const override final
