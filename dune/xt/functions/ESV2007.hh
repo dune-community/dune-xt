@@ -327,7 +327,7 @@ private:
     };
 
     const std::unique_ptr<DiffusionType> diffusion_;
-    const std::unique_ptr<typename DiffusionType::LocalFunctionType> local_diffusion_;
+    std::unique_ptr<typename DiffusionType::LocalFunctionType> local_diffusion_;
     const RangeFieldType poincare_constant_;
     RangeFieldType value_;
   }; // class LocalCutoffFunction
@@ -353,7 +353,7 @@ public:
 
   CutoffFunction(const ThisType& other)
     : BaseType(other)
-    , diffusion_(other.diffusion_.copy_as_grid_function())
+    , diffusion_(other.diffusion_->copy_as_grid_function())
     , poincare_constant_(other.poincare_constant_)
     , name_(other.name_)
   {}
