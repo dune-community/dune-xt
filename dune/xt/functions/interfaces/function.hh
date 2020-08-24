@@ -35,7 +35,7 @@ namespace Functions {
 namespace internal {
 
 
-template <class, class, CombinationType>
+template <class, class, class CombinationType>
 struct CombinedHelper;
 
 

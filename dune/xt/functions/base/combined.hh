@@ -22,265 +22,167 @@ namespace Functions {
 namespace internal {
 
 
-template <CombinationType comb, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename anything = void>
+template <typename comb, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
 struct CombinedDim
 {
-  static const constexpr bool available = false;
-};
-
-template <size_t L_r, size_t L_rC, typename a>
-struct CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC, a>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = L_r;
-  static const constexpr size_t rC = L_rC;
-};
-
-template <size_t L_r, size_t L_rC, typename a>
-struct CombinedDim<CombinationType::fraction, L_r, L_rC, 1, 1, a>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = L_r;
-  static const constexpr size_t rC = L_rC;
+  static constexpr bool available()
+  {
+    return true;
+  };
+  static constexpr size_t r()
+  {
+    return L_r;
+  }
+  static constexpr size_t rC()
+  {
+    return L_rC;
+  }
 };
 
 // general case: non-scalar matrix * non-scalar {matrix or vector}
-template <size_t L_r, size_t L_rC, size_t R_rC>
-struct CombinedDim<CombinationType::product, L_r, L_rC, L_rC, R_rC, std::enable_if_t<L_rC * R_rC != 1, void>>
+template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
+struct CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>
 {
-  static const constexpr bool available = true;
-  static const constexpr size_t r = L_r;
-  static const constexpr size_t rC = R_rC;
-};
-
-// special case: elementwise multiplication by scalar from the right AND all scalar case
-template <size_t L_r, size_t L_rC, typename a>
-struct CombinedDim<CombinationType::product, L_r, L_rC, 1, 1, a>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = L_r;
-  static const constexpr size_t rC = L_rC;
-};
-
-// special case: non-scalar elementwise multiplication by scalar from the left
-template <size_t R_r, size_t R_rC>
-struct CombinedDim<CombinationType::product, 1, 1, R_r, R_rC, std::enable_if_t<R_r * R_rC != 1, void>>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = R_r;
-  static const constexpr size_t rC = R_rC;
-};
-
-// special case: non-scalar vectors
-template <size_t L_r>
-struct CombinedDim<CombinationType::product, L_r, 1, L_r, 1, std::enable_if_t<L_r != 1, void>>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = 1;
-  static const constexpr size_t rC = 1;
-};
-
-template <size_t L_r, size_t L_rC, typename a>
-struct CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC, a>
-{
-  static const constexpr bool available = true;
-  static const constexpr size_t r = L_r;
-  static const constexpr size_t rC = L_rC;
-};
-
-
-template <CombinationType comb, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename anything = void>
-struct CombinedOrder
-{
-  static_assert(CombinedDim<comb, L_r, L_rC, R_r, R_rC>::available, "Not available for these dimensions!");
-};
-
-template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename a>
-struct CombinedOrder<CombinationType::difference, L_r, L_rC, R_r, R_rC, a>
-{
-  template <class L, class R>
-  static int compute(const L& left, const R& right, const Common::Parameter& param)
+  static constexpr size_t r()
   {
-    return std::max(left.order(param), right.order(param));
+    if constexpr (L_rC * R_rC != 1) {
+      return L_r;
+    } else if constexpr (R_r == 1 && R_rC == 1) {
+      return L_r;
+    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+      return R_r;
+    } else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
+      return 1;
+    }
+    return -1;
+  }
+  static constexpr size_t rC()
+  {
+    if constexpr (L_rC * R_rC != 1) {
+      return R_rC;
+    } else if constexpr (R_r == 1 && R_rC == 1) {
+      return L_rC;
+    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+      return R_rC;
+    } else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
+      return 1;
+    }
+    return -1;
+  }
+  static constexpr bool available()
+  {
+    return r() != -1 && rC() != -1;
   }
 };
 
-/// \todo Any better ideas?
-template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename a>
-struct CombinedOrder<CombinationType::fraction, L_r, L_rC, R_r, R_rC, a>
+template <class L, class R>
+static int
+compute_combined_order(const L& left, const R& right, const Common::Parameter& param, CombinationType::difference)
 {
-  template <class L, class R>
-  static int compute(const L& left, const R& right, const Common::Parameter& param)
-  {
-    return left.order(param) + right.order(param);
-  }
-};
+  return std::max(left.order(param), right.order(param));
+}
 
-template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename a>
-struct CombinedOrder<CombinationType::product, L_r, L_rC, R_r, R_rC, a>
+template <class L, class R>
+static int
+compute_combined_order(const L& left, const R& right, const Common::Parameter& param, CombinationType::fraction)
 {
-  template <class L, class R>
-  static int compute(const L& left, const R& right, const Common::Parameter& param)
-  {
-    return left.order(param) + right.order(param);
-  }
-};
-
-template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC, typename a>
-struct CombinedOrder<CombinationType::sum, L_r, L_rC, R_r, R_rC, a>
+  return left.order(param) + right.order(param);
+}
+template <class L, class R>
+static int
+compute_combined_order(const L& left, const R& right, const Common::Parameter& param, CombinationType::product)
 {
-  template <class L, class R>
-  static int compute(const L& left, const R& right, const Common::Parameter& param)
-  {
-    return std::max(left.order(param), right.order(param));
-  }
-};
+  return left.order(param) + right.order(param);
+}
+template <class L, class R>
+static int compute_combined_order(const L& left, const R& right, const Common::Parameter& param, CombinationType::sum)
+{
+  return std::max(left.order(param), right.order(param));
+}
 
+template <class Left, class Right, class D>
+static auto compute_combined_eval(
+    const Left& left, const Right& right, const D& point, const Common::Parameter& param, CombinationType::difference)
+{
+  return left.evaluate(point, param) - right.evaluate(point, param);
+}
 
-template <CombinationType comb,
-          class L_R,
-          class R_R,
-          size_t L_r,
-          size_t L_rC,
-          size_t R_r,
-          size_t R_rC,
-          typename anything = void>
+template <class Left, class Right, class D>
+static auto compute_combined_eval(
+    const Left& left, const Right& right, const D& point, const Common::Parameter& param, CombinationType::fraction)
+{
+  auto left_value = left.evaluate(point, param);
+  const auto right_value = right.evaluate(point, param)[0];
+  left_value /= right_value;
+  return left_value;
+}
+
+template <class Left, class Right, class D>
+static auto compute_combined_eval(
+    const Left& left, const Right& right, const D& point, const Common::Parameter& param, CombinationType::sum)
+{
+  return left.evaluate(point, param) + right.evaluate(point, param);
+}
+
+template <typename comb, class L_R, class R_R, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
 struct CombinedEval
-{};
-
-template <class L_R, class R_R, size_t L_r, size_t L_rC, typename a>
-struct CombinedEval<CombinationType::difference, L_R, R_R, L_r, L_rC, L_r, L_rC, a>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::rC;
-
-  using R = typename Common::plus_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
+  using R = typename std::conditional<std::is_same<CombinationType::fraction, comb>::value,
+                                      typename Common::multiplication_promotion<L_R, R_R>::type,
+                                      typename Common::plus_promotion<L_R, R_R>::type>::type;
+  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r;
+  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC;
 
   template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
+  static auto compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
   {
-    return left.evaluate(point, param) - right.evaluate(point, param);
+    return compute_combined_eval(left, right, point, param, comb{});
   }
 };
 
-template <class L_R, class R_R, size_t L_r, size_t L_rC, typename a>
-struct CombinedEval<CombinationType::fraction, L_R, R_R, L_r, L_rC, 1, 1, a>
+template <class L_R, class R_R, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
+struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::fraction, L_r, L_rC, 1, 1>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::fraction, L_r, L_rC, 1, 1>::rC;
-
+  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::r;
+  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::rC;
   using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
+  //  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
   template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
+  static auto compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
   {
-    RangeReturnType left_value = left.evaluate(point, param);
-    auto right_value = right.evaluate(point, param)[0];
-    left_value /= right_value;
-    return left_value;
-  }
-};
-
-// general case: non-scalar matrix * non-scalar {matrix or vector}
-template <class L_R, class R_R, size_t L_r, size_t L_rC, size_t R_rC>
-struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, L_rC, R_rC, std::enable_if_t<L_rC * R_rC != 1, void>>
-{
-  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, L_rC, R_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, L_rC, R_rC>::rC;
-
-  using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
-  template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
-  {
-    if constexpr (L_rC == 1) {
-      // need to wrap the left vector into a matrix, for * to do the right thing
-      XT::Common::FieldMatrix<R, 1, L_r> left_value;
-      left_value[0] = left.evaluate(point, param);
-      return left_value.transpose() * right.evaluate(point, param);
-    } else
+    // general case: non-scalar matrix * non-scalar {matrix or vector}
+    if constexpr (L_rC * R_rC != 1) {
+      if constexpr (L_rC == 1) {
+        // need to wrap the left vector into a matrix, for * to do the right thing
+        XT::Common::FieldMatrix<R, 1, L_r> left_value;
+        left_value[0] = left.evaluate(point, param);
+        return left_value.transpose() * right.evaluate(point, param);
+      } else
+        return left.evaluate(point, param) * right.evaluate(point, param);
+    }
+    // special case: elementwise multiplication by scalar from the right AND all scalar case
+    else if constexpr (R_r == 1 && R_rC == 1) {
+      auto left_value = left.evaluate(point, param);
+      const auto right_value = right.evaluate(point, param)[0];
+      left_value *= right_value;
+      return left_value;
+    }
+    // special case: non-scalar elementwise multiplication by scalar from the left
+    else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+      const auto left_value = left.evaluate(point, param)[0];
+      auto right_value = right.evaluate(point, param);
+      right_value *= left_value;
+      return right_value;
+    }
+    // special case: non-scalar vectors
+    else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
       return left.evaluate(point, param) * right.evaluate(point, param);
+    }
+    DUNE_THROW(NotImplemented, "no product compute combination available");
   }
 };
 
-// special case: elementwise multiplication by scalar from the right AND all scalar case
-template <class L_R, class R_R, size_t L_r, size_t L_rC, typename a>
-struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, 1, 1, a>
-{
-  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, 1, 1>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, 1, 1>::rC;
-
-  using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
-  template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
-  {
-    RangeReturnType left_value = left.evaluate(point, param);
-    auto right_value = right.evaluate(point, param)[0];
-    left_value *= right_value;
-    return left_value;
-  }
-};
-
-// special case: non-scalar elementwise multiplication by scalar from the left
-template <class L_R, class R_R, size_t R_r, size_t R_rC>
-struct CombinedEval<CombinationType::product, L_R, R_R, 1, 1, R_r, R_rC, std::enable_if_t<R_r * R_rC != 1, void>>
-{
-  static const constexpr size_t r = CombinedDim<CombinationType::product, 1, 1, R_r, R_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, 1, 1, R_r, R_rC>::rC;
-
-  using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
-  template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
-  {
-    auto left_value = left.evaluate(point, param)[0];
-    RangeReturnType right_value = right.evaluate(point, param);
-    right_value *= left_value;
-    return right_value;
-  }
-};
-
-// special case: non-scalar vectors
-template <class L_R, class R_R, size_t L_r>
-struct CombinedEval<CombinationType::product, L_R, R_R, L_r, 1, L_r, 1, std::enable_if_t<L_r != 1, void>>
-{
-  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, 1, L_r, 1>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, 1, L_r, 1>::rC;
-
-  using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
-  template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
-  {
-    return left.evaluate(point, param) * right.evaluate(point, param);
-  }
-};
-
-template <class L_R, class R_R, size_t L_r, size_t L_rC, typename a>
-struct CombinedEval<CombinationType::sum, L_R, R_R, L_r, L_rC, L_r, L_rC, a>
-{
-  static const constexpr size_t r = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::rC;
-
-  using R = typename Common::plus_promotion<L_R, R_R>::type;
-  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
-
-  template <class Left, class Right, class D>
-  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
-  {
-    return left.evaluate(point, param) + right.evaluate(point, param);
-  }
-};
-
-
-template <CombinationType comb,
+template <class comb,
           class L_R,
           class R_R,
           size_t d,
@@ -291,8 +193,8 @@ template <CombinationType comb,
           typename anything = void>
 struct CombinedJac
 {
-  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r;
-  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC;
+  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
+  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
 
   using R = typename CombinedEval<comb, L_R, R_R, L_r, L_rC, R_r, R_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -302,7 +204,7 @@ struct CombinedJac
   compute(const Left& /*left*/, const Right& /*right*/, const D& /*point*/, const Common::Parameter& /*param*/)
   {
     DUNE_THROW(Exceptions::combined_error,
-               "Not available for a " << GetCombination<comb>::name() << "of " << L_r << "x" << L_rC << " and " << R_r
+               "Not available for a " << get_combination_name(comb{}) << "of " << L_r << "x" << L_rC << " and " << R_r
                                       << "x" << R_rC << "!");
     return DerivativeRangeReturnType();
   }
@@ -311,8 +213,8 @@ struct CombinedJac
 template <class L_R, class R_R, size_t d, size_t L_r, size_t L_rC, typename a>
 struct CombinedJac<CombinationType::difference, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::rC;
+  static const constexpr size_t r = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::r();
+  static const constexpr size_t rC = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::rC();
 
   using R = typename CombinedEval<CombinationType::difference, L_R, R_R, L_r, L_rC, L_r, L_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -328,8 +230,8 @@ struct CombinedJac<CombinationType::difference, L_R, R_R, d, L_r, L_rC, L_r, L_r
 template <class L_R, class R_R, size_t d, size_t L_r, size_t L_rC, typename a>
 struct CombinedJac<CombinationType::sum, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::rC;
+  static const constexpr size_t r = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::r();
+  static const constexpr size_t rC = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::rC();
 
   using R = typename CombinedEval<CombinationType::sum, L_R, R_R, L_r, L_rC, L_r, L_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -349,7 +251,7 @@ struct CombinedJac<CombinationType::sum, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
  * \note Most likely you do not want to use this class directly, but CombinedConstElementFunction or
  *       CombinedElementFunction.
  */
-template <class Left, class Right, CombinationType comb>
+template <class Left, class Right, typename comb>
 struct CombinedHelper
 {
   static_assert(is_element_function<Left>::value || is_function<Left>::value || is_grid_function<Left>::value, "");
@@ -363,23 +265,22 @@ struct CombinedHelper
   static const constexpr size_t R_rC = Right::rC;
 
   using CombinedDimHelper = CombinedDim<comb, L_r, L_rC, R_r, R_rC>;
-  static const constexpr bool available = CombinedDimHelper::available;
-  static const constexpr size_t r = CombinedDimHelper::r;
-  static const constexpr size_t rC = CombinedDimHelper::rC;
+  static const constexpr bool available = CombinedDimHelper::available();
+  static const constexpr size_t r = CombinedDimHelper::r();
+  static const constexpr size_t rC = CombinedDimHelper::rC();
 
   static int order(const Left& left, const Right& right, const Common::Parameter& param)
   {
-    return CombinedOrder<comb, L_r, L_rC, R_r, R_rC>::compute(left, right, param);
+    return compute_combined_order(left, right, param, comb{});
   }
 
   using L_R = typename Left::R;
   using R_R = typename Right::R;
   using CombinedEvalHelper = CombinedEval<comb, L_R, R_R, L_r, L_rC, R_r, R_rC>;
   using R = typename CombinedEvalHelper::R;
-  using RangeReturnType = typename CombinedEvalHelper::RangeReturnType;
 
   template <class D>
-  static RangeReturnType evaluate(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
+  static auto evaluate(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
   {
     return CombinedEvalHelper::compute(left, right, point, param);
   }

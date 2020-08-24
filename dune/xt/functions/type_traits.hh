@@ -318,87 +318,73 @@ template <class F>
 using as_grid_function_interface_t = typename as_grid_function_interface<F>::type;
 
 
-enum class CombinationType
+struct CombinationType
 {
-  difference,
-  fraction,
-  product,
-  sum,
-}; // enum class CombinationType
+  struct difference
+  {};
+  struct fraction
+  {};
+  struct product
+  {};
+  struct sum
+  {};
+}; // struct CombinationType
 
 
-template <CombinationType>
+template <typename CombinationType>
 struct GetCombination
 {
   static std::string name()
   {
-    DUNE_THROW(Common::Exceptions::this_should_not_happen, "Unknonw combination!");
-    return "";
+    return get_combination_name(CombinationType());
   }
 
   static std::string symbol()
   {
-    DUNE_THROW(Common::Exceptions::this_should_not_happen, "Unknonw combination!");
-    return "";
+    return get_combination_symbol(CombinationType());
   }
 }; // struct GetCombination
 
 
-template <>
-struct GetCombination<CombinationType::difference>
+inline std::string get_combination_name(CombinationType::difference)
 {
-  static std::string name()
-  {
-    return "difference";
-  }
+  return "difference";
+}
 
-  static std::string symbol()
-  {
-    return "-";
-  }
-}; // struct GetCombination<CombinationType::difference>
-
-template <>
-struct GetCombination<CombinationType::fraction>
+inline std::string get_combination_symbol(CombinationType::difference)
 {
-  static std::string name()
-  {
-    return "fraction";
-  }
+  return "-";
+}
 
-  static std::string symbol()
-  {
-    return "/";
-  }
-}; // struct GetCombination<CombinationType::fraction>
-
-template <>
-struct GetCombination<CombinationType::product>
+inline std::string get_combination_name(CombinationType::fraction)
 {
-  static std::string name()
-  {
-    return "product";
-  }
+  return "fraction";
+}
 
-  static std::string symbol()
-  {
-    return "*";
-  }
-}; // struct GetCombination<CombinationType::product>
-
-template <>
-struct GetCombination<CombinationType::sum>
+inline std::string get_combination_symbol(CombinationType::fraction)
 {
-  static std::string name()
-  {
-    return "sum";
-  }
+  return "/";
+}
 
-  static std::string symbol()
-  {
-    return "+";
-  }
-}; // struct GetCombination<CombinationType::sum>
+inline std::string get_combination_name(CombinationType::product)
+{
+  return "product";
+}
+
+inline std::string get_combination_symbol(CombinationType::product)
+{
+  return "*";
+}
+
+inline std::string get_combination_name(CombinationType::sum)
+{
+  return "sum";
+}
+
+inline std::string get_combination_symbol(CombinationType::sum)
+{
+  return "+";
+}
 
 
 enum class DerivativeType

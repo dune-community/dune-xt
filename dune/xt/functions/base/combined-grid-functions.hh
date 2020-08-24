@@ -68,7 +68,7 @@ Difference<IndicatorType, IndicatorType> stupid_difference()
  *
  * \todo Implement custom local function to hold a copy of this!
  */
-template <class LeftType, class RightType, CombinationType comb>
+template <class LeftType, class RightType, class comb>
 class CombinedGridFunction
   : public GridFunctionInterface<typename LeftType::E,
                                  internal::CombinedHelper<LeftType, RightType, comb>::r,
@@ -94,14 +94,14 @@ public:
                        const std::string nm = "",
                        const std::string& logging_prefix = "")
     : BaseType(left.parameter_type() + right.parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<comb>::name() + "GridFunction")
+               logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
                logging_prefix.empty())
     , left_(left.copy_as_grid_function())
     , right_(right.copy_as_grid_function())
     , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") << "(left=" << &left
+    LOG_(debug) << Common::to_camel_case(get_combination_name(comb{}) + "GridFunction") << "(left=" << &left
                 << ", right=" << &right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
@@ -110,14 +110,14 @@ public:
                        const std::string nm = "",
                        const std::string& logging_prefix = "")
     : BaseType(left->parameter_type() + right->parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<comb>::name() + "GridFunction")
+               logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
                logging_prefix.empty())
     , left_(std::move(left))
     , right_(std::move(right))
     , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") << "(left=" << left
+    LOG_(debug) << Common::to_camel_case(get_combination_name(comb{}) + "GridFunction") << "(left=" << left
                 << ", right=" << right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
@@ -132,7 +132,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<comb>::name() + "GridFunction") + "::local_function()"
+    LOG_(debug) << Common::to_camel_case(get_combination_name(comb{}) + "GridFunction") + "::local_function()"
                 << std::endl;
     using LeftLF = typename LeftType::LocalFunctionType;
     using RightLF = typename RightType::LocalFunctionType;

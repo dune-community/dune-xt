@@ -76,7 +76,7 @@ Difference< ConstantType, ConstantType > stupid_difference()
  * \note  Most likely you do not want to use this class diretly, but one of
 Difference, Sum or Product.
  */
-template <class LeftType, class RightType, CombinationType comb>
+template <class LeftType, class RightType, class comb>
 class CombinedFunction
   : public FunctionInterface<LeftType::d,
                              internal::CombinedHelper<LeftType, RightType, comb>::r,

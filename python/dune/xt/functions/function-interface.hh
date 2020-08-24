@@ -27,7 +27,7 @@ namespace Functions {
 namespace internal {
 
 
-template <class L, class R, CombinationType comb>
+template <class L, class R, class comb>
 struct get_combined
 {}; // struct get_combined
 

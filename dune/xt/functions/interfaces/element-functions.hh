@@ -68,7 +68,7 @@ class FractionElementFunction;
 namespace internal {
 
 
-template <class, class, CombinationType>
+template <class, class, class CombinationType>
 struct CombinedHelper;
 
 

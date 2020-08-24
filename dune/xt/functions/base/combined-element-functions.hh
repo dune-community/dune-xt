@@ -25,7 +25,7 @@ namespace XT {
 namespace Functions {
 
 
-template <class LeftType, class RightType, CombinationType comb>
+template <class LeftType, class RightType, typename comb>
 class CombinedConstElementFunction
   : public ElementFunctionInterface<typename LeftType::E,
                                     internal::CombinedHelper<LeftType, RightType, comb>::r,
@@ -147,7 +147,7 @@ private:
 }; // class CombinedConstElementFunction
 
 
-template <class LeftType, class RightType, CombinationType combination>
+template <class LeftType, class RightType, class combination>
 class CombinedElementFunction
   : internal::CombinedStorageProvider<LeftType, RightType>
   , public CombinedConstElementFunction<LeftType, RightType, combination>
