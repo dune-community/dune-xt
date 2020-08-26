@@ -65,7 +65,7 @@ class FunctionAsGridFunctionWrapper;
  *        These functions do not depend on a grid, but only on the dimensions and fields of their domain and range.
  *        See in particular RangeReturnTypeSelector and DerivativeRangeReturnTypeSelector for the interpretation of a
  *        function and its derivatives, and GridFunctionInterface for functions which may have discontinuities between
- *        entites (as in: which are double-valued on intersections).
+ *        entities (as in: which are double-valued on intersections).
  *
  *        To turn a function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
  *        to visualize it or to use it in a discretization scheme), use as_grid_function to obtain a const reference to
@@ -153,7 +153,7 @@ public:
   /**
    * \brief Returns a (shallow) copy of the function.
    * actual implementation work is delegated to the private `copy_as_function_impl`
-   * combined with hiding `copy_as_function` in dervived classes, this allows us the a
+   * combined with hiding `copy_as_function` in derived classes, this allows us the a
    * unique_ptr with correct type at all levels of the polymorphic hierarchy
    *
    * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
