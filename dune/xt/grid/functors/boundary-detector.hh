@@ -13,6 +13,7 @@
 #define DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH
 
 #include <dune/xt/common/parallel/threadstorage.hh>
+
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/print.hh>

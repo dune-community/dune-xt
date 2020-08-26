@@ -172,11 +172,10 @@ bool contains(const Dune::Intersection<G, I>& intersection,
 
 // DXT_DEPRECATED_MSG did not work here
 template <class G, class I>
-std::ostream& DUNE_DEPRECATED_MSG("Use out << print(intersection) from <dune/xt/grid/print.hh> instead (05.07.2020)!")
-operator<<(std::ostream& out, const Dune::Intersection<G, I>& intersection)
+void DUNE_DEPRECATED_MSG("Use out << print(intersection) from <dune/xt/grid/print.hh> instead (05.07.2020)!")
+operator<<(std::ostream& /*out*/, const Dune::Intersection<G, I>& intersection)
 {
   XT::Common::print(intersection);
-  return out;
 }
 
 

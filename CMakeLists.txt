@@ -47,7 +47,7 @@ dune_project()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 dune_enable_all_packages(INCLUDE_DIRS
-                         ${dune-xt-common_SOURCE_DIR}/dune
+                         ${dune-xt_SOURCE_DIR}/dune
                          MODULE_LIBRARIES
                          dunepybindxiinterface
                          dunepybindximodule

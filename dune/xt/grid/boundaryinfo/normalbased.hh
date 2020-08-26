@@ -17,6 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
+
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/print.hh>

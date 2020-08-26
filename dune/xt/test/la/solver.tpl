@@ -44,13 +44,13 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
     const MatrixType matrix = ContainerFactory<MatrixType>::create(dim);
     const RhsType rhs = ContainerFactory<RhsType>::create(dim);
     SolutionType solution = ContainerFactory<SolutionType>::create(dim);
-    solution.scal(0);
+    solution *= 0;
 
     // dynamic test
     const SolverType solver(matrix);
     solver.apply(rhs, solution);
-    EXPECT_TRUE(solution.almost_equal(rhs));
-    solution.scal(0);
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
+    solution *= 0;
 
     // static tests
     std::vector<std::string> types = SolverType::types();
@@ -65,11 +65,11 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
 
       // dynamic tests
       solver.apply(rhs, solution, type);
-      EXPECT_TRUE(solution.almost_equal(rhs));
-      solution.scal(0);
+      EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
+      solution *= 0.;
 
       solver.apply(rhs, solution, options);
-      EXPECT_TRUE(solution.almost_equal(rhs));
+      EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
     }
   } // ... produces_correct_results(...)
 }; // struct SolverTest

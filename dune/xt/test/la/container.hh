@@ -18,6 +18,9 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/vector.hh>
+
 #include <dune/xt/la/container/common.hh>
 #include <dune/xt/la/container/eigen.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
@@ -46,12 +49,58 @@ public:
 };
 
 template <class S>
+class ContainerFactory<Dune::DynamicVector<S>>
+{
+public:
+  static Dune::DynamicVector<S> create(const size_t size)
+  {
+    return Dune::DynamicVector<S>(size, S(1));
+  }
+};
+
+template <class S>
+class ContainerFactory<Dune::XT::Common::FieldVector<S, 4>>
+{
+public:
+  static Dune::XT::Common::FieldVector<S, 4> create(const size_t size)
+  {
+    DUNE_THROW_IF(size != 4, Dune::NotImplemented, "");
+    return Dune::XT::Common::FieldVector<S, 4>(S(1));
+  }
+};
+
+template <class S>
+class ContainerFactory<Dune::XT::Common::FieldVector<S, 10>>
+{
+public:
+  static Dune::XT::Common::FieldVector<S, 10> create(const size_t size)
+  {
+    DUNE_THROW_IF(size != 10, Dune::NotImplemented, "");
+    return Dune::XT::Common::FieldVector<S, 10>(S(1));
+  }
+};
+
+template <class S>
 class ContainerFactory<Dune::XT::LA::CommonSparseVector<S>>
 {
 public:
   static Dune::XT::LA::CommonSparseVector<S> create(const size_t size)
   {
     return Dune::XT::LA::CommonSparseVector<S>(size, S(1));
+  }
+};
+
+template <class S>
+class ContainerFactory<Dune::XT::Common::FieldMatrix<S, 10, 10>>
+{
+public:
+  static Dune::XT::Common::FieldMatrix<S, 10, 10> create(const size_t size)
+  {
+    DUNE_THROW_IF(size != 10, Dune::NotImplemented, "");
+    Dune::XT::Common::FieldMatrix<S, 10, 10> matrix(0);
+    for (size_t ii = 0; ii < size; ++ii)
+      matrix[ii][ii] = 1;
+    return matrix;
   }
 };
 

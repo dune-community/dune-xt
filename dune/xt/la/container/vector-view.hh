@@ -336,7 +336,7 @@ public:
   template <class T>
   ScalarType dot(const VectorInterface<T, ScalarType>& other) const
   {
-    return BaseType::template complex_switch<>::dot(*this, other);
+    return BaseType::complex_switch::dot(*this, other);
   }
 
   template <class T>

@@ -18,7 +18,9 @@
 
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/timedlogging.hh>
+
 #include <dune/xt/grid/boundaryinfo.hh>
+#include <dune/xt/grid/print.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/print.hh>
 
