@@ -159,23 +159,23 @@ class CombinedElementFunction
 public:
   using typename BaseType::ElementType;
 
-  CombinedElementFunction(LeftType& left, RightType& right)
-    : Storage(left, right)
+  CombinedElementFunction(LeftType& lft, RightType& rght)
+    : Storage(lft, rght)
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
-  CombinedElementFunction(LeftType& left, RightType&& right)
-    : Storage(left, std::move(right))
+  CombinedElementFunction(LeftType& lft, RightType&& rght)
+    : Storage(lft, std::move(rght))
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
-  CombinedElementFunction(std::shared_ptr<LeftType> left, std::shared_ptr<RightType> right)
-    : Storage(left, right)
+  CombinedElementFunction(std::shared_ptr<LeftType> lft, std::shared_ptr<RightType> rght)
+    : Storage(lft, rght)
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
-  CombinedElementFunction(std::unique_ptr<LeftType>&& left, std::unique_ptr<RightType>&& right)
-    : Storage(std::move(left), std::move(right))
+  CombinedElementFunction(std::unique_ptr<LeftType>&& lft, std::unique_ptr<RightType>&& rght)
+    : Storage(std::move(lft), std::move(rght))
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
