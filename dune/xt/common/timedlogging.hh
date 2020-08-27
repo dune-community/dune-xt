@@ -141,33 +141,30 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-  DXT_DEPRECATED_MSG("Use this.logger.prefix instead (12.08.2020)!") const std::string logging_id;
+  DXT_DEPRECATED_MSG("Use this.logger.prefix instead (12.08.2020)!")
+  static const std::string logging_id;
 
   DXT_DEPRECATED_MSG("Use WithLogger(id, start_enabled) instead (12.08.2020)!")
   WithLogger(const std::string& /*prefix*/, const std::string& id, const bool start_enabled = false)
     : logger(id, start_enabled)
-    , logging_id(id)
   {
     LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
   }
 
   WithLogger(const std::string& id, const bool start_enabled = false)
     : logger(id, start_enabled)
-    , logging_id(id)
   {
     LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
   }
 
   WithLogger(const ThisType& other)
     : logger(other.logger)
-    , logging_id(other.logger.prefix)
   {
     LOG_(debug) << "WithLogger(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
   WithLogger(ThisType&& source)
     : logger(std::move(source.logger))
-    , logging_id(std::move(source.logging_id))
   {
     LOG_(debug) << "WithLogger(this=" << this << ", source=" << &source << ")" << std::endl;
   }
@@ -194,6 +191,8 @@ public:
   }
 }; // class WithLogger
 
+template <class T>
+const std::string WithLogger<T>::logging_id = "Use this.logger.prefix instead";
 
 /**
  * \brief A logging manager that provides info, debug and warning streams
