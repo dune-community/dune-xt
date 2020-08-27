@@ -113,14 +113,14 @@ template <class G, class E, size_t Lr = 1, size_t LrC = 1, size_t Rr = 1, size_t
 class ProductGridFunction
   : public GridFunctionInterface<G,
                                  E,
-                                 internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::r,
-                                 internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::rC,
+                                 internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::r(),
+                                 internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::rC(),
                                  R>
 {
   using BaseType = GridFunctionInterface<G,
                                          E,
-                                         internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::r,
-                                         internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::rC,
+                                         internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::r(),
+                                         internal::CombinedDim<CombinationType::product, Lr, LrC, Rr, RrC>::rC(),
                                          R>;
 
   using Left = Functions::GridFunctionInterface<E, Lr, LrC, R>;

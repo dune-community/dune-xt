@@ -114,7 +114,7 @@ struct get_combined<L, R, CombinationType::product>
 
 
 template <size_t d,
-          CombinationType comb,
+          class comb,
           size_t lr,
           size_t lrC,
           size_t rr,
@@ -147,7 +147,7 @@ bind_combined_Function(pybind11::module& m)
 } // ... bind_combined_Function(...)
 
 
-template <size_t d, CombinationType comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+template <size_t d, class comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_FunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
