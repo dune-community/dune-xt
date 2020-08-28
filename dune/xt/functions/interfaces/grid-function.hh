@@ -21,8 +21,6 @@
 
 #include <dune/common/parallel/mpihelper.hh>
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/grid/io/file/vtk.hh>
 
 #include <dune/xt/common/filesystem.hh>

@@ -15,8 +15,6 @@
 #include <atomic>
 #include <mutex>
 
-#include <dune/xt/common/deprecated.hh>
-
 #include "exceptions.hh"
 
 #ifdef CHECK_CRTP
@@ -75,18 +73,6 @@ public:
   using Traits = TraitsImp;
   using derived_type = typename Traits::derived_type;
 
-  DXT_DEPRECATED_MSG("Use that.as_imp() instead (10.04.2018)!")
-  static inline derived_type& as_imp(InterfaceType& that)
-  {
-    return static_cast<derived_type&>(that);
-  }
-
-  DXT_DEPRECATED_MSG("Use that.as_imp() instead (10.04.2018)!")
-  static inline const derived_type& as_imp(const InterfaceType& that)
-  {
-    return static_cast<const derived_type&>(that);
-  }
-
   inline derived_type& as_imp()
   {
     return static_cast<derived_type&>(*this);
@@ -115,13 +101,6 @@ std::recursive_mutex CRTPInterface<I, T>::crtp_mutex_;
 
 
 } // namespace Common
-
-
-template <class I, class T>
-using CRTPInterface DXT_DEPRECATED_MSG("CRTPInterface was moved into Dune::XT:Common namespace (2018/3/16)") =
-    Common::CRTPInterface<I, T>;
-
-
 } // namespace XT
 } // namespace Dune
 

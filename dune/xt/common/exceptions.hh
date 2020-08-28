@@ -17,7 +17,6 @@
 #include <dune/common/parallel/mpihelper.hh>
 
 #include <dune/xt/common/color.hh>
-#include <dune/xt/common/deprecated.hh>
 
 #ifdef DUNE_THROW
 #  undef DUNE_THROW

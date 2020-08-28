@@ -18,7 +18,6 @@
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridview.hh>
 
-#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>

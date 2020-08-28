@@ -34,7 +34,6 @@
 #include <boost/static_assert.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
-#include <dune/common/deprecated.hh>
 #include <dune/common/promotiontraits.hh>
 
 #include <dune/xt/common/type_traits.hh>
