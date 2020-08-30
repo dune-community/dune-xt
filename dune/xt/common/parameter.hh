@@ -31,13 +31,11 @@ template <class ValueType>
 class SimpleDict
 {
 public:
-  using ThisType = SimpleDict;
+  SimpleDict() = default;
 
-  SimpleDict() {}
+  SimpleDict(const SimpleDict& other) = default;
 
-  SimpleDict(const ThisType& other) = default;
-
-  SimpleDict(ThisType&& source) = default;
+  SimpleDict(SimpleDict&& source) = default;
 
   SimpleDict(const std::string& key, const ValueType& value)
     : dict_({std::make_pair(key, value)})
@@ -52,9 +50,14 @@ public:
     update_keys();
   }
 
-  ThisType& operator=(const ThisType& other) = default;
+  SimpleDict& operator=(const SimpleDict& other) = default;
 
-  ThisType& operator=(ThisType&& source) = default;
+  SimpleDict& operator=(SimpleDict&& source)
+  {
+    dict_ = std::move(source.dict_);
+    keys_ = std::move(source.keys_);
+    return *this;
+  }
 
   const std::vector<std::string>& keys() const
   {
