@@ -67,14 +67,14 @@
 
 include(Hints)
 
-set(tbb_hints ${root_hints})
+set(tbb_hints $ENV{TBBROOT} ${TBBROOT} ${root_hints})
 set(tbb_lib_hints "")
 set(tbb_include_hints "")
 set(tbb_bin_hints "")
 list(APPEND tbb_hints "/opt/intel/tbb/" "$ENV{HOME}/intel/tbb/")
-append_to_each("${tbb_hints}" "lib/intel64" tbb_lib_hints)
-append_to_each("${tbb_hints}" "include/" tbb_include_hints)
-append_to_each("${tbb_hints}" "bin/" tbb_bin_hints)
+append_to_each("${tbb_hints}" "/lib/intel64" tbb_lib_hints)
+append_to_each("${tbb_hints}" "/include/" tbb_include_hints)
+append_to_each("${tbb_hints}" "/bin/" tbb_bin_hints)
 
 option(TBB_DEBUG "Turn on TBB debugging (modifies compiler flags and links against debug version of libraries)")
 
@@ -140,7 +140,7 @@ find_file(TBB_VARS_SH tbbvars.sh HINTS ${tbb_bin_hints} DOC "Path to tbbvars.sh 
 if(TBB_VARS_SH)
   parse_tbb_vars_sh()
 else() # Try to find TBB in standard include paths
-  find_path(TBB_INCLUDE_DIRS tbb/task_scheduler_init.h
+  find_path(TBB_INCLUDE_DIRS tbb/tbb.h
             PATHS ENV
                   CPATH
                   ${TBB_INCLUDE_DIR}
