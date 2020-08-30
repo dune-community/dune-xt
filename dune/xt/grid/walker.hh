@@ -20,7 +20,6 @@
 #if HAVE_TBB
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_reduce.h>
-#  include <tbb/tbb_stddef.h>
 #endif
 
 #include <dune/common/unused.hh>

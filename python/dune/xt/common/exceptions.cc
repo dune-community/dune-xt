@@ -15,7 +15,7 @@
 
 #include <boost/exception/all.hpp>
 
-#if HAVE_TBB
+#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
 #  include <tbb/tbb_exception.h>
 #endif
 
@@ -30,7 +30,7 @@ PYBIND11_MODULE(_common_exceptions, m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-#if HAVE_TBB
+#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
   static py::exception<tbb::tbb_exception> tbb_exc(m, "TbbError");
 #endif
   static py::exception<boost::exception> boost_exc(m, "BoostError");
@@ -44,7 +44,7 @@ PYBIND11_MODULE(_common_exceptions, m)
       boost_exc(boost::diagnostic_information_what(e));
     } catch (const Dune::Exception& e) {
       dune_exc(e.what());
-#if HAVE_TBB
+#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
     } catch (const tbb::tbb_exception& e) {
       tbb_exc((std::string(e.name()) + ": " + e.what()).c_str());
 #endif

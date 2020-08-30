@@ -200,7 +200,12 @@
   // https://www.threadingbuildingblocks.org/docs/help/reference/appendices/known_issues/linux_os.html. For older versions
   // we need the hack below.
   #define TBB_USE_GLIBCXX_VERSION 40902
-  #include "tbb/tbb_stddef.h"
+  // new versions of tbb do not have tbb_stddef.h anymore
+  #if __has_include("tbb.version.h")
+  #  include "tbb/version.h"
+  #else
+  #  include "tbb/tbb_stddef.h"
+  #endif
   #if TBB_INTERFACE_VERSION < 4400
     #include <tbb/tbb_config.h>
     #undef __TBB_CPP11_RVALUE_REF_PRESENT

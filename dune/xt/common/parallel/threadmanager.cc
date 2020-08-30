@@ -16,7 +16,6 @@
 
 #if HAVE_TBB
 #  include <tbb/concurrent_unordered_map.h>
-#  include <tbb/task_scheduler_init.h>
 #endif
 
 #include <boost/numeric/conversion/cast.hpp>
@@ -112,7 +111,6 @@ Dune::XT::Common::ThreadManager::ThreadManager()
   : max_threads_(default_max_threads())
 {
 #  if HAVE_EIGEN
-  // must be called before tbb threads are created via tbb::task_scheduler_init object ctor
   Eigen::initParallel();
   Eigen::setNbThreads(1);
 #  endif

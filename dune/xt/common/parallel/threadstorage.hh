@@ -252,7 +252,7 @@ private:
 /**
  * Previous implementation of PerThreadValue. This implementation suffers from the fact that it is not possible (or
  * at least we did not find a way yet) to set a hard upper limit on the number of threads TBB uses. Setting max_threads
- * via tbb::task_scheduler_init apparently only sets a soft limit on the number of threads. In addition, even if TBB
+ * via tbb::global_control apparently only sets a soft limit on the number of threads. In addition, even if TBB
  * uses only N threads at a time, it might be possible that a thread is destroyed and later in the program another
  * thread with a different id replaces it, which will then get a number greater than or equal to N in our
  * implementation (see ThreadManager::thread()). This occasionally leads to segfaults.

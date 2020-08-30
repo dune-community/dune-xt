@@ -24,7 +24,7 @@
 #include <vector>
 
 #if HAVE_TBB
-#include <tbb/tbb_stddef.h>
+#include <tbb/tbb.h>
 #endif
 
 #include <dune/xt/grid/type_traits.hh>

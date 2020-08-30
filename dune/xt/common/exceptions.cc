@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-#if HAVE_TBB
+#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
 #  include <tbb/tbb_exception.h>
 #endif
 
@@ -46,7 +46,7 @@ int handle_exception(const std::exception& exp)
 }
 
 
-#if HAVE_TBB
+#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
 
 
 int handle_exception(const tbb::tbb_exception& exp)
