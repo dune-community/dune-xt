@@ -26,6 +26,16 @@
 namespace Dune {
 namespace XT {
 namespace Common {
+
+
+// forward declarations
+template <class T, bool use_repr = false, typename anything = void>
+class Printer;
+
+template <class T>
+Printer<T, false> print(const T& /*value*/, const Configuration& /*param*/ = {});
+
+
 namespace internal {
 
 
@@ -222,7 +232,7 @@ public:
  * \sa print
  * \sa repr
  */
-template <class T, bool use_repr = false, typename anything = void>
+template <class T, bool use_repr, typename anything>
 class Printer : public internal::DefaultPrinter<T, use_repr>
 {
 public:
@@ -282,7 +292,7 @@ std::cout << complicated_object << std::endl;
  * \sa repr
  */
 template <class T>
-Printer<T, false> print(const T& value, const Configuration& param = {})
+Printer<T, false> print(const T& value, const Configuration& param)
 {
   return Printer<T, false>(value, param);
 }
