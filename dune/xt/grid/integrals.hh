@@ -18,6 +18,8 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/grid/common/entity.hh>
 
+#include <dune/xt/grid/type_traits.hh>
+
 namespace Dune {
 namespace XT {
 namespace Grid {
@@ -26,20 +28,17 @@ namespace Grid {
 /**
  * \brief Computes the integral of a given function over a given element [most general variant].
  */
-// We would have liked to use
-//   std::function<F(const FieldVector<typename Entity<0, d, G, E>::Geometry::ctype, d>& point_in_reference_element)>
-// (note the d), which did not compile for generic lambdas. Thus we use
-//   G::dimension
-// instead.
-template <class RangeType, int d, class G, template <int, int, class> class E>
-RangeType
-element_integral(const Entity<0, d, G, E>& element,
-                 std::function<RangeType(const FieldVector<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>&
-                                             point_in_reference_element)> function,
-                 const int polynomial_order_of_the_function)
+template <class RangeType, class Element>
+RangeType element_integral(
+    const Element& element,
+    std::function<RangeType(
+        const FieldVector<typename Element::Geometry::ctype, Element::dimension>& point_in_reference_element)> function,
+    const int polynomial_order_of_the_function)
 {
+  static_assert(XT::Grid::is_entity<Element>::value, "element has to be a codim-0 grid entity");
+  static_assert(Element::codimension == 0, "element has to be a codim-0 grid entity");
   RangeType result(0.), local_result;
-  for (auto&& quadrature_point : QuadratureRules<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>::rule(
+  for (auto&& quadrature_point : QuadratureRules<typename Element::Geometry::ctype, Element::dimension>::rule(
            element.type(), polynomial_order_of_the_function)) {
     const auto point_in_reference_element = quadrature_point.position();
     const auto quadrature_weight = quadrature_point.weight();
@@ -55,13 +54,13 @@ element_integral(const Entity<0, d, G, E>& element,
 /**
  * \brief Computes the integral of a given function over a given element [uses double as FieldType].
  */
-template <int d, class G, template <int, int, class> class E>
-double element_integral(const Entity<0, d, G, E>& element,
-                        std::function<double(const FieldVector<typename Entity<0, d, G, E>::Geometry::ctype,
-                                                               G::dimension>& point_in_reference_element)> function,
+template <class Element>
+double element_integral(const Element& element,
+                        std::function<double(const FieldVector<typename Element::Geometry::ctype, Element::dimension>&
+                                                 point_in_reference_element)> function,
                         const int polynomial_order_of_the_function)
 {
-  return element_integral<double>(element, function, polynomial_order_of_the_function);
+  return element_integral<double, Element>(element, function, polynomial_order_of_the_function);
 }
 
 
