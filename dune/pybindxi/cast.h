@@ -2606,23 +2606,18 @@ private:
   dict m_kwargs;
 };
 
-/// Collect only positional arguments for a Python function call
-template <return_value_policy policy, typename... Args, typename = enable_if_t<all_of<is_positional<Args>...>::value>>
-simple_collector<policy> collect_arguments(Args&&... args)
+template <return_value_policy policy, typename... Args>
+auto collect_arguments(Args&&... args)
 {
-  return simple_collector<policy>(std::forward<Args>(args)...);
-}
-
-/// Collect all arguments, including keywords and unpacking (only instantiated when needed)
-template <return_value_policy policy, typename... Args, typename = enable_if_t<!all_of<is_positional<Args>...>::value>>
-unpacking_collector<policy> collect_arguments(Args&&... args)
-{
-  // Following argument order rules for generalized unpacking according to PEP 448
-  static_assert(constexpr_last<is_positional, Args...>() < constexpr_first<is_keyword_or_ds, Args...>()
-                    && constexpr_last<is_s_unpacking, Args...>() < constexpr_first<is_ds_unpacking, Args...>(),
-                "Invalid function call: positional args must precede keywords and ** unpacking; "
-                "* unpacking must precede ** unpacking");
-  return unpacking_collector<policy>(std::forward<Args>(args)...);
+  if constexpr (all_of<is_positional<Args>...>::value) {
+    return simple_collector<policy>(std::forward<Args>(args)...);
+  } else {
+    static_assert(constexpr_last<is_positional, Args...>() < constexpr_first<is_keyword_or_ds, Args...>()
+                      && constexpr_last<is_s_unpacking, Args...>() < constexpr_first<is_ds_unpacking, Args...>(),
+                  "Invalid function call: positional args must precede keywords and ** unpacking; "
+                  "* unpacking must precede ** unpacking");
+    return unpacking_collector<policy>(std::forward<Args>(args)...);
+  }
 }
 
 template <typename Derived>
