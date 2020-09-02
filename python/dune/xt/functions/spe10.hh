@@ -32,8 +32,8 @@ namespace Functions {
 /**
  * \note We would like to drop the d template parameter and use either of
 \code
-static const           size_t d = G::dimension;
-static const constexpr size_t d = G::dimension;
+static constexpr           size_t d = G::dimension;
+static constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9 and we thus need to use G::dimension
  *       everywhere: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937

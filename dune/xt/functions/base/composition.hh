@@ -40,9 +40,9 @@ struct GeneralElementFunctionChooser
   using DomainType = typename GridFunctionInterfaceType::DomainType;
   using RangeType = typename GridFunctionInterfaceType::RangeType;
   using DerivativeRangeType = typename GridFunctionInterfaceType::DerivativeRangeType;
-  static const size_t domain_dim = GridFunctionInterfaceType::domain_dim;
-  static const size_t range_dim = GridFunctionInterfaceType::range_dim;
-  static const size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
+  static constexpr size_t domain_dim = GridFunctionInterfaceType::domain_dim;
+  static constexpr size_t range_dim = GridFunctionInterfaceType::range_dim;
+  static constexpr size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
 
   class ElementFunction : public ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>
   {
@@ -121,9 +121,9 @@ struct ElementFunctionForGlobalChooser
   using DomainType = typename InnerType::DomainType;
   using RangeType = typename OuterType::RangeType;
   using DerivativeRangeType = typename OuterType::DerivativeRangeType;
-  static const size_t domain_dim = GridFunctionInterfaceType::domain_dim;
-  static const size_t range_dim = GridFunctionInterfaceType::range_dim;
-  static const size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
+  static constexpr size_t domain_dim = GridFunctionInterfaceType::domain_dim;
+  static constexpr size_t range_dim = GridFunctionInterfaceType::range_dim;
+  static constexpr size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
 
   class ElementFunction : public ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>
   {
@@ -210,7 +210,7 @@ private:
 public:
   using typename BaseType::LocalFunctionType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

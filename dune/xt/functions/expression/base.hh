@@ -52,10 +52,10 @@ public:
   using ThisType = MathExpressionBase;
 
   using DomainFieldType = DomainField;
-  static const size_t domain_dim = domainDim;
+  static constexpr size_t domain_dim = domainDim;
 
   using RangeFieldType = RangeField;
-  static const size_t range_dim = rangeDim;
+  static constexpr size_t range_dim = rangeDim;
 
   //  MathExpressionBase(const std::string var, const std::string expr)
   //  {
@@ -231,10 +231,10 @@ public:
   using ThisType = DynamicMathExpressionBase;
 
   using DomainFieldType = D;
-  static const size_t maxDimDomain = max_d;
+  static constexpr size_t maxDimDomain = max_d;
 
   using RangeFieldType = R;
-  static const size_t range_dim = r;
+  static constexpr size_t range_dim = r;
 
   DynamicMathExpressionBase(const std::vector<std::string>& vars, const std::vector<std::string>& exprs)
   {

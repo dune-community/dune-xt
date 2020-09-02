@@ -28,9 +28,9 @@ struct ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
   using ScalarIndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, 1, 1>;

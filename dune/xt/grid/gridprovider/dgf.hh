@@ -54,7 +54,7 @@ class DgfGridProviderFactory
   static_assert(is_grid<GridType>::value, "");
 
 public:
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

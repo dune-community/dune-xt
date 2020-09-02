@@ -142,7 +142,7 @@ struct Layer<GridType, layer, backend, true>
 template <class GridLayerType>
 struct extract_layer_backend
 {
-  static const constexpr Backends value = Backends::view;
+  static constexpr Backends value = Backends::view;
 };
 
 

@@ -38,7 +38,7 @@ public:
   using RangeReturnType = typename BaseType::RangeReturnType;
   using SingleDerivativeRangeReturnType = typename BaseType::SingleDerivativeRangeReturnType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

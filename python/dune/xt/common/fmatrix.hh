@@ -31,8 +31,8 @@ struct FieldMatrix_type_caster
   using type = FieldMatrixImp;
   typedef typename type::value_type K;
   typedef typename type::row_type row_type;
-  static const int ROWS = type::rows;
-  static const int COLS = type::cols;
+  static constexpr int ROWS = type::rows;
+  static constexpr int COLS = type::cols;
   using value_conv = make_caster<K>;
   using row_conv = make_caster<row_type>;
 
@@ -91,8 +91,8 @@ struct type_caster<Dune::XT::Common::FieldMatrix<K, N, M>>
 {
   using type = Dune::XT::Common::FieldMatrix<K, N, M>;
   typedef typename type::row_type row_type;
-  static const int ROWS = type::rows;
-  static const int COLS = type::cols;
+  static constexpr int ROWS = type::rows;
+  static constexpr int COLS = type::cols;
   using value_conv = make_caster<K>;
   using row_conv = make_caster<row_type>;
 

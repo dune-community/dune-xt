@@ -18,9 +18,9 @@
 using namespace Dune;
 using namespace Dune::XT;
 
-static const size_t dim = 4;
-static const size_t rows = 4;
-static const size_t cols = 4;
+static constexpr size_t dim = 4;
+static constexpr size_t rows = 4;
+static constexpr size_t cols = 4;
 
 {% for T_NAME, M_TYPE, V_TYPE in config.testtypes %}
 struct MatrixViewTest_{{T_NAME}} : public ::testing::Test

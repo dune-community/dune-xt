@@ -33,15 +33,15 @@ class InverseFunctionHelper
                 "");
 
 public:
-  static const constexpr size_t d = FunctionType::d;
-  static const constexpr size_t r = FunctionType::r;
-  static const constexpr size_t rC = FunctionType::rC;
+  static constexpr size_t d = FunctionType::d;
+  static constexpr size_t r = FunctionType::r;
+  static constexpr size_t rC = FunctionType::rC;
   using R = typename FunctionType::R;
   using DomainType = Dune::FieldVector<double, d>;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
 
 public:
-  static const constexpr bool available = (FunctionType::rC == FunctionType::r);
+  static constexpr bool available = (FunctionType::rC == FunctionType::r);
 
   static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
   {

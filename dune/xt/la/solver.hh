@@ -28,7 +28,7 @@ namespace LA {
 namespace internal {
 
 
-static const constexpr size_t max_size_to_print = 5;
+static constexpr size_t max_size_to_print = 5;
 
 
 class SolverUtils

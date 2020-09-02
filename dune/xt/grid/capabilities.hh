@@ -25,12 +25,12 @@ template <class G>
 struct has_boundary_id
 {
 #if DUNE_VERSION_GTE(DUNE_GRID, 2, 6)
-  static const constexpr bool value = false;
+  static constexpr bool value = false;
 #else
 #  if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
-  static const constexpr bool value = true;
+  static constexpr bool value = true;
 #  else
-  static const constexpr bool value = false;
+  static constexpr bool value = false;
 #  endif
 #endif
 };
@@ -41,7 +41,7 @@ struct has_boundary_id
 template <int dim>
 struct has_boundary_id<UGGrid<dim>>
 {
-  static const constexpr bool value = false;
+  static constexpr bool value = false;
 };
 
 #endif // HAVE_DUNE_UGGRID || HAVE_UG

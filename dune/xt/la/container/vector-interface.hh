@@ -57,9 +57,9 @@ public:
   using DataType = ScalarType;
   using BackendType = BackendImp;
   using derived_type = derived_imp;
-  static const Backends backend_type = backend_imp;
-  static const Backends dense_matrix_type = dense_matrix_imp;
-  static const Backends sparse_matrix_type = sparse_matrix_imp;
+  static constexpr Backends backend_type = backend_imp;
+  static constexpr Backends dense_matrix_type = dense_matrix_imp;
+  static constexpr Backends sparse_matrix_type = sparse_matrix_imp;
 };
 
 
@@ -436,7 +436,7 @@ public:
    */
   virtual void isub(const derived_type& other)
   {
-    static const ScalarType neg_one(-1);
+    static constexpr ScalarType neg_one(-1);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -681,13 +681,13 @@ namespace internal {
 template <class VectorImp>
 struct VectorAbstractionBase
 {
-  static const bool is_vector = LA::is_vector<VectorImp>::value;
+  static constexpr bool is_vector = LA::is_vector<VectorImp>::value;
 
-  static const bool has_static_size = false;
+  static constexpr bool has_static_size = false;
 
-  static const size_t static_size = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_size = std::numeric_limits<size_t>::max();
 
-  static const bool is_contiguous = true;
+  static constexpr bool is_contiguous = true;
 
   using VectorType = VectorImp;
   using ScalarType = typename VectorImp::ScalarType;

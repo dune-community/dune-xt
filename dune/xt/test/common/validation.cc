@@ -35,7 +35,7 @@ struct ValidationTest : public testing::Test
 {
   typedef FIELD_TYPE T;
   typedef DefaultRNG<T> RNGType;
-  static const T eps;
+  static constexpr T eps;
   typedef VectorAbstraction<T>::S S;
   typedef std::numeric_limits<S> limit;
   const int eps_fac = 4;

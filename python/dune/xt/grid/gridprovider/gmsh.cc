@@ -25,7 +25,7 @@ using namespace Dune::XT::Grid::bindings;
 template <class G, class element_type>
 struct make_gmsh_grid
 {
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   static void bind(pybind11::module& m)
   {

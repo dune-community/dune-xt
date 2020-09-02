@@ -28,12 +28,12 @@ namespace Spe10 {
 namespace internal {
 
 
-static const size_t model2_x_elements = 60;
-static const size_t model2_y_elements = 220;
-static const size_t model2_z_elements = 85;
-static const double model_2_length_x = 1;
-static const double model_2_length_y = 3.667;
-static const double model_2_length_z = 1.417;
+static constexpr size_t model2_x_elements = 60;
+static constexpr size_t model2_y_elements = 220;
+static constexpr size_t model2_z_elements = 85;
+static constexpr double model_2_length_x = 1;
+static constexpr double model_2_length_y = 3.667;
+static constexpr double model_2_length_z = 1.417;
 
 } // namespace internal
 
@@ -63,9 +63,9 @@ public:
   using DomainType = typename LocalFunctionType::DomainType;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
-  static const constexpr size_t domain_dim = E::dimension;
+  static constexpr size_t domain_dim = E::dimension;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

@@ -420,7 +420,7 @@ template <class VectorImp>
 struct VectorAbstraction<LA::ConstVectorView<VectorImp>>
   : public LA::internal::VectorAbstractionBase<LA::ConstVectorView<VectorImp>>
 {
-  static const bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
+  static constexpr bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
 };
 
 
@@ -428,7 +428,7 @@ template <class VectorImp>
 struct VectorAbstraction<LA::VectorView<VectorImp>>
   : public LA::internal::VectorAbstractionBase<LA::VectorView<VectorImp>>
 {
-  static const bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
+  static constexpr bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
 };
 
 

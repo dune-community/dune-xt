@@ -242,9 +242,9 @@ struct QrHelper
   using VI = Common::VectorAbstraction<IndexVectorType>;
   using ScalarType = typename V::ScalarType;
   using W = typename Common::VectorAbstraction<DynamicVector<ScalarType>>;
-  static const bool is_row_major = (storage_layout == Common::StorageLayout::dense_row_major);
-  static const bool has_contiguous_storage = (storage_layout == Common::StorageLayout::dense_row_major)
-                                             || (storage_layout == Common::StorageLayout::dense_column_major);
+  static constexpr bool is_row_major = (storage_layout == Common::StorageLayout::dense_row_major);
+  static constexpr bool has_contiguous_storage = (storage_layout == Common::StorageLayout::dense_row_major)
+                                                 || (storage_layout == Common::StorageLayout::dense_column_major);
 
   static int lapacke_storage_layout()
   {

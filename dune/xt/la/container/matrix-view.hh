@@ -525,7 +525,7 @@ struct MatrixAbstraction<LA::ConstMatrixView<MatrixImp>>
   : public LA::internal::MatrixAbstractionBase<LA::ConstMatrixView<MatrixImp>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<MatrixImp>;
-  static const constexpr Common::StorageLayout storage_layout = MatrixAbstraction<MatrixImp>::storage_layout;
+  static constexpr Common::StorageLayout storage_layout = MatrixAbstraction<MatrixImp>::storage_layout;
 
   template <size_t rows = BaseType::static_rows,
             size_t cols = BaseType::static_cols,
@@ -539,7 +539,7 @@ struct MatrixAbstraction<LA::MatrixView<MatrixImp>>
   : public LA::internal::MatrixAbstractionBase<LA::MatrixView<MatrixImp>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<MatrixImp>;
-  static const constexpr Common::StorageLayout storage_layout = MatrixAbstraction<MatrixImp>::storage_layout;
+  static constexpr Common::StorageLayout storage_layout = MatrixAbstraction<MatrixImp>::storage_layout;
 
   template <size_t rows = BaseType::static_rows,
             size_t cols = BaseType::static_cols,

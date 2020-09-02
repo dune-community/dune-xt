@@ -60,7 +60,7 @@ public:
     return Common::MatrixAbstraction<MatrixType>::data(matrix_);
   }
 
-  static const Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout;
+  static constexpr Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout;
 
 private:
   MatrixType& matrix_;
@@ -80,7 +80,7 @@ public:
     return serialized_matrix_.get();
   }
 
-  static const Common::StorageLayout storage_layout = Common::StorageLayout::dense_column_major;
+  static constexpr Common::StorageLayout storage_layout = Common::StorageLayout::dense_column_major;
 
 private:
   std::unique_ptr<double[]> serialized_matrix_;

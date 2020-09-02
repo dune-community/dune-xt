@@ -19,7 +19,7 @@ using namespace Dune;
 using namespace Dune::XT;
 using namespace Dune::XT::Common;
 
-static const size_t dim = 4;
+static constexpr size_t dim = 4;
 
 {% for T_NAME, V_TYPE in config.testtypes %}
 struct VectorTest_{{T_NAME}} : public ::testing::Test

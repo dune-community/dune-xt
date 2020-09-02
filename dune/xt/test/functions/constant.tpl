@@ -25,9 +25,9 @@ struct ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testi
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using FunctionType = Functions::ConstantFunction<d, r, rC>;
 
@@ -179,9 +179,9 @@ struct ConstantGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using FunctionType = Functions::ConstantGridFunction<ElementType, r, rC>;
 
@@ -284,10 +284,10 @@ struct ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t s = 2;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t s = 2;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using FunctionType = Functions::ConstantFluxFunction<ElementType, s, r, rC>;
 

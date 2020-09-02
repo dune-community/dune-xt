@@ -530,17 +530,17 @@ namespace internal {
 template <class MatrixImp>
 struct MatrixAbstractionBase
 {
-  static const bool is_matrix = LA::is_matrix<MatrixImp>::value;
+  static constexpr bool is_matrix = LA::is_matrix<MatrixImp>::value;
 
-  static const bool has_static_size = false;
+  static constexpr bool has_static_size = false;
 
-  static const size_t static_rows = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_rows = std::numeric_limits<size_t>::max();
 
-  static const size_t static_cols = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_cols = std::numeric_limits<size_t>::max();
 
-  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
+  static constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
 
-  static const bool has_ostream = true;
+  static constexpr bool has_ostream = true;
 
   using MatrixType = typename std::conditional<is_matrix, MatrixImp, void>::type;
   using ScalarType = typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type;

@@ -48,11 +48,11 @@ struct VectorAbstractionBase
   using S = ScalarType;
   using R = RealType;
 
-  static const constexpr bool is_vector = true;
-  static const constexpr bool has_static_size = false;
-  static const constexpr size_t static_size = std::numeric_limits<size_t>::max();
-  static const constexpr bool has_ostream = false;
-  static const constexpr bool is_contiguous = false;
+  static constexpr bool is_vector = true;
+  static constexpr bool has_static_size = false;
+  static constexpr size_t static_size = std::numeric_limits<size_t>::max();
+  static constexpr bool has_ostream = false;
+  static constexpr bool is_contiguous = false;
 
   template <size_t SIZE = static_size, class FieldType = ScalarType>
   using VectorTypeTemplate = Vector;
@@ -117,11 +117,11 @@ struct VectorAbstraction
   typedef ScalarType S;
   typedef RealType R;
 
-  static const constexpr bool is_vector = false;
-  static const constexpr bool has_static_size = false;
-  static const constexpr size_t static_size = std::numeric_limits<size_t>::max();
-  static const constexpr bool has_ostream = true;
-  static const constexpr bool is_contiguous = false;
+  static constexpr bool is_vector = false;
+  static constexpr bool has_static_size = false;
+  static constexpr size_t static_size = std::numeric_limits<size_t>::max();
+  static constexpr bool has_ostream = true;
+  static constexpr bool is_contiguous = false;
 
   template <size_t SIZE = static_size, class FieldType = ScalarType>
   using VectorTypeTemplate = VecType;
@@ -167,8 +167,8 @@ struct VectorAbstraction<std::vector<T, Allocator>>
   : public internal::VectorAbstractionBase<std::vector<T, Allocator>, T>
   , public internal::HasSubscriptOperatorForVectorAbstraction<std::vector<T, Allocator>, T>
 {
-  static const constexpr bool is_contiguous = true;
-  static const constexpr bool static_size = std::numeric_limits<size_t>::max();
+  static constexpr bool is_contiguous = true;
+  static constexpr bool static_size = std::numeric_limits<size_t>::max();
 
   template <size_t SIZE = static_size>
   static inline std::vector<T, Allocator> create(const size_t sz, const T& val = T(0))
@@ -193,10 +193,10 @@ struct VectorAbstraction<std::array<K, SIZE>>
   , public internal::HasSubscriptOperatorForVectorAbstraction<std::array<K, SIZE>,
                                                               typename Dune::FieldTraits<K>::field_type>
 {
-  static const constexpr bool has_static_size = true;
-  static const constexpr size_t static_size = SIZE;
-  static const constexpr bool has_ostream = true; // provided in dune/common/streamoperators.hh
-  static const constexpr bool is_contiguous = true;
+  static constexpr bool has_static_size = true;
+  static constexpr size_t static_size = SIZE;
+  static constexpr bool has_ostream = true; // provided in dune/common/streamoperators.hh
+  static constexpr bool is_contiguous = true;
 
   template <size_t SZ = SIZE, class FieldType = K>
   using VectorTypeTemplate = std::array<FieldType, SZ>;
@@ -228,8 +228,8 @@ struct VectorAbstraction<Dune::DynamicVector<K>>
   , public internal::HasSubscriptOperatorForVectorAbstraction<Dune::DynamicVector<K>,
                                                               typename Dune::FieldTraits<K>::field_type>
 {
-  static const constexpr bool is_contiguous = true;
-  static const constexpr bool static_size = internal::VectorAbstractionBase<Dune::DynamicVector<K>, K>::static_size;
+  static constexpr bool is_contiguous = true;
+  static constexpr bool static_size = internal::VectorAbstractionBase<Dune::DynamicVector<K>, K>::static_size;
 
   template <size_t SIZE = static_size>
   static inline Dune::DynamicVector<K> create(const size_t sz, const K& val = K(0))
@@ -244,9 +244,9 @@ struct VectorAbstraction<Dune::FieldVector<K, SIZE>>
   , public internal::HasSubscriptOperatorForVectorAbstraction<Dune::FieldVector<K, SIZE>,
                                                               typename Dune::FieldTraits<K>::field_type>
 {
-  static const constexpr bool has_static_size = true;
-  static const constexpr size_t static_size = SIZE;
-  static const constexpr bool is_contiguous = true;
+  static constexpr bool has_static_size = true;
+  static constexpr size_t static_size = SIZE;
+  static constexpr bool is_contiguous = true;
 
   template <size_t SZ = SIZE, class Field = K>
   using VectorTypeTemplate = Dune::FieldVector<Field, SZ>;

@@ -215,8 +215,8 @@ struct is_element_function_helper
   DXTC_has_typedef_initialize_once(R);
   DXTC_has_static_member_initialize_once(r);
   DXTC_has_static_member_initialize_once(rC);
-  static const bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
-                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
+                                       && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
 }; // struct is_element_function_helper
 
 
@@ -227,8 +227,8 @@ struct is_function_helper
   DXTC_has_static_member_initialize_once(d);
   DXTC_has_static_member_initialize_once(r);
   DXTC_has_static_member_initialize_once(rC);
-  static const bool is_candidate = DXTC_has_typedef(R)<Tt>::value && DXTC_has_static_member(d)<Tt>::value
-                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(R)<Tt>::value && DXTC_has_static_member(d)<Tt>::value
+                                       && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
 }; // struct is_function_helper
 
 
@@ -239,8 +239,8 @@ struct is_grid_function_helper
   DXTC_has_typedef_initialize_once(R);
   DXTC_has_static_member_initialize_once(r);
   DXTC_has_static_member_initialize_once(rC);
-  static const bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
-                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
+                                       && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
 }; // struct is_grid_function_helper
 
 

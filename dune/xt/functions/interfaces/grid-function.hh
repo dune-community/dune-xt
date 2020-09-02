@@ -76,19 +76,19 @@ public:
 
   using ElementType = typename LocalFunctionType::ElementType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
-  static const constexpr size_t domain_dim = LocalFunctionType::domain_dim;
+  static constexpr size_t domain_dim = LocalFunctionType::domain_dim;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
-  static const constexpr size_t range_dim = LocalFunctionType::range_dim;
-  static const constexpr size_t range_dim_cols = LocalFunctionType::range_dim_cols;
+  static constexpr size_t range_dim = LocalFunctionType::range_dim;
+  static constexpr size_t range_dim_cols = LocalFunctionType::range_dim_cols;
 
   using E = typename LocalFunctionType::E;
   using D = typename LocalFunctionType::D;
-  static const constexpr size_t d = LocalFunctionType::d;
+  static constexpr size_t d = LocalFunctionType::d;
   using R = typename LocalFunctionType::R;
-  static const constexpr size_t r = LocalFunctionType::r;
-  static const constexpr size_t rC = LocalFunctionType::rC;
+  static constexpr size_t r = LocalFunctionType::r;
+  static constexpr size_t rC = LocalFunctionType::rC;
 
-  static const constexpr bool available = false;
+  static constexpr bool available = false;
 
   using DifferenceType = Functions::DifferenceGridFunction<ThisType, ThisType>;
   using SumType = Functions::SumGridFunction<ThisType, ThisType>;

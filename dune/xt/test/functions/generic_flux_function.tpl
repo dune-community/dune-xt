@@ -25,10 +25,10 @@ struct GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t s = {{s}};
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t s = {{s}};
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using GenericType = Functions::GenericFluxFunction<ElementType, s, r, rC>;
 

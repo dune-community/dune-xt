@@ -64,16 +64,16 @@
     template <typename TT_local, typename = void>                                                                      \
     struct helper                                                                                                      \
     {                                                                                                                  \
-      static const bool value = false;                                                                                 \
+      static constexpr bool value = false;                                                                             \
     };                                                                                                                 \
                                                                                                                        \
     template <typename TT_local>                                                                                       \
     struct helper<TT_local, typename void_<typename TT_local::tpdef>::type>                                            \
     {                                                                                                                  \
-      static const bool value = true;                                                                                  \
+      static constexpr bool value = true;                                                                              \
     };                                                                                                                 \
                                                                                                                        \
-    static const bool value = helper<T_local>::value;                                                                  \
+    static constexpr bool value = helper<T_local>::value;                                                              \
   }
 
 /**
@@ -84,7 +84,7 @@
 \code
 DXTC_has_typedef_initialize_once(Bar);
 \endcode
-  *        You can then check for Bar (this will give you a static const bool):
+  *        You can then check for Bar (this will give you a static constexpr bool):
 \code
 DXTC_has_typedef(Bar)< Foo >::value
 \endcode
@@ -107,7 +107,7 @@ DXTC_has_typedef(Bar)< Foo >::value
     template <class>                                                                                                   \
     static std::false_type helper(...);                                                                                \
                                                                                                                        \
-    static const bool value = decltype(helper<T_local>(0))::value;                                                     \
+    static constexpr bool value = decltype(helper<T_local>(0))::value;                                                 \
   }
 
 /**
@@ -118,7 +118,7 @@ DXTC_has_typedef(Bar)< Foo >::value
 \code
 DXTC_has_static_member_initialize_once(bar);
 \endcode
-  *        You can then check for bar (this will give you a static const bool):
+  *        You can then check for bar (this will give you a static constexpr bool):
 \code
 DXTC_has_static_member(bar)< Foo >::value
 \endcode
@@ -141,7 +141,7 @@ DXTC_has_static_member(bar)< Foo >::value
     template <class>                                                                                                   \
     static std::false_type helper(...);                                                                                \
                                                                                                                        \
-    static const bool value = decltype(helper<T_local>(0))::value;                                                     \
+    static constexpr bool value = decltype(helper<T_local>(0))::value;                                                 \
   }
 
 
@@ -153,7 +153,7 @@ DXTC_has_static_member(bar)< Foo >::value
 \code
 DXTC_has_method_initialize_once(bar);
 \endcode
-  *        You can then check for bar (this will give you a static const bool):
+  *        You can then check for bar (this will give you a static constexpr bool):
 \code
 DXTC_has_method(bar)< Foo >::value
 \endcode
@@ -253,9 +253,9 @@ std::string get_template_basename(const T&)
 template <class T>
 struct is_smart_ptr
 {
-  static const bool value = std::is_same<std::unique_ptr<typename T::element_type>, T>::value
-                            || std::is_same<std::shared_ptr<typename T::element_type>, T>::value
-                            || std::is_same<std::weak_ptr<typename T::element_type>, T>::value;
+  static constexpr bool value = std::is_same<std::unique_ptr<typename T::element_type>, T>::value
+                                || std::is_same<std::shared_ptr<typename T::element_type>, T>::value
+                                || std::is_same<std::weak_ptr<typename T::element_type>, T>::value;
   typedef T type;
 };
 
@@ -376,7 +376,7 @@ template <class M>
 struct is_matrix_helper
 {
   DXTC_has_static_member_initialize_once(is_matrix);
-  static const bool is_candidate = DXTC_has_static_member(is_matrix)<MatrixAbstraction<M>>::value;
+  static constexpr bool is_candidate = DXTC_has_static_member(is_matrix)<MatrixAbstraction<M>>::value;
 }; // struct is_matrix_helper
 
 
@@ -384,7 +384,7 @@ template <class V>
 struct is_vector_helper
 {
   DXTC_has_static_member_initialize_once(is_vector);
-  static const bool is_candidate = DXTC_has_static_member(is_vector)<VectorAbstraction<V>>::value;
+  static constexpr bool is_candidate = DXTC_has_static_member(is_vector)<VectorAbstraction<V>>::value;
 }; // struct is_vector_helper
 
 
@@ -394,7 +394,7 @@ struct is_vector_helper
 template <class T, bool candidate = internal::is_matrix_helper<T>::is_candidate>
 struct is_matrix
 {
-  static const bool value = MatrixAbstraction<T>::is_matrix;
+  static constexpr bool value = MatrixAbstraction<T>::is_matrix;
 };
 
 template <class T>
@@ -405,7 +405,7 @@ struct is_matrix<T, false> : public std::false_type
 template <class T, bool candidate = internal::is_vector_helper<T>::is_candidate>
 struct is_vector
 {
-  static const bool value = VectorAbstraction<T>::is_vector;
+  static constexpr bool value = VectorAbstraction<T>::is_vector;
 };
 
 template <class T>

@@ -98,7 +98,7 @@ public:
   using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

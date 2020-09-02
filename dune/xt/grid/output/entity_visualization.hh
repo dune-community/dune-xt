@@ -200,8 +200,8 @@ struct ElementVisualization
 
     double operator()(const Element& entity) const
     {
-      static const constexpr DirichletBoundary dirichlet_type{};
-      static const constexpr NeumannBoundary neumann_type{};
+      static constexpr DirichletBoundary dirichlet_type{};
+      static constexpr NeumannBoundary neumann_type{};
       for (auto intersectionIt = gridview_.ibegin(entity); intersectionIt != gridview_.iend(entity); ++intersectionIt) {
         if (type_ == "dirichlet") {
           return (boundaryInfo_.type(*intersectionIt) == dirichlet_type);

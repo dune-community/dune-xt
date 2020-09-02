@@ -34,7 +34,7 @@ class CutoffFunction
 {
   static_assert(XT::Grid::is_grid<G>::value, "");
   typedef typename G::ctype D;
-  static const size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   template <bool is_correct_dim = (d == 2), bool anything = false>
   struct helper

@@ -25,7 +25,7 @@ using namespace Dune::XT::Common;
 
 struct PeriodicViewTest : public testing::Test
 {
-  static const bool codim_iters_provided = CODIM_ITERS_PROVIDED;
+  static constexpr bool codim_iters_provided = CODIM_ITERS_PROVIDED;
   typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
@@ -39,7 +39,7 @@ struct PeriodicViewTest : public testing::Test
       PeriodicIntersectionIteratorType;
   typedef typename PeriodicGridViewType::Intersection PeriodicIntersectionType;
   typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
-  static const size_t dimDomain = GridViewType::dimension;
+  static constexpr size_t dimDomain = GridViewType::dimension;
 
   static constexpr int factorial(int n)
   {

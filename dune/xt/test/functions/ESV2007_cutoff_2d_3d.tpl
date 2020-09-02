@@ -28,9 +28,9 @@ struct ESV2007CutoffFunction_from_{{GRIDNAME}} : public ::testing::Test
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = d;
-  static const size_t rC = d;
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = d;
+  static constexpr size_t rC = d;
 
   using DiffusionType = Functions::ExpressionFunction<d, r, rC>;
   using FunctionType = Functions::ESV2007::CutoffFunction<ElementType>;

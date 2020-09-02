@@ -129,8 +129,8 @@ bind_combined_Function(pybind11::module& m)
   typedef double R;
   typedef FunctionInterface<d, lr, lrC, R> Left;
   typedef FunctionInterface<d, rr, rrC, R> Right;
-  static const size_t r = C::range_dim;
-  static const size_t rC = C::range_dim_cols;
+  static constexpr size_t r = C::range_dim;
+  static constexpr size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();
   const std::string op = internal::get_combined<Left, Right, comb>::doc();
   const std::string class_name =

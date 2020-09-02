@@ -33,8 +33,8 @@ typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
-  static const size_t griddim = T::value;
-  static const size_t level = 128;
+  static constexpr size_t griddim = T::value;
+  static constexpr size_t level = 128;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridLayerType;
   using EntityType = extract_entity_t<GridLayerType>;

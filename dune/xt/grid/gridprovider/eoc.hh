@@ -36,7 +36,7 @@ class LevelBasedEOCGridProvider : public GridProvider<GridImp>
 public:
   using typename BaseType::GridType;
 
-  static const constexpr Layers layer_type = Layers::level;
+  static constexpr Layers layer_type = Layers::level;
 
   LevelBasedEOCGridProvider(const Common::Configuration& grid_cfg, const size_t num_refs)
     : BaseType(GridProviderFactory<GridType>::create(grid_cfg).grid_ptr())
@@ -108,7 +108,7 @@ public:
   typedef typename GridProviderType::GridType GridType;
   typedef typename GridProviderType::LeafGridViewType LevelGridViewType;
 
-  static const constexpr Layers layer_type = Layers::leaf;
+  static constexpr Layers layer_type = Layers::leaf;
 
   LeafBasedEOCGridProvider(const Common::Configuration& grid_cfg, const size_t num_refs)
   {

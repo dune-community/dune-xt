@@ -63,7 +63,7 @@ template <class T>
 struct has_traits_helper
 {
   DXTC_has_typedef_initialize_once(Traits);
-  static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
 };
 
 

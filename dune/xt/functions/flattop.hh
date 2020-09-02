@@ -49,10 +49,10 @@ public:
   using DomainType = typename BaseType::DomainType;
   using RangeReturnType = typename BaseType::RangeReturnType;
 
-  static const size_t domain_dim = BaseType::domain_dim;
-  static const size_t range_dim = BaseType::range_dim;
+  static constexpr size_t domain_dim = BaseType::domain_dim;
+  static constexpr size_t range_dim = BaseType::range_dim;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

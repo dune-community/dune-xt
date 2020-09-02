@@ -59,7 +59,7 @@ class MinMaxCoordinateFunctor
   using BaseType = ElementFunctor<GV>;
 
   using D = typename GV::ctype;
-  static const constexpr size_t d = GV::dimension;
+  static constexpr size_t d = GV::dimension;
   using VectorType = FieldVector<D, d>;
   using Propagator = Common::ThreadResultPropagator<MinMaxCoordinateFunctor<GV>,
                                                     std::pair<VectorType, VectorType>,

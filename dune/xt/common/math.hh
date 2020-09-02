@@ -55,13 +55,13 @@ struct Epsilon
 template <class T>
 struct Epsilon<T, true>
 {
-  static const T value;
+  static constexpr T value = T(1);
 };
 
 template <class T>
 struct Epsilon<T, false>
 {
-  static const T value;
+  static constexpr T value = std::numeric_limits<T>::epsilon();
 };
 
 template <>
@@ -69,11 +69,6 @@ struct Epsilon<std::string, false>
 {
   static const std::string value;
 };
-
-template <class T>
-const T Epsilon<T, true>::value = T(1);
-template <class T>
-const T Epsilon<T, false>::value = std::numeric_limits<T>::epsilon();
 
 
 namespace internal {

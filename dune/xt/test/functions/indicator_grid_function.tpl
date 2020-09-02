@@ -26,9 +26,9 @@ struct IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   int dummy = 0;
   using FunctionType = Functions::IndicatorGridFunction<ElementType, r, rC>;
@@ -115,7 +115,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visuali
   FunctionType function({std::make_tuple(middle_1, upper_right, first_value)});
   function.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
-  FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value), 
+  FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value),
                                  std::make_tuple(middle_1, upper_right, second_value)});
   function_overlap.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
@@ -192,7 +192,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_eval
   DomainType upper_right(0.5);
   RangeType first_value(1.);
   RangeType second_value(2.);
-  FunctionType function_multiple({std::make_tuple(lower_left, middle, first_value), 
+  FunctionType function_multiple({std::make_tuple(lower_left, middle, first_value),
                                   std::make_tuple(middle, upper_right, second_value)});
   auto local_f_mult = function_multiple.local_function();
   for (auto&& element : elements(leaf_view)) {

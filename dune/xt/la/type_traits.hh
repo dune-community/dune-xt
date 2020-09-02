@@ -70,7 +70,7 @@ struct provides_backend_helper
 {
   DXTC_has_typedef_initialize_once(Traits);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<C>::value;
 }; // provides_backend_helper
 
 
@@ -80,7 +80,7 @@ struct provides_data_access_helper
   DXTC_has_typedef_initialize_once(Traits);
   DXTC_has_typedef_initialize_once(DataType);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(DataType)<C>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(DataType)<C>::value;
 }; // provides_data_access_helper
 
 
@@ -90,7 +90,7 @@ struct is_container_helper
   DXTC_has_typedef_initialize_once(Traits);
   DXTC_has_typedef_initialize_once(ScalarType);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
 }; // class is_container_helper
 
 
@@ -100,7 +100,7 @@ struct is_matrix_helper
   DXTC_has_typedef_initialize_once(Traits);
   DXTC_has_typedef_initialize_once(ScalarType);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<M>::value && DXTC_has_typedef(ScalarType)<M>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<M>::value && DXTC_has_typedef(ScalarType)<M>::value;
 }; // class is_matrix_helper
 
 
@@ -110,7 +110,7 @@ struct is_vector_helper
   DXTC_has_typedef_initialize_once(Traits);
   DXTC_has_typedef_initialize_once(ScalarType);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
 }; // class is_vector_helper
 
 
@@ -120,7 +120,7 @@ struct is_eigen_vector_helper
   DXTC_has_typedef_initialize_once(Traits);
   DXTC_has_typedef_initialize_once(ScalarType);
 
-  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
 }; // class is_eigen_vector_helper
 
 
@@ -129,7 +129,7 @@ struct is_istl_dense_vector_helper
 {
   DXTC_has_typedef_initialize_once(ScalarType);
 
-  static const bool is_candidate = DXTC_has_typedef(ScalarType)<C>::value;
+  static constexpr bool is_candidate = DXTC_has_typedef(ScalarType)<C>::value;
 }; // class is_istl_dense_vector_helper
 
 

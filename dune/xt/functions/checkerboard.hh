@@ -137,7 +137,7 @@ public:
   using RangeType = typename LocalFunctionType::RangeType;
   using DomainType = typename LocalFunctionType::DomainType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

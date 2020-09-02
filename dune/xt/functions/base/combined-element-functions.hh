@@ -41,7 +41,7 @@ public:
 
 private:
   using D = typename LeftType::D;
-  static const constexpr size_t d = LeftType::d;
+  static constexpr size_t d = LeftType::d;
 
 private:
   static_assert(std::is_same<typename RightType::E, E>::value, "");
@@ -62,73 +62,73 @@ private:
     class Dimension
     {
     public:
-      static const bool available = false;
+      static constexpr bool available = false;
     };
 
     template <size_t r_, size_t rC_, bool anything>
     class Dimension<CombinationType::difference, r_, rC_, r_, rC_, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = r_;
-      static const size_t rC = rC_;
+      static constexpr bool available = true;
+      static constexpr size_t r = r_;
+      static constexpr size_t rC = rC_;
     };
 
     template <size_t r_, size_t rC_, bool anything>
     class Dimension<CombinationType::sum, r_, rC_, r_, rC_, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = r_;
-      static const size_t rC = rC_;
+      static constexpr bool available = true;
+      static constexpr size_t r = r_;
+      static constexpr size_t rC = rC_;
     };
 
     template <bool anything>
     class Dimension<CombinationType::product, 1, 1, 1, 1, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = 1;
-      static const size_t rC = 1;
+      static constexpr bool available = true;
+      static constexpr size_t r = 1;
+      static constexpr size_t rC = 1;
     };
 
     template <size_t r_, size_t rC_, bool anything>
     class Dimension<CombinationType::product, r_, rC_, 1, 1, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = r_;
-      static const size_t rC = rC_;
+      static constexpr bool available = true;
+      static constexpr size_t r = r_;
+      static constexpr size_t rC = rC_;
     };
 
     template <size_t r_, size_t rC_, bool anything>
     class Dimension<CombinationType::product, 1, 1, r_, rC_, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = r_;
-      static const size_t rC = rC_;
+      static constexpr bool available = true;
+      static constexpr size_t r = r_;
+      static constexpr size_t rC = rC_;
     };
 
     template <size_t rL, size_t c, size_t rR, bool anything>
     class Dimension<CombinationType::product, rL, c, c, rR, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = rL;
-      static const size_t rC = rR;
+      static constexpr bool available = true;
+      static constexpr size_t r = rL;
+      static constexpr size_t rC = rR;
     };
 
   public:
-    static const bool available = Dimension<>::available;
-    static const size_t r = Dimension<>::r;
-    static const size_t rC = Dimension<>::rC;
+    static constexpr bool available = Dimension<>::available;
+    static constexpr size_t r = Dimension<>::r;
+    static constexpr size_t rC = Dimension<>::rC;
   }; // class dim_switch
 
 public:
-  static const size_t r = dim_switch<LeftType, RightType>::r;
-  static const size_t rC = dim_switch<LeftType, RightType>::rC;
-  static const bool available = dim_switch<LeftType, RightType>::available;
+  static constexpr size_t r = dim_switch<LeftType, RightType>::r;
+  static constexpr size_t rC = dim_switch<LeftType, RightType>::rC;
+  static constexpr bool available = dim_switch<LeftType, RightType>::available;
 
 private:
   using DomainType = typename ElementFunctionInterface<E, r, rC, R>::DomainType;

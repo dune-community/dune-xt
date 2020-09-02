@@ -38,7 +38,7 @@ class SelectCombined
 
 public:
   using D = typename LeftType::DomainFieldType;
-  static const size_t d = LeftType::domain_dim;
+  static constexpr size_t d = LeftType::domain_dim;
   using R = typename LeftType::RangeFieldType;
 
 private:
@@ -60,34 +60,34 @@ private:
     class Dimension<r_in, r_in, rC_in, rC_in, CombinationType::difference, anything>
     {
     public:
-      static const size_t r = r_in;
-      static const size_t rC = rC_in;
+      static constexpr size_t r = r_in;
+      static constexpr size_t rC = rC_in;
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
     class Dimension<r_in, r_in, rC_in, rC_in, CombinationType::sum, anything>
     {
     public:
-      static const size_t r = r_in;
-      static const size_t rC = rC_in;
+      static constexpr size_t r = r_in;
+      static constexpr size_t rC = rC_in;
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
     class Dimension<1, r_in, 1, rC_in, CombinationType::product, anything>
     {
     public:
-      static const size_t r = r_in;
-      static const size_t rC = rC_in;
+      static constexpr size_t r = r_in;
+      static constexpr size_t rC = rC_in;
     };
 
   public:
-    static const size_t r = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::r;
-    static const size_t rC = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::rC;
+    static constexpr size_t r = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::r;
+    static constexpr size_t rC = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::rC;
   }; // class Choose
 
 public:
-  static const size_t r = Choose<LeftType, RightType>::r;
-  static const size_t rC = Choose<LeftType, RightType>::rC;
+  static constexpr size_t r = Choose<LeftType, RightType>::r;
+  static constexpr size_t rC = Choose<LeftType, RightType>::rC;
 
   using DomainType = typename FunctionInterface<d, r, rC, R>::DomainType;
   using RangeReturnType = typename RightType::RangeReturnType;

@@ -432,9 +432,9 @@ struct VectorAbstraction<Dune::XT::Common::FieldVector<K, SIZE>>
   , public internal::HasSubscriptOperatorForVectorAbstraction<Dune::XT::Common::FieldVector<K, SIZE>,
                                                               typename Dune::FieldTraits<K>::field_type>
 {
-  static const bool has_static_size = true;
-  static const size_t static_size = SIZE;
-  static const bool is_contiguous = true;
+  static constexpr bool has_static_size = true;
+  static constexpr size_t static_size = SIZE;
+  static constexpr bool is_contiguous = true;
 
   template <size_t SZ = SIZE, class Field = K>
   using VectorTypeTemplate = Dune::XT::Common::FieldVector<Field, SZ>;

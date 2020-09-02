@@ -47,7 +47,7 @@ public:
   typedef GridProvider<GridImp> ThisType;
 
   typedef GridImp GridType;
-  static const size_t dimDomain = GridImp::dimension;
+  static constexpr size_t dimDomain = GridImp::dimension;
   typedef typename GridType::ctype DomainFieldType;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef typename GridType::template Codim<0>::Entity EntityType;

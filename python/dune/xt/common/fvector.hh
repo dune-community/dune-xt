@@ -29,7 +29,7 @@ struct FieldVector_type_caster
 {
   using type = FieldVectorImp;
   typedef typename type::value_type K;
-  static const int SZ = type::dimension;
+  static constexpr int SZ = type::dimension;
   using value_conv = make_caster<K>;
 
   bool load(handle src, bool convert)
@@ -77,7 +77,7 @@ struct FieldVector_type_caster<FieldVectorImp, false>
 {
   using type = FieldVectorImp;
   typedef typename type::value_type K;
-  static const int SZ = type::dimension;
+  static constexpr int SZ = type::dimension;
   using value_conv = make_caster<K>;
 
   bool load(handle src, bool convert)

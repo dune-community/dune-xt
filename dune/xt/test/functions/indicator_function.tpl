@@ -26,9 +26,9 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
-  static const constexpr size_t d = GridType::dimension;
-  static const size_t r = {{r}};
-  static const size_t rC = {{rC}};
+  static constexpr size_t d = GridType::dimension;
+  static constexpr size_t r = {{r}};
+  static constexpr size_t rC = {{rC}};
 
   using FunctionType = Functions::IndicatorFunction<d, r, rC>;
 
@@ -275,8 +275,8 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   // overlapping indicators
   DomainType lower_left_ol(-0.5);
   DomainType upper_right_ol(0);
-  FunctionType function_overlap({std::make_tuple(lower_left, middle, first_value), 
-                                 std::make_tuple(middle, upper_right, second_value), 
+  FunctionType function_overlap({std::make_tuple(lower_left, middle, first_value),
+                                 std::make_tuple(middle, upper_right, second_value),
                                  std::make_tuple(lower_left_ol, upper_right_ol, first_value)});
   const auto& localizable_function_ol = function_overlap.template as_grid_function<ElementType>();
   auto local_f_ol = localizable_function_ol.local_function();

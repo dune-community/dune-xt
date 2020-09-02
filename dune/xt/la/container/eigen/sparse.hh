@@ -554,7 +554,7 @@ struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>;
 
-  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csr;
+  static constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csr;
 
   template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
   using MatrixTypeTemplate = LA::EigenRowMajorSparseMatrix<FieldType>;

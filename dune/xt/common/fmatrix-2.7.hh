@@ -236,8 +236,8 @@ public:
 template <class K>
 class FieldMatrix<K, 1, 1> : public Dune::FieldMatrix<K, 1, 1>
 {
-  static const int ROWS = 1;
-  static const int COLS = 1;
+  static constexpr int ROWS = 1;
+  static constexpr int COLS = 1;
   using BaseType = Dune::FieldMatrix<K, ROWS, COLS>;
   using ThisType = FieldMatrix;
 
@@ -672,15 +672,15 @@ struct MatrixAbstraction<Dune::XT::Common::FieldMatrix<K, N, M>>
   template <size_t rows = N, size_t cols = M, class FieldType = K>
   using MatrixTypeTemplate = Dune::XT::Common::FieldMatrix<FieldType, rows, cols>;
 
-  static const bool is_matrix = true;
+  static constexpr bool is_matrix = true;
 
-  static const bool has_static_size = true;
+  static constexpr bool has_static_size = true;
 
-  static const size_t static_rows = N;
+  static constexpr size_t static_rows = N;
 
-  static const size_t static_cols = M;
+  static constexpr size_t static_cols = M;
 
-  static const constexpr StorageLayout storage_layout = StorageLayout::dense_row_major;
+  static constexpr StorageLayout storage_layout = StorageLayout::dense_row_major;
 
   static constexpr bool has_ostream = true;
 
@@ -748,18 +748,18 @@ struct MatrixAbstraction<Dune::XT::Common::BlockedFieldMatrix<K, num_blocks, blo
   typedef ScalarType S;
   typedef RealType R;
 
-  static const bool is_matrix = true;
+  static constexpr bool is_matrix = true;
 
-  static const bool has_static_size = true;
+  static constexpr bool has_static_size = true;
 
-  static const size_t static_rows = MatrixType::num_rows;
+  static constexpr size_t static_rows = MatrixType::num_rows;
 
-  static const size_t static_cols = MatrixType::num_cols;
+  static constexpr size_t static_cols = MatrixType::num_cols;
 
   template <size_t rows = static_rows, size_t cols = static_cols, class FieldType = K>
   using MatrixTypeTemplate = Dune::XT::Common::BlockedFieldMatrix<FieldType, rows / block_rows, block_rows, block_cols>;
 
-  static const constexpr StorageLayout storage_layout = StorageLayout::other;
+  static constexpr StorageLayout storage_layout = StorageLayout::other;
 
   static constexpr bool has_ostream = true;
 
@@ -827,8 +827,8 @@ typename std::enable_if<is_matrix<M>::value && MatrixAbstraction<M>::has_static_
                                                     MatrixAbstraction<M>::static_cols>>>::type
 make_field_container_ptr(const M& mat)
 {
-  static const size_t rows = MatrixAbstraction<M>::static_rows;
-  static const size_t cols = MatrixAbstraction<M>::static_cols;
+  static constexpr size_t rows = MatrixAbstraction<M>::static_rows;
+  static constexpr size_t cols = MatrixAbstraction<M>::static_cols;
   auto ret = std::make_unique<FieldMatrix<typename MatrixAbstraction<M>::S, rows, cols>>;
   for (size_t ii = 0; ii < rows; ++ii)
     for (size_t jj = 0; jj < cols; ++jj)
@@ -844,8 +844,8 @@ typename std::enable_if<is_matrix<M>::value && MatrixAbstraction<M>::has_static_
                                     MatrixAbstraction<M>::static_cols>>::type
 make_field_container(const M& mat)
 {
-  static const size_t rows = MatrixAbstraction<M>::static_rows;
-  static const size_t cols = MatrixAbstraction<M>::static_cols;
+  static constexpr size_t rows = MatrixAbstraction<M>::static_rows;
+  static constexpr size_t cols = MatrixAbstraction<M>::static_cols;
   FieldMatrix<typename MatrixAbstraction<M>::S, rows, cols> ret;
   for (size_t ii = 0; ii < rows; ++ii)
     for (size_t jj = 0; jj < cols; ++jj)

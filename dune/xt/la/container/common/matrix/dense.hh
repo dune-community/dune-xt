@@ -584,7 +584,7 @@ struct MatrixAbstraction<LA::CommonDenseMatrix<T, layout>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>;
 
-  static const constexpr Common::StorageLayout storage_layout = layout;
+  static constexpr Common::StorageLayout storage_layout = layout;
 
   template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
   using MatrixTypeTemplate = LA::CommonDenseMatrix<FieldType, layout>;

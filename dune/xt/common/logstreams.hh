@@ -51,7 +51,7 @@ class SuspendableStrBuffer : public std::basic_stringbuf<char, std::char_traits<
 
 public:
   typedef int PriorityType;
-  static const PriorityType default_suspend_priority = 0;
+  static constexpr PriorityType default_suspend_priority = 0;
 
   SuspendableStrBuffer(int loglevel, int& logflags);
 
@@ -176,7 +176,7 @@ class LogStream
 
 public:
   typedef SuspendableStrBuffer::PriorityType PriorityType;
-  static const PriorityType default_suspend_priority = SuspendableStrBuffer::default_suspend_priority;
+  static constexpr PriorityType default_suspend_priority = SuspendableStrBuffer::default_suspend_priority;
 
   explicit LogStream(SuspendableStrBuffer*&& buffer)
     : StorageBaseType(std::move(buffer))

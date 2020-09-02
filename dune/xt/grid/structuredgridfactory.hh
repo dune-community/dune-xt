@@ -55,7 +55,7 @@ class StructuredGridFactory<SPGrid<ct, dim, Refinement, Comm>>
 {
   typedef SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
-  static const int dimworld = GridType::dimensionworld;
+  static constexpr int dimworld = GridType::dimensionworld;
 
 public:
   /** \brief Create a structured cube grid

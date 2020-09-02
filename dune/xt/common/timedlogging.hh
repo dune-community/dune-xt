@@ -205,10 +205,10 @@ private:
 class TimedLogging
 {
 public:
-  static const ssize_t default_max_info_level = -1;
-  static const ssize_t default_max_debug_level = -1;
-  static const bool default_enable_warnings = true;
-  static const bool default_enable_colors = true;
+  static constexpr ssize_t default_max_info_level = -1;
+  static constexpr ssize_t default_max_debug_level = -1;
+  static constexpr bool default_enable_warnings = true;
+  static constexpr bool default_enable_colors = true;
 
   static const std::string default_info_color()
   {

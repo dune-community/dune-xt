@@ -55,7 +55,7 @@ template <int dim, class Coordinates>
 class GmshGridProviderFactory<Dune::YaspGrid<dim, Coordinates>>
 {
 public:
-  static const bool available = false;
+  static constexpr bool available = false;
 
   static std::string static_id()
   {
@@ -79,7 +79,7 @@ template <class GridType>
 class GmshGridProviderFactory
 {
 public:
-  static const bool available = false;
+  static constexpr bool available = false;
 
   static std::string static_id()
   {

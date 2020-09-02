@@ -194,7 +194,7 @@ static void val_compare_eq(const std::string& aa, const std::string& bb)
 template <class T>
 struct ConfigTest : public testing::Test
 {
-  static const int count = 2;
+  static constexpr int count = 2;
   DefaultRNG<T> rng;
   RandomStrings key_gen;
   // std::array is not assignable from list_of it seems. Don't make the following two arrays const (triggers boost/intel

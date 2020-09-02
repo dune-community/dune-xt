@@ -16,7 +16,7 @@
 using namespace Dune;
 using namespace Dune::XT;
 
-static const size_t dim = 4;
+static constexpr size_t dim = 4;
 {% for NAME,CIMP in config.container %}
 struct ContainerTest{{NAME}} : public ::testing::Test
 {

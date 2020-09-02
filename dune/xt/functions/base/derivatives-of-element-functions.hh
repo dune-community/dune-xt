@@ -35,7 +35,7 @@ public:
 
 private:
   using D = typename ElementFunctionType::D;
-  static const constexpr size_t d = ElementFunctionType::d;
+  static constexpr size_t d = ElementFunctionType::d;
 
 private:
   template <class F>
@@ -45,37 +45,37 @@ private:
     class Dimension
     {
     public:
-      static const bool available = false;
+      static constexpr bool available = false;
     };
 
     template <size_t d, bool anything>
     class Dimension<d, d, 1, DerivativeType::divergence, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = 1;
-      static const size_t rC = 1;
+      static constexpr bool available = true;
+      static constexpr size_t r = 1;
+      static constexpr size_t rC = 1;
     };
 
     template <size_t d, bool anything>
     class Dimension<d, 1, 1, DerivativeType::gradient, anything>
     {
     public:
-      static const bool available = true;
-      static const size_t r = d;
-      static const size_t rC = 1;
+      static constexpr bool available = true;
+      static constexpr size_t r = d;
+      static constexpr size_t rC = 1;
     };
 
   public:
-    static const bool available = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::available;
-    static const size_t r = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::r;
-    static const size_t rC = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::rC;
+    static constexpr bool available = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::available;
+    static constexpr size_t r = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::r;
+    static constexpr size_t rC = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::rC;
   }; // class DerivativeElementFunctionHelper
 
 public:
-  static const bool available = DimSwitch<ElementFunctionType>::available;
-  static const size_t r = DimSwitch<ElementFunctionType>::r;
-  static const size_t rC = DimSwitch<ElementFunctionType>::rC;
+  static constexpr bool available = DimSwitch<ElementFunctionType>::available;
+  static constexpr size_t r = DimSwitch<ElementFunctionType>::r;
+  static constexpr size_t rC = DimSwitch<ElementFunctionType>::rC;
 
   using DomainType = typename ElementFunctionInterface<E, r, rC, R>::DomainType;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;

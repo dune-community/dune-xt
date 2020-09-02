@@ -53,17 +53,17 @@ struct MatrixAbstraction
   template <size_t rows = 0, size_t cols = 0, class FieldType = ScalarType>
   using MatrixTypeTemplate = MatrixType;
 
-  static const bool is_matrix = false;
+  static constexpr bool is_matrix = false;
 
-  static const bool has_static_size = false;
+  static constexpr bool has_static_size = false;
 
-  static const size_t static_rows = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_rows = std::numeric_limits<size_t>::max();
 
-  static const size_t static_cols = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_cols = std::numeric_limits<size_t>::max();
 
-  static const constexpr StorageLayout storage_layout = XT::Common::StorageLayout::other;
+  static constexpr StorageLayout storage_layout = XT::Common::StorageLayout::other;
 
-  static const bool has_ostream = false;
+  static constexpr bool has_ostream = false;
 
   template <class SparsityPatternType = FullPattern>
   static inline /*MatrixType*/ void create(const size_t /*rows*/,
@@ -138,17 +138,17 @@ struct MatrixAbstraction<Dune::DynamicMatrix<K>>
   template <size_t rows = 0, size_t cols = 0, class FieldType = K>
   using MatrixTypeTemplate = DynamicMatrix<K>;
 
-  static const bool is_matrix = true;
+  static constexpr bool is_matrix = true;
 
-  static const bool has_static_size = false;
+  static constexpr bool has_static_size = false;
 
-  static const size_t static_rows = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_rows = std::numeric_limits<size_t>::max();
 
-  static const size_t static_cols = std::numeric_limits<size_t>::max();
+  static constexpr size_t static_cols = std::numeric_limits<size_t>::max();
 
-  static const constexpr StorageLayout storage_layout = StorageLayout::other;
+  static constexpr StorageLayout storage_layout = StorageLayout::other;
 
-  static const bool has_ostream = true;
+  static constexpr bool has_ostream = true;
 
   template <class SparsityPatternType = FullPattern>
   static inline MatrixType create(const size_t rows,
@@ -216,17 +216,17 @@ struct MatrixAbstraction<Dune::FieldMatrix<K, N, M>>
   template <size_t rows = N, size_t cols = M, class FieldType = K>
   using MatrixTypeTemplate = Dune::FieldMatrix<FieldType, rows, cols>;
 
-  static const bool is_matrix = true;
+  static constexpr bool is_matrix = true;
 
-  static const bool has_static_size = true;
+  static constexpr bool has_static_size = true;
 
-  static const size_t static_rows = N;
+  static constexpr size_t static_rows = N;
 
-  static const size_t static_cols = M;
+  static constexpr size_t static_cols = M;
 
-  static const constexpr StorageLayout storage_layout = StorageLayout::dense_row_major;
+  static constexpr StorageLayout storage_layout = StorageLayout::dense_row_major;
 
-  static const bool has_ostream = true;
+  static constexpr bool has_ostream = true;
 
   template <class SparsityPatternType = FullPattern>
   static inline MatrixType create(const size_t rows,

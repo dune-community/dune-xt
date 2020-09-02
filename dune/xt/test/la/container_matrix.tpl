@@ -17,7 +17,7 @@
 using namespace Dune;
 using namespace Dune::XT;
 
-static const size_t dim = 4;
+static constexpr size_t dim = 4;
 
 {% for T_NAME, M_TYPE, V_TYPE in config.testtypes %}
 struct MatrixTest_{{T_NAME}} : public ::testing::Test

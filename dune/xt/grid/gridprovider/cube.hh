@@ -69,20 +69,20 @@ class CubeGridProviderFactory
   template <typename G>
   struct ElementVariant
   {
-    static const int id = 2;
+    static constexpr int id = 2;
   };
 
   template <int dim, class Coords>
   struct ElementVariant<Dune::YaspGrid<dim, Coords>>
   {
-    static const int id = 1;
+    static constexpr int id = 1;
   };
 
 #if HAVE_DUNE_SPGRID
   template <class ct, int dim, template <int> class Refinement, class Comm>
   struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
   {
-    static const int id = 1;
+    static constexpr int id = 1;
   };
 #endif
 
@@ -91,19 +91,19 @@ class CubeGridProviderFactory
   template <int dimGrid, int dimWorld, class MpiCommImp>
   struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming, MpiCommImp>>
   {
-    static const int id = 1;
+    static constexpr int id = 1;
   };
 
   template <int dimGrid, int dimWorld, class MpiCommImp>
   struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming, MpiCommImp>>
   {
-    static const int id = 1;
+    static constexpr int id = 1;
   };
 
 #endif // HAVE_DUNE_ALUGRID
 
 public:
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {
@@ -123,7 +123,7 @@ public:
                                        const std::array<unsigned int, GridType::dimension>& overlap_size,
                                        MPIHelper::MPICommunicator mpi_comm)
   {
-    static const int variant = ElementVariant<GridType>::id;
+    static constexpr int variant = ElementVariant<GridType>::id;
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
     for (unsigned int dd = 0; dd < GridType::dimension; ++dd) {
       if (!(lower_left[dd] < upper_right[dd]))
@@ -174,7 +174,7 @@ public:
 
   static GridProvider<GridType> create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
   {
-    static const size_t d = GridType::dimension;
+    static constexpr size_t d = GridType::dimension;
     auto overlap_size =
         cfg.has_key("overlap_size")
             ? cfg.template get<std::vector<unsigned int>>("overlap_size")

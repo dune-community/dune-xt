@@ -55,7 +55,7 @@ struct TestRunner
 template <int i>
 struct Int
 {
-  static const int value = i;
+  static constexpr int value = i;
 };
 
 

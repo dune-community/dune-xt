@@ -114,7 +114,7 @@ class FixedMap
 {
 public:
   typedef std::pair<key_imp, T> value_type;
-  static const std::size_t N;
+  static constexpr std::size_t N = nin;
 
 private:
   typedef boost::array<value_type, nin> MapType;
@@ -232,8 +232,6 @@ private:
   MapType map_;
 };
 
-template <class K, class T, std::size_t nin>
-const std::size_t FixedMap<K, T, nin>::N = nin;
 
 } // namespace Common
 } // namespace XT

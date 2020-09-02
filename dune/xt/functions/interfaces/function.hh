@@ -75,16 +75,16 @@ class FunctionInterface : public Common::ParametricInterface
 
 public:
   using DomainFieldType = double;
-  static const constexpr size_t domain_dim = domainDim;
+  static constexpr size_t domain_dim = domainDim;
   using RangeFieldType = RangeField;
-  static const constexpr size_t range_dim = rangeDim;
-  static const constexpr size_t range_dim_cols = rangeDimCols;
+  static constexpr size_t range_dim = rangeDim;
+  static constexpr size_t range_dim_cols = rangeDimCols;
 
   using D = DomainFieldType;
-  static const constexpr size_t d = domain_dim;
+  static constexpr size_t d = domain_dim;
   using R = RangeFieldType;
-  static const constexpr size_t r = range_dim;
-  static const constexpr size_t rC = range_dim_cols;
+  static constexpr size_t r = range_dim;
+  static constexpr size_t rC = range_dim_cols;
 
   using DomainType = Dune::FieldVector<D, d>;
 

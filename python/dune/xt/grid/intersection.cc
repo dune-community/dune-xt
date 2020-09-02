@@ -36,7 +36,7 @@ class Intersection
   using G = XT::Grid::extract_grid_t<GV>;
   using I = XT::Grid::extract_intersection_t<GV>;
   using D = typename G::ctype;
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
 public:
   using type = I;

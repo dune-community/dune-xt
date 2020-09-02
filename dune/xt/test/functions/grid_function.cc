@@ -24,9 +24,9 @@ using namespace Dune::XT::Functions;
 
 using G = CUBEGRID_2D;
 using E = XT::Grid::extract_entity_t<G>;
-static const constexpr size_t d = G::dimension;
-static const constexpr size_t r = 2;
-static const constexpr size_t rC = 3;
+static constexpr size_t d = G::dimension;
+static constexpr size_t r = 2;
+static constexpr size_t rC = 3;
 
 // from here on, the code should work for any E and d to allow for grid parametrization
 

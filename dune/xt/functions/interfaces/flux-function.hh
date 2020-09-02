@@ -57,22 +57,22 @@ public:
   using StateType = typename LocalFunctionType::StateType;
   using DynamicStateType = typename LocalFunctionType::DynamicStateType;
   using DomainType = typename LocalFunctionType::DomainType;
-  static const constexpr size_t domain_dim = LocalFunctionType::domain_dim;
-  static const constexpr size_t state_dim = LocalFunctionType::state_dim;
+  static constexpr size_t domain_dim = LocalFunctionType::domain_dim;
+  static constexpr size_t state_dim = LocalFunctionType::state_dim;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
-  static const constexpr size_t range_dim = LocalFunctionType::range_dim;
-  static const constexpr size_t range_dim_cols = LocalFunctionType::range_dim_cols;
+  static constexpr size_t range_dim = LocalFunctionType::range_dim;
+  static constexpr size_t range_dim_cols = LocalFunctionType::range_dim_cols;
 
   using E = typename LocalFunctionType::E;
   using D = typename LocalFunctionType::D;
-  static const constexpr size_t d = LocalFunctionType::d;
-  static const constexpr size_t s = LocalFunctionType::s;
+  static constexpr size_t d = LocalFunctionType::d;
+  static constexpr size_t s = LocalFunctionType::s;
   using R = typename LocalFunctionType::R;
   using S = typename LocalFunctionType::S;
-  static const constexpr size_t r = LocalFunctionType::r;
-  static const constexpr size_t rC = LocalFunctionType::rC;
+  static constexpr size_t r = LocalFunctionType::r;
+  static constexpr size_t rC = LocalFunctionType::rC;
 
-  static const constexpr bool available = false;
+  static constexpr bool available = false;
 
   FluxFunctionInterface(const Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)

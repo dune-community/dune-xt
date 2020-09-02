@@ -58,7 +58,7 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {
@@ -144,7 +144,7 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {

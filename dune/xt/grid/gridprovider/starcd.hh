@@ -62,10 +62,10 @@ static inline Common::Configuration starcd_gridprovider_default_config()
 template <class GridType>
 class StarCDGridProviderFactory
 {
-  static const size_t dimDomain = GridType::dimension;
+  static constexpr size_t dimDomain = GridType::dimension;
 
 public:
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static const std::string static_id()
   {

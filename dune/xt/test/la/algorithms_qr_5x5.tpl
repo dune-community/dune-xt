@@ -42,7 +42,7 @@ struct QrTest_{{T_NAME}} : public ::testing::Test
   typedef XT::Common::VectorAbstraction<RhsType> RhsV;
   typedef XT::Common::VectorAbstraction<SolutionType> SolV;
 
-  static const size_t dim = 5;
+  static constexpr size_t dim = 5;
 
   QrTest_{{T_NAME}}()
     : matrix_(create<MatrixType>({ {17, 24,  1,  8, 15},  // Matlab's magic(5) matrix

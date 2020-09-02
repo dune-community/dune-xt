@@ -256,8 +256,8 @@ struct get_grid_combined<L, R, CombinationType::product>
 /**
  * \note We would like to drop the d template paremter and use either of
 \code
-static const           size_t d = G::dimension;
-static const constexpr size_t d = G::dimension;
+static constexpr           size_t d = G::dimension;
+static constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
@@ -282,8 +282,8 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
   typedef double R;
   typedef GridFunctionInterface<E, lr, lrC, R> Left;
   typedef GridFunctionInterface<E, rr, rrC, R> Right;
-  static const size_t r = C::range_dim;
-  static const size_t rC = C::range_dim_cols;
+  static constexpr size_t r = C::range_dim;
+  static constexpr size_t rC = C::range_dim_cols;
   const std::string id = internal::get_grid_combined<Left, Right, comb>::id();
   const std::string op = internal::get_grid_combined<Left, Right, comb>::doc();
   const std::string class_name = id + "__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
@@ -302,8 +302,8 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 /**
  * \note We would like to drop the d template paremter and use either of
 \code
-static const           size_t d = G::dimension;
-static const constexpr size_t d = G::dimension;
+static constexpr           size_t d = G::dimension;
+static constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */

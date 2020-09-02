@@ -17,7 +17,7 @@
 using namespace Dune;
 using namespace Dune::XT;
 
-static const size_t dim = 4;
+static constexpr size_t dim = 4;
 
 {% for T_NAME, V_TYPE in config.testtypes %}
 struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test

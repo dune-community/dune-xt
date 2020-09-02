@@ -40,7 +40,7 @@ template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
 class CheckerboardFunction
 {
   using GP = XT::Grid::GridProvider<G>;
-  static const size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
 public:
   using type = Functions::CheckerboardFunction<E, r, rC, R>;
@@ -111,7 +111,7 @@ struct CheckerboardFunction_for_all_grids
   using G = typename GridTypes::head_type;
   using GV = typename G::LeafGridView;
   using E = Dune::XT::Grid::extract_entity_t<GV>;
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   static void bind(pybind11::module& m)
   {

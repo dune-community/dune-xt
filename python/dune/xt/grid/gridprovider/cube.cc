@@ -32,7 +32,7 @@ struct make_cube_grid
     namespace py = pybind11;
     using namespace pybind11::literals;
     using D = typename G::ctype;
-    static const size_t d = G::dimension;
+    static constexpr size_t d = G::dimension;
 
     m.def("make_cube_grid",
           [](const Dimension<d>&,
@@ -64,7 +64,7 @@ struct make_cube_grid<G, void>
     namespace py = pybind11;
     using namespace pybind11::literals;
     using D = typename G::ctype;
-    static const size_t d = G::dimension;
+    static constexpr size_t d = G::dimension;
 
     m.def("make_cube_grid",
             [](const Dimension<d>&,

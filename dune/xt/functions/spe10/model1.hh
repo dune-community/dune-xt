@@ -28,14 +28,14 @@ namespace Spe10 {
 namespace internal {
 
 
-static const size_t model1_x_elements = 100;
-static const size_t model1_y_elements = 1;
-static const size_t model1_z_elements = 20;
-static const double model_1_length_x = 762.0;
-static const double model_1_length_y = 7.62;
-static const double model_1_length_z = 152.4;
-static const double model1_min_value = 0.001;
-static const double model1_max_value = 998.915;
+static constexpr size_t model1_x_elements = 100;
+static constexpr size_t model1_y_elements = 1;
+static constexpr size_t model1_z_elements = 20;
+static constexpr double model_1_length_x = 762.0;
+static constexpr double model_1_length_y = 7.62;
+static constexpr double model_1_length_z = 152.4;
+static constexpr double model1_min_value = 0.001;
+static constexpr double model1_max_value = 998.915;
 
 
 template <class E, size_t r, size_t rC, class R>
@@ -52,7 +52,7 @@ public:
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
 
-  static const bool available = true;
+  static constexpr bool available = true;
 
   static std::string static_id()
   {
@@ -74,7 +74,7 @@ private:
     std::ifstream datafile(filename);
     if (!datafile.is_open())
       DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
-    static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
+    static constexpr size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
     // create storage (there should be exactly 6000 values in the file, but we only read the first 2000)
     std::vector<RangeType> data(entriesPerDim, unit_range);
     double tmp = 0;
@@ -149,7 +149,7 @@ class Model1Function<E, r, r, R> : public internal::Model1Base<E, r, r, R>
 
 public:
   using DomainFieldType = typename BaseType::DomainFieldType;
-  static const constexpr size_t domain_dim = E::dimension;
+  static constexpr size_t domain_dim = E::dimension;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using RangeType = typename BaseType::RangeType;
   using BaseType::defaults;

@@ -99,7 +99,7 @@ struct GluedDdGridTest : public ::testing::Test
   template <class G, bool anything = true>
   struct get_local_layer
   {
-    static const constexpr Layers type = Layers::level;
+    static constexpr Layers type = Layers::level;
   };
 
 #  if HAVE_ALBERTA
@@ -107,12 +107,12 @@ struct GluedDdGridTest : public ::testing::Test
   template <int d, int dw, bool anything>
   struct get_local_layer<AlbertaGrid<d, dw>, anything>
   {
-    static const constexpr Layers type = Layers::leaf;
+    static constexpr Layers type = Layers::leaf;
   };
 
 #  endif
 
-  static const constexpr Layers local_layer = get_local_layer<LocalGridType>::type;
+  static constexpr Layers local_layer = get_local_layer<LocalGridType>::type;
 
   void setup()
   {
