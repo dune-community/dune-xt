@@ -640,7 +640,7 @@ public:
           const auto& local_intersections = element.second;
           if (!local_intersections.empty()) {
             const size_t local_entity_index = local_grid_view.indexSet().index(local_entity);
-            boundary_visualization[macro_entity_index][local_entity_index] = macro_entity_index;
+            boundary_visualization[macro_entity_index][local_entity_index] = static_cast<double>(macro_entity_index);
           }
         }
       } else
@@ -678,10 +678,10 @@ public:
             const auto& coupling_intersection = *in_out_coupling_intersection_it;
             const auto local_entity = coupling_intersection.inside();
             const size_t local_entity_index = local_grid_view.indexSet().index(local_entity);
-            inside_outside_coupling_visualization[macro_entity_index][local_entity_index] = macro_entity_index;
+            inside_outside_coupling_visualization[macro_entity_index][local_entity_index] = static_cast<double>(macro_entity_index);
             const auto local_neighbor = coupling_intersection.outside();
             const size_t local_neighbor_index = local_neighbor_grid_view.indexSet().index(local_neighbor);
-            inside_outside_coupling_visualization[macro_neighbor_index][local_neighbor_index] = macro_neighbor_index;
+            inside_outside_coupling_visualization[macro_neighbor_index][local_neighbor_index] = static_cast<double>(macro_neighbor_index);
           }
           // walk the coupling, where this is the outside
           size_t out_in_num_coupling_intersections = 0;
@@ -698,10 +698,10 @@ public:
             const auto& coupling_intersection = *out_in_coupling_intersection_it;
             const auto local_entity = coupling_intersection.inside();
             const size_t local_entity_index = local_grid_view.indexSet().index(local_entity);
-            outside_inside_coupling_visualization[macro_neighbor_index][local_entity_index] = macro_neighbor_index;
+            outside_inside_coupling_visualization[macro_neighbor_index][local_entity_index] = static_cast<double>(macro_neighbor_index);
             const auto local_neighbor = coupling_intersection.outside();
             const size_t local_neighbor_index = local_neighbor_grid_view.indexSet().index(local_neighbor);
-            outside_inside_coupling_visualization[macro_entity_index][local_neighbor_index] = macro_entity_index;
+            outside_inside_coupling_visualization[macro_entity_index][local_neighbor_index] = static_cast<double>(macro_entity_index);
           }
           if (num_coupling_intersections != out_in_num_coupling_intersections)
             DUNE_THROW(XT::Common::Exceptions::internal_error,

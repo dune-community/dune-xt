@@ -48,9 +48,9 @@ struct SerializeRowwiseTest : public ::testing::Test
   SerializeRowwiseTest()
     : matrix_(M::create(rows, cols))
   {
-    if (is_block_matrix) {
-      const size_t block_rows = rows / num_blocks;
-      const size_t block_cols = cols / num_blocks;
+    if constexpr (is_block_matrix) {
+      constexpr size_t block_rows = rows / num_blocks;
+      constexpr size_t block_cols = cols / num_blocks;
       for (size_t jj = 0; jj < num_blocks; ++jj)
         for (size_t ll = 0; ll < block_rows; ++ll)
           for (size_t mm = 0; mm < block_cols; ++mm) {
@@ -88,7 +88,7 @@ struct SerializeRowwiseTest : public ::testing::Test
 }; // struct SerializeRowwiseTest
 
 
-TYPED_TEST_CASE(SerializeRowwiseTest, MatrixTypes);
+TYPED_TEST_SUITE(SerializeRowwiseTest, MatrixTypes);
 TYPED_TEST(SerializeRowwiseTest, default)
 {
   this->check_default();

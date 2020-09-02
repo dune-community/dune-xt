@@ -459,7 +459,7 @@ struct ConfigurationTest : public ::testing::Test
   } // ... behaves_correctly(...)
 }; // struct ConfigurationTest
 
-TYPED_TEST_CASE(ConfigTest, TestTypes);
+TYPED_TEST_SUITE(ConfigTest, TestTypes);
 TYPED_TEST(ConfigTest, Get)
 {
   this->get();
@@ -477,7 +477,7 @@ TYPED_TEST(ConfigTest, Other)
   this->subtree_ctor();
 }
 
-TYPED_TEST_CASE(ConfigurationTest, ConfigurationCreators);
+TYPED_TEST_SUITE(ConfigurationTest, ConfigurationCreators);
 TYPED_TEST(ConfigurationTest, behaves_correctly)
 {
   this->behaves_correctly();

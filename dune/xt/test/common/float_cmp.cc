@@ -307,7 +307,7 @@ struct FloatCmpTest : public testing::Test
 }; // struct FloatCmpBase
 
 
-TYPED_TEST_CASE(FloatCmpTest, TESTTYPES);
+TYPED_TEST_SUITE(FloatCmpTest, TESTTYPES);
 TYPED_TEST(FloatCmpTest, eq)
 {
   this->check_eq();

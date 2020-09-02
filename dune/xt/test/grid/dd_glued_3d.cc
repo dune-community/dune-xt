@@ -192,7 +192,7 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 #endif
                         > GridTypes; // clang-format on
 
-TYPED_TEST_CASE(GluedDdGridTest, GridTypes);
+TYPED_TEST_SUITE(GluedDdGridTest, GridTypes);
 TYPED_TEST(GluedDdGridTest, setup_works)
 {
   this->setup();

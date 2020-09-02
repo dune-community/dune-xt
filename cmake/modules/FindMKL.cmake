@@ -13,7 +13,6 @@
 include(Hints)
 
 set(mkl_hints $ENV{MKLROOT} ${MKLROOT} ${root_hints})
-message(WARNING ${mkl_hints})
 set(mkl_lib_hints "")
 set(mkl_include_hints "")
 list(APPEND mkl_hints "/opt/intel/mkl/" "$ENV{HOME}/intel/mkl/")

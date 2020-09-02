@@ -119,6 +119,17 @@ public:
     , pattern_(std::shared_ptr<SparsityPatternDefault>(nullptr))
   {}
 
+  ConstMatrixView(const ThisType& other) = default;
+  ConstMatrixView(ThisType&& other) = default;
+  // No assigment as this is a const view
+  ThisType& operator=(const ThisType& other) = delete;
+  ThisType& operator=(ThisType&& other) = delete;
+
+  inline ThisType copy() const
+  {
+    return *this;
+  }
+
   size_t row_index(const size_t ii) const
   {
     assert(ii < rows());
@@ -320,6 +331,10 @@ public:
     , matrix_(matrix)
   {}
 
+  MatrixView(const ThisType& other) = default;
+  MatrixView(ThisType&& other) = default;
+  ThisType& operator=(MatrixView&& other) = default;
+
   ThisType& operator=(const Matrix& other)
   {
     const auto& patt = get_pattern();
@@ -327,6 +342,11 @@ public:
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : patt.inner(ii))
         set_entry(ii, jj, other.get_entry(ii, jj));
+    return *this;
+  }
+
+  inline ThisType copy() const
+  {
     return *this;
   }
 

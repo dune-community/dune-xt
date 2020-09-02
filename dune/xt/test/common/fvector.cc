@@ -62,7 +62,7 @@ GTEST_TEST(dune_xt_common_field_vector, creation_and_calculations)
     EXPECT_EQ(array[ii], ii);
   // TODO: remove this when the construction above is reenabled
   ColMatrixType col_mat;
-  for (size_t ii = 0; ii < 4; ++ii)
+  for (auto ii = 0; ii < 4; ++ii)
     col_mat[ii][0] = ii;
   EXPECT_DOUBLE_EQ(test_vec * test_vec, 14.);
   EXPECT_DOUBLE_EQ(test_vec * col_mat, 14.);

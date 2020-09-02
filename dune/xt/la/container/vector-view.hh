@@ -113,6 +113,17 @@ public:
     , past_last_entry_(past_last_entry)
   {}
 
+  ConstVectorView(const ThisType& other) = default;
+  ConstVectorView(ThisType&& other) = default;
+  // No assigment as this is a const view
+  ThisType& operator=(const ThisType& other) = delete;
+  ThisType& operator=(ThisType&& other) = delete;
+
+  inline ThisType copy() const
+  {
+    return *this;
+  }
+
   size_t index(const size_t ii) const
   {
     return first_entry_ + ii;
@@ -270,11 +281,20 @@ public:
     , vector_(vector)
   {}
 
+  VectorView(const ThisType& other) = default;
+  VectorView(ThisType&& other) = default;
+  ThisType& operator=(VectorView&& other) = default;
+
   template <class Vec>
   std::enable_if_t<XT::Common::is_vector<Vec>::value, ThisType>& operator=(const Vec& other)
   {
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, other.get_entry(ii));
+    return *this;
+  }
+
+  inline ThisType copy() const
+  {
     return *this;
   }
 

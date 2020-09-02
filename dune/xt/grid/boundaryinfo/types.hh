@@ -230,8 +230,11 @@ static inline BoundaryType* make_boundary_type(const std::string& id)
 
 static constexpr AbsorbingBoundary absorbing_boundary{};
 static constexpr DirichletBoundary dirichlet_boundary{};
+static constexpr NeumannBoundary neumann_boundary{};
 static constexpr NoBoundary no_boundary{};
 static constexpr ReflectingBoundary reflecting_boundary{};
+static constexpr RobinBoundary robin_boundary{};
+static constexpr UnknownBoundary unknown_boundary{};
 
 
 } // namespace Grid

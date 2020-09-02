@@ -51,23 +51,13 @@ public:
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary() && !intersection.neighbor())
-      return dirichlet_boundary_;
-    return no_boundary_;
+      return dirichlet_boundary;
+    return no_boundary;
   }
-
-protected:
-  static constexpr NoBoundary no_boundary_{};
-  static constexpr DirichletBoundary dirichlet_boundary_{};
 }; // class AllDirichletBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #  pragma GCC diagnostic pop
 #endif
-
-template <class I>
-constexpr NoBoundary AllDirichletBoundaryInfo<I>::no_boundary_;
-template <class I>
-constexpr DirichletBoundary AllDirichletBoundaryInfo<I>::dirichlet_boundary_;
-
 
 template <class I>
 std::unique_ptr<AllDirichletBoundaryInfo<I>>
@@ -99,18 +89,10 @@ public:
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (!intersection.neighbor() && !intersection.boundary())
-      return dirichlet_boundary_;
-    return no_boundary_;
+      return dirichlet_boundary;
+    return no_boundary;
   }
-
-protected:
-  static constexpr NoBoundary no_boundary_{};
-  static constexpr DirichletBoundary dirichlet_boundary_{};
 }; // class ProcessBoundaryInfo
-template <class I>
-constexpr NoBoundary ProcessBoundaryInfo<I>::no_boundary_;
-template <class I>
-constexpr DirichletBoundary ProcessBoundaryInfo<I>::dirichlet_boundary_;
 
 } // namespace Grid
 } // namespace XT

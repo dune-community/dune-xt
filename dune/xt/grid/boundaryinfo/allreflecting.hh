@@ -51,23 +51,13 @@ public:
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary())
-      return reflecting_boundary_;
-    return no_boundary_;
+      return reflecting_boundary;
+    return no_boundary;
   }
-
-protected:
-  static constexpr NoBoundary no_boundary_{};
-  static constexpr ReflectingBoundary reflecting_boundary_{};
 }; // class AllReflectingBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #  pragma GCC diagnostic pop
 #endif
-
-template <class I>
-constexpr NoBoundary AllReflectingBoundaryInfo<I>::no_boundary_;
-template <class I>
-constexpr ReflectingBoundary AllReflectingBoundaryInfo<I>::reflecting_boundary_;
-
 
 template <class I>
 std::unique_ptr<AllReflectingBoundaryInfo<I>>

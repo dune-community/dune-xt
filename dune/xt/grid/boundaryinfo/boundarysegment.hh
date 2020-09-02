@@ -91,47 +91,29 @@ public:
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (!intersection.boundary() || intersection.neighbor())
-      return no_boundary_;
+      return no_boundary;
     const size_t boundary_segment_index = intersection.boundarySegmentIndex();
     std::string id = default_;
     for (const auto& element : id_map_)
       if (element.second.first <= boundary_segment_index && boundary_segment_index < element.second.second)
         id = element.first;
     if (id == "dirichlet")
-      return dirichlet_boundary_;
+      return dirichlet_boundary;
     else if (id == "neumann")
-      return neumann_boundary_;
+      return neumann_boundary;
     else if (id == "robin")
-      return robin_boundary_;
+      return robin_boundary;
     else
-      return unknown_boundary_;
+      return unknown_boundary;
   } // ... type(...)
 
 private:
   const std::string default_;
   const std::map<std::string, std::pair<size_t, size_t>> id_map_;
-  static constexpr NoBoundary no_boundary_{};
-  static constexpr DirichletBoundary dirichlet_boundary_{};
-  static constexpr NeumannBoundary neumann_boundary_{};
-  static constexpr RobinBoundary robin_boundary_{};
-  static constexpr UnknownBoundary unknown_boundary_{};
 }; // class BoundarySegmentIndexBasedBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #  pragma GCC diagnostic pop
 #endif
-
-
-template <class I>
-constexpr NoBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::no_boundary_;
-template <class I>
-constexpr DirichletBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::dirichlet_boundary_;
-template <class I>
-constexpr NeumannBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::neumann_boundary_;
-template <class I>
-constexpr RobinBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::robin_boundary_;
-template <class I>
-constexpr UnknownBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::unknown_boundary_;
-
 
 template <class I>
 std::unique_ptr<BoundarySegmentIndexBasedBoundaryInfo<I>>

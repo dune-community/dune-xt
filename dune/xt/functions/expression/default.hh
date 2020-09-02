@@ -190,11 +190,12 @@ public:
 
 
   template <class V>
-  void check_value(const DomainType& point_in_global_coordinates, const V& value) const
+  void check_value(const DomainType& DXTC_DEBUG_ONLY(point_in_global_coordinates),
+                   const V& DXTC_DEBUG_ONLY(value)) const
   {
-    size_t range = value.size();
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+    size_t range = value.size();
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < range; ++rr) {
@@ -375,11 +376,12 @@ public:
 
 private:
   template <class V>
-  void check_value(const DomainType& point_in_global_coordinates, const V& value) const
+  void check_value(const DomainType& DXTC_DEBUG_ONLY(point_in_global_coordinates),
+                   const V& DXTC_DEBUG_ONLY(value)) const
   {
-    size_t range = value.size();
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+    size_t range = value.size();
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < range; ++rr) {

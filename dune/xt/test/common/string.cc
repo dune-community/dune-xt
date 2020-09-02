@@ -84,25 +84,25 @@ typedef testing::Types<Dune::DynamicMatrix<char>, FieldMatrix<char, 2, 2>, Dune:
     MatrixTypesChar;
 
 // from_string/to_string tests for vector and matrix types
-TYPED_TEST_CASE(MatrixStringTestDouble, MatrixTypesDouble);
+TYPED_TEST_SUITE(MatrixStringTestDouble, MatrixTypesDouble);
 TYPED_TEST(MatrixStringTestDouble, CheckDouble)
 {
   this->check();
 }
 
-TYPED_TEST_CASE(MatrixStringTestChar, MatrixTypesChar);
+TYPED_TEST_SUITE(MatrixStringTestChar, MatrixTypesChar);
 TYPED_TEST(MatrixStringTestChar, CheckChar)
 {
   this->check();
 }
 
-TYPED_TEST_CASE(VectorStringTestDouble, VectorTypesDouble);
+TYPED_TEST_SUITE(VectorStringTestDouble, VectorTypesDouble);
 TYPED_TEST(VectorStringTestDouble, CheckDouble)
 {
   this->check();
 }
 
-TYPED_TEST_CASE(VectorStringTestInt, VectorTypesInt);
+TYPED_TEST_SUITE(VectorStringTestInt, VectorTypesInt);
 TYPED_TEST(VectorStringTestInt, CheckInt)
 {
   this->check();

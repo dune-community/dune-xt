@@ -35,7 +35,7 @@ struct ClampTest : public testing::Test
   {}
 };
 
-TYPED_TEST_CASE(ClampTest, TestTypes);
+TYPED_TEST_SUITE(ClampTest, TestTypes);
 TYPED_TEST(ClampTest, All)
 {
   using T = TypeParam;
@@ -48,7 +48,7 @@ template <class T>
 struct EpsilonTest : public testing::Test
 {};
 
-TYPED_TEST_CASE(EpsilonTest, TestTypes);
+TYPED_TEST_SUITE(EpsilonTest, TestTypes);
 TYPED_TEST(EpsilonTest, All)
 {
   EXPECT_NE(Epsilon<TypeParam>::value, TypeParam(0));
@@ -66,7 +66,7 @@ void mmCheck(const MMType& mma)
   EXPECT_TRUE(Dune::FloatCmp::eq(mma.average(), TypeParam(-1.0)));
 }
 
-TYPED_TEST_CASE(MinMaxAvgTest, TestTypes);
+TYPED_TEST_SUITE(MinMaxAvgTest, TestTypes);
 TYPED_TEST(MinMaxAvgTest, All)
 {
   MinMaxAvg<TypeParam> mma;

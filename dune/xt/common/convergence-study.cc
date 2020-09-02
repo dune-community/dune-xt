@@ -135,7 +135,7 @@ void ConvergenceStudy::print_eoc(std::ostream& out,
       eoc_str << "inf";
     else
       eoc_str << std::setprecision(len - /*dot*/ 1 - /*sign*/ (eoc_value > 0 ? 0 : 1)
-                                   - /*prefix*/ (std::ceil(std::abs(std::log10(std::abs(eoc_value))))))
+                                   - /*prefix*/ static_cast<int>(std::ceil(std::abs(std::log10(std::abs(eoc_value))))))
               << std::fixed << eoc_value;
     // color string
     if (eoc_value > (0.9 * self.expected_rate(type, id)))

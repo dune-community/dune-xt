@@ -71,7 +71,7 @@ template <class T>
 struct ThreadValueTest : public testing::Test
 {};
 
-TYPED_TEST_CASE(ThreadValueTest, TLSTypes);
+TYPED_TEST_SUITE(ThreadValueTest, TLSTypes);
 TYPED_TEST(ThreadValueTest, All)
 {
   typedef TypeParam PTVType;

@@ -252,14 +252,13 @@ private:
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
-                             const Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(xx);
       return value_;
     }
 
-    DerivativeRangeReturnType jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
+    DerivativeRangeReturnType jacobian(const DomainType& xx,
                                        const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(xx);

@@ -269,7 +269,7 @@ GTEST_TEST(blockedfieldmatrix, creation_and_calculations)
     for (size_t jj = 0; jj < cols; ++jj)
       EXPECT_EQ(transposed_block_mat.get_entry(jj, ii), transposed_mat[jj][ii]);
   Dune::XT::Common::BlockedFieldMatrix<double, 2, 2, 2> block_square_mat;
-  size_t val = 0;
+  auto val = 0;
   for (size_t jj = 0; jj < 2; ++jj)
     for (size_t ll = 0; ll < 2; ++ll)
       for (size_t mm = 0; mm < 2; ++mm)

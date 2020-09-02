@@ -226,7 +226,7 @@ struct GridWalkerTest : public ::testing::Test
   }
 };
 
-TYPED_TEST_CASE(GridWalkerTest, GridDims);
+TYPED_TEST_SUITE(GridWalkerTest, GridDims);
 TYPED_TEST(GridWalkerTest, count)
 {
   this->check_count();

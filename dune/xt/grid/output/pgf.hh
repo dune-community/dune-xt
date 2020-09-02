@@ -65,7 +65,9 @@ public:
     for (std::size_t i = 0; i < geo.corners(); ++i) {
       const PgfCoordWrapper corner(geo.corner(i));
       char buffer[150] = {'\0'};
+#ifndef NDEBUG
       const int c =
+#endif
           std::snprintf(buffer, 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
       assert(c > 0);
       file_ << buffer;
@@ -185,7 +187,7 @@ public:
                            const typename BaseType::ElementType& /*outside_entity*/) override
   {
     const PgfCoordWrapper center(inside_entity.geometry().center());
-    const float fac = 0.16 * level_;
+    const auto fac = 0.16 * level_;
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
     PgfCoordWrapper a_c = center - a;
