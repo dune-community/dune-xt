@@ -37,8 +37,9 @@ struct EigenSolverTest : public ::testing::Test
   using ComplexMatrixType = C;
   using RealMatrixType = R;
   using RealType = Common::real_t<FieldType>;
-  using EigenValuesType = std::vector<Common::complex_t<FieldType>>;
-  using RealEigenValuesType = std::vector<Common::real_t<FieldType>>;
+  using ComplexType = Common::complex_t<FieldType>;
+  using EigenValuesType = std::vector<ComplexType>;
+  using RealEigenValuesType = std::vector<RealType>;
   typedef EigenSolver<MatrixType> EigenSolverType;
   typedef EigenSolverOptions<MatrixType> EigenSolverOpts;
 

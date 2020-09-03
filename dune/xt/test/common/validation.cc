@@ -35,7 +35,7 @@ struct ValidationTest : public testing::Test
 {
   typedef FIELD_TYPE T;
   typedef DefaultRNG<T> RNGType;
-  static constexpr T eps;
+  static constexpr T eps = Epsilon<T>::value;
   typedef VectorAbstraction<T>::S S;
   typedef std::numeric_limits<S> limit;
   const int eps_fac = 4;
@@ -82,7 +82,6 @@ struct ValidationTest : public testing::Test
     EXPECT_FALSE(ValidateNone<T>()(arg_T));
   }
 };
-const FIELD_TYPE ValidationTest::eps = Epsilon<T>::value;
 
 TEST_F(ValidationTest, All)
 {

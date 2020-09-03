@@ -29,18 +29,22 @@ struct EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}
   using typename BaseType::RealMatrixType;
   using typename BaseType::EigenValuesType;
   using typename BaseType::RealEigenValuesType;
+  using typename BaseType::RealType;
+  using typename BaseType::ComplexType;
+  using typename BaseType::M;
+  using ScalarType = typename M::S;
 
   EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}()
   {
     matrix_ = XT::LA::eye_matrix<MatrixType>(TESTMATRIXSIZE, TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
-      XT::Common::set_matrix_entry(matrix_, ii, ii, ii + 1);
+      XT::Common::set_matrix_entry(matrix_, ii, ii, static_cast<ScalarType>(ii + 1));
     expected_eigenvalues_ = XT::Common::create<EigenValuesType>(TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
-      expected_eigenvalues_[ii] = ii + 1;
+      expected_eigenvalues_[ii] = static_cast<ComplexType>(ii + 1);
     expected_real_eigenvalues_ = XT::Common::create<RealEigenValuesType>(TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
-      expected_real_eigenvalues_[ii] = ii + 1;
+      expected_real_eigenvalues_[ii] = static_cast<RealType>(ii + 1);
     expected_max_ev_ = TESTMATRIXSIZE;
     expected_min_ev_ = 1;
     all_matrices_and_expected_eigenvalues_and_vectors_are_computed_ = true;

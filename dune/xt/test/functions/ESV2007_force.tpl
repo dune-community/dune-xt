@@ -89,7 +89,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_eval
   FunctionType function(3);
   for (auto point : {0.25, 0.5, 0.75}) {
     const DomainType xx(point);
-    const RangeReturnType expected_value(M_PI_2l * M_PIl * cos(M_PI_2l * point) * cos(M_PI_2l * point));
+    const RangeReturnType expected_value(M_PI_2 * M_PI * cos(M_PI_2 * point) * cos(M_PI_2 * point));
     const auto actual_value = function.evaluate(xx);
     EXPECT_EQ(expected_value, actual_value);
   }
@@ -101,9 +101,9 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jaco
   for (auto point : {0.25, 0.5, 0.75}) {
     const DomainType xx(point);
     DerivativeRangeReturnType ret(0.);
-    const double pre = -0.25 * M_PIl * M_PIl * M_PIl;
-    const double x_arg = M_PI_2l * xx[0];
-    const double y_arg = M_PI_2l * xx[1];
+    const double pre = -0.25 * M_PI * M_PI * M_PI;
+    const double x_arg = M_PI_2 * xx[0];
+    const double y_arg = M_PI_2 * xx[1];
     ret[0][0] = pre * sin(x_arg) * cos(y_arg);
     ret[0][1] = pre * cos(x_arg) * sin(y_arg);
     const auto actual_value = function.jacobian(xx);
@@ -150,7 +150,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalu
       const auto local_x = quadrature_point.position();
       const auto value = local_f->evaluate(local_x);
       const auto point = element.geometry().global(local_x);
-      const RangeReturnType expected_value(M_PI_2l * M_PIl * cos(M_PI_2l * point[0]) * cos(M_PI_2l * point[1]));
+      const RangeReturnType expected_value(M_PI_2 * M_PI * cos(M_PI_2 * point[0]) * cos(M_PI_2 * point[1]));
       EXPECT_EQ(expected_value, value);
     }
   }
@@ -170,9 +170,9 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacob
       const auto value = local_f->jacobian(local_x);
       const auto point = element.geometry().global(local_x);
       DerivativeRangeReturnType ret(0.);
-      const double pre = -0.25 * M_PIl * M_PIl * M_PIl;
-      const double x_arg = M_PI_2l * point[0];
-      const double y_arg = M_PI_2l * point[1];
+      const double pre = -0.25 * M_PI * M_PI * M_PI;
+      const double x_arg = M_PI_2 * point[0];
+      const double y_arg = M_PI_2 * point[1];
       ret[0][0] = pre * sin(x_arg) * cos(y_arg);
       ret[0][1] = pre * cos(x_arg) * sin(y_arg);
       EXPECT_EQ(ret, value);

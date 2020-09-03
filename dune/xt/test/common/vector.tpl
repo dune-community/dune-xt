@@ -32,7 +32,7 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
   {
     auto vec = ContainerFactory<VectorImp>::create(dim);
     for (size_t ii = 0; ii < dim; ++ii)
-      vec[ii] = ii;
+      vec[ii] = static_cast<ScalarType>(ii);
 
     // test sup_norm
     EXPECT_EQ(sup_norm(vec), static_cast<ScalarType>(3));

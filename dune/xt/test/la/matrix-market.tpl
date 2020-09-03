@@ -35,7 +35,7 @@ struct MatrixMarketTest_{{T_NAME}} : public ::testing::Test
     MatrixImp mat = M::create(rows, cols);
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
-        M::set_entry(mat, ii, jj, ii+jj);
+        M::set_entry(mat, ii, jj, static_cast<ScalarType>(ii+jj));
     const std::string filename = "testmat_{{T_NAME}}.mtx";
     LA::write_matrix_market(mat, filename);
     const MatrixImp mat2 = LA::read_matrix_market<MatrixImp>(filename);
