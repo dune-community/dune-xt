@@ -9,6 +9,10 @@
 //   René Fritze     (2011 - 2012, 2015 - 2016, 2018 - 2019)
 //   Tobias Leibner  (2020)
 
-#ifdef __GNUC__
+#include <boost/config.hpp>
+
+#if defined(BOOST_INTEL) && BOOST_INTEL
+#  pragma warning pop
+#else
 #  pragma GCC diagnostic pop
 #endif

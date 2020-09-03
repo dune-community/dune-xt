@@ -76,4 +76,7 @@
 #  pragma GCC diagnostic ignored "-Wunreachable-code"
 #  pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #  pragma GCC diagnostic ignored "-Wunused-parameter"
+#elif defined(BOOST_INTEL) && BOOST_INTEL
+#  pragma warning push
+#  pragma warning disable 177 187 654 1011 2259 2282
 #endif
