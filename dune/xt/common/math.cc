@@ -11,11 +11,31 @@
 
 #include "config.h"
 
+#include <dune/xt/common/disable_warnings.hh>
+#include <boost/numeric/conversion/cast.hpp>
+#include <dune/xt/common/reenable_warnings.hh>
+
 #include "math.hh"
 
 namespace Dune {
 namespace XT {
 namespace Common {
+namespace internal {
+
+
+char abs(const char& val)
+{
+  return val < 0 ? static_cast<char>(-val) : val;
+}
+
+char absolute_difference(char a, char b)
+{
+  // calculating with chars returns an int, so we have to cast back to char
+  return boost::numeric_cast<char>((a > b) ? a - b : b - a);
+}
+
+
+} // namespace internal
 
 
 // this is just for the test to compile

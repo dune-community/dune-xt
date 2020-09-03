@@ -30,8 +30,6 @@
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/format.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/static_assert.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/common/promotiontraits.hh>
@@ -73,6 +71,9 @@ struct Epsilon<std::string, false>
 
 namespace internal {
 
+
+// silences narrowing warning as there is no std::abs(char)
+char abs(const char& val);
 
 /**
  *  Helper struct to compute absolute values of signed and unsigned values,
@@ -129,8 +130,11 @@ T absolute_difference(T a, T b)
   return (a > b) ? a - b : b - a;
 }
 
+// specialization to silence narrowing warning
+char absolute_difference(char a, char b);
 
-//! a vector wrapper for continiously updating min,max,avg of some element type vector
+
+//! a vector wrapper for continuously updating min,max,avg of some element type vector
 template <class ElementType>
 class MinMaxAvg
 {
@@ -145,7 +149,7 @@ public:
   template <class stl_container_type>
   MinMaxAvg(const stl_container_type& elements)
   {
-    static_assert((boost::is_same<ElementType, typename stl_container_type::value_type>::value),
+    static_assert((std::is_same<ElementType, typename stl_container_type::value_type>::value),
                   "cannot assign mismatching types");
     acc_ = std::for_each(elements.begin(), elements.end(), acc_);
   }
