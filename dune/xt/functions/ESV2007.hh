@@ -98,7 +98,7 @@ public:
    */
   RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
-    return (M_PI_2l * M_PIl * cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]));
+    return (M_PI_2 * M_PI * cos(M_PI_2 * xx[0]) * cos(M_PI_2 * xx[1]));
   }
 
   /**
@@ -108,9 +108,9 @@ public:
   DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
     DerivativeRangeReturnType ret(0.);
-    const DomainFieldType pre = -0.25 * M_PIl * M_PIl * M_PIl;
-    const DomainFieldType x_arg = M_PI_2l * xx[0];
-    const DomainFieldType y_arg = M_PI_2l * xx[1];
+    const DomainFieldType pre = -0.25 * M_PI * M_PI * M_PI;
+    const DomainFieldType x_arg = M_PI_2 * xx[0];
+    const DomainFieldType y_arg = M_PI_2 * xx[1];
     ret[0][0] = pre * sin(x_arg) * cos(y_arg);
     ret[0][1] = pre * cos(x_arg) * sin(y_arg);
     return ret;
@@ -184,7 +184,7 @@ public:
    */
   RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
-    return (cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]));
+    return (cos(M_PI_2 * xx[0]) * cos(M_PI_2 * xx[1]));
   }
 
   /**
@@ -194,9 +194,9 @@ public:
   DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
     DerivativeRangeReturnType ret(0.);
-    const DomainFieldType pre = -0.5 * M_PIl;
-    const DomainFieldType x_arg = M_PI_2l * xx[0];
-    const DomainFieldType y_arg = M_PI_2l * xx[1];
+    const DomainFieldType pre = -0.5 * M_PI;
+    const DomainFieldType x_arg = M_PI_2 * xx[0];
+    const DomainFieldType y_arg = M_PI_2 * xx[1];
     ret[0][0] = pre * sin(x_arg) * cos(y_arg);
     ret[0][1] = pre * cos(x_arg) * sin(y_arg);
     return ret;
@@ -329,7 +329,7 @@ public:
   }
 
   CutoffFunction(const DiffusionType& diffusion,
-                 const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
+                 const RangeFieldType poincare_constant = 1.0 / (M_PI * M_PI),
                  const std::string nm = static_id())
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
