@@ -317,22 +317,24 @@ public:
   /**
    * \note This function keeps a map of all wrappers in a local static map, to avoid temporaries.
    * \todo Check if this implementation is thread safe!
+   * \todo nvm thread safe, the caching is already broken for multiple functions in sequence
    */
   template <class E>
   const typename std::enable_if<XT::Grid::is_entity<E>::value && E::dimension == d,
-                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
+                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type
   as_grid_function() const
   {
-    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
-    if (wrappers.find(this) == wrappers.end())
-      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
-    return *(wrappers[this]);
+    //    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
+    //    if (wrappers.find(this) == wrappers.end())
+    //      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
+    //    return *(wrappers[this]);
+    return FunctionAsGridFunctionWrapper<E, r, rC, R>(copy_as_function());
   }
 
   template <class ViewTraits>
   const typename std::enable_if<
       (ViewTraits::Grid::dimension == d),
-      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
+      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type
   as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
   {
     return this->as_grid_function<typename ViewTraits::template Codim<0>::Entity>();
