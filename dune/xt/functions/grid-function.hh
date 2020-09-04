@@ -160,7 +160,7 @@ public:
 
   GridFunction(GridFunctionInterface<E, r, rC, R>*&& func_ptr, const std::string logging_prefix = "")
     : BaseType(func_ptr->parameter_type(),
-               logging_prefix.empty() ? func_ptr->logging_id() : logging_prefix,
+               logging_prefix.empty() ? func_ptr->logger.prefix : logging_prefix,
                logging_prefix.empty() ? !func_ptr->logger.debug_enabled : true)
     , function_(std::move(func_ptr))
     , name_(function_->name())
@@ -329,7 +329,7 @@ public:
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr, const std::string logging_prefix = "")
     : BaseType(func_ptr->parameter_type(),
-               logging_prefix.empty() ? func_ptr->logging_id() : logging_prefix,
+               logging_prefix.empty() ? func_ptr->logger.prefix : logging_prefix,
                logging_prefix.empty() ? !func_ptr->logger.debug_enabled : true)
     , function_(new ProductGridFunction<GridFunctionInterface<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           std::move(func_ptr), std::move(unit_matrix()), func_ptr->name()))
@@ -346,7 +346,7 @@ public:
 
   GridFunction(GridFunctionInterface<E, r, r, R>*&& func_ptr, const std::string logging_prefix = "")
     : BaseType(func_ptr->parameter_type(),
-               logging_prefix.empty() ? func_ptr->logging_id() : logging_prefix,
+               logging_prefix.empty() ? func_ptr->logger.prefix : logging_prefix,
                logging_prefix.empty() ? !func_ptr->logger.debug_enabled : true)
     , function_(std::move(func_ptr))
     , name_(function_->name())
@@ -514,7 +514,7 @@ public:
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr, const std::string logging_prefix = "")
     : BaseType(func_ptr->parameter_type(),
-               logging_prefix.empty() ? "GridFunction(" + func_ptr->logging_id() + ")" : logging_prefix,
+               logging_prefix.empty() ? "GridFunction(" + func_ptr->logger.prefix + ")" : logging_prefix,
                logging_prefix.empty() ? !func_ptr->logger.debug_enabled : true)
     , function_(std::move(func_ptr))
     , name_(function_->name())
