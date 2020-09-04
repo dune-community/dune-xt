@@ -97,7 +97,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
 TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   LambdaType function(1.);
-  const auto& localizable_function = function.template as_grid_function<ElementType>();
+  auto&& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -110,7 +110,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   for (auto vv : {1, 3, 5}) {
     const int expected_order = vv;
     LambdaType function(vv);
-    const auto& localizable_function = function.template as_grid_function<ElementType>();
+    auto&& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -127,7 +127,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
                       [](const auto& xx, const auto& param) { RangeReturnType ret(std::pow(xx[0], param.get("power").at(0))); return ret;},
                       "x_power_p",
                       Common::ParameterType("power", 1));
-  const auto& localizable_function = function.template as_grid_function<ElementType>();
+  auto&& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -151,7 +151,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
                       "jacobian.function",
                       {},
                       [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType();});
-  const auto& localizable_function = function.template as_grid_function<ElementType>();
+  auto&& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

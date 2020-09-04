@@ -199,7 +199,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   RangeExpressionType expr_1(std::string("x[0]*x[0]"));
   FunctionType default_function("x", expr_1, 2);
 
-  const auto& localizable_function = default_function.template as_grid_function<ElementType>();
+  auto&& localizable_function = default_function.template as_grid_function<ElementType>();
 
   auto local_f = localizable_function.local_function();
 
@@ -218,7 +218,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 
   const auto leaf_view = grid_.leaf_view();
 
-  const auto& localizable_function = function.template as_grid_function<ElementType>();
+  auto&& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -236,7 +236,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluat
     const RangeReturnType expected_value(value);
     const RangeExpressionType constant_expr(Common::to_string(value));
     FunctionType function("x", constant_expr, 0);
-    const auto& localizable_function = function.template as_grid_function<ElementType>();
+    auto&& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
       local_f->bind(element);
@@ -261,7 +261,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobia
     DerivativeRangeExpressionType constant_grad(constant_grad_single);
     DerivativeRangeReturnType expected_jacobian(Common::FieldMatrix<double, rC, d>(0.));
     FunctionType function("x", constant_expr, constant_grad, 0);
-    const auto& localizable_function = function.template as_grid_function<ElementType>();
+    auto&& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
       local_f->bind(element);

@@ -186,7 +186,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   RangeType first_value(1.);
 
   FunctionType default_function({std::make_tuple(lower_left, upper_right, first_value)});
-  const auto& localizable_function = default_function.template as_grid_function<ElementType>();
+  auto&& localizable_function = default_function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : elements(leaf_view)) {
@@ -205,7 +205,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        const auto& localizable_function = function.template as_grid_function<ElementType>();
+        auto&& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
@@ -229,7 +229,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        const auto& localizable_function = function.template as_grid_function<ElementType>();
+        auto&& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
@@ -313,7 +313,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        const auto& localizable_function = function.template as_grid_function<ElementType>();
+        auto&& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
