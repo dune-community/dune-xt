@@ -45,33 +45,35 @@ struct CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>
 {
   static constexpr size_t r()
   {
-    if constexpr (L_rC * R_rC != 1) {
-      return L_r;
-    } else if constexpr (R_r == 1 && R_rC == 1) {
-      return L_r;
+    if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
+      return 1;
     } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
       return R_r;
-    } else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
-      return 1;
+    } else if constexpr (R_r == 1 && R_rC == 1) {
+      return L_r;
+    } else if constexpr (L_rC * R_rC != 1) {
+      return L_r;
     }
-    return -1;
+    return 0;
   }
+
   static constexpr size_t rC()
   {
-    if constexpr (L_rC * R_rC != 1) {
+    if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
+      return 1;
+    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
       return R_rC;
     } else if constexpr (R_r == 1 && R_rC == 1) {
       return L_rC;
-    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+    } else if constexpr (L_rC * R_rC != 1) {
       return R_rC;
-    } else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
-      return 1;
     }
-    return -1;
+    return 0;
   }
+
   static constexpr bool available()
   {
-    return r() != -1 && rC() != -1;
+    return r() != 0 && rC() != 0;
   }
 };
 
@@ -130,8 +132,8 @@ struct CombinedEval
   using R = typename std::conditional<std::is_same<CombinationType::fraction, comb>::value,
                                       typename Common::multiplication_promotion<L_R, R_R>::type,
                                       typename Common::plus_promotion<L_R, R_R>::type>::type;
-  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r;
-  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC;
+  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
+  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
 
   template <class Left, class Right, class D>
   static auto compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
@@ -143,15 +145,15 @@ struct CombinedEval
 template <class L_R, class R_R, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
 struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::r;
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::rC;
+  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::r();
+  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::rC();
   using R = typename Common::multiplication_promotion<L_R, R_R>::type;
-  //  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
+  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
   template <class Left, class Right, class D>
-  static auto compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
+  static RangeReturnType compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
   {
     // general case: non-scalar matrix * non-scalar {matrix or vector}
-    if constexpr (L_rC * R_rC != 1) {
+    if constexpr (R_r == L_rC && L_rC * R_rC != 1) {
       if constexpr (L_rC == 1) {
         // need to wrap the left vector into a matrix, for * to do the right thing
         XT::Common::FieldMatrix<R, 1, L_r> left_value;
@@ -160,22 +162,24 @@ struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
       } else
         return left.evaluate(point, param) * right.evaluate(point, param);
     }
+
+    // special case: non-scalar elementwise multiplication by scalar from the left
+    else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+      const auto left_value = left.evaluate(point, param)[0];
+      RangeReturnType right_value = right.evaluate(point, param);
+      right_value *= left_value;
+      return right_value;
+    }
     // special case: elementwise multiplication by scalar from the right AND all scalar case
-    else if constexpr (R_r == 1 && R_rC == 1) {
-      auto left_value = left.evaluate(point, param);
+    else if constexpr (std::is_convertible<decltype(left.evaluate(point, param)), RangeReturnType>::value && R_r == 1
+                       && R_rC == 1) {
+      RangeReturnType left_value = left.evaluate(point, param);
       const auto right_value = right.evaluate(point, param)[0];
       left_value *= right_value;
       return left_value;
     }
-    // special case: non-scalar elementwise multiplication by scalar from the left
-    else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
-      const auto left_value = left.evaluate(point, param)[0];
-      auto right_value = right.evaluate(point, param);
-      right_value *= left_value;
-      return right_value;
-    }
     // special case: non-scalar vectors
-    else if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
+    else if constexpr (L_r == R_r && R_rC == 1 && L_rC == 1 && L_r != 1) {
       return left.evaluate(point, param) * right.evaluate(point, param);
     }
     DUNE_THROW(NotImplemented, "no product compute combination available");
