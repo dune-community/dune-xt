@@ -12,8 +12,6 @@
 #ifndef DUNE_XT_COMMON_EXCEPTIONS_BINDINGS_HH
 #define DUNE_XT_COMMON_EXCEPTIONS_BINDINGS_HH
 
-#include <dune/xt/common/deprecated.hh>
-
 namespace pybind11 {
 class module;
 }
@@ -24,8 +22,8 @@ namespace Common {
 namespace bindings {
 
 
-DXT_DEPRECATED_MSG("you no longer need to call this for your module")
-void addbind_exceptions(pybind11::module&) {} // ... addbind_exceptions(...)
+[[deprecated("you no longer need to call this for your module")]] void addbind_exceptions(pybind11::module&) {
+} // ... addbind_exceptions(...)
 
 
 } // namespace bindings

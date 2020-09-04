@@ -17,7 +17,6 @@
 #ifndef PYTHON_DUNE_XT_GRID_TYPES_HH
 #  define PYTHON_DUNE_XT_GRID_TYPES_HH
 
-#  include <dune/xt/common/deprecated.hh>
 #  include <dune/xt/grid/grids.hh>
 
 namespace Dune {
@@ -26,8 +25,8 @@ namespace Grid {
 namespace bindings {
 
 
-using AvailableTypes
-    DXT_DEPRECATED_MSG("Use XT::Grid::AvailableGridTypes instead (31.07.2019)!") = Dune::XT::Grid::AvailableGridTypes;
+using AvailableTypes [[deprecated("Use XT::Grid::AvailableGridTypes instead (31.07.2019)!")]] =
+    Dune::XT::Grid::AvailableGridTypes;
 
 
 } // namespace bindings

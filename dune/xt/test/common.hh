@@ -25,7 +25,6 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/convergence-study.hh>
 #include <dune/xt/common/compiler.hh>
-#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/vector.hh>
 
@@ -117,9 +116,9 @@ void check_eoc_study_for_success(
     const double& zero_tolerance = 1e-15);
 
 
-DXT_DEPRECATED_MSG("Does not make any sense with the new ConvergenceStudy (25.01.2019)!")
-void print_collected_eoc_study_results(const std::map<std::string, std::vector<double>>& results,
-                                       std::ostream& out = std::cout);
+[[deprecated("Does not make any sense with the new ConvergenceStudy (25.01.2019)!")]] void
+print_collected_eoc_study_results(const std::map<std::string, std::vector<double>>& results,
+                                  std::ostream& out = std::cout);
 
 
 // returns unsigned int on purpose, see GridProvider

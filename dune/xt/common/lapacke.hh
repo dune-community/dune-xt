@@ -14,8 +14,6 @@
 
 #include <complex>
 
-#include <dune/xt/common/deprecated.hh>
-
 namespace Dune {
 namespace XT {
 namespace Common {

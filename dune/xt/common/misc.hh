@@ -43,11 +43,11 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
-#include <dune/xt/common/deprecated.hh>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 //! element-index-in-container search
 template <class StlSequence>
@@ -58,48 +58,6 @@ inline int get_idx(const StlSequence& ct, const typename StlSequence::value_type
     return -1;
   return std::distance(ct.begin(), result);
 } // get_idx
-
-/** this allows subscription indices to wrap around
- * \example N=4: WraparoundArray[4] == WraparoundArray[0] && WraparoundArray[-1] == WraparoundArray[3]
- **/
-template <class T, size_t N>
-struct WraparoundArray : public std::array<T, N>
-{
-  typedef std::array<T, N> BaseType;
-  WraparoundArray()
-  {
-    for (size_t i = 0; i < N; ++i)
-      this->operator[](i) = T();
-  }
-
-  WraparoundArray(const BaseType other)
-  {
-    for (size_t i = 0; i < N; ++i)
-      this->operator[](i) = other[i];
-  }
-
-  typename BaseType::reference operator[](std::size_t i)
-  {
-    return BaseType::operator[](i % N);
-  }
-
-  typename BaseType::reference operator[](int i)
-  {
-    const std::size_t real_index = i < 0 ? static_cast<std::size_t>(N - (((i * -1) % N) + 1)) : std::size_t(i);
-    return BaseType::operator[](real_index);
-  } // []
-
-  typename BaseType::const_reference operator[](std::size_t i) const
-  {
-    return BaseType::operator[](i % N);
-  }
-
-  typename BaseType::const_reference operator[](int i) const
-  {
-    const std::size_t real_index = i < 0 ? static_cast<std::size_t>(N - (((i * -1) % N) + 1)) : std::size_t(i);
-    return BaseType::operator[](real_index);
-  } // []
-};
 
 //! type safe (this will not compile for degraded-to-pointer arrays) way of getting array length
 template <class T, size_t N>
@@ -138,38 +96,6 @@ std::array<T, N> make_array(const std::vector<T>& v)
 
 //! writes process environment to file
 void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep = ",");
-
-/** abstraction for stdlibs w/o map.emplace
- * This isn't covering the full emplace spec, and the piecewise case potentially improper,
- * but we only need this in an Intel MIC setup with weird lib versioning.
- * Normally we'd depend on the full gcc 4.8 stack atm and do not use the insert fallback
- **/
-template <typename Key, typename T, typename MapType>
-std::pair<typename MapType::iterator, bool> map_emplace(MapType& map_in, Key key, T value)
-{
-#if HAVE_MAP_EMPLACE
-  return map_in.emplace(key, value);
-#else
-  DXTC_LOG_DEBUG_0 << "using map.insert fallback instead of emplace\n";
-  return map_in.insert(typename MapType::value_type(key, value));
-#endif
-}
-
-template <typename K, typename V, typename MapType>
-DXT_DEPRECATED_MSG("no longer needed with c++14 (2018/03/20)")
-std::pair<typename MapType::iterator, bool> map_emplace(MapType& map_in,
-                                                        std::piecewise_construct_t pcw,
-                                                        K&& keys,
-                                                        V&& values)
-{
-  return map_in.emplace(pcw, keys, values);
-}
-
-template <typename T>
-struct remove_const_reference
-{
-  typedef typename std::remove_reference<typename std::remove_const<T>::type>::type type;
-};
 
 } // namespace Common
 } // namespace XT

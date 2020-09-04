@@ -18,7 +18,6 @@
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 
-#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/type_traits.hh>
 
 #if HAVE_ALBERTA
@@ -458,13 +457,12 @@ using extract_iterator_t = typename extract_iterator<T, c, pit>::type;
 
 
 template <class T, PartitionIteratorType pit, int c = 0, bool view = is_view<T>::value, bool part = is_part<T>::value>
-struct DXT_DEPRECATED_MSG("Use extract_iterator instead (24.04.2018)!") extract_partition_iterator
-  : public extract_iterator<T, c, pit, view, part>
-{};
+struct [[deprecated("Use extract_iterator instead (24.04.2018)!")]] extract_partition_iterator
+  : public extract_iterator<T, c, pit, view, part>{};
 
 template <class T, PartitionIteratorType pit, int c = 0>
-using extract_partition_iterator_t
-    DXT_DEPRECATED_MSG("Use extract_iterator_t instead (24.04.2018)!") = extract_iterator_t<T, c, pit>;
+using extract_partition_iterator_t [[deprecated("Use extract_iterator_t instead (24.04.2018)!")]] =
+    extract_iterator_t<T, c, pit>;
 
 
 } // namespace Grid
