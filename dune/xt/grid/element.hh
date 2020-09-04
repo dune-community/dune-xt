@@ -37,7 +37,7 @@ class SubEntityCenter
         DUNE_THROW_IF(i >= element.subEntities(codim),
                       Common::Exceptions::index_out_of_range,
                       "element.subEntities(" << codim << ") = " << element.subEntities(codim) << "\n   i = " << i);
-        return element.subEntity<cd>(Common::numeric_cast<int>(i)).geometry().center();
+        return element.template subEntity<cd>(Common::numeric_cast<int>(i)).geometry().center();
       } else
         return subEntity<cd - 1>::center(element, codim, i);
     } // ... center(...)
@@ -49,7 +49,7 @@ class SubEntityCenter
     static FieldVector<D, d> center(const E& element, const int codim, const size_t i)
     {
       DUNE_THROW_IF(codim != 0, Common::Exceptions::internal_error, "This must not happen");
-      return element.subEntity<0>(Common::numeric_cast<int>(i)).geometry().center();
+      return element.template subEntity<0>(Common::numeric_cast<int>(i)).geometry().center();
     }
   }; // struct subEntity
 
