@@ -141,11 +141,11 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-  DXT_DEPRECATED_MSG("Use this.logger.prefix instead (12.08.2020)!")
-  static const std::string logging_id;
+  [[deprecated("Use this.logger.prefix instead (12.08.2020)!")]] static const std::string logging_id;
 
-  DXT_DEPRECATED_MSG("Use WithLogger(id, start_enabled) instead (12.08.2020)!")
-  WithLogger(const std::string& /*prefix*/, const std::string& id, const bool start_enabled = false)
+  [[deprecated("Use WithLogger(id, start_enabled) instead (12.08.2020)!")]] WithLogger(const std::string& /*prefix*/,
+                                                                                       const std::string& id,
+                                                                                       const bool start_enabled = false)
     : logger(id, start_enabled)
   {
     LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
@@ -184,8 +184,8 @@ public:
     LOG_(debug) << "WithLogger.operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
 
-  DXT_DEPRECATED_MSG("Use this.logger.enable_like(other.logger) instead (12.08.2020)!")
-  void enable_logging_like(const ThisType& other)
+  [[deprecated("Use this.logger.enable_like(other.logger) instead (12.08.2020)!")]] void
+  enable_logging_like(const ThisType& other)
   {
     this->logger.enable_like(other.logger);
   }

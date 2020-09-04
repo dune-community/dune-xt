@@ -23,7 +23,6 @@
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 
-#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
