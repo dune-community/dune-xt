@@ -40,6 +40,8 @@ namespace internal {
 
 
 /// \note Should be used to derive from (except for vectors and matrices), when specializing Printer.
+/// \todo Drop silenced warnings once all operator<< overloads in dune-xt and dune-gdt which are deprecated due to this
+///       DefaultPrinter are removed!
 /// \sa Printer
 /// \sa VectorPrinter
 template <class T, bool use_repr = false>
@@ -66,7 +68,10 @@ public:
   virtual void repr(std::ostream& out) const
   {
     if constexpr (is_printable<T>::value) {
+      // There are some of our operator<< overloads that are deprecated due to the introduction of this Printer.
+#include <dune/xt/common/disable_warnings.hh>
       out << value;
+#include <dune/xt/common/reenable_warnings.hh>
     } else {
       out << "missing specialization for Printer<T> with T=" << Typename<T>::value();
     }
@@ -157,17 +162,17 @@ public:
     const auto rows = M::rows(this->value);
     const auto cols = M::cols(this->value);
     if (rows * cols > 0) {
-      out << "{";
+      out << "[";
       const std::string delim =
           (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
       const std::string newline = "\n";
       for (auto&& ii : value_range(rows)) {
-        out << (ii == 0 ? "{" : " ") << "{" << print(M::get_entry(this->value, ii, 0), this->opts);
+        out << (ii == 0 ? "[" : " ") << "[" << print(M::get_entry(this->value, ii, 0), this->opts);
         for (auto&& jj : value_range(decltype(cols)(1), cols))
           out << delim << " " << print(M::get_entry(this->value, ii, jj), this->opts);
-        out << "}" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
+        out << "]" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
       }
-      out << "}";
+      out << "]";
     }
     out << ")";
   } // ... repr(...)
@@ -261,6 +266,41 @@ public:
   Printer(const M& val, const Configuration& param = {{"oneline", "false"}})
     : internal::MatrixPrinter<M, use_repr>(val, param)
   {}
+}; // class Printer
+
+
+template <bool use_repr, typename anything>
+class Printer<Configuration, use_repr, anything> : public internal::DefaultPrinter<Configuration, use_repr>
+{
+public:
+  Printer(const Configuration& val, const Configuration& param = {{"oneline", "false"}})
+    : internal::DefaultPrinter<Configuration, use_repr>(val, param)
+  {}
+
+  // let repr() default to operator<<, handled in internal::DefaultPrinter
+
+  void str(std::ostream& out) const override
+  {
+    if (!this->opts.get("oneline", false))
+      this->repr(out);
+    else {
+      const auto key_value_map = this->value.flatten();
+      const auto sz = key_value_map.size();
+      if (sz == 0)
+        out << "{}";
+      else {
+        out << "{";
+        size_t counter = 0;
+        for (const auto& key_value_pair : key_value_map) {
+          out << "\"" << key_value_pair.first << "\": \"" << key_value_pair.second << "\"";
+          if (counter < sz - 1)
+            out << ", ";
+          ++counter;
+        }
+        out << "}";
+      }
+    }
+  } // ... str(...)
 }; // class Printer
 
 

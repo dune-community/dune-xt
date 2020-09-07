@@ -275,7 +275,7 @@ int dgesvd(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-double dlamch(char cmach)
+double dlamch(char DXTC_LAPACKE_ONLY(cmach))
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dlamch(cmach);

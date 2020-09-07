@@ -15,7 +15,10 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/la/matrix-inverter.hh>
+#include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/interfaces/element-functions.hh>
+#include <dune/xt/functions/interfaces/function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
@@ -43,27 +46,26 @@ public:
 public:
   static constexpr bool available = (FunctionType::rC == FunctionType::r);
 
-  static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
+  static RangeReturnType compute(const RangeReturnType& value)
   {
     if constexpr (FunctionType::rC == 1 && FunctionType::r == 1) {
-      auto value_to_invert = func.evaluate(xx, param);
+      auto value_to_invert = value[0];
       DUNE_THROW_IF(XT::Common::FloatCmp::eq(value_to_invert, 0.),
                     Exceptions::wrong_input_given,
                     "Scalar function value was not invertible!\n\nvalue_to_invert = " << value_to_invert);
       return 1. / value_to_invert;
     } else if constexpr (available) {
-      auto matrix_to_invert = func.evaluate(xx, param);
       RangeReturnType inverse_matrix;
       try {
-        inverse_matrix = XT::LA::invert_matrix(matrix_to_invert);
+        inverse_matrix = XT::LA::invert_matrix(value);
       } catch (const XT::LA::Exceptions::matrix_invert_failed& ee) {
         DUNE_THROW(Exceptions::wrong_input_given,
                    "Matrix-valued function value was not invertible!\n\nmatrix_to_invert = "
-                       << matrix_to_invert << "\n\nThis was the original error: " << ee.what());
+                       << value << "\n\nThis was the original error: " << ee.what());
       }
       return inverse_matrix;
     } else {
-      static_assert(AlwaysFalse<FunctionType>::value, "compute not available");
+      static_assert(AlwaysFalse<FunctionType>::value, "Not available for these dimensions!");
     }
   }
 }; // class InverseFunctionHelper
@@ -79,6 +81,8 @@ class InverseElementFunction
                                     internal::InverseFunctionHelper<ElementFunctionType>::rC,
                                     typename internal::InverseFunctionHelper<ElementFunctionType>::R>
 {
+  static_assert(is_element_function<ElementFunctionType>::value, "");
+
   using BaseType = ElementFunctionInterface<typename ElementFunctionType::E,
                                             internal::InverseFunctionHelper<ElementFunctionType>::r,
                                             internal::InverseFunctionHelper<ElementFunctionType>::rC,
@@ -88,6 +92,7 @@ class InverseElementFunction
 
 public:
   using typename BaseType::DomainType;
+  using typename BaseType::E;
   using typename BaseType::ElementType;
   using typename BaseType::RangeReturnType;
 
@@ -107,7 +112,7 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element)
+  void post_bind(const ElementType& element) override final
   {
     func_.access().bind(element);
   }
@@ -120,7 +125,7 @@ public:
 
   RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
   {
-    return Helper::compute(func_.access(), xx, param);
+    return Helper::compute(func_.access().evaluate(xx, param));
   }
 
 private:
@@ -136,6 +141,9 @@ class InverseFunction
                              internal::InverseFunctionHelper<FunctionType>::rC,
                              typename internal::InverseFunctionHelper<FunctionType>::R>
 {
+  static_assert(is_function<FunctionType>::value, "");
+
+  using ThisType = InverseFunction;
   using BaseType = FunctionInterface<FunctionType::d,
                                      internal::InverseFunctionHelper<FunctionType>::r,
                                      internal::InverseFunctionHelper<FunctionType>::rC,
@@ -147,21 +155,37 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  InverseFunction(FunctionType& func, const int ord)
-    : func_(func)
+  InverseFunction(const FunctionType& func, const int ord)
+    : BaseType(func.parameter_type())
+    , func_(func.copy_as_function())
     , order_(ord)
   {}
 
-  InverseFunction(std::shared_ptr<FunctionType> func, const int ord)
-    : func_(func)
+  InverseFunction(FunctionType&& func, const int ord)
+    : BaseType(func->parameter_type())
+    , func_(std::move(func))
     , order_(ord)
   {}
 
-  InverseFunction(std::unique_ptr<FunctionType>&& func, const int ord)
-    : func_(std::move(func))
-    , order_(ord)
+  InverseFunction(const ThisType& other)
+    : BaseType(other)
+    , func_(other.func_->copy_as_function())
+    , order_(order)
   {}
 
+  InverseFunction(ThisType&&) = default;
+
+private:
+  ThisType* copy_as_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
+  }
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
     return order_;
@@ -169,15 +193,18 @@ public:
 
   RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
   {
-    return Helper::compute(func_.access(), xx, param);
+    return Helper::compute(func_.evaluate(xx, param));
   }
 
 private:
-  XT::Common::StorageProvider<FunctionType> func_;
+  const std::unique_ptr<FunctionType> func_;
   const int order_;
 }; // class InverseFunction
 
 
+/**
+ * \todo Write custom local function to hold a copy af this!
+ */
 template <class GridFunctionType>
 class InverseGridFunction
   : public GridFunctionInterface<typename GridFunctionType::E,
@@ -185,46 +212,69 @@ class InverseGridFunction
                                  internal::InverseFunctionHelper<GridFunctionType>::rC,
                                  typename internal::InverseFunctionHelper<GridFunctionType>::R>
 {
+  static_assert(is_grid_function<GridFunctionType>::value, "");
+
+  using Helper = internal::InverseFunctionHelper<GridFunctionType>;
+  static const constexpr size_t r_ = GridFunctionType::r;
+  static const constexpr size_t rC_ = GridFunctionType::rC;
+
+public:
+  using ThisType = InverseGridFunction;
   using BaseType = GridFunctionInterface<typename GridFunctionType::E,
                                          internal::InverseFunctionHelper<GridFunctionType>::r,
                                          internal::InverseFunctionHelper<GridFunctionType>::rC,
                                          typename internal::InverseFunctionHelper<GridFunctionType>::R>;
-
-  using Helper = internal::InverseFunctionHelper<GridFunctionType>;
-
-public:
+  using typename BaseType::E;
   using typename BaseType::LocalFunctionType;
+  using typename BaseType::R;
 
-  InverseGridFunction(const GridFunctionType& func, const int ord)
-    : func_(func)
+  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string nm = "")
+    : func_(func.copy_as_grid_function())
     , order_(ord)
+    , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)
   {}
 
-  InverseGridFunction(std::shared_ptr<const GridFunctionType> func, const int ord)
-    : func_(func)
-    , order_(ord)
-  {}
-
-  InverseGridFunction(std::unique_ptr<const GridFunctionType>&& func, const int ord)
+  InverseGridFunction(GridFunctionInterface<E, r_, rC_, R>&& func, const int ord, const std::string nm = "")
     : func_(std::move(func))
     , order_(ord)
+    , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)
   {}
 
+  InverseGridFunction(const ThisType& other)
+    : BaseType(other)
+    , func_(other.func_->copy_as_grid_function())
+    , order_(other.order_)
+  {}
+
+  InverseGridFunction(ThisType&&) = default;
+
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     using LocalFunction = InverseElementFunction<typename GridFunctionType::LocalFunctionType>;
-    return std::unique_ptr<LocalFunction>(new LocalFunction(std::move(func_.access().local_function()), order_));
+    return std::make_unique<LocalFunction>(func_->local_function(), order_);
   }
 
   std::string name() const override final
   {
-    auto func_name = func_.access().name();
-    return func_name.empty() ? ("dune.xt.functions.inversegridfunction") : ("inverse of " + func_name);
+    return name_;
   }
 
 private:
-  const XT::Common::ConstStorageProvider<GridFunctionType> func_;
+  const std::unique_ptr<GridFunctionInterface<E, r_, rC_, R>> func_;
   const int order_;
+  const std::string name_;
 }; // class InverseGridFunction
 
 
@@ -234,7 +284,7 @@ auto inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available) {
     return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
   } else {
-    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
   }
 }
 
@@ -245,7 +295,7 @@ auto inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available) {
     return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
   } else {
-    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
   }
 }
 
@@ -256,7 +306,7 @@ auto inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available) {
     return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
   } else {
-    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
   }
 }
 

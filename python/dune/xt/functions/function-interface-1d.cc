@@ -35,9 +35,9 @@ PYBIND11_MODULE(_functions_function_interface_1d, m)
 
   using namespace Dune::XT::Functions;
 
-  const auto diff = CombinationType::difference;
-  const auto sum = CombinationType::sum;
-  const auto prod = CombinationType::product;
+  using diff = CombinationType::difference;
+  using sum = CombinationType::sum;
+  using prod = CombinationType::product;
 
   auto i_1_1_1 = bind_FunctionInterface<1, 1, 1>(m);
   auto i_1_2_1 = bind_FunctionInterface<1, 2, 1>(m);

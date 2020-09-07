@@ -47,7 +47,7 @@ public:
     c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
 
-    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return type(); });
+    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return new type(); });
 
     return c;
   } // ... bind(...)
@@ -79,7 +79,7 @@ public:
     c.def(py::init([](const BoundaryInfo<I>& boundary_info,
                       const BoundaryType& boundary_type,
                       const std::string& logging_prefix) {
-            return type(boundary_info, boundary_type.copy(), logging_prefix);
+            return new type(boundary_info, boundary_type.copy(), logging_prefix);
           }),
           "boundary_info"_a,
           "boundary_type"_a,
@@ -92,7 +92,7 @@ public:
         [](const Grid::GridProvider<G>&,
            const BoundaryInfo<I>& boundary_info,
            const BoundaryType& boundary_type,
-           const std::string& logging_prefix) { return type(boundary_info, boundary_type.copy(), logging_prefix); },
+           const std::string& logging_prefix) { return new type(boundary_info, boundary_type.copy(), logging_prefix); },
         "grid_provider"_a,
         "boundary_info"_a,
         "boundary_type"_a,

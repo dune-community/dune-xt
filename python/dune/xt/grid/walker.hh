@@ -78,14 +78,15 @@ public:
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
-    c.def(py::init([](GridProvider<G>& grid_provider) { return type(grid_provider.leaf_view()); }), "grid_provider"_a);
+    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
+          "grid_provider"_a);
 
     addbind_methods(c);
 
     // factories
     m.def(
         Common::to_camel_case(class_id).c_str(),
-        [](GridProvider<G>& grid_provider) { return type(grid_provider.leaf_view()); },
+        [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
         "grid_provider"_a);
 
     return c;

@@ -42,7 +42,8 @@ class ReinterpretLocalizableFunction
   : public GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>
 {
   static_assert(XT::Grid::is_layer<SourceGridView>::value, "");
-  using ThisType = ReinterpretLocalizableFunction<SourceGridView, TargetElement, range_dim, range_dim_cols, RangeField>;
+
+  using ThisType = ReinterpretLocalizableFunction;
   using BaseType = GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>;
 
 public:
@@ -53,25 +54,41 @@ public:
 
   using SourceType = GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>;
 
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".reinterpret";
-  }
-
   ReinterpretLocalizableFunction(const SourceType& source, const SourceGridView& source_grid_view)
     : BaseType(source.parameter_type())
-    , source_(source)
+    , source_(source.copy_as_grid_function())
     , source_grid_view_(source_grid_view)
   {}
 
+  ReinterpretLocalizableFunction(const ThisType& other)
+    : BaseType(other)
+    , source_(other.source_->copy_as_grid_function())
+    , source_grid_view_(other.source_grid_view_)
+  {}
+
+  ReinterpretLocalizableFunction(ThisType&&) = default;
+
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
+
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<ReinterpretLocalfunction>(source_, source_grid_view_);
+    return std::make_unique<ReinterpretLocalfunction>(*source_, source_grid_view_);
   }
 
   std::string name() const
   {
-    return BaseType::name() + ".reinterpret";
+    return source_->name();
   }
 
 private:
@@ -88,10 +105,10 @@ private:
 
     ReinterpretLocalfunction(const SourceType& source, const SourceGridView& source_grid_view)
       : BaseType(source.parameter_type())
-      , source_(source)
+      , source_(source.copy_as_grid_function())
       , source_grid_view_(source_grid_view)
       , source_element_search_(source_grid_view_)
-      , local_source_(source_.local_function())
+      , local_source_(source_->local_function())
       , source_element_which_contains_complete_target_element_(nullptr)
       , source_element_which_contains_some_point_of_target_element_(nullptr)
       , local_source_valid_for_this_point_(false)
@@ -214,7 +231,7 @@ private:
       }
     } // ... try_to_bind_local_source_for_this_point(...)
 
-    const SourceType& source_;
+    const std::unique_ptr<SourceType> source_;
     const SourceGridView& source_grid_view_;
     mutable XT::Grid::EntityInlevelSearch<SourceGridView> source_element_search_;
     mutable std::unique_ptr<typename SourceType::LocalFunctionType> local_source_;
@@ -227,7 +244,7 @@ private:
     mutable std::vector<DomainType> single_point_;
   }; // class ReinterpretLocalfunction
 
-  const SourceType& source_;
+  std::unique_ptr<SourceType> source_;
   const SourceGridView& source_grid_view_;
 }; // class ReinterpretLocalizableFunction
 

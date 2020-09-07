@@ -417,11 +417,11 @@ protected:
   template <class MM>
   derived_type& add_assign(const MatrixInterface<MM, ScalarType>& other)
   {
-    const auto& other_pattern = other.pattern();
+    const auto other_pattern = other.pattern();
 #ifndef NDEBUG
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
-    const auto& this_pattern = pattern();
+    const auto this_pattern = pattern();
     if (!this_pattern.contains(other_pattern))
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "The matrix to be added contains entries that are not in this' pattern!");
@@ -435,11 +435,11 @@ protected:
   template <class MM>
   derived_type& subtract_assign(const MatrixInterface<MM, ScalarType>& other)
   {
-    const auto& other_pattern = other.pattern();
+    const auto other_pattern = other.pattern();
 #ifndef NDEBUG
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
-    const auto& this_pattern = pattern();
+    const auto this_pattern = pattern();
     if (!this_pattern.contains(other_pattern))
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "The matrix to be added contains entries that are not in this' pattern!");

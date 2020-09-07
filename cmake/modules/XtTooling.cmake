@@ -94,20 +94,56 @@ macro(add_format glob_dir)
 endmacro(add_format)
 
 find_package(ClangTidy 8)
-macro(add_tidy glob_dir)
+macro(add_tidy)
   if(ClangTidy_FOUND)
     dune_symlink_to_source_files(FILES .clang-tidy)
     message(STATUS "adding tidy target")
-    set(TIDY_ARGS -config= -style=file -p=${CMAKE_CURRENT_BINARY_DIR} -j ${DXT_TEST_PROCS})
-    add_custom_target("tidy"
-                      ${RunTidy_EXECUTABLE}
-                      ${TIDY_ARGS}
-                      -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes)
-    add_custom_target("fix_tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -fix)
+    add_custom_target(tidy)
+    add_custom_target(fix_tidy)
+    add_tidy_subdir(common)
+    add_tidy_subdir(grid)
+    add_tidy_subdir(la)
+    add_tidy_subdir(functions)
   else()
     message(WARNING "not adding tidy target because clang-tidy is missing or"
                     "wrong version: ${ClangTidy_EXECUTABLE} ${ClangTidy_VERSION}")
   endif(ClangTidy_FOUND)
+endmacro()
+
+macro(add_tidy_subdir _dxt_subdir)
+  set(BASE ${PROJECT_SOURCE_DIR}/dune/xt/${_dxt_subdir})
+  # including the headercheck sources works around our headers needing included config.h to function adding "-extra-
+  # arg-before='-include config.h'" to TIDY_ARGS results in a tidy error despite the arg actually being applied
+  # correctly
+  file(GLOB_RECURSE _files
+                    "${PROJECT_BINARY_DIR}/headercheck/dune/xt/${_dxt_subdir}/*.cc"
+                    "${BASE}/*.cc"
+                    "${BASE}/*.cxx"
+                    "${BASE}/*.cpp"
+                    "${BASE}/*.c")
+  set(BASE ${PROJECT_SOURCE_DIR}/python/dune/xt/${_dxt_subdir})
+  file(GLOB_RECURSE _pyfiles
+                    "${PROJECT_BINARY_DIR}/headercheck/python/dune/xt/${_dxt_subdir}/*.cc"
+                    "${BASE}/*.cc"
+                    "${BASE}/*.cxx"
+                    "${BASE}/*.cpp"
+                    "${BASE}/*.c")
+  list(APPEND _files ${_pyfiles})
+  list(REMOVE_DUPLICATES _files)
+  set(TIDY_ARGS
+      -config=
+      -format-style=file
+      -p=${CMAKE_CURRENT_BINARY_DIR}
+      -header-filter=\".*/dune/xt/${_dxt_subdir}.*\")
+  add_custom_target(tidy_${_dxt_subdir}
+                    COMMAND ${ClangTidy_EXECUTABLE} ${TIDY_ARGS}
+                            -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes ${_files}
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  add_custom_target(fix_tidy_${_dxt_subdir}
+                    COMMAND ${ClangTidy_EXECUTABLE} ${TIDY_ARGS} -fix ${_files}
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  add_dependencies(tidy tidy_${_dxt_subdir})
+  add_dependencies(fix_tidy fix_tidy_${_dxt_subdir})
 endmacro(add_tidy)
 
 macro(add_forced_doxygen_target)

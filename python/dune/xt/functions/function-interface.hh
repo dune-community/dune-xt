@@ -27,7 +27,7 @@ namespace Functions {
 namespace internal {
 
 
-template <class L, class R, CombinationType comb>
+template <class L, class R, class comb>
 struct get_combined
 {}; // struct get_combined
 
@@ -114,7 +114,7 @@ struct get_combined<L, R, CombinationType::product>
 
 
 template <size_t d,
-          CombinationType comb,
+          class comb,
           size_t lr,
           size_t lrC,
           size_t rr,
@@ -147,7 +147,7 @@ bind_combined_Function(pybind11::module& m)
 } // ... bind_combined_Function(...)
 
 
-template <size_t d, CombinationType comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+template <size_t d, class comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_FunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
@@ -158,8 +158,7 @@ void addbind_FunctionInterface_combined_op(C& c)
   c.def(
       internal::get_combined<S, O, comb>::op().c_str(),
       [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
-      py::keep_alive<0, 1>(),
-      py::keep_alive<0, 2>());
+      py::is_operator());
 } // ... addbind_FunctionInterface_combined_op(...)
 
 
@@ -179,6 +178,11 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
                               + Common::to_string(rC))
                       .c_str());
 
+  c.def_property_readonly("dim_domain", [](const C& /*self*/) { return size_t(d); });
+  if (rC == 1)
+    c.def_property_readonly("dim_range", [](const C& /*self*/) { return size_t(r); });
+  else
+    c.def_property_readonly("dim_range", [](const C& /*self*/) { return std::make_pair(size_t(r), size_t(rC)); });
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 

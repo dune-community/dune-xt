@@ -16,6 +16,9 @@
 
 #if !HAVE_MPI
 
+// defines No_Comm + CollectiveCommunication
+#  include <dune/common/parallel/communication.hh>
+
 namespace Dune {
 
 

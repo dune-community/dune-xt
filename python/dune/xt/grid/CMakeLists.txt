@@ -20,7 +20,6 @@ dune_pybindxi_add_module(_grid_boundaryinfo_normalbased EXCLUDE_FROM_ALL boundar
 dune_pybindxi_add_module(_grid_boundaryinfo_types EXCLUDE_FROM_ALL boundaryinfo/types.cc)
 dune_pybindxi_add_module(_grid_filters_base EXCLUDE_FROM_ALL filters/base.cc)
 dune_pybindxi_add_module(_grid_filters_element EXCLUDE_FROM_ALL filters/element.cc)
-dune_pybindxi_add_module(_grid_filters_intersection EXCLUDE_FROM_ALL filters/intersection.cc)
 dune_pybindxi_add_module(_grid_functors_boundary_detector EXCLUDE_FROM_ALL functors/boundary-detector.cc)
 # dune_pybindxi_add_module(_grid_functors_bounding_box EXCLUDE_FROM_ALL functors/bounding-box.cc)
 dune_pybindxi_add_module(_grid_functors_interfaces EXCLUDE_FROM_ALL functors/interfaces.cc)

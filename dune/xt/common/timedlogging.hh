@@ -56,17 +56,26 @@ DUNE_EXPORT inline const Timer& SecondsSinceStartup()
  */
 class DefaultLogger
 {
-  static std::string build_prefix(const std::string& prefix, const std::string& clr)
+  static std::string build_prefix(const std::string& prfx, const size_t cnt, const std::string& clr)
   {
     const std::string actual_color = terminal_supports_color() ? color(clr) : "";
+    std::string copy_count_str = "";
+    if (cnt > 0)
+      copy_count_str += "[" + to_string(cnt) + "]";
+    std::string ret;
     if (actual_color.empty())
-      return prefix + ": ";
+      ret = prfx + copy_count_str + ": ";
     else
-      return actual_color + StreamModifiers::bold + prefix + ": " + StreamModifiers::normal;
-  }
+      ret = actual_color + StreamModifiers::bold + prfx + StreamModifiers::normal + copy_count_str
+            + StreamModifiers::bold + ": " + StreamModifiers::normal;
+    return ret;
+  } // ... build_prefix(...)
 
 public:
-  DefaultLogger(const std::string& prefix = "",
+  std::string prefix;
+  size_t copy_count;
+
+  DefaultLogger(const std::string& prfx = "",
                 bool start_disabled = false,
                 const std::array<std::string, 3>& colors = {"blue", "darkgray", "red"},
                 bool global_timer = true);
@@ -77,7 +86,6 @@ public:
 
 private:
   Timer timer_;
-  std::string prefix_;
   std::array<std::string, 3> colors_;
   bool global_timer_;
   std::shared_ptr<std::ostream> info_;
@@ -89,7 +97,14 @@ public:
   bool debug_enabled;
   bool warn_enabled;
 
-  void enable(const std::string& prefix = "");
+  void enable(const std::string& prfx = "");
+
+  void enable_like(const DefaultLogger& other)
+  {
+    this->info_enabled = this->info_enabled || other.info_enabled;
+    this->debug_enabled = this->debug_enabled || other.debug_enabled;
+    this->warn_enabled = this->warn_enabled || other.warn_enabled;
+  }
 
   void disable();
 
@@ -102,11 +117,19 @@ public:
 
 
 #ifdef LOG_
-#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt/issues/new !
+#  error Macro LOG_ already defined, open an issue at https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues !
 #else
 #  define LOG_(type)                                                                                                   \
     if (this->logger.type##_enabled)                                                                                   \
     this->logger.type()
+#endif
+
+#ifdef LOG__
+#  error Macro LOG_ already defined, open an issue at https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues !
+#else
+#  define LOG__(base, type)                                                                                            \
+    if (base ::logger.type##_enabled)                                                                                  \
+    base ::logger.type()
 #endif
 
 
@@ -118,47 +141,58 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-protected:
-  const std::string logging_id;
+  [[deprecated("Use this.logger.prefix instead (12.08.2020)!")]] static const std::string logging_id;
 
-public:
-  WithLogger(const std::string& prefix, const std::string& id, const bool start_enabled = false)
-    : logger(prefix, start_enabled)
-    , logging_id(id)
+  [[deprecated("Use WithLogger(id, start_enabled) instead (12.08.2020)!")]] WithLogger(const std::string& /*prefix*/,
+                                                                                       const std::string& id,
+                                                                                       const bool start_enabled = false)
+    : logger(id, start_enabled)
   {
-    LOG_(debug) << logging_id << "(this=" << this << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
+  }
+
+  WithLogger(const std::string& id, const bool start_enabled = false)
+    : logger(id, start_enabled)
+  {
+    LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
   }
 
   WithLogger(const ThisType& other)
     : logger(other.logger)
-    , logging_id(other.logging_id)
   {
-    LOG_(debug) << logging_id << "(this=" << this << ", other=" << &other << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
   WithLogger(ThisType&& source)
     : logger(std::move(source.logger))
-    , logging_id(std::move(source.logging_id))
   {
-    LOG_(debug) << logging_id << "(this=" << this << ", source=" << &source << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ", source=" << &source << ")" << std::endl;
   }
 
   ~WithLogger()
   {
-    LOG_(debug) << "~" << logging_id << "(this=" << this << ")" << std::endl;
+    LOG_(debug) << "~WithLogger(this=" << this << ")" << std::endl;
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    LOG_(debug) << logging_id << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
+    LOG_(debug) << "WithLogger.operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
   ThisType& operator=(ThisType&& source)
   {
-    LOG_(debug) << logging_id << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
+    LOG_(debug) << "WithLogger.operator=(this=" << this << ", source=" << &source << ")" << std::endl;
+  }
+
+  [[deprecated("Use this.logger.enable_like(other.logger) instead (12.08.2020)!")]] void
+  enable_logging_like(const ThisType& other)
+  {
+    this->logger.enable_like(other.logger);
   }
 }; // class WithLogger
 
+template <class T>
+const std::string WithLogger<T>::logging_id = "Use this.logger.prefix instead";
 
 /**
  * \brief A logging manager that provides info, debug and warning streams
@@ -228,7 +262,7 @@ public:
   /**
    * \brief sets the state
    *
-   *        This methos is mainly intended to be used on the global TimedLogger() instance. Before calling this method
+   *        This method is mainly intended to be used on the global TimedLogger() instance. Before calling this method
    *        the state is set according to the defaults default_max_info_level, default_max_debug_level and
    *        default_enable_warnings.
    * \note  Calling this method more than once will throw an Exceptions::you_are_using_this_wrong, following the idea of
@@ -238,11 +272,11 @@ public:
               const ssize_t max_debug_level = default_max_debug_level,
               const bool enable_warnings = default_enable_warnings,
               const bool enable_colors = default_enable_colors,
-              const std::string info_color = default_info_color(),
-              const std::string debug_color = default_debug_color(),
-              const std::string warning_color = default_warning_color());
+              const std::string& info_color = default_info_color(),
+              const std::string& debug_color = default_debug_color(),
+              const std::string& warning_color = default_warning_color());
 
-  TimedLogManager get(const std::string id);
+  TimedLogManager get(const std::string& id);
 
 private:
   void update_colors();
@@ -388,89 +422,81 @@ int main() {
  * The same holds for the move ctor as well as move and assignment operators.
  */
 template <typename T = void>
-class EnableDebugLoggingForCtors
+class NoOpEnableDebugLoggingForCtors
 {
-  typedef EnableDebugLoggingForCtors<T> ThisType;
+  using ThisType = NoOpEnableDebugLoggingForCtors<T>;
 
 public:
-  EnableDebugLoggingForCtors(const std::string&
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
-                                 prefix
-#endif
-                             ,
-                             const std::string&
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
-                                 class_id
-#endif
-                             )
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  NoOpEnableDebugLoggingForCtors(const std::string&, const std::string&) {}
+
+  NoOpEnableDebugLoggingForCtors(const ThisType& other) = default;
+
+  NoOpEnableDebugLoggingForCtors(ThisType&& source) = default;
+
+  ~NoOpEnableDebugLoggingForCtors() = default;
+
+  ThisType& operator=(const ThisType& other) = default;
+
+  ThisType& operator=(ThisType&& source) = default;
+
+}; // class NoOpEnableDebugLoggingForCtors
+
+template <typename T = void>
+class ActiveEnableDebugLoggingForCtors
+{
+  using ThisType = ActiveEnableDebugLoggingForCtors<T>;
+
+public:
+  ActiveEnableDebugLoggingForCtors(const std::string& prefix, const std::string& class_id)
     : logger_(TimedLogger().get(prefix))
     , class_id_(class_id)
   {
     logger_.debug() << class_id_ << "(this=" << this << ")" << std::endl;
   }
-#else
-  {}
-#endif
 
-  EnableDebugLoggingForCtors(const ThisType& other)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ActiveEnableDebugLoggingForCtors(const ThisType& other)
     : logger_(other.logger_)
     , class_id_(other.class_id_)
   {
     logger_.debug() << class_id_ << "(this=" << this << ", other=" << &other << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-  EnableDebugLoggingForCtors(ThisType&& source)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ActiveEnableDebugLoggingForCtors(ThisType&& source)
     : logger_(std::move(source.logger_))
     , class_id_(std::move(source.class_id_))
   {
     logger_.debug() << class_id_ << "(this=" << this << ", source=" << &source << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-  ~EnableDebugLoggingForCtors()
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ~ActiveEnableDebugLoggingForCtors()
   {
     logger_.debug() << "~" << class_id_ << "(this=" << this << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
   ThisType& operator=(const ThisType& other)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
   {
     logger_.debug() << class_id_ << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
   ThisType& operator=(ThisType&& source)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
   {
     logger_.debug() << class_id_ << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
 protected:
   TimedLogManager logger_;
 
 private:
   const std::string class_id_;
-#endif
-}; // class EnableDebugLoggingForCtors
+}; // class ActiveEnableDebugLoggingForCtors
 
+#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+template <class T>
+using EnableDebugLoggingForCtors = ActiveEnableDebugLoggingForCtors<T>;
+#else
+template <class T>
+using EnableDebugLoggingForCtors = NoOpEnableDebugLoggingForCtors<T>;
+#endif
 
 } // namespace Common
 } // namespace XT

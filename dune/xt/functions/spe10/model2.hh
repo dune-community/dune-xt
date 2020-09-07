@@ -73,8 +73,8 @@ public:
   } // ... static_id(...)
 
 private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename,
-                                                      const Common::FieldVector<size_t, domain_dim>& number_of_elements)
+  static std::shared_ptr<std::vector<RangeType>>
+  read_values_from_file(const std::string& filename, const Common::FieldVector<size_t, domain_dim>& number_of_elements)
 
   {
     // read all the data from the file
@@ -104,12 +104,12 @@ private:
     // if (filecounter != 3366000)
     //#warning you are not using the entire data file. Use default number_of_elements instead.
 
-    std::vector<RangeType> data(entries_per_coordinate, RangeType(0));
+    auto data = std::make_shared<std::vector<RangeType>>(entries_per_coordinate, RangeType(0));
 
     for (size_t ii = 0; ii < entries_per_coordinate; ++ii) {
       for (size_t dim = 0; dim < domain_dim; ++dim) {
         const auto idx = ii + dim * entries_per_coordinate;
-        data[ii][dim][dim] = values_in_file[idx];
+        (*data)[ii][dim][dim] = values_in_file[idx];
       }
     }
     return data;

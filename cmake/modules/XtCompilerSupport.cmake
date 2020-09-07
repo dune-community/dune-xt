@@ -25,13 +25,8 @@ endmacro(ADD_IF_SUPPORTED)
 macro(INCLUDE_SYS_DIR)
   foreach(ARG ${ARGN})
     if(IS_DIRECTORY ${ARG})
-      include_directories(${ARG}) # due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129  we have to filter what
-                                  # to sys-include includes
-      if(${ARG} MATCHES "/usr/include")
-        message(AUTHOR_WARNING "-isystem not supported for ${ARG}")
-      else()
-        add_definitions("-isystem ${ARG}")
-      endif()
+      include_directories(SYSTEM ${ARG}) # due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129  we have to filter
+                                         # what to sys-include includes
     else(IS_DIRECTORY ${ARG})
       message(STATUS "Include directory ${ARG} does not exist")
     endif(IS_DIRECTORY ${ARG})

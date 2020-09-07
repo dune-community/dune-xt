@@ -167,6 +167,12 @@ public:
     return this->as_imp();
   }
 
+  virtual derived_type& operator/=(const ScalarType& alpha)
+  {
+    scal(1. / alpha);
+    return this->as_imp();
+  }
+
   /**
    *  \brief  Multiplies every component of this by a scalar.
    *  \param  alpha The scalar.

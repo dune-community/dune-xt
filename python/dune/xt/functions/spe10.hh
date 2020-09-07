@@ -104,6 +104,8 @@ auto bind_Spe10Model1Function_2D(pybind11::module& m, const std::string& grid_id
       "min"_a = Spe10::internal::model1_min_value,
       "max"_a = Spe10::internal::model1_max_value,
       "name"_a = C::static_id());
+
+  return c;
 } // ... bind_Spe10Model1Function(...)
 
 template <class G, size_t d, size_t r, size_t rC>

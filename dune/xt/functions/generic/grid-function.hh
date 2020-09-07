@@ -54,6 +54,7 @@ namespace Functions {
 template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class GenericGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
+  using ThisType = GenericGridFunction;
   using BaseType = GridFunctionInterface<E, r, rC, R>;
 
 public:
@@ -89,11 +90,10 @@ private:
                              const Common::ParameterType& param_type,
                              const GenericJacobianFunctionType& jacobian_func,
                              const GenericDerivativeFunctionType& derivative_func)
-      : BaseType()
+      : BaseType(param_type)
       , order_(order_func)
       , post_bind_(post_bind_func)
       , evaluate_(evaluate_func)
-      , param_type_(param_type)
       , jacobian_(jacobian_func)
       , derivative_(derivative_func)
     {}
@@ -147,18 +147,12 @@ private:
       return derivative_(alpha, point_in_local_coordinates, parsed_param);
     }
 
-    const Common::ParameterType& parameter_type() const override final
-    {
-      return param_type_;
-    }
-
   private:
-    const GenericOrderFunctionType& order_;
-    const GenericPostBindFunctionType& post_bind_;
-    const GenericEvaluateFunctionType& evaluate_;
-    const Common::ParameterType& param_type_;
-    const GenericJacobianFunctionType& jacobian_;
-    const GenericDerivativeFunctionType& derivative_;
+    const GenericOrderFunctionType order_;
+    const GenericPostBindFunctionType post_bind_;
+    const GenericEvaluateFunctionType evaluate_;
+    const GenericJacobianFunctionType jacobian_;
+    const GenericDerivativeFunctionType derivative_;
   }; // class LocalGenericGridFunction
 
 public:
@@ -185,10 +179,10 @@ public:
                       const std::string nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
-    : order_(default_order_lambda(ord))
+    : BaseType(param_type)
+    , order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
-    , param_type_(param_type)
     , name_(nm)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
@@ -201,18 +195,29 @@ public:
                       const std::string nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
-    : order_(order_func)
+    : BaseType(param_type)
+    , order_(order_func)
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
-    , param_type_(param_type)
     , name_(nm)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
   {}
 
-  const Common::ParameterType& parameter_type() const override final
+  GenericGridFunction(const ThisType&) = default;
+
+  GenericGridFunction(ThisType&&) = default;
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
   {
-    return param_type_;
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
   std::string name() const override final
@@ -223,7 +228,7 @@ public:
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalGenericGridFunction>(
-        order_, post_bind_, evaluate_, param_type_, jacobian_, derivative_);
+        order_, post_bind_, evaluate_, this->parameter_type(), jacobian_, derivative_);
   }
 
   /**
@@ -281,10 +286,9 @@ private:
   const GenericOrderFunctionType order_;
   const GenericPostBindFunctionType post_bind_;
   const GenericEvaluateFunctionType evaluate_;
-  const Common::ParameterType param_type_;
   const std::string name_;
-  GenericJacobianFunctionType jacobian_;
-  GenericDerivativeFunctionType derivative_;
+  const GenericJacobianFunctionType jacobian_;
+  const GenericDerivativeFunctionType derivative_;
 }; // class GenericGridFunction
 
 

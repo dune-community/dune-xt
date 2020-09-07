@@ -49,16 +49,18 @@ const auto to_primitive = [&](const auto& conservative_variables) {
 auto u_primitive = XT::Functions::make_transformed_function<d + 2, 1, R>(u_conservative, to_primitive);
 \endcode
  */
-template <class LF, size_t r = LF::r, size_t rC = LF::rC, class R = typename LF::R>
-class TransformedGridFunction : public XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>
+template <class GF, size_t r = GF::r, size_t rC = GF::rC, class R = typename GF::R>
+class TransformedGridFunction : public XT::Functions::GridFunctionInterface<typename GF::E, r, rC, R>
 {
-  static_assert(is_grid_function<LF>::value, "");
-  using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>;
+  static_assert(is_grid_function<GF>::value, "");
 
-  class TransformedLocalFunction : public XT::Functions::ElementFunctionInterface<typename LF::E, r, rC, R>
+  using ThisType = TransformedGridFunction;
+  using BaseType = XT::Functions::GridFunctionInterface<typename GF::E, r, rC, R>;
+
+  class TransformedLocalFunction : public XT::Functions::ElementFunctionInterface<typename GF::E, r, rC, R>
   {
-    using BaseType = XT::Functions::ElementFunctionInterface<typename LF::E, r, rC, R>;
-    using UntransformedLocalFunctionType = typename LF::LocalFunctionType;
+    using BaseType = XT::Functions::ElementFunctionInterface<typename GF::E, r, rC, R>;
+    using UntransformedLocalFunctionType = typename GF::LocalFunctionType;
 
   public:
     using UntransformedRangeType = typename UntransformedLocalFunctionType::RangeType;
@@ -70,9 +72,10 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     using typename BaseType::RangeType;
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
-    TransformedLocalFunction(const LF& function, const Transformation& transformation)
-      : BaseType()
-      , local_function_(function.local_function())
+    TransformedLocalFunction(const GF& function, const Transformation& transformation)
+      : BaseType(function.paramter_type())
+      , function_(function.copy_as_grid_function())
+      , local_function_(function_->local_function())
       , transformation_(transformation)
     {}
 
@@ -100,6 +103,7 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     }
 
   private:
+    std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
     std::unique_ptr<UntransformedLocalFunctionType> local_function_;
     const Transformation& transformation_;
   }; // class TransformedLocalFunction
@@ -110,17 +114,39 @@ public:
   using UntransformedRangeType = typename TransformedLocalFunction::UntransformedRangeType;
   using TransformedRangeType = typename TransformedLocalFunction::RangeType;
 
-  TransformedGridFunction(const LF& f,
+  TransformedGridFunction(const GF& func,
                           std::function<TransformedRangeType(const UntransformedRangeType&)> transformation,
                           const std::string& nm = "")
-    : function_(f)
+    : BaseType(func.parameter_type())
+    , function_(func.copy_as_grid_function())
     , transformation_(transformation)
-    , name_(nm)
+    , name_(nm.empty() ? "transformed " + function_.name() : nm)
   {}
 
+  TransformedGridFunction(const ThisType& other)
+    : BaseType(other)
+    , function_(other.function_->copy_as_grid_function())
+    , transformation_(other.transformation_)
+    , name_(other.name_)
+  {}
+
+  TransformedGridFunction(ThisType&&) = default;
+
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
   std::string name() const override final
   {
-    return name_.empty() ? "transformed " + function_.name() : name_;
+    return name_;
   }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -129,7 +155,7 @@ public:
   }
 
 private:
-  const LF& function_;
+  std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
   const typename TransformedLocalFunction::Transformation transformation_;
   const std::string name_;
 }; // class TransformedGridFunction

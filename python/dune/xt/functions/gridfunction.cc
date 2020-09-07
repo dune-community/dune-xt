@@ -57,9 +57,16 @@ private:
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      c.def(py::init<const typename RangeTypeSelector<R, r, rC>::type&>(), "constant_matrix"_a);
-      c.def(py::init<const FunctionInterface<d, r, rC, R>&>(), "matrix_function"_a, py::keep_alive<1, 2>());
-      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&>(), "matrix_grid_function"_a, py::keep_alive<1, 2>());
+      c.def(py::init<const typename RangeTypeSelector<R, r, rC>::type&, const std::string&, const std::string&>(),
+            "constant_matrix"_a,
+            "name"_a = "GridFunction",
+            "logging_prefix"_a = "");
+      c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
+            "matrix_function"_a,
+            "logging_prefix"_a = "");
+      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
+            "matrix_grid_function"_a,
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -70,63 +77,70 @@ private:
       // without dimRange
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const typename RangeTypeSelector<R, r, rC>::type& constant_matrix) {
-            return type(constant_matrix);
-          },
+          [](const GP&,
+             const typename RangeTypeSelector<R, r, rC>::type& constant_matrix,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_matrix, name, logging_prefix); },
           "grid"_a,
-          "constant_matrix"_a);
+          "constant_matrix"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, r, rC, R>& matrix_function) { return type(matrix_function); },
+          [](const GP&, const FunctionInterface<d, r, rC, R>& matrix_function, const std::string& logging_prefix) {
+            return new type(matrix_function, logging_prefix);
+          },
           "grid"_a,
           "matrix_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const GridFunctionInterface<E, r, rC, R>& matrix_grid_function) {
-            return type(matrix_grid_function);
-          },
+          [](const GP&,
+             const GridFunctionInterface<E, r, rC, R>& matrix_grid_function,
+             const std::string& logging_prefix) { return new type(matrix_grid_function, logging_prefix); },
           "grid"_a,
           "matrix_grid_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GridFunctionInterface<E, r, rC, R>& matrix_grid_function) { return type(matrix_grid_function); },
+          [](const GridFunctionInterface<E, r, rC, R>& matrix_grid_function, const std::string& logging_prefix) {
+            return new type(matrix_grid_function, logging_prefix);
+          },
           "matrix_grid_function"_a,
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // and with dimRange
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const typename RangeTypeSelector<R, r, rC>::type& constant_matrix,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(constant_matrix);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_matrix, name, logging_prefix); },
           "grid"_a,
           "constant_matrix"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FunctionInterface<d, r, rC, R>& matrix_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(matrix_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(matrix_function, logging_prefix); },
           "grid"_a,
           "matrix_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, r, rC, R>& matrix_grid_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(matrix_grid_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(matrix_grid_function, logging_prefix); },
           "grid"_a,
           "matrix_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r, rC, anything>, the general case, neither scalar nor square matrix
 
@@ -138,10 +152,20 @@ private:
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      c.def(py::init<const R&>(), "constant_scalar"_a);
-      c.def(py::init<const FieldVector<R, 1>&>(), "constant_vector_of_length_one"_a);
-      c.def(py::init<const FunctionInterface<d, 1, 1, R>&>(), "scalar_function"_a, py::keep_alive<1, 2>());
-      c.def(py::init<const GridFunctionInterface<E, 1, 1, R>&>(), "scalar_grid_function"_a, py::keep_alive<1, 2>());
+      c.def(py::init<const R&, const std::string&, const std::string&>(),
+            "constant_scalar"_a,
+            "name"_a = "GridFunction",
+            "logging_prefix"_a = "");
+      c.def(py::init<const FieldVector<R, 1>&, const std::string&, const std::string&>(),
+            "constant_vector_of_length_one"_a,
+            "name"_a = "GridFunction",
+            "logging_prefix"_a = "");
+      c.def(py::init<const FunctionInterface<d, 1, 1, R>&, const std::string&>(),
+            "scalar_function"_a,
+            "logging_prefix"_a = "");
+      c.def(py::init<const GridFunctionInterface<E, 1, 1, R>&, const std::string&>(),
+            "scalar_grid_function"_a,
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -152,113 +176,142 @@ private:
       // without dimRange
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const R& constant_scalar) { return type(constant_scalar); },
-          "grid"_a,
-          "constant_scalar"_a);
-      m.def(
-          FactoryName.c_str(),
-          [](const GP&, const FieldVector<R, 1>& constant_vector_of_length_one) {
-            return type(constant_vector_of_length_one);
-          },
-          "grid"_a,
-          "constant_vector_of_length_one"_a);
-      m.def(
-          FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, 1, 1, R>& scalar_function) { return type(scalar_function); },
-          "grid"_a,
-          "scalar_function"_a,
-          py::keep_alive<0, 2>());
-      m.def(
-          FactoryName.c_str(),
-          [](const GP&, const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function) {
-            return type(scalar_grid_function);
-          },
-          "grid"_a,
-          "scalar_grid_function"_a,
-          py::keep_alive<0, 2>());
-      m.def(
-          FactoryName.c_str(),
-          [](const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function) { return type(scalar_grid_function); },
-          "scalar_grid_function"_a,
-          py::keep_alive<0, 1>());
-      // and with dimRange, to distinguish from the square matrix case
-      m.def(
-          FactoryName.c_str(),
-          [](const GP&, const R& constant_scalar, const Grid::bindings::Dimension<1>&) {
-            return type(constant_scalar);
+          [](const GP&, const R& constant_scalar, const std::string& name, const std::string& logging_prefix) {
+            return new type(constant_scalar, name, logging_prefix);
           },
           "grid"_a,
           "constant_scalar"_a,
-          "dim_range"_a);
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FieldVector<R, 1>& constant_vector_of_length_one, const Grid::bindings::Dimension<1>&) {
-            return type(constant_vector_of_length_one);
+          [](const GP&,
+             const FieldVector<R, 1>& constant_vector_of_length_one,
+             const std::string& name,
+             const std::string& logging_prefix) {
+            return new type(constant_vector_of_length_one, name, logging_prefix);
           },
           "grid"_a,
           "constant_vector_of_length_one"_a,
-          "dim_range"_a);
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, 1, 1, R>& scalar_function, const Grid::bindings::Dimension<1>&) {
-            return type(scalar_function);
+          [](const GP&, const FunctionInterface<d, 1, 1, R>& scalar_function, const std::string& logging_prefix) {
+            return new type(scalar_function, logging_prefix);
           },
           "grid"_a,
           "scalar_function"_a,
-          "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function,
-             const Grid::bindings::Dimension<1>&) { return type(scalar_grid_function); },
+             const std::string& logging_prefix) { return new type(scalar_grid_function, logging_prefix); },
+          "grid"_a,
+          "scalar_grid_function"_a,
+          "logging_prefix"_a = "");
+      m.def(
+          FactoryName.c_str(),
+          [](const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function, const std::string& logging_prefix) {
+            return new type(scalar_grid_function, logging_prefix);
+          },
+          "scalar_grid_function"_a,
+          "logging_prefix"_a = "");
+      // and with dimRange, to distinguish from the square matrix case
+      m.def(
+          FactoryName.c_str(),
+          [](const GP&,
+             const R& constant_scalar,
+             const Grid::bindings::Dimension<1>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_scalar, name, logging_prefix); },
+          "grid"_a,
+          "constant_scalar"_a,
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
+      m.def(
+          FactoryName.c_str(),
+          [](const GP&,
+             const FieldVector<R, 1>& constant_vector_of_length_one,
+             const Grid::bindings::Dimension<1>&,
+             const std::string& name,
+             const std::string& logging_prefix) {
+            return new type(constant_vector_of_length_one, name, logging_prefix);
+          },
+          "grid"_a,
+          "constant_vector_of_length_one"_a,
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
+      m.def(
+          FactoryName.c_str(),
+          [](const GP&,
+             const FunctionInterface<d, 1, 1, R>& scalar_function,
+             const Grid::bindings::Dimension<1>&,
+             const std::string& logging_prefix) { return new type(scalar_function, logging_prefix); },
+          "grid"_a,
+          "scalar_function"_a,
+          "dim_range"_a,
+          "logging_prefix"_a = "");
+      m.def(
+          FactoryName.c_str(),
+          [](const GP&,
+             const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function,
+             const Grid::bindings::Dimension<1>&,
+             const std::string& logging_prefix) { return new type(scalar_grid_function, logging_prefix); },
           "grid"_a,
           "scalar_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       // and with dimRange x dimRangeCols
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const R& constant_scalar,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(constant_scalar);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_scalar, name, logging_prefix); },
           "grid"_a,
           "constant_scalar"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FieldVector<R, 1>& constant_vector_of_length_one,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(constant_vector_of_length_one);
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name,
+             const std::string& logging_prefix) {
+            return new type(constant_vector_of_length_one, name, logging_prefix);
           },
           "grid"_a,
           "constant_vector_of_length_one"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FunctionInterface<d, 1, 1, R>& scalar_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(scalar_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(scalar_function, logging_prefix); },
           "grid"_a,
           "scalar_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, 1, 1, R>& scalar_grid_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(scalar_grid_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(scalar_grid_function, logging_prefix); },
           "grid"_a,
           "scalar_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<1, 1, anything> the scalar case
 
@@ -270,9 +323,16 @@ private:
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      c.def(py::init<const typename RangeTypeSelector<R, r, rC>::type&>(), "constant_vector"_a);
-      c.def(py::init<const FunctionInterface<d, r, rC, R>&>(), "vector_function"_a, py::keep_alive<1, 2>());
-      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&>(), "vector_grid_function"_a, py::keep_alive<1, 2>());
+      c.def(py::init<const typename RangeTypeSelector<R, r, rC>::type&, const std::string&, const std::string&>(),
+            "constant_vector"_a,
+            "name"_a = "GridFunction",
+            "logging_prefix"_a = "");
+      c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
+            "vector_function"_a,
+            "logging_prefix"_a = "");
+      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
+            "vector_grid_function"_a,
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -283,90 +343,103 @@ private:
       // without dimRange
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const typename RangeTypeSelector<R, r, rC>::type& constant_vector) {
-            return type(constant_vector);
-          },
+          [](const GP&,
+             const typename RangeTypeSelector<R, r, rC>::type& constant_vector,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_vector, name, logging_prefix); },
           "grid"_a,
-          "constant_vector"_a);
+          "constant_vector"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, r, rC, R>& vector_function) { return type(vector_function); },
+          [](const GP&, const FunctionInterface<d, r, rC, R>& vector_function, const std::string& logging_prefix) {
+            return new type(vector_function, logging_prefix);
+          },
           "grid"_a,
           "vector_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const GridFunctionInterface<E, r, rC, R>& vector_grid_function) {
-            return type(vector_grid_function);
-          },
+          [](const GP&,
+             const GridFunctionInterface<E, r, rC, R>& vector_grid_function,
+             const std::string& logging_prefix) { return new type(vector_grid_function, logging_prefix); },
           "grid"_a,
           "vector_grid_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GridFunctionInterface<E, r, rC, R>& vector_grid_function) { return type(vector_grid_function); },
+          [](const GridFunctionInterface<E, r, rC, R>& vector_grid_function, const std::string& logging_prefix) {
+            return new type(vector_grid_function, logging_prefix);
+          },
           "vector_grid_function"_a,
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // with dimRange
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const typename RangeTypeSelector<R, r, rC>::type& constant_vector,
-             const Grid::bindings::Dimension<r>&) { return type(constant_vector); },
+             const Grid::bindings::Dimension<r>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_vector, name, logging_prefix); },
           "grid"_a,
           "constant_vector"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, r, rC, R>& vector_function, const Grid::bindings::Dimension<r>&) {
-            return type(vector_function);
-          },
+          [](const GP&,
+             const FunctionInterface<d, r, rC, R>& vector_function,
+             const Grid::bindings::Dimension<r>&,
+             const std::string& logging_prefix) { return new type(vector_function, logging_prefix); },
           "grid"_a,
           "vector_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, r, rC, R>& vector_grid_function,
-             const Grid::bindings::Dimension<r>&) { return type(vector_grid_function); },
+             const Grid::bindings::Dimension<r>&,
+             const std::string& logging_prefix) { return new type(vector_grid_function, logging_prefix); },
           "grid"_a,
           "vector_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       // with dimRange x 1
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const typename RangeTypeSelector<R, r, rC>::type& constant_vector,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&) {
-            return type(constant_vector);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_vector, name, logging_prefix); },
           "grid"_a,
           "constant_vector"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FunctionInterface<d, r, rC, R>& vector_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&) {
-            return type(vector_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&,
+             const std::string& logging_prefix) { return new type(vector_function, logging_prefix); },
           "grid"_a,
           "vector_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, r, rC, R>& vector_grid_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&) {
-            return type(vector_grid_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<1>>&,
+             const std::string& logging_prefix) { return new type(vector_grid_function, logging_prefix); },
           "grid"_a,
           "vector_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r, 1, anything>, the non scalar vector case
 
@@ -382,11 +455,16 @@ private:
       dim_dependent<1, 1>::init(c);
 
       // .. and the matrix ones
-      c.def(py::init<const FieldMatrix<R, r, rC>&>(), "constant_square_matrix"_a);
-      c.def(py::init<const FunctionInterface<d, r, rC, R>&>(), "square_matrix_function"_a, py::keep_alive<1, 2>());
-      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&>(),
+      c.def(py::init<const FieldMatrix<R, r, rC>&, const std::string&, const std::string&>(),
+            "constant_square_matrix"_a,
+            "name"_a = "GridFunction",
+            "logging_prefix"_a = "");
+      c.def(py::init<const FunctionInterface<d, r, rC, R>&, const std::string&>(),
+            "square_matrix_function"_a,
+            "logging_prefix"_a = "");
+      c.def(py::init<const GridFunctionInterface<E, r, rC, R>&, const std::string&>(),
             "square_matrix_grid_function"_a,
-            py::keep_alive<1, 2>());
+            "logging_prefix"_a = "");
     } // ... init(...)
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
@@ -400,71 +478,76 @@ private:
       // .. and the matrix ones, without dimRange
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FieldMatrix<R, r, rC>& constant_square_matrix) { return type(constant_square_matrix); },
+          [](const GP&,
+             const FieldMatrix<R, r, rC>& constant_square_matrix,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_square_matrix, name, logging_prefix); },
           "grid"_a,
-          "constant_square_matrix"_a);
+          "constant_square_matrix"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const FunctionInterface<d, r, rC, R>& square_matrix_function) {
-            return type(square_matrix_function);
-          },
+          [](const GP&,
+             const FunctionInterface<d, r, rC, R>& square_matrix_function,
+             const std::string& logging_prefix) { return new type(square_matrix_function, logging_prefix); },
           "grid"_a,
           "square_matrix_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GP&, const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function) {
-            return type(square_matrix_grid_function);
-          },
+          [](const GP&,
+             const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function,
+             const std::string& logging_prefix) { return new type(square_matrix_grid_function, logging_prefix); },
           "grid"_a,
           "square_matrix_grid_function"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
-          [](const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function) {
-            return type(square_matrix_grid_function);
+          [](const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function, const std::string& logging_prefix) {
+            return new type(square_matrix_grid_function, logging_prefix);
           },
           "square_matrix_grid_function"_a,
-          py::keep_alive<0, 1>());
+          "logging_prefix"_a = "");
       // .. and with dimRange
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FieldMatrix<R, r, rC>& constant_square_matrix,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(constant_square_matrix);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name,
+             const std::string& logging_prefix) { return new type(constant_square_matrix, name, logging_prefix); },
           "grid"_a,
           "constant_square_matrix"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction",
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const FunctionInterface<d, r, rC, R>& square_matrix_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(square_matrix_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(square_matrix_function, logging_prefix); },
           "grid"_a,
           "square_matrix_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              const GridFunctionInterface<E, r, rC, R>& square_matrix_grid_function,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return type(square_matrix_grid_function);
-          },
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& logging_prefix) { return new type(square_matrix_grid_function, logging_prefix); },
           "grid"_a,
           "square_matrix_grid_function"_a,
           "dim_range"_a,
-          py::keep_alive<0, 2>());
+          "logging_prefix"_a = "");
     } // ... factory (...)
   }; // struct dim_dependent<r_, r_, anything> the square matrix (but not scalar) case
 
 public:
   static bound_type bind(pybind11::module& m,
-                         const std::string& grid_id = Grid::bindings::grid_name<G>::value(),
+                         const std::string& grid_id,
                          const std::string& layer_id = "",
                          const std::string& class_id = "grid_function")
   {
@@ -483,76 +566,87 @@ public:
       class_name += "_" + Common::Typename<R>::value(/*fail_wo_typeid=*/true);
     const auto ClassName = Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), Common::to_camel_case(class_id).c_str());
-    c.def(py::init([](int order, typename GFT::GenericEvaluateFunctionType evaluate) {
-            return new type({order, evaluate});
-          }),
-          "order"_a,
-          "evaluate_lambda"_a);
-    c.def(py::init([](int order,
-                      typename GFT::GenericEvaluateFunctionType evaluate,
-                      typename GFT::GenericJacobianFunctionType jacobian) {
-            return new type({order, evaluate, jacobian});
+    c.def(py::init([](int order, typename GFT::GenericEvaluateFunctionType evaluate, const std::string& name) {
+            return new type({order, evaluate, name});
           }),
           "order"_a,
           "evaluate_lambda"_a,
-          "jacobian_lambda"_a);
+          "name"_a = "GridFunction");
+    c.def(py::init([](int order,
+                      typename GFT::GenericEvaluateFunctionType evaluate,
+                      typename GFT::GenericJacobianFunctionType jacobian,
+                      const std::string& name) {
+            return new type({order, evaluate, jacobian, name});
+          }),
+          "order"_a,
+          "evaluate_lambda"_a,
+          "jacobian_lambda"_a,
+          "name"_a = "GridFunction");
     dim_dependent<>::init(c);
 
     const auto FactoryName = Common::to_camel_case(class_id);
-    if (rC == 1) { // two variants opposed to four above
+    if (rC == 1) { // two variants here opposed to four above
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              int order,
              typename GFT::GenericEvaluateFunctionType evaluate,
-             const Grid::bindings::Dimension<r>&) {
-            return new type({order, evaluate});
+             const Grid::bindings::Dimension<r>&,
+             const std::string& name) {
+            return new type({order, evaluate, name});
           },
           "grid"_a,
           "order"_a,
           "evaluate_lambda"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              int order,
              typename GFT::GenericEvaluateFunctionType evaluate,
              typename GFT::GenericJacobianFunctionType jacobian,
-             const Grid::bindings::Dimension<r>&) {
-            return new type({order, evaluate, jacobian});
+             const Grid::bindings::Dimension<r>&,
+             const std::string& name) {
+            return new type({order, evaluate, jacobian, name});
           },
           "grid"_a,
           "order"_a,
           "evaluate_lambda"_a,
           "jacobian_lambda"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction");
     } else {
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              int order,
              typename GFT::GenericEvaluateFunctionType evaluate,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return new type({order, evaluate});
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name) {
+            return new type({order, evaluate, name});
           },
           "grid"_a,
           "order"_a,
           "evaluate_lambda"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction");
       m.def(
           FactoryName.c_str(),
           [](const GP&,
              int order,
              typename GFT::GenericEvaluateFunctionType evaluate,
              typename GFT::GenericJacobianFunctionType jacobian,
-             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&) {
-            return new type({order, evaluate, jacobian});
+             const std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>>&,
+             const std::string& name) {
+            return new type({order, evaluate, jacobian, name});
           },
           "grid"_a,
           "order"_a,
           "evaluate_lambda"_a,
           "jacobian_lambda"_a,
-          "dim_range"_a);
+          "dim_range"_a,
+          "name"_a = "GridFunction");
     }
     dim_dependent<>::factory(m, FactoryName);
     return c;
@@ -579,15 +673,15 @@ struct GridFunction_for_all_grids
     using Dune::XT::Functions::bindings::GridFunction;
     using Dune::XT::Grid::bindings::grid_name;
 
-    GridFunction<G, E, 1, 1>::bind(m);
-    GridFunction<G, E, 1, 2>::bind(m);
-    GridFunction<G, E, 1, 3>::bind(m);
-    GridFunction<G, E, 2, 1>::bind(m);
-    GridFunction<G, E, 2, 2>::bind(m);
-    GridFunction<G, E, 2, 3>::bind(m);
-    GridFunction<G, E, 3, 1>::bind(m);
-    GridFunction<G, E, 3, 2>::bind(m);
-    GridFunction<G, E, 3, 3>::bind(m);
+    GridFunction<G, E, 1, 1>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 1, 2>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 1, 3>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 2, 1>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 2, 2>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 2, 3>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 3, 1>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 3, 2>::bind(m, grid_name<G>::value());
+    GridFunction<G, E, 3, 3>::bind(m, grid_name<G>::value());
 
     GridFunction_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }
@@ -607,9 +701,9 @@ PYBIND11_MODULE(_functions_gridfunction, m)
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
   py::module::import("dune.xt.la");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_1d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_2d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_3d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_1d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_2d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_3d");
 
   GridFunction_for_all_grids<>::bind(m);
 } // PYBIND11_MODULE(...)

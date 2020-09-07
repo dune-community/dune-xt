@@ -18,7 +18,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/intersection.hh>
-#include <dune/xt/common/print.hh>
+#include <dune/xt/grid/print.hh>
 
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
@@ -72,12 +72,12 @@ public:
     // special methods/operators
     c.def("__str__", [](type& self) {
       std::stringstream ss;
-      ss << Common::print(self);
+      ss << print(self);
       return ss.str();
     });
     c.def("__repr__", [](type& self) {
       std::stringstream ss;
-      ss << Common::repr(self);
+      ss << repr(self);
       return ss.str();
     });
     c.def(

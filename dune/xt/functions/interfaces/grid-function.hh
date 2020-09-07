@@ -25,15 +25,16 @@
 
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/view/from-part.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+#include <dune/xt/functions/base/visualization.hh>
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
-#include <dune/xt/functions/base/visualization.hh>
 
 #include "element-functions.hh"
 
@@ -42,17 +43,21 @@ namespace XT {
 namespace Functions {
 
 
-template <class MinuendType, class SubtrahendType>
+// forwards, includes are below
+template <class, class, class CombinationType>
+struct CombinedHelper;
+
+template <class, class>
 class DifferenceGridFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class SumGridFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class ProductGridFunction;
 
-// template <class Function>
-// class DivergenceFunction;
+template <class, class>
+class FractionGridFunction;
 
 
 /**
@@ -67,9 +72,12 @@ class ProductGridFunction;
  *        situations which could not be handled generically later on.
  */
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class GridFunctionInterface : public Common::ParametricInterface
+class GridFunctionInterface
+  : public Common::ParametricInterface
+  , public Common::WithLogger<GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>>
 {
-  using ThisType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = GridFunctionInterface;
+  using Logger = Common::WithLogger<GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>>;
 
 public:
   using LocalFunctionType = ElementFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
@@ -90,14 +98,34 @@ public:
 
   static constexpr bool available = false;
 
-  using DifferenceType = Functions::DifferenceGridFunction<ThisType, ThisType>;
-  using SumType = Functions::SumGridFunction<ThisType, ThisType>;
+private:
+  std::string logging_id() const
+  {
+    return "GridFunctionInterface<" + Common::to_string(size_t(r)) + "," + Common::to_string(size_t(rC)) + ">";
+  }
 
-  GridFunctionInterface(const Common::ParameterType& param_type = {})
+public:
+  GridFunctionInterface(const Common::ParameterType& param_type = {},
+                        const std::string& logging_prefix = "",
+                        const bool logging_disabled = true)
     : Common::ParametricInterface(param_type)
+    , Logger(logging_prefix.empty() ? "GridFunctionInterface" : logging_prefix, logging_disabled)
+  {
+    LOG_(debug) << logging_id() << "(param_type=" << param_type << ")" << std::endl;
+  }
+
+  GridFunctionInterface(const ThisType& other)
+    : Common::ParametricInterface(other)
+    , Logger(other)
   {}
 
+  GridFunctionInterface(ThisType&) = default;
+
   virtual ~GridFunctionInterface() = default;
+
+  ThisType& operator=(const ThisType&) = delete;
+
+  ThisType& operator=(ThisType&&) = delete;
 
   static std::string static_id()
   {
@@ -105,10 +133,32 @@ public:
   }
 
   /**
-   * \name ´´This method has to be implemented.''
+   * \name ´´These methods have to be implemented.''
    * \{
    **/
 
+  /**
+   * \brief Returns a (shallow) copy of the function.
+   * actual implementation work is delegated to the private `copy_as_function_impl`
+   * combined with hiding `copy_as_function` in dervived classes, this allows us the a
+   * unique_ptr with correct type at all levels of the polymorphic hierarchy
+   *
+   * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
+   */
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
+
+private:
+  virtual ThisType* copy_as_grid_function_impl() const = 0;
+
+public:
+  /**
+   * \brief Returns the local function which can be bound to grid elements.
+   *
+   * \note If possible, the returned function should be able to live on its own, e.g. by copying the grid function.
+   */
   virtual std::unique_ptr<LocalFunctionType> local_function() const = 0;
 
   /**
@@ -119,27 +169,68 @@ public:
 
   virtual std::string name() const
   {
-    return "dune.xt.functions.gridfunction";
+    LOG_(debug) << logging_id() << "::name()\n   returning \"GridFunction\"" << std::endl;
+    return "GridFunction";
   }
 
   /// \}
 
-  DifferenceType operator-(const ThisType& other) const
+  /// \name Operators emulating numeric types.
+  /// \{
+
+  Functions::DifferenceGridFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
-    return DifferenceType(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator-(other=" << &other << ")" << std::endl;
+    }
+    return Functions::DifferenceGridFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " - " + other.name() + ")", derived_logging_prefix);
   }
 
-  SumType operator+(const ThisType& other) const
+  Functions::SumGridFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
-    return SumType(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator+(other=" << &other << ")" << std::endl;
+    }
+    return Functions::SumGridFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " + " + other.name() + ")", derived_logging_prefix);
   }
 
   template <class OtherType>
-  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductGridFunction<ThisType, OtherType>>::type
+  std::enable_if_t<is_grid_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::product>::available,
+                   Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
   operator*(const OtherType& other) const
   {
-    return Functions::ProductGridFunction<ThisType, OtherType>(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "*" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator*(other=" << &other << ")" << std::endl;
+    }
+    return Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "*" + other.name() + ")", derived_logging_prefix);
   }
+
+  template <class OtherType>
+  std::enable_if_t<is_grid_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::fraction>::available,
+                   Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
+  operator/(const OtherType& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "/" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator/(other=" << &other << ")" << std::endl;
+    }
+    return Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "/" + other.name() + ")", derived_logging_prefix);
+  }
+
+  /// \}
 
   /**
    * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default: the grid you see in the
@@ -234,6 +325,5 @@ public:
 } // namespace Dune
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
-#include <dune/xt/functions/base/visualization.hh>
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_GRID_FUNCTION_HH

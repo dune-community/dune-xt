@@ -13,7 +13,9 @@
 #define DUNE_XT_FUNCTIONS_DERIVATIVES_HH
 
 #include <dune/xt/functions/base/derivatives-of-element-functions.hh>
+#include <dune/xt/functions/base/derivatives-of-grid-functions.hh>
 #include <dune/xt/functions/interfaces/element-functions.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
 namespace XT {
@@ -27,11 +29,31 @@ DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>
   return DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>(func);
 }
 
+template <class E, class R>
+DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>
+divergence(const ElementFunctionInterface<E, E::dimension, 1, R>& func)
+{
+  return DivergenceElementFunction<ElementFunctionInterface<E, E::dimension, 1, R>>(func);
+}
 
 template <class E, class R>
-GradientElementFunction<ElementFunctionInterface<E, 1, 1, R>> gradient(ElementFunctionInterface<E, 1, 1, R>& func)
+DivergenceGridFunction<GridFunctionInterface<E, E::dimension, 1, R>>
+divergence(const GridFunctionInterface<E, E::dimension, 1, R>& func)
+{
+  return DivergenceGridFunction<GridFunctionInterface<E, E::dimension, 1, R>>(func);
+}
+
+
+template <class E, class R>
+GradientElementFunction<ElementFunctionInterface<E, 1, 1, R>> gradient(const ElementFunctionInterface<E, 1, 1, R>& func)
 {
   return GradientElementFunction<ElementFunctionInterface<E, 1, 1, R>>(func);
+}
+
+template <class E, class R>
+GradientGridFunction<GridFunctionInterface<E, 1, 1, R>> gradient(const GridFunctionInterface<E, 1, 1, R>& func)
+{
+  return GradientGridFunction<GridFunctionInterface<E, 1, 1, R>>(func);
 }
 
 

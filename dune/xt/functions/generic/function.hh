@@ -33,6 +33,7 @@ namespace Functions {
 template <size_t domain_dim, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
 class GenericFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
 {
+  using ThisType = GenericFunction;
   using BaseType = FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>;
 
 public:
@@ -111,11 +112,21 @@ public:
     , name_(nm)
   {}
 
+  GenericFunction(const ThisType&) = default;
 
-  /**
-   * \name ´´These methods are required by FunctionInterface.''
-   * \{
-   */
+  GenericFunction(ThisType&&) = default;
+
+private:
+  ThisType* copy_as_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
+  }
 
   int order(const Common::Parameter& param = {}) const override final
   {
@@ -154,7 +165,6 @@ public:
   }
 
   /**
-   * \}
    * \name ´´These methods may be used to provide defaults on construction.''
    * \{
    */

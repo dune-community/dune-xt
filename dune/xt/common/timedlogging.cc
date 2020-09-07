@@ -27,22 +27,23 @@ namespace XT {
 namespace Common {
 
 
-DefaultLogger::DefaultLogger(const std::string& prefix,
+DefaultLogger::DefaultLogger(const std::string& prfx,
                              bool start_disabled,
                              const std::array<std::string, 3>& colors,
                              bool global_timer)
-  : timer_()
-  , prefix_(prefix)
+  : prefix(prfx)
+  , copy_count(0)
+  , timer_()
   , colors_(colors)
   , global_timer_(global_timer)
   , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                   build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
+                                                   build_prefix(prfx.empty() ? "info" : prfx, copy_count, colors_[0]),
                                                    std::cout))
   , debug_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                    build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
+                                                    build_prefix(prfx.empty() ? "debug" : prfx, copy_count, colors_[1]),
                                                     std::cout))
   , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                   build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
+                                                   build_prefix(prfx.empty() ? "warn" : prfx, copy_count, colors_[2]),
                                                    std::cerr))
   , info_enabled(!start_disabled)
   , debug_enabled(!start_disabled)
@@ -50,19 +51,23 @@ DefaultLogger::DefaultLogger(const std::string& prefix,
 {}
 
 DefaultLogger::DefaultLogger(const DefaultLogger& other)
-  : timer_()
-  , prefix_(other.prefix_)
+  : prefix(other.prefix)
+  , copy_count(other.copy_count + 1)
+  , timer_()
   , colors_(other.colors_)
   , global_timer_(other.global_timer_)
-  , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                   build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
-                                                   std::cout))
-  , debug_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                    build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
-                                                    std::cout))
-  , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                   build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
-                                                   std::cerr))
+  , info_(
+        std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                 build_prefix(prefix.empty() ? "info" : prefix, copy_count, colors_[0]),
+                                                 std::cout))
+  , debug_(std::make_shared<TimedPrefixedLogStream>(
+        global_timer_ ? SecondsSinceStartup() : timer_,
+        build_prefix(prefix.empty() ? "debug" : prefix, copy_count, colors_[1]),
+        std::cout))
+  , warn_(
+        std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                 build_prefix(prefix.empty() ? "warn" : prefix, copy_count, colors_[2]),
+                                                 std::cerr))
   , info_enabled(other.info_enabled)
   , debug_enabled(other.debug_enabled)
   , warn_enabled(other.warn_enabled)
@@ -71,19 +76,23 @@ DefaultLogger::DefaultLogger(const DefaultLogger& other)
 DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
 {
   if (&other != this) {
+    prefix = other.prefix;
+    copy_count = other.copy_count;
     timer_ = other.timer_;
-    prefix_ = other.prefix_;
     colors_ = other.colors_;
     global_timer_ = other.global_timer_;
-    info_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                     build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
-                                                     std::cout);
-    debug_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                      build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
-                                                      std::cout);
-    warn_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
-                                                     build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
-                                                     std::cerr);
+    info_ =
+        std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                 build_prefix(prefix.empty() ? "info" : prefix, copy_count, colors_[0]),
+                                                 std::cout);
+    debug_ = std::make_shared<TimedPrefixedLogStream>(
+        global_timer_ ? SecondsSinceStartup() : timer_,
+        build_prefix(prefix.empty() ? "debug" : prefix, copy_count, colors_[1]),
+        std::cout);
+    warn_ =
+        std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                 build_prefix(prefix.empty() ? "warn" : prefix, copy_count, colors_[2]),
+                                                 std::cerr);
     info_enabled = other.info_enabled;
     debug_enabled = other.debug_enabled;
     warn_enabled = other.warn_enabled;
@@ -91,19 +100,20 @@ DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
   return *this;
 } // ... operator=(...)
 
-void DefaultLogger::enable(const std::string& prefix)
+void DefaultLogger::enable(const std::string& prfx)
 {
   info_enabled = true;
   debug_enabled = true;
   warn_enabled = true;
-  if (!prefix.empty()) {
-    prefix_ = prefix;
+  if (!prfx.empty()) {
+    prefix = prfx;
+    copy_count = 0;
     info_ = std::make_shared<TimedPrefixedLogStream>(
-        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[0]), std::cout);
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prfx, copy_count, colors_[0]), std::cout);
     debug_ = std::make_shared<TimedPrefixedLogStream>(
-        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[1]), std::cout);
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prfx, copy_count, colors_[1]), std::cout);
     warn_ = std::make_shared<TimedPrefixedLogStream>(
-        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[2]), std::cerr);
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prfx, copy_count, colors_[2]), std::cerr);
   }
 } // ... enable(...)
 
@@ -206,9 +216,9 @@ void TimedLogging::create(const ssize_t max_info_level,
                           const ssize_t max_debug_level,
                           const bool enable_warnings,
                           const bool enable_colors,
-                          const std::string info_color,
-                          const std::string debug_color,
-                          const std::string warning_color)
+                          const std::string& info_color,
+                          const std::string& debug_color,
+                          const std::string& warning_color)
 {
   DUNE_UNUSED std::lock_guard<std::mutex> guard(mutex_);
   DUNE_THROW_IF(created_, Exceptions::logger_error, "Do not call create() more than once!");
@@ -224,7 +234,7 @@ void TimedLogging::create(const ssize_t max_info_level,
   update_colors();
 } // ... create(...)
 
-TimedLogManager TimedLogging::get(const std::string id)
+TimedLogManager TimedLogging::get(const std::string& id)
 {
   DUNE_UNUSED std::lock_guard<std::mutex> guard(mutex_);
   ++current_level_;

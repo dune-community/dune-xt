@@ -31,15 +31,28 @@ namespace XT {
 namespace Functions {
 
 
-// forwards, required in operator+-*
-template <class MinuendType, class SubtrahendType>
+// forwards, required in operator+-*, includes are below
+namespace internal {
+
+
+template <class, class, class CombinationType>
+struct CombinedHelper;
+
+
+} // namespace internal
+
+
+template <class, class>
 class DifferenceFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class SumFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class ProductFunction;
+
+template <class, class>
+class FractionFunction;
 
 // forward, required in FunctionInterface::as_grid_function
 template <class E, size_t r, size_t rC, class R>
@@ -52,7 +65,7 @@ class FunctionAsGridFunctionWrapper;
  *        These functions do not depend on a grid, but only on the dimensions and fields of their domain and range.
  *        See in particular RangeReturnTypeSelector and DerivativeRangeReturnTypeSelector for the interpretation of a
  *        function and its derivatives, and GridFunctionInterface for functions which may have discontinuities between
- *        entites (as in: which are double-valued on intersections).
+ *        entities (as in: which are double-valued on intersections).
  *
  *        To turn a function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
  *        to visualize it or to use it in a discretization scheme), use as_grid_function to obtain a const reference to
@@ -120,13 +133,40 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
+  FunctionInterface(const ThisType& other)
+    : Common::ParametricInterface(other)
+  {}
+
+  FunctionInterface(ThisType&) = default;
+
   virtual ~FunctionInterface() = default;
+
+  ThisType& operator=(const ThisType&) = delete;
+
+  ThisType& operator=(ThisType&&) = delete;
 
   /**
    * \name ´´These methods have to be implemented.''
    * \{
    **/
 
+  /**
+   * \brief Returns a (shallow) copy of the function.
+   * actual implementation work is delegated to the private `copy_as_function_impl`
+   * combined with hiding `copy_as_function` in derived classes, this allows us the a
+   * unique_ptr with correct type at all levels of the polymorphic hierarchy
+   *
+   * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
+   */
+  std::unique_ptr<ThisType> copy_as_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_function_impl());
+  }
+
+private:
+  virtual ThisType* copy_as_function_impl() const = 0;
+
+public:
   virtual int order(const XT::Common::Parameter& /*param*/ = {}) const = 0;
 
   /**
@@ -165,27 +205,46 @@ public:
     return "dune.xt.functions.function";
   }
 
+  /// \}
+  /// \name Operators emulating numeric types.
+  /// \{
+
+  Functions::DifferenceFunction<ThisType, ThisType> operator-(const ThisType& other) const
+  {
+    return Functions::DifferenceFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " - " + other.name() + ")");
+  }
+
+  Functions::SumFunction<ThisType, ThisType> operator+(const ThisType& other) const
+  {
+    return Functions::SumFunction<ThisType, ThisType>(*this, other, "(" + this->name() + " + " + other.name() + ")");
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::product>::available,
+                   Functions::ProductFunction<ThisType, as_function_interface_t<OtherType>>>
+  operator*(const OtherType& other) const
+  {
+    return Functions::ProductFunction<ThisType, as_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "*" + other.name() + ")");
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::fraction>::available,
+                   Functions::FractionFunction<ThisType, as_function_interface_t<OtherType>>>
+  operator/(const OtherType& other) const
+  {
+    return Functions::FractionFunction<ThisType, as_function_interface_t<OtherType>>(
+        *this, other, "(" + this->name() + "/" + other.name() + ")");
+  }
+
   /**
    * \}
    * \name ´´These methods are default implemented and should be overridden to improve their performance.''
    * \{
    **/
-
-  DifferenceType operator-(const ThisType& other) const
-  {
-    return DifferenceType(*this, other);
-  }
-
-  SumType operator+(const ThisType& other) const
-  {
-    return SumType(*this, other);
-  }
-
-  template <class OtherType>
-  auto operator*(const OtherType& other) const
-  {
-    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
-  }
 
   virtual R evaluate(const DomainType& point_in_global_coordinates,
                      const size_t row,
@@ -258,22 +317,24 @@ public:
   /**
    * \note This function keeps a map of all wrappers in a local static map, to avoid temporaries.
    * \todo Check if this implementation is thread safe!
+   * \todo nvm thread safe, the caching is already broken for multiple functions in sequence
    */
   template <class E>
   const typename std::enable_if<XT::Grid::is_entity<E>::value && E::dimension == d,
-                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
+                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type
   as_grid_function() const
   {
-    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
-    if (wrappers.find(this) == wrappers.end())
-      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
-    return *(wrappers[this]);
+    //    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
+    //    if (wrappers.find(this) == wrappers.end())
+    //      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
+    //    return *(wrappers[this]);
+    return FunctionAsGridFunctionWrapper<E, r, rC, R>(copy_as_function());
   }
 
   template <class ViewTraits>
   const typename std::enable_if<
       (ViewTraits::Grid::dimension == d),
-      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
+      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type
   as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
   {
     return this->as_grid_function<typename ViewTraits::template Codim<0>::Entity>();

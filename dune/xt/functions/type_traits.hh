@@ -16,6 +16,7 @@
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/dynvector.hh>
 
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/type_traits.hh>
@@ -125,8 +126,8 @@ struct RangeTypeSelector<R, r, 1>
 template <size_t d, class R, size_t r, size_t rC>
 struct DerivativeRangeTypeSelector
 {
-  using single_type = XT::Common::FieldVector<R, d>;
-  using return_single_type = FieldVector<R, d>;
+  using single_type = FieldVector<R, d>;
+  using return_single_type = XT::Common::FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
 
   using row_derivative_type = FieldMatrix<R, rC, d>;
@@ -284,12 +285,106 @@ struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typenam
 {};
 
 
-enum class CombinationType
+template <class F>
+struct as_element_function_interface
 {
-  difference,
-  product,
-  sum
-}; // enum class CombinationType
+  static_assert(is_element_function<F>::value, "");
+  using type = Functions::ElementFunctionInterface<typename F::E, F::r, F::rC, typename F::R>;
+};
+
+template <class F>
+using as_element_function_interface_t = typename as_element_function_interface<F>::type;
+
+
+template <class F>
+struct as_function_interface
+{
+  static_assert(is_function<F>::value, "");
+  using type = Functions::FunctionInterface<F::d, F::r, F::rC, typename F::R>;
+};
+
+template <class F>
+using as_function_interface_t = typename as_function_interface<F>::type;
+
+
+template <class F>
+struct as_grid_function_interface
+{
+  static_assert(is_grid_function<F>::value, "");
+  using type = Functions::GridFunctionInterface<typename F::E, F::r, F::rC, typename F::R>;
+};
+
+template <class F>
+using as_grid_function_interface_t = typename as_grid_function_interface<F>::type;
+
+
+struct CombinationType
+{
+  struct difference
+  {};
+  struct fraction
+  {};
+  struct product
+  {};
+  struct sum
+  {};
+}; // struct CombinationType
+
+
+template <typename CombinationType>
+struct GetCombination
+{
+  static std::string name()
+  {
+    return get_combination_name(CombinationType());
+  }
+
+  static std::string symbol()
+  {
+    return get_combination_symbol(CombinationType());
+  }
+}; // struct GetCombination
+
+
+inline std::string get_combination_name(CombinationType::difference)
+{
+  return "difference";
+}
+
+inline std::string get_combination_symbol(CombinationType::difference)
+{
+  return "-";
+}
+
+inline std::string get_combination_name(CombinationType::fraction)
+{
+  return "fraction";
+}
+
+inline std::string get_combination_symbol(CombinationType::fraction)
+{
+  return "/";
+}
+
+inline std::string get_combination_name(CombinationType::product)
+{
+  return "product";
+}
+
+inline std::string get_combination_symbol(CombinationType::product)
+{
+  return "*";
+}
+
+inline std::string get_combination_name(CombinationType::sum)
+{
+  return "sum";
+}
+
+inline std::string get_combination_symbol(CombinationType::sum)
+{
+  return "+";
+}
 
 
 enum class DerivativeType

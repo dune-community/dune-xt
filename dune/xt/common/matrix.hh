@@ -323,13 +323,15 @@ auto set_matrix_entry(MatrixType& matrix, const size_t ii, const size_t jj, cons
 }
 
 
+// The enable_if has to stay, there is an alternative in vector.hh!
 template <class MatrixType,
           size_t ROWS = MatrixAbstraction<MatrixType>::static_rows,
           size_t COLS = MatrixAbstraction<MatrixType>::static_cols,
           class FieldType = typename MatrixAbstraction<MatrixType>::S,
           class SparsityPatternType = FullPattern>
-typename std::enable_if_t<is_matrix<MatrixType>::value,
-                          typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>
+typename std::enable_if<
+    is_matrix<MatrixType>::value,
+    typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>::type
 create(const size_t rows,
        const size_t cols,
        const FieldType& val = 0,
@@ -343,8 +345,10 @@ create(const size_t rows,
 }
 
 
+// The enable_if has to stay, there is an alternative in vector.hh!
 template <class TargetMatrixType, class SourceMatrixType>
-typename std::enable_if_t<is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value, TargetMatrixType>
+typename std::enable_if<is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value,
+                        TargetMatrixType>::type
 zeros_like(const SourceMatrixType& source)
 {
   return create<TargetMatrixType>(
@@ -352,8 +356,9 @@ zeros_like(const SourceMatrixType& source)
 }
 
 
+// The enable_if has to stay, there is an alternative in vector.hh!
 template <class MatrixType>
-typename std::enable_if_t<is_matrix<MatrixType>::value, MatrixType> zeros_like(const MatrixType& source)
+typename std::enable_if<is_matrix<MatrixType>::value, MatrixType>::type zeros_like(const MatrixType& source)
 {
   return zeros_like<MatrixType, MatrixType>(source);
 }

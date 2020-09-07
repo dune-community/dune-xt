@@ -98,7 +98,7 @@ class CutoffFunction
              const ScalarFunction& diffusion_factor,
              const TensorFunction& diffusion_tensor,
              const R& poincare_constant,
-             const std::string& name) { return type(diffusion_factor, diffusion_tensor, poincare_constant, name); },
+             const std::string& name) { return new type(diffusion_factor, diffusion_tensor, poincare_constant, name); },
           "grid_provider"_a,
           "diffusion_factor"_a,
           "diffusion_tesor"_a,

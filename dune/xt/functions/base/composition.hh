@@ -243,11 +243,20 @@ public:
 
   CompositionFunction(const ThisType& other) = default;
 
-  ThisType& operator=(const ThisType& other) = delete;
 
-  ThisType& operator=(ThisType&& source) = delete;
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
 
-  virtual std::string name() const override
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
+
+  std::string name() const override final
   {
     return name_;
   }
@@ -255,8 +264,7 @@ public:
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<ElementFunction>(inner_function_, outer_function_, element_search_);
-  } // ... local_function(...)
-
+  }
 
 private:
   const InnerType inner_function_;

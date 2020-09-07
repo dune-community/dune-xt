@@ -27,7 +27,7 @@ namespace internal {
 template <class ElementFunctionType, DerivativeType derivative>
 class DerivativeElementFunctionHelper
 {
-  static_assert(is_element_function<ElementFunctionType>::value, "");
+  static_assert(is_element_function<ElementFunctionType>::value || is_grid_function<ElementFunctionType>::value, "");
 
 public:
   using E = typename ElementFunctionType::E;
@@ -201,7 +201,7 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element)
+  void post_bind(const ElementType& element) override final
   {
     if (do_post_bind_)
       func_.access().bind(element);

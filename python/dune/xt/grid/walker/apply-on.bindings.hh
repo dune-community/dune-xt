@@ -59,13 +59,13 @@ private:
       m.def(
           makename(class_name, layer_name).c_str(),
           [](const BoundaryInfoType& boundary_info, XT::Grid::BoundaryType*&& boundary_type) {
-            return type(boundary_info, std::move(boundary_type));
+            return new type(boundary_info, std::move(boundary_type));
           },
           "boundary_info"_a,
           "boundary_type"_a);
     } else {
       c.def(pybind11::init<>());
-      m.def(makename(class_name, layer_name).c_str(), []() { return type(); });
+      m.def(makename(class_name, layer_name).c_str(), []() { return new type(); });
     }
   }
 

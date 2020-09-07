@@ -973,6 +973,17 @@ void rightmultiply(Dune::FieldMatrix<K, L_ROWS, R_COLS>& ret,
   }
 }
 
+
+template <class K, int rows, int cols>
+XT::Common::FieldVector<K, rows> operator*(const Dune::FieldMatrix<K, rows, cols>& mat,
+                                           const Dune::FieldVector<K, cols>& vec)
+{
+  XT::Common::FieldVector<K, rows> ret;
+  mat.mv(vec, ret);
+  return ret;
+}
+
+
 // versions that do not allocate matrices on the stack (for large matrices)
 template <class K, int L_ROWS, int L_COLS, int R_COLS>
 std::unique_ptr<Dune::XT::Common::FieldMatrix<K, L_ROWS, R_COLS>>

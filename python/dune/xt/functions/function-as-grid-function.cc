@@ -66,9 +66,9 @@ PYBIND11_MODULE(_functions_function_as_grid_function, m)
   py::module::import("dune.xt.functions._functions_function_interface_1d");
   py::module::import("dune.xt.functions._functions_function_interface_2d");
   py::module::import("dune.xt.functions._functions_function_interface_3d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_1d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_2d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_3d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_1d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_2d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_3d");
 
   all_grids(m);
 }

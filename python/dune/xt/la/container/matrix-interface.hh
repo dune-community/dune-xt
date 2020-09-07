@@ -208,6 +208,55 @@ auto bind_Matrix(pybind11::module& m)
       "min_cols"_a = -1,
       "mode"_a = "ascii");
 
+  c.def(
+      "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
+  c.def("__iadd__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator+=,
+        py::is_operator());
+  c.def(
+      "__sub__", [](const C& self, const C& other) { return std::make_unique<C>(self - other); }, py::is_operator());
+  c.def("__isub__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator-=,
+        py::is_operator());
+  c.def(
+      "__mul__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def(
+      "__rmul__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__imul__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator*=,
+        py::is_operator());
+  c.def(
+      "__truediv__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) /= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__itruediv__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator/=,
+        py::is_operator());
+  c.def(
+      "neg",
+      [](const C& self) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= -1;
+        return ret;
+      },
+      py::is_operator());
+
   addbind_ContainerInterface(c);
 
   return c;
@@ -222,9 +271,23 @@ void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class
   mat.def(
       "mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
   mat.def(
+      "dot",
+      [](const M& self, const V& xx) {
+        V yy(self.rows());
+        self.mv(xx, yy);
+        return yy;
+      },
+      "source");
+  mat.def(
+      "__matmul__",
+      [](const M& self, const V& xx) {
+        V yy(self.rows());
+        self.mv(xx, yy);
+        return yy;
+      },
+      "source");
+  mat.def(
       "mtv", [](const M& self, const V& xx, V& yy) { self.mtv(xx, yy); }, "source", "range");
-
-  mat.def(py::self * V());
 
   mat.def("vector_type", [vec](M& /*self*/) { return vec; });
   vec.def("matrix_type", [mat](V& /*self*/) { return mat; });

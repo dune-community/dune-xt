@@ -44,16 +44,18 @@ auto density_times_velocity = XT::Functions::make_sliced_function<d>(u, {1, 2}, 
 auto energy                 = XT::Functions::make_sliced_function<1>(u, {3},    "energy");
 \endcode
  */
-template <class LF, size_t r>
-class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>
+template <class GF, size_t r>
+class SlicedGridFunction<GF, r, 1> : public XT::Functions::GridFunctionInterface<typename GF::E, r, 1, typename GF::R>
 {
-  static_assert(is_grid_function<LF>::value, "");
-  static_assert(r <= LF::r, "Does not make sense!");
-  using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>;
+  static_assert(is_grid_function<GF>::value, "");
+  static_assert(r <= GF::r, "Does not make sense!");
 
-  class SlicedLocalFunction : public XT::Functions::ElementFunctionInterface<typename LF::E, r, 1, typename LF::R>
+  using ThisType = SlicedGridFunction;
+  using BaseType = XT::Functions::GridFunctionInterface<typename GF::E, r, 1, typename GF::R>;
+
+  class SlicedLocalFunction : public XT::Functions::ElementFunctionInterface<typename GF::E, r, 1, typename GF::R>
   {
-    using BaseType = XT::Functions::ElementFunctionInterface<typename LF::E, r, 1, typename LF::R>;
+    using BaseType = XT::Functions::ElementFunctionInterface<typename GF::E, r, 1, typename GF::R>;
 
   public:
     using typename BaseType::DerivativeRangeReturnType;
@@ -63,10 +65,10 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
     using typename BaseType::RangeReturnType;
     using typename BaseType::RangeType;
 
-
-    SlicedLocalFunction(const LF& function, const std::array<size_t, r>& dims)
-      : BaseType()
-      , local_function_(function.local_function())
+    SlicedLocalFunction(const GF& function, const std::array<size_t, r>& dims)
+      : BaseType(function.parameter_type())
+      , function_(function.copy_as_grid_function())
+      , local_function_(function_->local_function())
       , dims_(dims)
     {}
 
@@ -98,39 +100,60 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
     }
 
   private:
-    std::unique_ptr<typename LF::LocalFunctionType> local_function_;
-    const std::array<size_t, r>& dims_;
+    std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
+    std::unique_ptr<typename GF::LocalFunctionType> local_function_;
+    const std::array<size_t, r> dims_;
   }; // class SlicedLocalFunction
 
 public:
-  using typename BaseType::ElementType;
+  using typename BaseType::E;
   using typename BaseType::LocalFunctionType;
 
-  SlicedGridFunction(const LF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
-    : function_(function)
+  SlicedGridFunction(const GF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
+    : BaseType(function.parameter_type())
+    , function_(function.copy_as_grid_function())
     , dims_(dims)
     , name_(nm)
   {
     for (size_t ii = 0; ii < r; ++ii)
-      if (dims_[ii] >= LF::r)
+      if (dims_[ii] >= GF::r)
         DUNE_THROW(InvalidStateException,
-                   "LF::r = " << LF::r << "\n   "
+                   "GF::r = " << GF::r << "\n   "
                               << "r = " << r << "\n   "
                               << "dims[" << ii << "] = " << dims_[ii]);
   }
 
+  SlicedGridFunction(const ThisType& other)
+    : BaseType(other)
+    , function_(other.function_->copy_as_grid_function())
+  {}
+
+  SlicedGridFunction(ThisType&&) = default;
+
+
+private:
+  ThisType* copy_as_grid_function_impl() const override
+  {
+    return new ThisType(*this);
+  }
+
+public:
+  std::unique_ptr<ThisType> copy_as_grid_function() const
+  {
+    return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
+  }
   std::string name() const override final
   {
-    return name_.empty() ? "sliced " + function_.name() : name_;
+    return name_.empty() ? "sliced " + function_->name() : name_;
   }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<SlicedLocalFunction>(function_, dims_);
+    return std::make_unique<SlicedLocalFunction>(*function_, dims_);
   }
 
 private:
-  const LF& function_;
+  std::unique_ptr<GridFunctionInterface<typename GF::E, GF::r, GF::rC, typename GF::R>> function_;
   const std::array<size_t, r> dims_;
   const std::string& name_;
 }; // class SlicedGridFunction

@@ -112,14 +112,54 @@ auto bind_Vector(pybind11::module& m)
       },
       pybind11::keep_alive<0, 1>() /*Essential: keep object alive while iterator exists!*/);
 
-  c.def(py::self == py::self);
-  c.def(py::self != py::self);
-  c.def(py::self + py::self);
-  c.def(py::self += py::self);
-  c.def(py::self -= py::self);
-  c.def(py::self * py::self);
-  c.def(py::self *= R());
-  c.def(py::self /= R());
+  c.def(
+      "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
+  c.def("__iadd__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator+=,
+        py::is_operator());
+  c.def(
+      "__sub__", [](const C& self, const C& other) { return std::make_unique<C>(self - other); }, py::is_operator());
+  c.def("__isub__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator-=,
+        py::is_operator());
+  c.def(
+      "__mul__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def(
+      "__rmul__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__imul__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator*=,
+        py::is_operator());
+  c.def(
+      "__truediv__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) /= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__itruediv__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator/=,
+        py::is_operator());
+  c.def(
+      "neg",
+      [](const C& self) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= -1;
+        return ret;
+      },
+      py::is_operator());
 
   c.def_property_readonly("size", [](const C& self) { return self.size(); });
   c.def(

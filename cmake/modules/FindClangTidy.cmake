@@ -33,7 +33,7 @@ find_program(ClangTidy_EXECUTABLE
 if(EXISTS ${ClangTidy_EXECUTABLE})
   execute_process(COMMAND ${ClangTidy_EXECUTABLE} -version OUTPUT_VARIABLE clang_out)
   string(REGEX
-         REPLACE ".*LLVM version ([0-9]+\\.[0-9]+).*"
+         REPLACE ".*LLVM version ([0-9]+)\.[0-9]+\.[0-9]*.*"
                  "\\1"
                  ClangTidy_VERSION
                  ${clang_out})

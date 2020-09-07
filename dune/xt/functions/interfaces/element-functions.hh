@@ -58,12 +58,20 @@ class ConstProductElementFunction;
 template <class LeftFactorType, class RightFactorType>
 class ProductElementFunction;
 
+template <class LeftFactorType, class RightFactorType>
+class ConstFractionElementFunction;
+
+template <class LeftFactorType, class RightFactorType>
+class FractionElementFunction;
+
 
 namespace internal {
 
 
-template <class LeftType, class RightType, CombinationType>
-class CombinedElementFunctionHelper;
+template <class, class, class CombinationType>
+struct CombinedHelper;
+
+
 }
 
 
@@ -652,25 +660,47 @@ public:
     result[0] = this->derivative(alpha, point_in_reference_element, param);
   }
 
-  /**
-   * \}
-   * \name ´´These operators are provided for convenience.''
-   * \{
-   **/
+  /// \}
+
+  /// \name Numerical operators (const variants).
+  /// \{
 
   ConstDifferenceElementFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
     return ConstDifferenceElementFunction<ThisType, ThisType>(*this, other);
   }
 
-  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
-  {
-    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
-  }
-
   ConstSumElementFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
     return ConstSumElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_element_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::product>::available,
+                   ConstProductElementFunction<ThisType, as_element_function_interface_t<OtherType>>>
+  operator*(const OtherType& other) const
+  {
+    return ConstProductElementFunction<ThisType, as_element_function_interface_t<OtherType>>(*this, other);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<is_element_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::fraction>::available,
+                   ConstFractionElementFunction<ThisType, as_element_function_interface_t<OtherType>>>
+  operator/(const OtherType& other) const
+  {
+    return ConstFractionElementFunction<ThisType, as_element_function_interface_t<OtherType>>(*this, other);
+  }
+
+  /// \}
+
+  /// \name Numerical operators (mutable variants).
+  /// \{
+
+  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
+  {
+    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
   }
 
   SumElementFunction<ThisType, ThisType> operator+(ThisType& other)
@@ -679,28 +709,24 @@ public:
   }
 
   template <class OtherType>
-  std::enable_if_t<
-      is_element_function<OtherType>::value
-          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
-      ConstProductElementFunction<ThisType, OtherType>>
-  operator*(const OtherType& other) const
+  std::enable_if_t<is_element_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::product>::available,
+                   ProductElementFunction<ThisType, as_element_function_interface_t<OtherType>>>
+  operator*(OtherType& other)
   {
-    return ConstProductElementFunction<ThisType, OtherType>(*this, other);
+    return ProductElementFunction<ThisType, as_element_function_interface_t<OtherType>>(*this, other);
   }
 
   template <class OtherType>
-  std::enable_if_t<
-      is_element_function<OtherType>::value
-          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
-      ProductElementFunction<ThisType, OtherType>>
-  operator*(OtherType& other)
+  std::enable_if_t<is_element_function<OtherType>::value
+                       && internal::CombinedHelper<ThisType, OtherType, CombinationType::fraction>::available,
+                   FractionElementFunction<ThisType, as_element_function_interface_t<OtherType>>>
+  operator/(OtherType& other)
   {
-    return ProductElementFunction<ThisType, OtherType>(*this, other);
+    return FractionElementFunction<ThisType, as_element_function_interface_t<OtherType>>(*this, other);
   }
 
-  /**
-   * \{
-   **/
+  /// \}
 
 private:
   template <class FullType>
