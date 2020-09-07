@@ -19,13 +19,14 @@ struct InitlessElementFilter_for_all_grids
 {
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, typename GridTypes::head_type>::bind(m, class_id);
-    InitlessElementFilter_for_all_grids<Filter, typename GridTypes::tail_type>::bind(m, class_id);
+    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m,
+                                                                                                             class_id);
+    InitlessElementFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
 
 template <template <class> class Filter>
-struct InitlessElementFilter_for_all_grids<Filter, boost::tuples::null_type>
+struct InitlessElementFilter_for_all_grids<Filter, Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
 };

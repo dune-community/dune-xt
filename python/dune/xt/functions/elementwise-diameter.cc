@@ -86,7 +86,7 @@ public:
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
 struct ElementwiseDiameterFunction_for_all_grids
 {
-  using G = typename GridTypes::head_type;
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
   using GV = typename G::LeafGridView;
   using E = Dune::XT::Grid::extract_entity_t<GV>;
 
@@ -97,12 +97,12 @@ struct ElementwiseDiameterFunction_for_all_grids
 
     ElementwiseDiameterFunction<G, E>::bind(m, grid_name<G>::value());
 
-    ElementwiseDiameterFunction_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    ElementwiseDiameterFunction_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct ElementwiseDiameterFunction_for_all_grids<boost::tuples::null_type>
+struct ElementwiseDiameterFunction_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };

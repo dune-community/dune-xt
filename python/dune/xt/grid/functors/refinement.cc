@@ -81,13 +81,13 @@ struct MaximumEntityVolumeRefineFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<typename GridTypes::head_type>::bind(m);
-    MaximumEntityVolumeRefineFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    MaximumEntityVolumeRefineFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct MaximumEntityVolumeRefineFunctor_for_all_grids<boost::tuples::null_type>
+struct MaximumEntityVolumeRefineFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };

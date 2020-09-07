@@ -80,7 +80,7 @@ struct tplB
 template <class Tuple>
 void type_call()
 {
-  using TupleElement = typename Tuple::template head_type<int, int>;
+  using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
   using Type = typename TupleElement::type;
   static_assert(std::is_same<Type, int>::value, "");
   using Tail = typename Tuple::template tail_type<int, int>;

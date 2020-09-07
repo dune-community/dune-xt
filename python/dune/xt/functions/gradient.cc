@@ -91,7 +91,7 @@ public:
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
 struct GradientGridFunction_for_all_grids
 {
-  using G = typename GridTypes::head_type;
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
   using GV = typename G::LeafGridView;
   using E = Dune::XT::Grid::extract_entity_t<GV>;
 
@@ -102,12 +102,12 @@ struct GradientGridFunction_for_all_grids
 
     GradientGridFunction<G, E>::bind(m, grid_name<G>::value());
 
-    GradientGridFunction_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    GradientGridFunction_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct GradientGridFunction_for_all_grids<boost::tuples::null_type>
+struct GradientGridFunction_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };

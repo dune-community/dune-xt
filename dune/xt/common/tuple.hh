@@ -17,8 +17,6 @@
 
 #include <dune/common/typetraits.hh>
 
-
-#include <boost/tuple/tuple.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/begin.hpp>
@@ -342,6 +340,34 @@ struct tuple_element<N, std::tuple<Ts...>>
   using type = typename wrapped_type::type;
 };
 
+struct tuple_null_type
+{};
+struct null_type
+{};
+
+template <typename TList>
+struct list_content;
+
+template <typename Head, typename... Tail>
+struct list_content<std::tuple<Head, Tail...>>
+{
+  using head = Head;
+  using tail = std::tuple<Tail...>;
+};
+
+template <typename T>
+struct list_content<std::tuple<T>>
+{
+  using head = T;
+  using tail = tuple_null_type;
+};
+
+template <typename T1>
+using tuple_head_t = typename list_content<T1>::head;
+template <typename T1>
+using tuple_tail_t = typename list_content<T1>::tail;
+
+
 /** These classes allow recursively visiting a typelist that may contain templates names
  *  So if you ever wanted to iterate over "AllDirichletBoundaryInfo, AllNeumannBoundaryInfo, etc"
  *  and then input another type as tpl arg, sthis is for you.
@@ -374,14 +400,14 @@ template <class... Templates>
 struct type_help
 {
   template <class... Parameters>
-  using type = boost::tuple<typename from_tplwrap<Templates, Parameters...>::type...>;
+  using type = std::tuple<typename from_tplwrap<Templates, Parameters...>::type...>;
 };
 
 template <class... Args>
-struct type_help<boost::tuple<Args...>>
+struct type_help<std::tuple<Args...>>
 {
   template <class...>
-  using type = boost::tuple<Args...>;
+  using type = std::tuple<Args...>;
 };
 
 template <class... Args>
@@ -391,7 +417,7 @@ struct tail_hlp
 };
 
 template <class... Args>
-struct tail_hlp<boost::tuple<Args...>>
+struct tail_hlp<std::tuple<Args...>>
 {
   using type = template_tuple<Args...>;
 };
@@ -403,7 +429,7 @@ struct head_hlp
 };
 
 template <class A, class B>
-struct head_hlp<boost::tuples::cons<A, B>>
+struct head_hlp<std::tuple<A, B>>
 {
   using type = A;
 };
@@ -417,12 +443,17 @@ public:
   template <typename... T>
   using type = typename internal::type_help<WrapperOrTypes...>::template type<T...>;
   template <typename... T>
-  using tail_type = typename internal::tail_hlp<typename type<T...>::tail_type>::type;
+  using tail_type = typename internal::tail_hlp<tuple_tail_t<type<T...>>>::type;
   template <typename... T>
-  using head_type = typename internal::head_hlp<typename type<T...>::head_type>::type;
+  using head_type = typename internal::head_hlp<tuple_head_t<type<T...>>>::type;
 };
 
-using null_template_tuple = template_tuple<boost::tuples::null_type>;
+
+using null_template_tuple = template_tuple<Dune::XT::Common::tuple_null_type>;
+
+
+template <typename... input_t>
+using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 
 } // namespace Common
 } // namespace XT

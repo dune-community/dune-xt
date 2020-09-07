@@ -19,13 +19,13 @@ struct ElementFilter_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::ElementFilter<typename GridTypes::head_type>::bind(m);
-    ElementFilter_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::ElementFilter<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    ElementFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct ElementFilter_for_all_grids<boost::tuples::null_type>
+struct ElementFilter_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -36,13 +36,13 @@ struct IntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::IntersectionFilter<typename GridTypes::head_type>::bind(m);
-    IntersectionFilter_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::IntersectionFilter<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    IntersectionFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct IntersectionFilter_for_all_grids<boost::tuples::null_type>
+struct IntersectionFilter_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
