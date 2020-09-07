@@ -11,10 +11,6 @@
 
 #include "config.h"
 
-#include <dune/xt/common/disable_warnings.hh>
-#include <boost/numeric/conversion/cast.hpp>
-#include <dune/xt/common/reenable_warnings.hh>
-
 #include "math.hh"
 
 namespace Dune {
@@ -28,15 +24,18 @@ char abs(const char& val)
   return val < 0 ? static_cast<char>(-val) : val;
 }
 
-char absolute_difference(char a, char b)
-{
-  // calculating with chars returns an int, so we have to cast back to char
-  return boost::numeric_cast<char>((a > b) ? a - b : b - a);
-}
-
 
 } // namespace internal
 
+
+//! calculates binomial coefficient for arbitrary n
+double binomial_coefficient(const double n, const size_t k)
+{
+  double ret(1);
+  for (size_t ii = 1; ii <= k; ++ii)
+    ret *= (n + 1 - ii) / ii;
+  return ret;
+}
 
 // this is just for the test to compile
 const std::string Epsilon<std::string, false>::value = "_";

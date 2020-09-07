@@ -33,7 +33,6 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/common/matrix.hh>
-#include <dune/xt/common/math.hh>
 
 namespace Dune {
 namespace XT {

@@ -30,6 +30,7 @@
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/format.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/common/promotiontraits.hh>
@@ -125,14 +126,18 @@ typename internal::Absretval<T>::type abs(const T& val)
 
 //! very simple, underrun-safe for unsigned types, difference method
 template <class T>
-T absolute_difference(T a, T b)
+T absolute_difference(const T& a, const T& b)
 {
   return (a > b) ? a - b : b - a;
 }
 
-// specialization to silence narrowing warning
-char absolute_difference(char a, char b);
-
+// char specialization to silence narrowing warning
+template <>
+inline char absolute_difference(const char& a, const char& b)
+{
+  // calculating with chars returns an int, so we have to cast back to char
+  return boost::numeric_cast<char>((a > b) ? a - b : b - a);
+}
 
 //! a vector wrapper for continuously updating min,max,avg of some element type vector
 template <class ElementType>
@@ -285,16 +290,8 @@ std::complex<T> conj(std::complex<T> val)
   return std::conj(val);
 }
 
-
 //! calculates binomial coefficient for arbitrary n
-inline double binomial_coefficient(const double n, const size_t k)
-{
-  double ret(1);
-  for (size_t ii = 1; ii <= k; ++ii)
-    ret *= (n + 1 - ii) / ii;
-  return ret;
-}
-
+double binomial_coefficient(const double n, const size_t k);
 
 template <class T>
 T max(const T& left, const T& right)

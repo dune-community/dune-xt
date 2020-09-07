@@ -28,7 +28,6 @@
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/misc.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/information.hh>
 #include <dune/xt/grid/structuredgridfactory.hh>
 #include <dune/xt/grid/type_traits.hh>
 
