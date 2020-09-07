@@ -139,9 +139,7 @@ struct ElementVisualization
       int numberOfBoundarySegments(0);
       bool isOnBoundary = false;
 
-      const auto intersection_it_end = gridview_.iend(entity);
-      for (auto intersection_it = gridview_.ibegin(entity); intersection_it != intersection_it_end; ++intersection_it) {
-        const auto& intersection = *intersection_it;
+      for (auto&& intersection : intersections(gridview_, entity)) {
         if (!intersection.neighbor() && intersection.boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;

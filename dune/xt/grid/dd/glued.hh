@@ -322,9 +322,7 @@ public:
     prepare_global_grid();
     const size_t global_index_of_local_entity = local_to_global_indices_->operator[](subd)[local_entity_index];
     const auto global_micro_grid_view = global_grid_view();
-    const auto entity_it_end = global_micro_grid_view.template end<0>();
-    for (auto entity_it = global_micro_grid_view.template begin<0>(); entity_it != entity_it_end; ++entity_it) {
-      const auto& entity = *entity_it;
+    for (auto&& entity : elements(global_macro_grid_view)) {
       if (global_micro_grid_view.indexSet().index(entity) == global_index_of_local_entity)
         return entity;
     }
@@ -352,9 +350,7 @@ public:
     const auto subd = subdomain_and_local_entity_index.first;
     const auto local_index_of_global_entity = subdomain_and_local_entity_index.second;
     const auto local_grid_view = extract_local_view<layer>()(*local_grids_[subd], max_local_level(subd));
-    const auto entity_it_end = local_grid_view.template end<0>();
-    for (auto entity_it = local_grid_view.template begin<0>(); entity_it != entity_it_end; ++entity_it) {
-      const auto& entity = *entity_it;
+    for (auto&& entity : elements(local_grid_view)) {
       if (local_grid_view.indexSet().index(entity) == local_index_of_global_entity)
         return entity;
     }
@@ -464,11 +460,7 @@ public:
           glues_for_this_entity_neighbor.clear();
       }
       // find the corresponding macro intersection ...
-      const auto macro_intersection_it_end = macro_leaf_view_.iend(macro_entity);
-      for (auto macro_intersection_it = macro_leaf_view_.ibegin(macro_entity);
-           macro_intersection_it != macro_intersection_it_end;
-           ++macro_intersection_it) {
-        const auto& macro_intersection = *macro_intersection_it;
+      for (auto&& macro_intersection : intersections(macro_leaf_view_, macro_entity)) {
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto real_neighbor_ptr = macro_intersection.outside();
 #  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
@@ -553,10 +545,7 @@ public:
       // create the container, therefore
       const auto local_leaf_view = local_grids_[macro_entity_index]->leaf_view();
       // * walk the local grid (manually, to have access to the entity pointer)
-      const auto local_entity_it_end = local_leaf_view.template end<0>();
-      for (auto local_entity_it = local_leaf_view.template begin<0>(); local_entity_it != local_entity_it_end;
-           ++local_entity_it) {
-        const auto& local_entity = *local_entity_it;
+      for (auto&& local_entity : elements(local_leaf_view)) {
         //        logger.debug() << "local_entity: " << local_leaf_view.indexSet().index(local_entity) << " ";
         if (local_entity.hasBoundaryIntersections()) {
           //          logger.debug() << "(boundary entity)" << std::endl;
@@ -862,11 +851,7 @@ private:
       const auto macro_entity_index = macro_index_set.index(macro_entity);
       auto& entity_glues = glues_[macro_entity_index];
       // walk the neighbors ...
-      const auto macro_intersection_it_end = macro_leaf_view_.iend(macro_entity);
-      for (auto macro_intersection_it = macro_leaf_view_.ibegin(macro_entity);
-           macro_intersection_it != macro_intersection_it_end;
-           ++macro_intersection_it) {
-        const auto& macro_intersection = *macro_intersection_it;
+      for (auto&& macro_intersection : intersections(macro_leaf_view_, macro_entity)) {
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto macro_neighbor_ptr = macro_intersection.outside();
 #  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)

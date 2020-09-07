@@ -103,17 +103,13 @@ struct PeriodicViewTest : public testing::Test
     size_t boundary_count = 0;
     size_t periodic_count = 0;
     // iterate over codim 0 entities
-    const EntityIteratorType it_end = periodic_grid_view.template end<0>();
-    for (EntityIteratorType it = periodic_grid_view.template begin<0>(); it != it_end; ++it) {
-      const EntityType& entity = *it;
-      EXPECT_TRUE(periodic_grid_view.contains(entity));
-      EXPECT_TRUE(index_set.contains(entity));
-      const auto sub_index = index_set.subIndex(entity, 0, 1);
+    for (auto&& element : elements(periodic_grid_view)) {
+      EXPECT_TRUE(periodic_grid_view.contains(element));
+      EXPECT_TRUE(index_set.contains(element));
+      const auto sub_index = index_set.subIndex(element, 0, 1);
       (void)sub_index;
-      // iterate over all intersections on current entity
-      const PeriodicIntersectionIteratorType i_it_end = periodic_grid_view.iend(entity);
-      for (PeriodicIntersectionIteratorType i_it = periodic_grid_view.ibegin(entity); i_it != i_it_end; ++i_it) {
-        const PeriodicIntersectionType& intersection = *i_it;
+      // iterate over all intersections on current element
+      for (auto&& intersection : intersections(periodic_grid_view, element)) {
         if (intersection.neighbor()) {
           ++neighbor_count;
           const EntityType outside = intersection.outside();
