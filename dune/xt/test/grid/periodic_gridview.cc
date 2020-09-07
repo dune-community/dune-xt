@@ -204,7 +204,7 @@ struct PeriodicViewTest : public testing::Test
             : std::pow(elements_per_direction - 1, dimDomain - 2)
                   * ((num_edges - num_periodic_edges) + num_periodic_edges / (is_partially_periodic ? 2 : 4));
     // add vertices on corners (codim 3) of grid
-    if constexpr (domainDim == 3)
+    if constexpr (dimDomain == 3)
       expected_num_vertices += is_partially_periodic ? 4 : (is_nonperiodic ? 8 : 1);
 
     const size_t num_vertices = periodic_grid_view.size(dimDomain);
