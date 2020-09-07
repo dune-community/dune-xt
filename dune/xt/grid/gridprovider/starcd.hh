@@ -154,9 +154,9 @@ public:
         numberOfCubes++;
         for (size_t k = 0; k < numberOfVerticesCube; k++)
           cubeVertices[k] = items2[k + 1] - 1;
-        if (dimDomain > 1)
+        if constexpr (dimDomain > 1)
           std::swap(cubeVertices[2], cubeVertices[3]);
-        if (dimDomain == 3)
+        if constexpr (dimDomain == 3)
           std::swap(cubeVertices[6], cubeVertices[7]);
         factory.insertElement(Dune::GeometryTypes::cube(dimDomain), cubeVertices);
       } else if ((items2.size() == numberOfVerticesPrism + 1) && (dimDomain == 3)) { // prism

@@ -189,9 +189,9 @@ TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalu
                          num_elements[dd] - 1);
           }
           size_t subdomain = 0;
-          if (d == 1)
+          if constexpr (d == 1)
             subdomain = which_partition[0];
-          else if (d == 2)
+          else if constexpr (d == 2)
             subdomain = which_partition[0] + which_partition[1] * num_elements[0];
           else
             subdomain = which_partition[0] + which_partition[1] * num_elements[0] + which_partition[2] * num_elements[1] * num_elements[0];

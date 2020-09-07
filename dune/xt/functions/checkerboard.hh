@@ -230,9 +230,9 @@ private:
           std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
     }
     size_t subdomain = 0;
-    if (domain_dim == 1)
+    if constexpr (domain_dim == 1)
       subdomain = which_partition[0];
-    else if (domain_dim == 2)
+    else if constexpr (domain_dim == 2)
       subdomain = which_partition[0] + which_partition[1] * ne[0];
     else
       subdomain = which_partition[0] + which_partition[1] * ne[0] + which_partition[2] * ne[1] * ne[0];
