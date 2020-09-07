@@ -30,15 +30,15 @@
 template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
 void addbind_for_Grid(pybind11::module& m, std::vector<std::string>& available_types)
 {
-  using G = typename Tuple::head_type;
+  using G = Dune::XT::Common::tuple_head_t<Tuple>;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
   available_types.push_back(grid_id);
-  addbind_for_Grid<typename Tuple::tail_type>(m, available_types);
+  addbind_for_Grid<Dune::XT::Common::tuple_tail_t<Tuple>>(m, available_types);
 } // ... addbind_for_Grid(...)
 
 
 template <>
-void addbind_for_Grid<boost::tuples::null_type>(pybind11::module&, std::vector<std::string>&)
+void addbind_for_Grid<Dune::XT::Common::tuple_null_type>(pybind11::module&, std::vector<std::string>&)
 {}
 
 PYBIND11_MODULE(_test_grid_types, m)

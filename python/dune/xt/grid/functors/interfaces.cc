@@ -19,13 +19,13 @@ struct ElementFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::ElementFunctor<typename GridTypes::head_type>::bind(m);
-    ElementFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::ElementFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    ElementFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct ElementFunctor_for_all_grids<boost::tuples::null_type>
+struct ElementFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -36,13 +36,13 @@ struct IntersectionFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::IntersectionFunctor<typename GridTypes::head_type>::bind(m);
-    IntersectionFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::IntersectionFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    IntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct IntersectionFunctor_for_all_grids<boost::tuples::null_type>
+struct IntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -53,13 +53,13 @@ struct ElementAndIntersectionFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<typename GridTypes::head_type>::bind(m);
-    ElementAndIntersectionFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    ElementAndIntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct ElementAndIntersectionFunctor_for_all_grids<boost::tuples::null_type>
+struct ElementAndIntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };

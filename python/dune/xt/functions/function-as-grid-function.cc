@@ -45,14 +45,14 @@ template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
 void all_grids(pybind11::module& m)
 {
   Dune::XT::Common::bindings::guarded_bind([&]() { //  different grids but same entity
-    addbind_for_Grid<typename Tuple::head_type>(m);
+    addbind_for_Grid<Dune::XT::Common::tuple_head_t<Tuple>>(m);
   });
-  all_grids<typename Tuple::tail_type>(m);
+  all_grids<Dune::XT::Common::tuple_tail_t<Tuple>>(m);
 } // ... addbind_for_Grid(...)
 
 
 template <>
-void all_grids<boost::tuples::null_type>(pybind11::module&)
+void all_grids<Dune::XT::Common::tuple_null_type>(pybind11::module&)
 {}
 
 

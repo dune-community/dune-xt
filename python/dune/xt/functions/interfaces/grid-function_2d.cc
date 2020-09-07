@@ -23,17 +23,7 @@ PYBIND11_MODULE(_functions_interfaces_grid_function_2d, m)
   py::module::import("dune.xt.la");
 
   // All of these need to be there ...
-  GridFunctionInterface_for_all_grids<boost::tuple<YASP_2D_EQUIDISTANT_OFFSET
-#if HAVE_DUNE_ALUGRID
-                                                   ,
-                                                   ALU_2D_SIMPLEX_CONFORMING
-#endif
-                                                   >>::bind_interface(m);
+  GridFunctionInterface_for_all_grids<Dune::XT::Grid::Available2dGridTypes>::bind_interface(m);
   // ... before we start binding those.
-  GridFunctionInterface_for_all_grids<boost::tuple<YASP_2D_EQUIDISTANT_OFFSET
-#if HAVE_DUNE_ALUGRID
-                                                   ,
-                                                   ALU_2D_SIMPLEX_CONFORMING
-#endif
-                                                   >>::bind_combined(m);
+  GridFunctionInterface_for_all_grids<Dune::XT::Grid::Available2dGridTypes>::bind_combined(m);
 } // PYBIND11_MODULE(...)

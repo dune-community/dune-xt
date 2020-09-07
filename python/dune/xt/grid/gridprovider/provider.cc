@@ -22,13 +22,14 @@ struct InitlessIntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, typename GridTypes::head_type>::bind(m, class_id);
-    InitlessIntersectionFilter_for_all_grids<Filter, typename GridTypes::tail_type>::bind(m, class_id);
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, Dune::XT::Common::tuple_head_t<GridTypes>>::bind(
+        m, class_id);
+    InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
 
 template <template <class> class Filter>
-struct InitlessIntersectionFilter_for_all_grids<Filter, boost::tuples::null_type>
+struct InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
 };
@@ -39,13 +40,13 @@ struct CustomBoundaryIntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<typename GridTypes::head_type>::bind(m);
-    CustomBoundaryIntersectionFilter_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct CustomBoundaryIntersectionFilter_for_all_grids<boost::tuples::null_type>
+struct CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -56,13 +57,13 @@ struct GridProvider_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::GridProvider<typename GridTypes::head_type>::bind(m);
-    GridProvider_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::GridProvider<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    GridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct GridProvider_for_all_grids<boost::tuples::null_type>
+struct GridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };

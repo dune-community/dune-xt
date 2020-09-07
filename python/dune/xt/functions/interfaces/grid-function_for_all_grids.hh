@@ -27,15 +27,15 @@ struct Int
 template <class GridTypes>
 struct GridFunctionInterface_for_all_grids
 {
-  using G = typename GridTypes::head_type;
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
   using GV = typename G::LeafGridView;
   using E = Dune::XT::Grid::extract_entity_t<GV>;
   static const constexpr size_t d = G::dimension;
 
-  template <size_t r, class Dims = boost::tuple<Int<1>, Int<2>, Int<3>>>
+  template <size_t r, class Dims = std::tuple<Int<1>, Int<2>, Int<3>>>
   struct for_all_rC
   {
-    static const constexpr size_t rC = Dims::head_type::value;
+    static const constexpr size_t rC = Dune::XT::Common::tuple_head_t<Dims>::value;
 
     template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
     struct product_helper // <true, false, ...>
@@ -90,7 +90,7 @@ struct GridFunctionInterface_for_all_grids
 
       GridFunctionInterface<G, E, r, rC>::bind(m, grid_name<G>::value());
 
-      for_all_rC<r, typename Dims::tail_type>::bind_interface(m);
+      for_all_rC<r, Dune::XT::Common::tuple_tail_t<Dims>>::bind_interface(m);
     }
 
     static void bind_combined(pybind11::module& m)
@@ -105,12 +105,12 @@ struct GridFunctionInterface_for_all_grids
       product_helper<>::addbind(m);
       fraction_helper<>::addbind(m);
 
-      for_all_rC<r, typename Dims::tail_type>::bind_combined(m);
+      for_all_rC<r, Dune::XT::Common::tuple_tail_t<Dims>>::bind_combined(m);
     }
   };
 
   template <size_t r>
-  struct for_all_rC<r, boost::tuples::null_type>
+  struct for_all_rC<r, Dune::XT::Common::tuple_null_type>
   {
     static void bind_interface(pybind11::module& /*m*/) {}
 
@@ -118,28 +118,28 @@ struct GridFunctionInterface_for_all_grids
   };
 
 
-  template <class Dims = boost::tuple<Int<1>, Int<2>, Int<3>>, bool anything = false>
+  template <class Dims = std::tuple<Int<1>, Int<2>, Int<3>>, bool anything = false>
   struct for_all_r_and_rC
   {
-    static const constexpr size_t r = Dims::head_type::value;
+    static const constexpr size_t r = Dune::XT::Common::tuple_head_t<Dims>::value;
 
     static void bind_interface(pybind11::module& m)
     {
       for_all_rC<r>::bind_interface(m);
 
-      for_all_r_and_rC<typename Dims::tail_type>::bind_interface(m);
+      for_all_r_and_rC<Dune::XT::Common::tuple_tail_t<Dims>>::bind_interface(m);
     }
 
     static void bind_combined(pybind11::module& m)
     {
       for_all_rC<r>::bind_combined(m);
 
-      for_all_r_and_rC<typename Dims::tail_type>::bind_combined(m);
+      for_all_r_and_rC<Dune::XT::Common::tuple_tail_t<Dims>>::bind_combined(m);
     }
   };
 
   template <bool a>
-  struct for_all_r_and_rC<boost::tuples::null_type, a>
+  struct for_all_r_and_rC<Dune::XT::Common::tuple_null_type, a>
   {
     static void bind_interface(pybind11::module& /*m*/) {}
 
@@ -150,19 +150,19 @@ struct GridFunctionInterface_for_all_grids
   {
     for_all_r_and_rC<>::bind_interface(m);
 
-    GridFunctionInterface_for_all_grids<typename GridTypes::tail_type>::bind_interface(m);
+    GridFunctionInterface_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind_interface(m);
   }
 
   static void bind_combined(pybind11::module& m)
   {
     for_all_r_and_rC<>::bind_combined(m);
 
-    GridFunctionInterface_for_all_grids<typename GridTypes::tail_type>::bind_combined(m);
+    GridFunctionInterface_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind_combined(m);
   }
 };
 
 template <>
-struct GridFunctionInterface_for_all_grids<boost::tuples::null_type>
+struct GridFunctionInterface_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind_interface(pybind11::module& /*m*/) {}
 

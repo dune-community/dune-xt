@@ -13,8 +13,6 @@
 #ifndef DUNE_XT_GRID_GRIDS_HH
 #define DUNE_XT_GRID_GRIDS_HH
 
-#include <boost/tuple/tuple.hpp>
-
 #if HAVE_ALBERTA
 #  include <dune/xt/common/disable_warnings.hh>
 #  include <dune/grid/albertagrid.hh>
@@ -36,6 +34,7 @@
 
 #include <dune/grid/onedgrid.hh>
 #include <dune/grid/yaspgrid.hh>
+#include <dune/xt/common/tuple.hh>
 
 
 // this is used by other headers
@@ -80,63 +79,65 @@ class ThereIsNoSimplexGridAvailableInDimension
 /**
  * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
  */
-using Available1dGridTypes = boost::tuple<ONED_1D, YASP_1D_EQUIDISTANT_OFFSET>;
+using Available1dGridTypes = std::tuple<ONED_1D, YASP_1D_EQUIDISTANT_OFFSET>;
 
 /**
  * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
  */
-using Available2dGridTypes = boost::tuple<YASP_2D_EQUIDISTANT_OFFSET
-#if HAVE_DUNE_ALUGRID
-                                          ,
-                                          ALU_2D_SIMPLEX_CONFORMING,
-                                          ALU_2D_SIMPLEX_NONCONFORMING,
-                                          ALU_2D_CUBE
-#endif
-#if HAVE_DUNE_UGGRID || HAVE_UG
-                                          ,
-                                          UG_2D
-#endif
-                                          >;
-
-/**
- * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
- */
-using Available3dGridTypes = boost::tuple<YASP_3D_EQUIDISTANT_OFFSET
-#if HAVE_DUNE_ALUGRID
-                                          ,
-                                          ALU_3D_SIMPLEX_CONFORMING,
-                                          ALU_3D_SIMPLEX_NONCONFORMING,
-                                          ALU_3D_CUBE
-#endif
-#if HAVE_DUNE_UGGRID || HAVE_UG
-                                          ,
-                                          UG_3D
-#endif
-                                          >;
-
-/**
- * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
- * \todo Find a tuple implementation which allows for more than 10 elements!
- */
-using AvailableGridTypes = boost::tuple<ONED_1D,
-                                        /*YASP_1D_EQUIDISTANT_OFFSET,*/
-                                        YASP_2D_EQUIDISTANT_OFFSET,
-                                        YASP_3D_EQUIDISTANT_OFFSET
+using Available2dGridTypes = std::tuple<YASP_2D_EQUIDISTANT_OFFSET
 #if HAVE_DUNE_ALUGRID
                                         ,
                                         ALU_2D_SIMPLEX_CONFORMING,
-                                        /*ALU_2D_SIMPLEX_NONCONFORMING,*/
-                                        /*ALU_2D_CUBE,*/
-                                        ALU_3D_SIMPLEX_CONFORMING /*,*/
+                                        ALU_2D_SIMPLEX_NONCONFORMING,
+                                        ALU_2D_CUBE
+#endif
+#if HAVE_DUNE_UGGRID || HAVE_UG
+                                        ,
+                                        UG_2D
+#endif
+                                        >;
+
+/**
+ * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
+ */
+using Available3dGridTypes = std::tuple<YASP_3D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                        ,
+                                        ALU_3D_SIMPLEX_CONFORMING,
+                                        ALU_3D_SIMPLEX_NONCONFORMING,
+                                        ALU_3D_CUBE
+#endif
+#if HAVE_DUNE_UGGRID || HAVE_UG
+                                        ,
+                                        UG_3D
+#endif
+                                        >;
+
+/**
+ * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
+ * \todo instead use:
+using AvailableGridTypes = Common::tuple_cat_t<Available1dGridTypes, Available2dGridTypes, Available3dGridTypes>;
+
+ */
+using AvailableGridTypes = std::tuple<ONED_1D,
+                                      /*YASP_1D_EQUIDISTANT_OFFSET,*/
+                                      YASP_2D_EQUIDISTANT_OFFSET,
+                                      YASP_3D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                      ,
+                                      ALU_2D_SIMPLEX_CONFORMING,
+                                      /*ALU_2D_SIMPLEX_NONCONFORMING,*/
+                                      /*ALU_2D_CUBE,*/
+                                      ALU_3D_SIMPLEX_CONFORMING /*,*/
 /*ALU_3D_SIMPLEX_NONCONFORMING,*/
 /*ALU_3D_CUBE*/
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
-                                        ,
-                                        UG_2D,
-                                        UG_3D
+                                      ,
+                                      UG_2D,
+                                      UG_3D
 #endif
-                                        >;
+                                      >;
 
 
 } // namespace Grid

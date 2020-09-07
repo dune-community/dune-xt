@@ -71,32 +71,32 @@ struct Container<ScalarType, Backends::istl_sparse>
 
 
 template <class S>
-using AvailableVectorTypes = boost::tuple<CommonDenseVector<S>,
-                                          IstlDenseVector<S>
+using AvailableVectorTypes = std::tuple<CommonDenseVector<S>,
+                                        IstlDenseVector<S>
 #if HAVE_EIGEN
-                                          ,
-                                          EigenDenseVector<S>
+                                        ,
+                                        EigenDenseVector<S>
 #endif
-                                          >;
+                                        >;
 
 
 template <class S>
-using AvailableDenseMatrixTypes = boost::tuple<CommonDenseMatrix<S>
+using AvailableDenseMatrixTypes = std::tuple<CommonDenseMatrix<S>
 #if HAVE_EIGEN
-                                               ,
-                                               EigenDenseMatrix<S>
+                                             ,
+                                             EigenDenseMatrix<S>
 #endif
-                                               >;
+                                             >;
 
 
 template <class S>
-using AvailableSparseMatrixTypes = boost::tuple<CommonSparseMatrix<S>,
-                                                IstlRowMajorSparseMatrix<S>
+using AvailableSparseMatrixTypes = std::tuple<CommonSparseMatrix<S>,
+                                              IstlRowMajorSparseMatrix<S>
 #if HAVE_EIGEN
-                                                ,
-                                                EigenRowMajorSparseMatrix<S>
+                                              ,
+                                              EigenRowMajorSparseMatrix<S>
 #endif
-                                                >;
+                                              >;
 
 
 } // namespace LA
