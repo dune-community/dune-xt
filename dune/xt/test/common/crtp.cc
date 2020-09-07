@@ -11,6 +11,8 @@
 // This one has to come first (includes the config.h)!
 #include <dune/xt/test/main.hxx>
 
+#include <boost/config.hpp>
+
 #include <dune/xt/common/crtp.hh>
 
 template <class Traits>
@@ -36,11 +38,18 @@ class TestInterface : public Dune::XT::Common::CRTPInterface<TestInterface<Trait
 public:
   typedef typename Traits::BackendType BackendType;
 
+#if defined(BOOST_CLANG) && BOOST_CLANG
+#  pragma GCC diagnostic push
+#  pragma clang diagnostic ignored "-Winfinite-recursion"
+#endif
   inline BackendType& backend()
   {
     CHECK_CRTP(this->as_imp().backend());
     return this->as_imp().backend();
   }
+#if defined(BOOST_CLANG) && BOOST_CLANG
+#  pragma GCC diagnostic pop
+#endif
 
   inline const BackendType& backend() const
   {
