@@ -322,7 +322,7 @@ public:
     prepare_global_grid();
     const size_t global_index_of_local_entity = local_to_global_indices_->operator[](subd)[local_entity_index];
     const auto global_micro_grid_view = global_grid_view();
-    for (auto&& entity : elements(global_macro_grid_view)) {
+    for (auto&& entity : elements(global_micro_grid_view)) {
       if (global_micro_grid_view.indexSet().index(entity) == global_index_of_local_entity)
         return entity;
     }
