@@ -217,7 +217,6 @@ public:
   {
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
-    size_t range = value.size();
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < value.size(); ++rr) {
@@ -401,7 +400,6 @@ private:
   {
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
-    size_t range = value.size();
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < value.size(); ++rr) {
