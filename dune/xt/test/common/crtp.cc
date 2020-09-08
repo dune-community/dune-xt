@@ -75,6 +75,8 @@ struct TestImp : public TestInterface<ImpTraits>
   }
 };
 
+// If NDEBUG is defined, the CHECK_CRTP macro does nothing, so the code below will not throw
+#ifndef NDEBUG
 GTEST_TEST(crtp, fail)
 {
   TestInterface<FailTraits> test_iface;
@@ -85,6 +87,7 @@ GTEST_TEST(crtp, fail)
       },
       Dune::XT::Common::Exceptions::CRTP_check_failed);
 }
+#endif // NDEBUG
 
 GTEST_TEST(crtp, success)
 {
