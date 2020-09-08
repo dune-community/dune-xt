@@ -370,7 +370,7 @@ using tuple_tail_t = typename list_content<T1>::tail;
 
 /** These classes allow recursively visiting a typelist that may contain templates names
  *  So if you ever wanted to iterate over "AllDirichletBoundaryInfo, AllNeumannBoundaryInfo, etc"
- *  and then input another type as tpl arg, sthis is for you.
+ *  and then input another type as tpl arg, this is for you.
  *
  * **/
 
@@ -448,9 +448,23 @@ public:
   using head_type = typename internal::head_hlp<tuple_head_t<type<T...>>>::type;
 };
 
+template <typename Head, typename... Tail>
+struct list_content<template_tuple<Head, Tail...>>
+{
+  template <class... Parameters>
+  using head = typename internal::from_tplwrap<Head, Parameters...>::type;
+  using tail = template_tuple<Tail...>;
+};
+
+template <typename T>
+struct list_content<template_tuple<T>>
+{
+  template <class... Parameters>
+  using head = typename internal::from_tplwrap<T, Parameters...>::type;
+  using tail = tuple_null_type;
+};
 
 using null_template_tuple = template_tuple<Dune::XT::Common::tuple_null_type>;
-
 
 template <typename... input_t>
 using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
@@ -459,4 +473,12 @@ using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 } // namespace XT
 } // namespace Dune
 
+namespace std {
+//! specialization for our custom tuple tuple_size can be use on it
+template <class... Types>
+class tuple_size<Dune::XT::Common::template_tuple<Types...>>
+  : public std::integral_constant<std::size_t, sizeof...(Types)>
+{};
+
+} // namespace std
 #endif // DUNE_XT_COMMON_TUPLE_HH
