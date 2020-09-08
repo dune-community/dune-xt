@@ -35,6 +35,27 @@ add_initialization(pybind11::module& /*m*/, std::string /*logger_name*/, std::st
 try_register(pybind11::module& m, const std::function<void(pybind11::module&)>& registrar);
 
 
+using Entry = std::unique_ptr<pybind11::object>;
+using Registry = std::unordered_map<std::string, Entry>;
+
+namespace internal {
+inline static Registry& registry()
+{
+  static Registry registry_;
+  return registry_;
+}
+} // namespace internal
+
+template <class PyBindClass>
+inline static PyBindClass& from_registry(pybind11::module& m, std::string name, std::string python_name)
+{
+  // name = typeid(PyBindClass)
+  auto iter = internal::registry().emplace(name, new PyBindClass(m, name.c_str(), python_name.c_str()));
+  // if( entry.second )
+  //  echo a warning if already present
+  return static_cast<PyBindClass&>(*iter.first->second);
+}
+
 } // namespace bindings
 } // namespace Common
 } // namespace XT

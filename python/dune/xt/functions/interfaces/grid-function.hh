@@ -18,6 +18,7 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <python/dune/xt/common/parameter.hh>
+#include <python/dune/xt/common/bindings.hh>
 
 namespace Dune {
 namespace XT {
@@ -165,16 +166,17 @@ public:
         "parse_parameter", [](const T& self, const Common::Parameter& mu) { return self.parse_parameter(mu); }, "mu"_a);
   } // ... addbind_methods(...)
 
-  static bound_type bind(pybind11::module& m,
-                         const std::string& grid_id,
-                         const std::string& layer_id = "",
-                         const std::string& class_id = "grid_function_interface")
+  static bound_type& bind(pybind11::module& m,
+                          const std::string& grid_id,
+                          const std::string& layer_id = "",
+                          const std::string& class_id = "grid_function_interface")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     const auto ClassName = Common::to_camel_case(class_name(grid_id, layer_id, class_id));
-    bound_type c(m, ClassName.c_str(), Common::to_camel_case(class_id).c_str());
+    bound_type& c = XT::Common::bindings::from_registry<bound_type>(m, ClassName, Common::to_camel_case(class_id));
+
 
     // our properties
     c.def_property_readonly("dim_domain", [](type&) { return size_t(d); });
