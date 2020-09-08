@@ -34,7 +34,10 @@ GTEST_TEST(dune_xt_common_field_vector, creation_and_calculations)
   VectorType test_vec{0, 1, 2, 3};
   for (size_t ii = 0; ii < 4; ++ii)
     EXPECT_EQ(test_vec[ii], ii);
+// If NDEBUG is defined, the input is not checked in the constructor
+#ifndef NDEBUG
   EXPECT_ANY_THROW(VectorType({1, 2, 3}));
+#endif
   VectorType copy_assigned = test_vec;
   check(copy_assigned, test_vec);
   VectorType copy_constructed(test_vec);
@@ -45,8 +48,11 @@ GTEST_TEST(dune_xt_common_field_vector, creation_and_calculations)
   std::vector<double> std_vec2 = test_vec;
   for (size_t ii = 0; ii < 4; ++ii)
     EXPECT_EQ(std_vec2[ii], ii);
+// If NDEBUG is defined, the input is not checked in the constructor
+#ifndef NDEBUG
   std_vec.resize(2);
   EXPECT_ANY_THROW(VectorType{std_vec});
+#endif
   BaseVectorType base_vec{0, 1, 2, 3};
   VectorType constructed_from_base(base_vec);
   check(constructed_from_base, test_vec);

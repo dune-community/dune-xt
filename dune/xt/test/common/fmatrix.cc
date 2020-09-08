@@ -31,14 +31,15 @@ GTEST_TEST(dune_xt_common_field_matrix, creation_and_calculations)
   ScalarMatrixType one(1.);
   ScalarMatrixType one2{1.};
   MatrixType mat({{0., 1., 2.}, {3., 4., 5.}});
+// If NDEBUG is defined, the input is not checked in the constructor
+#ifndef NDEBUG
   EXPECT_ANY_THROW(MatrixType({{0., 2.}, {3., 4., 5.}}));
   EXPECT_ANY_THROW(MatrixType({{0., 1., 2.}, {4., 5.}}));
   EXPECT_ANY_THROW(MatrixType({{0., 2.}, {4., 5.}}));
   EXPECT_ANY_THROW(ScalarMatrixType({{0., 2.}, {4., 5.}}));
-#ifdef NDEBUG
   EXPECT_ANY_THROW(MatrixType(rows + 1, cols - 1, 1.));
   EXPECT_ANY_THROW(ScalarMatrixType(2, 3, 1.));
-#endif
+#endif // NDEBUG
   EXPECT_EQ(zero[0][0], 0.);
   EXPECT_EQ(one[0][0], 1.);
   EXPECT_EQ(one2[0][0], 1.);
