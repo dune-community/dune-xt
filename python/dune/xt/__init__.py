@@ -28,7 +28,12 @@ from importlib import import_module
 
 def guarded_import(globs, base_name, mod_name):
     # see https://stackoverflow.com/questions/43059267/how-to-do-from-module-import-using-importlib
-    mod = import_module('.{}'.format(mod_name), base_name)
+    try:
+        mod = import_module('.{}'.format(mod_name), base_name)
+    except ImportError as e:
+        import logging
+        logging.getLogger('dune.xt').fatal(f'cannot load {mod_name} into {base_name}:\n{e}')
+        raise e
     if "__all__" in mod.__dict__:
         names = mod.__dict__["__all__"]
     else:
