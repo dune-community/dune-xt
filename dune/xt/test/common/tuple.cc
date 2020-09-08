@@ -80,14 +80,22 @@ struct tplB
 template <class Tuple>
 void type_call()
 {
-  using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
-  using Type = typename TupleElement::type;
-  static_assert(std::is_same<Type, int>::value, "");
-  using Tail = typename Tuple::template tail_type<int, int>;
+  if constexpr (std::tuple_size_v<Tuple> == 3) {
+    using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
+    using Type = typename TupleElement::type;
+    static_assert(std::is_same<TupleElement, tplA<int, int>>::value, "");
+    static_assert(std::is_same<Type, int>::value, "");
+  } else if constexpr (std::tuple_size_v<Tuple> == 2) {
+    using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
+    using Type = typename TupleElement::type;
+    static_assert(std::is_same<TupleElement, tplB<int, int>>::value, "");
+    static_assert(std::is_same<Type, int>::value, "");
+  } else if constexpr (std::tuple_size_v<Tuple> == 1) {
+    using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
+    static_assert(std::is_same<TupleElement, int>::value, "");
+  }
 
-  // do something meaningful with a single type
-  EXPECT_EQ(Type(0), int(0));
-  EXPECT_EQ(Type(0.2), int(0.2));
+  using Tail = typename Tuple::template tail_type<int, int>;
   type_call<Tail>();
 }
 
