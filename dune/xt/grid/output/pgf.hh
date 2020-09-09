@@ -244,8 +244,9 @@ public:
               "\\begin{tikzpicture}[scale=\\gridplotscale]\n";
     } else
       file << "\\begin{tikzpicture}\n";
-    Walker<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
-    PgfEntityFunctorIntersections<typename GridType::LeafGridView> pgf(grid_.leafGridView(), file);
+    const auto grid_view = grid_.leafGridView();
+    Walker<typename GridType::LeafGridView> gridWalk(grid_view);
+    PgfEntityFunctorIntersections<typename GridType::LeafGridView> pgf(grid_view, file);
     gridWalk.append(pgf);
     gridWalk.walk();
 
