@@ -24,4 +24,10 @@
 #  define DXTC_DEBUG_ONLY(param) DXTC_UNUSED(param)
 #endif
 
+#if defined(HAVE_MPI) && HAVE_MPI
+#  define DXTC_MPI_ONLY(param) param
+#else
+#  define DXTC_MPI_ONLY(param) DXTC_UNUSED(param)
+#endif
+
 #endif // DXTC_UNUSED_HH
