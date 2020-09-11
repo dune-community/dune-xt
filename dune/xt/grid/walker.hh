@@ -22,7 +22,6 @@
 #  include <tbb/parallel_reduce.h>
 #endif
 
-#include <dune/common/unused.hh>
 #include <dune/common/version.hh>
 
 #include <dune/grid/common/rangegenerators.hh>
@@ -34,7 +33,6 @@
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/common/ranges.hh>
-#include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/filters.hh>
 #include <dune/xt/grid/functors/interfaces.hh>
@@ -582,7 +580,7 @@ public:
    * \}
    */
 
-  void walk(const bool use_tbb = false, const bool clear_functors = true)
+  void walk([[maybe_unused]] const bool use_tbb = false, const bool clear_functors = true)
   {
 #if HAVE_TBB
     if (use_tbb) {
@@ -592,8 +590,6 @@ public:
       this->walk(partitioning, clear_functors);
       return;
     }
-#else
-    DUNE_UNUSED_PARAMETER(use_tbb);
 #endif
     // prepare functors
     prepare();

@@ -155,7 +155,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
-      const auto actual_value DUNE_UNUSED = local_f->evaluate(local_x);
+      [[maybe_unused]] const auto actual_value = local_f->evaluate(local_x);
     }
   }
 #else

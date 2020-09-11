@@ -424,7 +424,7 @@ struct ConfigurationTest : public ::testing::Test
     config.report(test_out);
     config.report(test_out, "'prefix '");
     test_out << config << std::endl;
-    std::string report_str DUNE_UNUSED = config.report_string();
+    [[maybe_unused]] std::string report_str = config.report_string();
     std::string str = config.get("string", std::string("foo"));
     EXPECT_EQ(str, "string");
     str = config.get("foo", std::string("string"));

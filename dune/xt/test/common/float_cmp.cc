@@ -103,9 +103,8 @@ template <class T,
           bool is_vector = XT::Common::is_vector<T>::value>
 struct suitable_entry
 {
-  static T change_an_entry(const T& input, const int value)
+  static T change_an_entry(const T& input, [[maybe_unused]] const int value)
   {
-    DUNE_UNUSED_PARAMETER(value);
     return input;
   }
 };

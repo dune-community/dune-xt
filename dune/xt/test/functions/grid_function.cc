@@ -11,7 +11,6 @@
 
 #include <dune/xt/test/main.hxx> // <- Has to come first, includes the config.h!
 
-#include <dune/xt/common/unused.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
@@ -56,7 +55,7 @@ std::string accepts_matrix_grid_function(GridFunction<E, r, rC> func)
 
 GTEST_TEST(ScalarGridFunction, constructible_from_double)
 {
-  GridFunction<E> DXTC_UNUSED(func){1.};
+  [[maybe_unused]] GridFunction<E> func{1.};
 }
 GTEST_TEST(ScalarGridFunction, convertible_from_double)
 {
@@ -64,7 +63,7 @@ GTEST_TEST(ScalarGridFunction, convertible_from_double)
 }
 GTEST_TEST(ScalarGridFunction, constructible_from_FieldVector)
 {
-  GridFunction<E> DXTC_UNUSED(func){FieldVector<double, 1>()};
+  [[maybe_unused]] GridFunction<E> func{FieldVector<double, 1>()};
 }
 GTEST_TEST(ScalarGridFunction, convertible_from_FieldVector)
 {
@@ -72,7 +71,7 @@ GTEST_TEST(ScalarGridFunction, convertible_from_FieldVector)
 }
 GTEST_TEST(ScalarGridFunction, constructible_from_XT_Common_FieldVector)
 {
-  GridFunction<E> DXTC_UNUSED(func){XT::Common::FieldVector<double, 1>()};
+  [[maybe_unused]] GridFunction<E> func{XT::Common::FieldVector<double, 1>()};
 }
 GTEST_TEST(ScalarGridFunction, convertible_from_XT_Common_FieldVector)
 {
@@ -127,7 +126,7 @@ GTEST_TEST(ScalarGridFunction, convertible_from_grid_function_lvalueptr)
 
 GTEST_TEST(VectorGridFunction, constructible_from_FieldVector)
 {
-  GridFunction<E, r> DXTC_UNUSED(func){FieldVector<double, r>()};
+  [[maybe_unused]] GridFunction<E, r> func{FieldVector<double, r>()};
 }
 GTEST_TEST(VectorGridFunction, convertible_from_FieldVector)
 {
@@ -135,7 +134,7 @@ GTEST_TEST(VectorGridFunction, convertible_from_FieldVector)
 }
 GTEST_TEST(VectorGridFunction, constructible_from_XT_Common_FieldVector)
 {
-  GridFunction<E, r> DXTC_UNUSED(func){XT::Common::FieldVector<double, r>()};
+  [[maybe_unused]] GridFunction<E, r> func{XT::Common::FieldVector<double, r>()};
 }
 GTEST_TEST(VectorGridFunction, convertible_from_XT_Common_FieldVector)
 {
@@ -191,7 +190,7 @@ GTEST_TEST(VectorGridFunction, convertible_from_grid_function_lvalueptr)
 
 GTEST_TEST(SquareMatrixGridFunction, constructible_from_double)
 {
-  GridFunction<E, r, r> DXTC_UNUSED(func){1.};
+  [[maybe_unused]] GridFunction<E, r, r> func{1.};
 }
 GTEST_TEST(SquareMatrixGridFunction, convertible_from_double)
 {
@@ -199,7 +198,7 @@ GTEST_TEST(SquareMatrixGridFunction, convertible_from_double)
 }
 GTEST_TEST(SquareMatrixGridFunction, constructible_from_FieldMatrix)
 {
-  GridFunction<E, r, r> DXTC_UNUSED(func){FieldMatrix<double, r, r>()};
+  [[maybe_unused]] GridFunction<E, r, r> func{FieldMatrix<double, r, r>()};
 }
 GTEST_TEST(SquareMatrixGridFunction, convertible_from_FieldMatrix)
 {
@@ -207,7 +206,7 @@ GTEST_TEST(SquareMatrixGridFunction, convertible_from_FieldMatrix)
 }
 GTEST_TEST(SquareMatrixGridFunction, constructible_from_XT_Common_FieldMatrix)
 {
-  GridFunction<E, r, r> DXTC_UNUSED(func){XT::Common::FieldMatrix<double, r, r>()};
+  [[maybe_unused]] GridFunction<E, r, r> func{XT::Common::FieldMatrix<double, r, r>()};
 }
 GTEST_TEST(SquareMatrixGridFunction, convertible_from_XT_Common_FieldMatrix)
 {
@@ -263,7 +262,7 @@ GTEST_TEST(SquareMatrixGridFunction, convertible_from_grid_function_lvalueptr)
 
 GTEST_TEST(MatrixGridFunction, constructible_from_FieldMatrix)
 {
-  GridFunction<E, r, rC> DXTC_UNUSED(func){FieldMatrix<double, r, rC>()};
+  [[maybe_unused]] GridFunction<E, r, rC> func{FieldMatrix<double, r, rC>()};
 }
 GTEST_TEST(MatrixGridFunction, convertible_from_FieldMatrix)
 {
@@ -271,7 +270,7 @@ GTEST_TEST(MatrixGridFunction, convertible_from_FieldMatrix)
 }
 GTEST_TEST(MatrixGridFunction, constructible_from_XT_Common_FieldMatrix)
 {
-  GridFunction<E, r, rC> DXTC_UNUSED(func){XT::Common::FieldMatrix<double, r, rC>()};
+  [[maybe_unused]] GridFunction<E, r, rC> func{XT::Common::FieldMatrix<double, r, rC>()};
 }
 GTEST_TEST(MatrixGridFunction, convertible_from_XT_Common_FieldMatrix)
 {

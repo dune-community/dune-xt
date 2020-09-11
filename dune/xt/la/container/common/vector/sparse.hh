@@ -24,7 +24,6 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
 
@@ -225,7 +224,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     auto& entries_ref = *entries_;
     for (size_t ii = 0; ii < entries_ref.size(); ++ii)
       entries_ref[ii] *= alpha;
@@ -275,7 +274,7 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, size());
     get_unchecked_ref(ii) += value;
   }
 

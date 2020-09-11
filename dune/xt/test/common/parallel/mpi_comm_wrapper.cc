@@ -10,8 +10,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#include <dune/common/unused.hh>
-
 #include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
 
 using namespace Dune;

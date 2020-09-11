@@ -96,7 +96,7 @@ TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_works)
   ScalarIndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& product DUNE_UNUSED = f * g;
+  [[maybe_unused]] const auto& product = f * g;
 }
 
 

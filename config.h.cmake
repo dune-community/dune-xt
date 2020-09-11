@@ -67,10 +67,6 @@
 #define DXT_DISABLE_LARGE_TESTS 0
 #endif
 
-#ifndef HAS_WORKING_UNUSED_ATTRIBUTE
-#cmakedefine HAS_WORKING_UNUSED_ATTRIBUTE 1
-#endif
-
 #ifndef HAVE_LIKWID
 #cmakedefine01 HAVE_LIKWID
 #endif

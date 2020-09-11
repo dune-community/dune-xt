@@ -615,7 +615,7 @@ struct MatrixAbstractionBase
 private:
   template <class SparsityPatternType>
   static SparsityPatternDefault
-  get_actual_pattern(SparsityPatternType&& pattern, size_t DXTC_DEBUG_ONLY(rows), size_t /*cols*/)
+  get_actual_pattern(SparsityPatternType&& pattern, DXTC_DEBUG_ONLY const size_t rows, const size_t /*cols*/)
   {
     assert(rows == pattern.size());
     return std::forward<SparsityPatternType>(pattern);

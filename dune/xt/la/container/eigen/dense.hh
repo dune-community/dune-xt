@@ -31,7 +31,6 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -533,7 +532,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -548,7 +547,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -609,7 +608,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, jj, cols());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, jj, cols());
     backend()(ii, jj) += value;
   } // ... add_to_entry(...)
 

@@ -19,8 +19,8 @@
 
 GTEST_TEST(EocProvider_{{name}}, layers)
 {
-  using Level DUNE_UNUSED = Dune::XT::Grid::LevelBasedEOCGridProvider<{{type}}>;
-  using Leaf DUNE_UNUSED = Dune::XT::Grid::LeafBasedEOCGridProvider<{{type}}>;
+  using Level [[maybe_unused]] = Dune::XT::Grid::LevelBasedEOCGridProvider<{{type}}>;
+  using Leaf [[maybe_unused]] = Dune::XT::Grid::LeafBasedEOCGridProvider<{{type}}>;
 }
 
 {% endfor %}

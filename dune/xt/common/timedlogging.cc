@@ -15,8 +15,6 @@
 
 #include <boost/format.hpp>
 
-#include <dune/common/unused.hh>
-
 #include "memory.hh"
 #include "exceptions.hh"
 #include "filesystem.hh"
@@ -210,7 +208,7 @@ void TimedLogging::create(const ssize_t max_info_level,
                           const std::string debug_color,
                           const std::string warning_color)
 {
-  DUNE_UNUSED std::lock_guard<std::mutex> guard(mutex_);
+  [[maybe_unused]] std::lock_guard<std::mutex> guard(mutex_);
   DUNE_THROW_IF(created_, Exceptions::logger_error, "Do not call create() more than once!");
   max_info_level_ = max_info_level;
   max_debug_level_ = max_debug_level;
@@ -226,7 +224,7 @@ void TimedLogging::create(const ssize_t max_info_level,
 
 TimedLogManager TimedLogging::get(const std::string id)
 {
-  DUNE_UNUSED std::lock_guard<std::mutex> guard(mutex_);
+  [[maybe_unused]] std::lock_guard<std::mutex> guard(mutex_);
   ++current_level_;
   return TimedLogManager(timer_,
                          info_prefix_ + (id.empty() ? "info" : id) + ": " + info_suffix_,

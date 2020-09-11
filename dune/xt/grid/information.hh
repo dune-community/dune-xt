@@ -18,8 +18,6 @@
 #include <boost/format.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
-#include <dune/common/unused.hh>
-
 #include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/common/math.hh>

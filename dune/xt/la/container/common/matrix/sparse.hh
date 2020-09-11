@@ -275,7 +275,7 @@ public:
 
   inline void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
@@ -283,7 +283,7 @@ public:
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     assert(has_equal_shape(xx));
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
       entries_->operator[](ii) += alpha * xx_entries[ii];
@@ -345,7 +345,7 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
@@ -752,14 +752,14 @@ public:
 
   inline void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
@@ -865,7 +865,7 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 

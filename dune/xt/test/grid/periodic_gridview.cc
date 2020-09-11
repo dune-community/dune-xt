@@ -214,8 +214,8 @@ struct PeriodicViewTest : public testing::Test
     size_t codim_iterator_size = 0;
     const auto codim_it_end = periodic_grid_view.template end<dimDomain>();
     for (auto codim_it = periodic_grid_view.template begin<dimDomain>(); codim_it != codim_it_end; ++codim_it) {
-      const auto codim_it_copy DUNE_UNUSED = codim_it;
-      const auto& entity DUNE_UNUSED = *codim_it;
+      [[maybe_unused]] const auto codim_it_copy = codim_it;
+      [[maybe_unused]] const auto& entity = *codim_it;
       ++codim_iterator_size;
     }
     EXPECT_EQ(num_vertices, codim_iterator_size);

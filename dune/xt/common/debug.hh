@@ -14,7 +14,6 @@
 
 #include <cstring>
 
-#include <dune/xt/common/unused.hh>
 #include <dune/xt/common/exceptions.hh>
 
 
@@ -37,7 +36,7 @@ inline char* charcopy(const char* s)
 
 
 //! try to ensure var is not optimized out
-#define DXTC_DEBUG_AUTO(name) volatile auto DXTC_UNUSED(name)
+#define DXTC_DEBUG_AUTO(name) [[maybe_unused]] volatile auto name
 
 #ifndef NDEBUG
 #  define DXT_ASSERT(condition)                                                                                        \

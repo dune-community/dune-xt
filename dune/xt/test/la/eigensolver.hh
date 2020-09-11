@@ -14,7 +14,6 @@
 #define DUNE_XT_LA_TEST_EIGENSOLVER_HH
 
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/unused.hh>
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/test/gtest/gtest.h>
 
@@ -85,7 +84,7 @@ struct EigenSolverTest : public ::testing::Test
   void throws_on_broken_matrix_construction() const
   {
     try {
-      EigenSolverType DXTC_UNUSED(default_solver){broken_matrix_};
+      [[maybe_unused]] EigenSolverType default_solver{broken_matrix_};
       FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements";
     } catch (const LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
     } catch (...) {
@@ -93,14 +92,14 @@ struct EigenSolverTest : public ::testing::Test
     }
     for (const auto& tp : EigenSolverOpts::types()) {
       try {
-        EigenSolverType DXTC_UNUSED(default_opts_solver)(broken_matrix_, tp);
+        [[maybe_unused]] EigenSolverType default_opts_solver(broken_matrix_, tp);
         FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
       } catch (...) {
         FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       }
       try {
-        EigenSolverType DXTC_UNUSED(solver)(broken_matrix_, EigenSolverOpts::options(tp));
+        [[maybe_unused]] EigenSolverType solver(broken_matrix_, EigenSolverOpts::options(tp));
         FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
       } catch (...) {
@@ -114,7 +113,7 @@ struct EigenSolverTest : public ::testing::Test
     for (const auto& tp : EigenSolverOpts::types()) {
       Common::Configuration opts_with_disabled_check = EigenSolverOpts::options(tp);
       opts_with_disabled_check["check_for_inf_nan"] = "false";
-      EigenSolverType DXTC_UNUSED(solver)(broken_matrix_, opts_with_disabled_check);
+      [[maybe_unused]] EigenSolverType solver(broken_matrix_, opts_with_disabled_check);
     }
   }
 
@@ -125,7 +124,7 @@ struct EigenSolverTest : public ::testing::Test
       inconsistent_opts["assert_positive_eigenvalues"] = "1e-15";
       inconsistent_opts["assert_negative_eigenvalues"] = "1e-15";
       try {
-        EigenSolverType DXTC_UNUSED(solver)(unit_matrix_, inconsistent_opts);
+        [[maybe_unused]] EigenSolverType solver(unit_matrix_, inconsistent_opts);
         FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly";
       } catch (const LA::Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly& /*ee*/) {
       } catch (...) {
@@ -137,10 +136,10 @@ struct EigenSolverTest : public ::testing::Test
   void is_constructible() const
   {
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    EigenSolverType DXTC_UNUSED(default_solver){matrix_};
+    [[maybe_unused]] EigenSolverType default_solver{matrix_};
     for (const auto& tp : EigenSolverOpts::types()) {
-      EigenSolverType DXTC_UNUSED(default_opts_solver)(matrix_, tp);
-      EigenSolverType DXTC_UNUSED(solver)(matrix_, EigenSolverOpts::options(tp));
+      [[maybe_unused]] EigenSolverType default_opts_solver(matrix_, tp);
+      [[maybe_unused]] EigenSolverType solver(matrix_, EigenSolverOpts::options(tp));
     }
   } // ... is_constructible(...)
 

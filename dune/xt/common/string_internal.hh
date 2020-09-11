@@ -29,10 +29,11 @@
 
 #include <dune/xt/common/debug.hh>
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/unused.hh>
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/matrix.hh>
 
 namespace Dune {
 namespace XT {
@@ -183,7 +184,7 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
 }
 
 template <class VectorType>
-VectorType vector_from_string(std::string vector_str, const size_t size, const size_t DXTC_DEBUG_ONLY(cols) = 0)
+VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DEBUG_ONLY const size_t cols = 0)
 {
   typedef typename VectorAbstraction<VectorType>::S S;
   DXT_ASSERT(cols == 0);

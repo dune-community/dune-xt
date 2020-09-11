@@ -14,7 +14,6 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/test/gtest/gtest.h>
-#include <dune/xt/common/unused.hh>
 
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
@@ -67,7 +66,7 @@ struct MatrixInverterTest : public ::testing::Test
   void throws_on_broken_matrix_construction() const
   {
     try {
-      MatrixInverterType DXTC_UNUSED(default_inverter)(broken_matrix_);
+      [[maybe_unused]] MatrixInverterType default_inverter(broken_matrix_);
       FAIL() << "Expected LA::Exceptions::eigen_inverter_failed_bc_data_did_not_fulfill_requirements";
     } catch (const LA::Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
     } catch (...) {
@@ -75,14 +74,14 @@ struct MatrixInverterTest : public ::testing::Test
     }
     for (const auto& tp : MatrixInverterOpts::types()) {
       try {
-        MatrixInverterType DXTC_UNUSED(default_opts_inverter)(broken_matrix_, tp);
+        [[maybe_unused]] MatrixInverterType default_opts_inverter(broken_matrix_, tp);
         FAIL() << "Expected LA::Exceptions::eigen_inverter_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
       } catch (...) {
         FAIL() << "Expected LA::Exceptions::eigen_inverter_failed_bc_data_did_not_fulfill_requirements";
       }
       try {
-        MatrixInverterType DXTC_UNUSED(inverter)(broken_matrix_, MatrixInverterOpts::options(tp));
+        [[maybe_unused]] MatrixInverterType inverter(broken_matrix_, MatrixInverterOpts::options(tp));
         FAIL() << "Expected LA::Exceptions::eigen_inverter_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
       } catch (...) {
@@ -94,10 +93,10 @@ struct MatrixInverterTest : public ::testing::Test
   void is_constructible() const
   {
     ASSERT_TRUE(all_matrices_and_inverse_matrices_are_computed_);
-    MatrixInverterType DXTC_UNUSED(default_inverter)(matrix_);
+    [[maybe_unused]] MatrixInverterType default_inverter(matrix_);
     for (const auto& tp : MatrixInverterOpts::types()) {
-      MatrixInverterType DXTC_UNUSED(default_opts_inverter)(matrix_, tp);
-      MatrixInverterType DXTC_UNUSED(inverter)(matrix_, MatrixInverterOpts::options(tp));
+      [[maybe_unused]] MatrixInverterType default_opts_inverter(matrix_, tp);
+      [[maybe_unused]] MatrixInverterType inverter(matrix_, MatrixInverterOpts::options(tp));
     }
   } // ... is_constructible(...)
 

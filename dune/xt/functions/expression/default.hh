@@ -19,6 +19,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
+#include <dune/xt/common/unused.hh>
 
 #include "base.hh"
 #include <dune/xt/functions/interfaces/function.hh>
@@ -190,8 +191,7 @@ public:
 
 
   template <class V>
-  void check_value(const DomainType& DXTC_DEBUG_ONLY(point_in_global_coordinates),
-                   const V& DXTC_DEBUG_ONLY(value)) const
+  void check_value(DXTC_DEBUG_ONLY const DomainType& point_in_global_coordinates, DXTC_DEBUG_ONLY const V& value) const
   {
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
@@ -376,8 +376,7 @@ public:
 
 private:
   template <class V>
-  void check_value(const DomainType& DXTC_DEBUG_ONLY(point_in_global_coordinates),
-                   const V& DXTC_DEBUG_ONLY(value)) const
+  void check_value(DXTC_DEBUG_ONLY const DomainType& point_in_global_coordinates, DXTC_DEBUG_ONLY const V& value) const
   {
 #ifndef NDEBUG
 #  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS

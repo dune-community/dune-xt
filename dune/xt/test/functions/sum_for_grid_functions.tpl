@@ -90,7 +90,7 @@ TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_works)
   IndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& sum DUNE_UNUSED = f + g;
+  [[maybe_unused]] const auto& sum = f + g;
 }
 
 

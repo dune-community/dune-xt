@@ -12,6 +12,7 @@
 
 #include <dune/pybindxi/pybind11.h>
 
+#include <dune/xt/common/string.hh>
 #include <dune/xt/common/timedlogging.hh>
 
 namespace Dune {
