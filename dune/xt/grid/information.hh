@@ -83,10 +83,8 @@ size_t max_number_of_neighbors(const GridLayerType& grid_layer)
   size_t maxNeighbours = 0;
   for (auto&& entity : elements(grid_layer)) {
     size_t neighbours = 0;
-    for (auto&& intersection : intersections(grid_layer, entity)) {
-      (void)intersection; // silence unused variable warning
+    for ([[maybe_unused]] auto&& intersection : intersections(grid_layer, entity))
       ++neighbours;
-    }
     maxNeighbours = std::max(maxNeighbours, neighbours);
   }
   return maxNeighbours;

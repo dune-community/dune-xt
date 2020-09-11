@@ -80,8 +80,7 @@ struct PeriodicViewTest : public testing::Test
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
 
     // check interface
-    const GridType& test_grid = periodic_grid_view.grid();
-    (void)test_grid;
+    [[maybe_unused]] const GridType& test_grid = periodic_grid_view.grid();
     const IndexSet& index_set = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
@@ -95,8 +94,7 @@ struct PeriodicViewTest : public testing::Test
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
     EXPECT_EQ(grid_view.ghostSize(1), periodic_grid_view.ghostSize(1));
-    const CollectiveCommunication& test_comm = periodic_grid_view.comm();
-    (void)test_comm;
+    [[maybe_unused]] const CollectiveCommunication& test_comm = periodic_grid_view.comm();
 
 
     size_t neighbor_count = 0;
@@ -106,8 +104,7 @@ struct PeriodicViewTest : public testing::Test
     for (auto&& element : elements(periodic_grid_view)) {
       EXPECT_TRUE(periodic_grid_view.contains(element));
       EXPECT_TRUE(index_set.contains(element));
-      const auto sub_index = index_set.subIndex(element, 0, 1);
-      (void)sub_index;
+      [[maybe_unused]] const auto sub_index = index_set.subIndex(element, 0, 1);
       // iterate over all intersections on current element
       for (auto&& intersection : intersections(periodic_grid_view, element)) {
         if (intersection.neighbor()) {

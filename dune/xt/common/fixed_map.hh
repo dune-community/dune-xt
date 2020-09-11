@@ -125,7 +125,7 @@ private:
 
   typedef FixedMap<key_imp, T, nin> ThisType;
 
-  std::string range_error_message(key_imp key) const
+  std::string range_error_message([[maybe_unused]] key_imp key) const
   {
     std::stringstream ss;
     if constexpr (std::is_convertible<key_imp, std::string>::value) {
