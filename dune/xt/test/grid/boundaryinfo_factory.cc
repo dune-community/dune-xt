@@ -17,8 +17,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#include <dune/common/unused.hh>
-
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
 
@@ -29,8 +27,8 @@ GTEST_TEST(BoundaryInfoFactory, all)
 
   for (auto type : Factory::available()) {
     auto opts = Factory::default_config(type);
-    auto aa DUNE_UNUSED = Factory::create();
-    auto bb DUNE_UNUSED = Factory::create(type);
-    auto cc DUNE_UNUSED = Factory::create(opts);
+    [[maybe_unused]] auto aa = Factory::create();
+    [[maybe_unused]] auto bb = Factory::create(type);
+    [[maybe_unused]] auto cc = Factory::create(opts);
   }
 }

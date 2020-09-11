@@ -23,7 +23,6 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
@@ -223,7 +222,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -232,7 +231,7 @@ public:
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend().axpy(alpha, xx.backend());
   }
 
@@ -261,7 +260,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, size());
     backend()[ii][0] += value;
   }
 
@@ -331,7 +330,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
@@ -340,7 +339,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 
@@ -513,7 +512,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -523,7 +522,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend().axpy(alpha, xx.backend());
   } // ... axpy(...)
 
@@ -588,7 +587,7 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, rows());
     backend()[ii][jj][0][0] += value;
   }
 

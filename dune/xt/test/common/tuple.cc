@@ -15,7 +15,6 @@
 
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/tupleutility.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/ranges.hh>
@@ -52,7 +51,7 @@ struct print_value
 
 GTEST_TEST(TypeTransform, All)
 {
-  typedef TUPLE_TYPEDEFS_2_TUPLE(MyTuple, MyFancyType) MySubTupleType DUNE_UNUSED;
+  [[maybe_unused]] typedef TUPLE_TYPEDEFS_2_TUPLE(MyTuple, MyFancyType) MySubTupleType;
 }
 
 GTEST_TEST(Product, All)

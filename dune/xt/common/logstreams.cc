@@ -11,13 +11,18 @@
 //   Tobias Leibner  (2016, 2019 - 2020)
 
 #include "config.h"
-#include "logstreams.hh"
 
-#include <dune/common/unused.hh>
+#include <boost/algorithm/string/constants.hpp>
+#include <boost/format.hpp>
+
+#include <dune/xt/common/string.hh>
+
+#include "logstreams.hh"
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 SuspendableStrBuffer::SuspendableStrBuffer(int loglevel, int& logflags)
   : logflags_(logflags)
@@ -84,7 +89,7 @@ TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, const s
 
 int TimedPrefixedStreamBuffer::sync()
 {
-  DUNE_UNUSED std::lock_guard<std::mutex> guard(mutex_);
+  [[maybe_unused]] std::lock_guard<std::mutex> guard(mutex_);
   const std::string tmp_str = str();
   if (prefix_needed_ && !tmp_str.empty()) {
     out_ << elapsed_time_str() << prefix_;
@@ -209,6 +214,7 @@ OstreamLogStream::OstreamLogStream(int loglevel, int& logflags, std::ostream& ou
 EmptyLogStream::EmptyLogStream(int& logflags)
   : LogStream(new EmptyBuffer(int(LOG_NONE), logflags))
 {}
+
 
 } // namespace Common
 } // namespace XT

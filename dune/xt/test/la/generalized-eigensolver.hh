@@ -14,7 +14,6 @@
 #define DUNE_XT_LA_TEST_GENERALIZED_EIGENSOLVER_HH
 
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/unused.hh>
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/test/gtest/gtest.h>
 
@@ -90,7 +89,7 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
   void throws_on_broken_matrix_construction()
   {
     try {
-      GeneralizedEigenSolverType DXTC_UNUSED(default_solver){broken_matrix_, unit_matrix_};
+      [[maybe_unused]] GeneralizedEigenSolverType default_solver{broken_matrix_, unit_matrix_};
       FAIL() << "Expected LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements";
     } catch (const LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
     } catch (...) {
@@ -98,14 +97,14 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
     }
     for (const auto& tp : GeneralizedEigenSolverOpts::types()) {
       try {
-        GeneralizedEigenSolverType DXTC_UNUSED(default_opts_solver)(broken_matrix_, unit_matrix_, tp);
+        [[maybe_unused]] GeneralizedEigenSolverType default_opts_solver(broken_matrix_, unit_matrix_, tp);
         FAIL() << "Expected LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
       } catch (...) {
         FAIL() << "Expected LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       }
       try {
-        GeneralizedEigenSolverType DXTC_UNUSED(solver)(
+        [[maybe_unused]] GeneralizedEigenSolverType solver(
             broken_matrix_, unit_matrix_, GeneralizedEigenSolverOpts::options(tp));
         FAIL() << "Expected LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements";
       } catch (const LA::Exceptions::generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
@@ -120,7 +119,7 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
     for (const auto& tp : GeneralizedEigenSolverOpts::types()) {
       Common::Configuration opts_with_disabled_check = GeneralizedEigenSolverOpts::options(tp);
       opts_with_disabled_check["check_for_inf_nan"] = "false";
-      GeneralizedEigenSolverType DXTC_UNUSED(solver)(broken_matrix_, unit_matrix_, opts_with_disabled_check);
+      [[maybe_unused]] GeneralizedEigenSolverType solver(broken_matrix_, unit_matrix_, opts_with_disabled_check);
     }
   }
 
@@ -131,7 +130,7 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
       inconsistent_opts["assert_positive_eigenvalues"] = "1e-15";
       inconsistent_opts["assert_negative_eigenvalues"] = "1e-15";
       try {
-        GeneralizedEigenSolverType DXTC_UNUSED(solver)(unit_matrix_, unit_matrix_, inconsistent_opts);
+        [[maybe_unused]] GeneralizedEigenSolverType solver(unit_matrix_, unit_matrix_, inconsistent_opts);
         FAIL() << "Expected LA::Exceptions::generalized_eigen_solver_failed_bc_it_was_not_set_up_correctly";
       } catch (const LA::Exceptions::generalized_eigen_solver_failed_bc_it_was_not_set_up_correctly& /*ee*/) {
       } catch (...) {
@@ -144,10 +143,11 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
   {
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
     this->make_unit_matrix();
-    GeneralizedEigenSolverType DXTC_UNUSED(default_solver){matrix_, unit_matrix_};
+    [[maybe_unused]] GeneralizedEigenSolverType default_solver{matrix_, unit_matrix_};
     for (const auto& tp : GeneralizedEigenSolverOpts::types()) {
-      GeneralizedEigenSolverType DXTC_UNUSED(default_opts_solver)(matrix_, unit_matrix_, tp);
-      GeneralizedEigenSolverType DXTC_UNUSED(solver)(matrix_, unit_matrix_, GeneralizedEigenSolverOpts::options(tp));
+      [[maybe_unused]] GeneralizedEigenSolverType default_opts_solver(matrix_, unit_matrix_, tp);
+      [[maybe_unused]] GeneralizedEigenSolverType solver(
+          matrix_, unit_matrix_, GeneralizedEigenSolverOpts::options(tp));
     }
   } // ... is_constructible(...)
 

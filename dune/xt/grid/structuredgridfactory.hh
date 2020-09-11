@@ -169,7 +169,7 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const std::array<unsigned int, GridType::dimension>& elements,
                  std::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator DXTC_MPI_ONLY(mpi_comm) = Dune::MPIHelper::getCommunicator())
+                 DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
@@ -184,7 +184,7 @@ public:
   createSimplexGrid(const Dune::FieldVector<ctype, dim>& lowerLeft,
                     const Dune::FieldVector<ctype, dim>& upperRight,
                     const std::array<unsigned int, dim>& elements,
-                    Dune::MPIHelper::MPICommunicator DXTC_MPI_ONLY(mpi_comm) = Dune::MPIHelper::getCommunicator())
+                    DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
@@ -210,7 +210,7 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const std::array<unsigned int, GridType::dimension>& elements,
                  std::array<unsigned int, GridType::dimension> overlap = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator DXTC_MPI_ONLY(mpi_comm) = Dune::MPIHelper::getCommunicator())
+                 DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     bool warn = false;
     unsigned int sum = 0;
@@ -233,7 +233,7 @@ public:
   createSimplexGrid(const Dune::FieldVector<ctype, dim>& lowerLeft,
                     const Dune::FieldVector<ctype, dim>& upperRight,
                     const std::array<unsigned int, dim>& elements,
-                    Dune::MPIHelper::MPICommunicator DXTC_MPI_ONLY(mpi_comm) = Dune::MPIHelper::getCommunicator())
+                    DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
@@ -261,7 +261,7 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const std::array<unsigned int, GridType::dimension>& elements,
                  std::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator DXTC_MPI_ONLY(mpi_comm) = Dune::MPIHelper::getCommunicator())
+                 DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);

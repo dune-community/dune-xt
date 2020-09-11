@@ -20,6 +20,7 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parameter.hh>
+#include <dune/xt/common/unused.hh>
 
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/functions/type_traits.hh>
@@ -120,7 +121,7 @@ public:
     return 1;
   }
 
-  double evaluate(const int& DXTC_DEBUG_ONLY(comp), const RangeType& val) const override final
+  double evaluate(DXTC_DEBUG_ONLY const int& comp, const RangeType& val) const override final
   {
     assert(comp == 0);
     return std::accumulate(val.begin(), val.end(), 0.);

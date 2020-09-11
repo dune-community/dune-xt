@@ -13,9 +13,8 @@
 #ifndef DUNE_XT_COMMON_TUPLE_HH
 #define DUNE_XT_COMMON_TUPLE_HH
 
+#include <type_traits>
 #include <utility>
-
-#include <dune/common/typetraits.hh>
 
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/deref.hpp>
@@ -23,7 +22,6 @@
 #include <boost/mpl/end.hpp>
 #include <boost/mpl/next.hpp>
 #include <boost/mpl/vector.hpp>
-#include <boost/type_traits.hpp>
 
 #define TMAX(t_, no_) (std::tuple_size<t_>::value >= (no_ + 1) ? no_ : 0)
 #define TELE(t_, s_, no_) typename std::tuple_element<TMAX(t_, no_), t_>::type::s_
@@ -160,7 +158,6 @@ namespace Common {
 // reduced from
 // http://stackoverflow.com/questions/1492204/is-it-possible-to-generate-types-with-all-combinations-of-template-arguments
 namespace TupleProduct {
-using boost::is_same;
 using boost::mpl::begin;
 using boost::mpl::deref;
 using boost::mpl::end;
@@ -200,8 +197,8 @@ struct Combine
     typedef typename next<VIterator>::type v_next;
 
     typedef
-        typename if_<boost::is_same<v_next, v_end>,
-                     typename if_<boost::is_same<u_next, u_end>, end_of_recursion_tag, Generate<u_next, v_begin>>::type,
+        typename if_<std::is_same<v_next, v_end>,
+                     typename if_<std::is_same<u_next, u_end>, end_of_recursion_tag, Generate<u_next, v_begin>>::type,
                      Generate<UIterator, v_next>>::type type;
   };
 

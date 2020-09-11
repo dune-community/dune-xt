@@ -10,7 +10,9 @@
 //   Tobias Leibner  (2016, 2020)
 
 #include <dune/xt/test/main.hxx>
+
 #include <vector>
+
 #include <dune/xt/common/algorithm.hh>
 
 using namespace Dune::XT::Common;

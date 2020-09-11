@@ -29,7 +29,6 @@
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -248,7 +247,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -263,7 +262,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -329,7 +328,7 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, rows());
     backend().coeffRef(static_cast<EIGEN_size_t>(ii), static_cast<EIGEN_size_t>(jj)) += value;
   }
 

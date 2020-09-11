@@ -23,8 +23,6 @@
 #include <dune/common/parametertree.hh>
 
 #include <dune/xt/common/algorithm.hh>
-#include <dune/xt/common/color.hh>
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/validation.hh>
 
 namespace Dune {

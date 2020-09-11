@@ -92,7 +92,7 @@ TEST_F(DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_work
   IndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& difference DUNE_UNUSED = f - g;
+  [[maybe_unused]] const auto& difference = f - g;
 }
 
 

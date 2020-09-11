@@ -15,7 +15,6 @@
 
 #include <dune/common/dynvector.hh>
 #include <dune/common/densevector.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/random.hh>
 #include <dune/xt/common/float_cmp.hh>
@@ -49,10 +48,8 @@ GTEST_TEST(Init, Random)
     RNG rng_a(lower_bound, upper_bound, seed);
     RNG rng_b(lower_bound, upper_bound, seed);
     // same seed -> same values
-    for (auto i : value_range(1000)) {
+    for ([[maybe_unused]] auto i : value_range(1000))
       EXPECT_EQ(rng_a(), rng_b());
-      DUNE_UNUSED_PARAMETER(i);
-    }
   }
   DefaultRNG<std::string> str_rng(2);
   std::string rstr = str_rng();

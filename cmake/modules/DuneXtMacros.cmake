@@ -22,7 +22,7 @@ include(Hints)
 # library checks  #########################################################################
 find_package(PkgConfig)
 
-set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem system thread timer)
+set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time system thread timer)
 set(BOOST_ROOT_HINTS "$ENV{BOOST_ROOT}" ${root_hints})
 # check if any hints are provided by user
 if(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR)

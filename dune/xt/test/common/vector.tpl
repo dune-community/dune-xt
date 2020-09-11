@@ -46,9 +46,9 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     EXPECT_TRUE(XT::Common::FloatCmp::eq(ones, XT::Common::FieldVector<ScalarType, dim>(1)));
 
     // test data
-    DUNE_UNUSED ScalarType* data_ptr = XT::Common::data(vec);
+    [[maybe_unused]] ScalarType* data_ptr = XT::Common::data(vec);
     const VectorImp const_vec = vec;
-    DUNE_UNUSED const ScalarType* const_data_ptr = XT::Common::data(const_vec);
+    [[maybe_unused]] const ScalarType* const_data_ptr = XT::Common::data(const_vec);
   } // void test_free_functions() const
 }; // struct VectorTest
 

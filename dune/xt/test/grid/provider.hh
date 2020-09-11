@@ -28,12 +28,12 @@ struct GridProviderBase : public testing::Test
   static void check_layers(const GridProviderType& grid_provider)
   {
     using namespace Dune::XT::Grid;
-    const std::shared_ptr<GridType>& grid_ptr DUNE_UNUSED = grid_provider.grid_ptr();
-    auto leaf_grid_view_1 DUNE_UNUSED = grid_provider.leaf_view();
-    auto leaf_grid_view_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::view>();
+    [[maybe_unused]] const std::shared_ptr<GridType>& grid_ptr = grid_provider.grid_ptr();
+    [[maybe_unused]] auto leaf_grid_view_1 = grid_provider.leaf_view();
+    [[maybe_unused]] auto leaf_grid_view_2 = grid_provider.template layer<Layers::leaf, Backends::view>();
     for (int level = 0; level <= grid_provider.max_level(); ++level) {
-      auto level_grid_view_1 DUNE_UNUSED = grid_provider.level_view(level);
-      auto level_grid_view_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::view>(level);
+      [[maybe_unused]] auto level_grid_view_1 = grid_provider.level_view(level);
+      [[maybe_unused]] auto level_grid_view_2 = grid_provider.template layer<Layers::leaf, Backends::view>(level);
     }
   } // ... check_layers()
 

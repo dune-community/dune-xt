@@ -20,14 +20,13 @@
 #endif
 
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/unused.hh>
 
 #include "cblas.hh"
 
 #if HAVE_MKL
-#  define DXTC_CBLAS_ONLY(param) param
+#  define DXTC_CBLAS_ONLY
 #else
-#  define DXTC_CBLAS_ONLY(param) DXTC_UNUSED(param)
+#  define DXTC_CBLAS_ONLY [[maybe_unused]]
 #endif
 
 namespace Dune {
@@ -159,18 +158,18 @@ int non_unit()
 }
 
 
-void dgemv(const int DXTC_CBLAS_ONLY(layout),
-           const int DXTC_CBLAS_ONLY(trans),
-           const int DXTC_CBLAS_ONLY(m),
-           const int DXTC_CBLAS_ONLY(n),
-           const double DXTC_CBLAS_ONLY(alpha),
-           const double* DXTC_CBLAS_ONLY(a),
-           const int DXTC_CBLAS_ONLY(lda),
-           const double* DXTC_CBLAS_ONLY(x),
-           const int DXTC_CBLAS_ONLY(incx),
-           const double DXTC_CBLAS_ONLY(beta),
-           double* DXTC_CBLAS_ONLY(y),
-           const int DXTC_CBLAS_ONLY(incy))
+void dgemv(DXTC_CBLAS_ONLY const int layout,
+           DXTC_CBLAS_ONLY const int trans,
+           DXTC_CBLAS_ONLY const int m,
+           DXTC_CBLAS_ONLY const int n,
+           DXTC_CBLAS_ONLY const double alpha,
+           DXTC_CBLAS_ONLY const double* a,
+           DXTC_CBLAS_ONLY const int lda,
+           DXTC_CBLAS_ONLY const double* x,
+           DXTC_CBLAS_ONLY const int incx,
+           DXTC_CBLAS_ONLY const double beta,
+           DXTC_CBLAS_ONLY double* y,
+           DXTC_CBLAS_ONLY const int incy)
 {
 #if HAVE_MKL
   cblas_dgemv(static_cast<CBLAS_LAYOUT>(layout),
@@ -191,18 +190,18 @@ void dgemv(const int DXTC_CBLAS_ONLY(layout),
 }
 
 
-void dtrsm(const int DXTC_CBLAS_ONLY(layout),
-           const int DXTC_CBLAS_ONLY(side),
-           const int DXTC_CBLAS_ONLY(uplo),
-           const int DXTC_CBLAS_ONLY(transa),
-           const int DXTC_CBLAS_ONLY(diag),
-           const int DXTC_CBLAS_ONLY(m),
-           const int DXTC_CBLAS_ONLY(n),
-           const double DXTC_CBLAS_ONLY(alpha),
-           const double* DXTC_CBLAS_ONLY(a),
-           const int DXTC_CBLAS_ONLY(lda),
-           double* DXTC_CBLAS_ONLY(b),
-           const int DXTC_CBLAS_ONLY(ldb))
+void dtrsm(DXTC_CBLAS_ONLY const int layout,
+           DXTC_CBLAS_ONLY const int side,
+           DXTC_CBLAS_ONLY const int uplo,
+           DXTC_CBLAS_ONLY const int transa,
+           DXTC_CBLAS_ONLY const int diag,
+           DXTC_CBLAS_ONLY const int m,
+           DXTC_CBLAS_ONLY const int n,
+           DXTC_CBLAS_ONLY const double alpha,
+           DXTC_CBLAS_ONLY const double* a,
+           DXTC_CBLAS_ONLY const int lda,
+           DXTC_CBLAS_ONLY double* b,
+           DXTC_CBLAS_ONLY const int ldb)
 {
 #if HAVE_MKL
   cblas_dtrsm(static_cast<CBLAS_LAYOUT>(layout),
@@ -228,15 +227,15 @@ void dtrsm(const int DXTC_CBLAS_ONLY(layout),
 }
 
 
-void dtrsv(const int DXTC_CBLAS_ONLY(layout),
-           const int DXTC_CBLAS_ONLY(uplo),
-           const int DXTC_CBLAS_ONLY(transa),
-           const int DXTC_CBLAS_ONLY(diag),
-           const int DXTC_CBLAS_ONLY(n),
-           const double* DXTC_CBLAS_ONLY(a),
-           const int DXTC_CBLAS_ONLY(lda),
-           double* DXTC_CBLAS_ONLY(x),
-           const int DXTC_CBLAS_ONLY(incx))
+void dtrsv(DXTC_CBLAS_ONLY const int layout,
+           DXTC_CBLAS_ONLY const int uplo,
+           DXTC_CBLAS_ONLY const int transa,
+           DXTC_CBLAS_ONLY const int diag,
+           DXTC_CBLAS_ONLY const int n,
+           DXTC_CBLAS_ONLY const double* a,
+           DXTC_CBLAS_ONLY const int lda,
+           DXTC_CBLAS_ONLY double* x,
+           DXTC_CBLAS_ONLY const int incx)
 {
 #if HAVE_MKL
   cblas_dtrsv(static_cast<CBLAS_LAYOUT>(layout),
@@ -259,18 +258,18 @@ void dtrsv(const int DXTC_CBLAS_ONLY(layout),
 }
 
 
-void ztrsm(const int DXTC_CBLAS_ONLY(layout),
-           const int DXTC_CBLAS_ONLY(side),
-           const int DXTC_CBLAS_ONLY(uplo),
-           const int DXTC_CBLAS_ONLY(transa),
-           const int DXTC_CBLAS_ONLY(diag),
-           const int DXTC_CBLAS_ONLY(m),
-           const int DXTC_CBLAS_ONLY(n),
-           const void* DXTC_CBLAS_ONLY(alpha),
-           const void* DXTC_CBLAS_ONLY(a),
-           const int DXTC_CBLAS_ONLY(lda),
-           void* DXTC_CBLAS_ONLY(b),
-           const int DXTC_CBLAS_ONLY(ldb))
+void ztrsm(DXTC_CBLAS_ONLY const int layout,
+           DXTC_CBLAS_ONLY const int side,
+           DXTC_CBLAS_ONLY const int uplo,
+           DXTC_CBLAS_ONLY const int transa,
+           DXTC_CBLAS_ONLY const int diag,
+           DXTC_CBLAS_ONLY const int m,
+           DXTC_CBLAS_ONLY const int n,
+           DXTC_CBLAS_ONLY const void* alpha,
+           DXTC_CBLAS_ONLY const void* a,
+           DXTC_CBLAS_ONLY const int lda,
+           DXTC_CBLAS_ONLY void* b,
+           DXTC_CBLAS_ONLY const int ldb)
 {
 #if HAVE_MKL
   cblas_ztrsm(static_cast<CBLAS_LAYOUT>(layout),
@@ -297,15 +296,15 @@ void ztrsm(const int DXTC_CBLAS_ONLY(layout),
 }
 
 
-void ztrsv(const int DXTC_CBLAS_ONLY(layout),
-           const int DXTC_CBLAS_ONLY(uplo),
-           const int DXTC_CBLAS_ONLY(transa),
-           const int DXTC_CBLAS_ONLY(diag),
-           const int DXTC_CBLAS_ONLY(n),
-           const void* DXTC_CBLAS_ONLY(a),
-           const int DXTC_CBLAS_ONLY(lda),
-           void* DXTC_CBLAS_ONLY(x),
-           const int DXTC_CBLAS_ONLY(incx))
+void ztrsv(DXTC_CBLAS_ONLY const int layout,
+           DXTC_CBLAS_ONLY const int uplo,
+           DXTC_CBLAS_ONLY const int transa,
+           DXTC_CBLAS_ONLY const int diag,
+           DXTC_CBLAS_ONLY const int n,
+           DXTC_CBLAS_ONLY const void* a,
+           DXTC_CBLAS_ONLY const int lda,
+           DXTC_CBLAS_ONLY void* x,
+           DXTC_CBLAS_ONLY const int incx)
 {
 #if HAVE_MKL
   cblas_ztrsv(static_cast<CBLAS_LAYOUT>(layout),

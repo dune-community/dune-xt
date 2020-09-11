@@ -23,7 +23,6 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
 
@@ -196,7 +195,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -205,7 +204,7 @@ public:
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     for (size_t ii = 0; ii < backend().size(); ++ii)
       backend()[ii] += alpha * xx.backend()[ii];
   } // ... axpy(...)
@@ -232,7 +231,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, size());
     backend()[ii] += value;
   }
 
@@ -303,7 +302,7 @@ public:
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
@@ -313,7 +312,7 @@ public:
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 

@@ -12,22 +12,16 @@
 #ifndef DXTC_UNUSED_HH
 #define DXTC_UNUSED_HH
 
-#ifdef HAS_WORKING_UNUSED_ATTRIBUTE
-#  define DXTC_UNUSED(identifier) identifier __attribute__((unused))
-#else
-#  define DXTC_UNUSED(identifier) /*identifier*/
-#endif
-
 #ifndef NDEBUG
-#  define DXTC_DEBUG_ONLY(param) param
+#  define DXTC_DEBUG_ONLY
 #else
-#  define DXTC_DEBUG_ONLY(param) DXTC_UNUSED(param)
+#  define DXTC_DEBUG_ONLY [[maybe_unused]]
 #endif
 
 #if defined(HAVE_MPI) && HAVE_MPI
-#  define DXTC_MPI_ONLY(param) param
+#  define DXTC_MPI_ONLY
 #else
-#  define DXTC_MPI_ONLY(param) DXTC_UNUSED(param)
+#  define DXTC_MPI_ONLY [[maybe_unused]]
 #endif
 
 #endif // DXTC_UNUSED_HH

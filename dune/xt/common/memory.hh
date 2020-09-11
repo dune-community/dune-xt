@@ -14,7 +14,6 @@
 
 #include <cassert>
 #include <memory>
-#include <boost/noncopyable.hpp>
 
 #include <dune/xt/common/debug.hh>
 

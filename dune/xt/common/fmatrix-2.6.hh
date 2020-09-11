@@ -15,14 +15,12 @@
 
 #include <initializer_list>
 
-#include <dune/common/fmatrix.hh>
-#include <dune/common/fvector.hh>
-
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/debug.hh>
-#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/unused.hh>
 
 namespace Dune {
 namespace XT {
@@ -53,8 +51,8 @@ public:
     }
   }
 
-  FieldMatrix(const size_t DXTC_DEBUG_ONLY(rr),
-              const size_t DXTC_DEBUG_ONLY(cc),
+  FieldMatrix(DXTC_DEBUG_ONLY const size_t rr,
+              DXTC_DEBUG_ONLY const size_t cc,
               const K& kk = suitable_default<K>::value())
     : BaseType()
   {
@@ -470,8 +468,8 @@ public:
     }
   } // FieldMatrix(std::initializer_list<std::initializer_list<K>> list_of_rows)
 
-  FieldMatrix(const size_t DXTC_DEBUG_ONLY(rr),
-              const size_t DXTC_DEBUG_ONLY(cc),
+  FieldMatrix(DXTC_DEBUG_ONLY const size_t rr,
+              DXTC_DEBUG_ONLY const size_t cc,
               const K& kk = suitable_default<K>::value())
     : BaseType()
   {
@@ -538,7 +536,7 @@ public:
     : backend_(BlockType(val))
   {}
 
-  BlockedFieldMatrix(const size_t DXTC_DEBUG_ONLY(rows), const size_t DXTC_DEBUG_ONLY(cols), const K& val = K(0.))
+  BlockedFieldMatrix(DXTC_DEBUG_ONLY const size_t rows, DXTC_DEBUG_ONLY const size_t cols, const K& val = K(0.))
     : backend_(BlockType(val))
   {
     assert(rows == num_rows && cols == num_cols && "Requested shape has to match static shape!");

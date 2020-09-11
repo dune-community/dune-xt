@@ -59,13 +59,6 @@ check_cxx_source_compiles("
 " HAS_STD_BEGIN_END)
 
 check_cxx_source_compiles("
-    int main(void)
-    {
-      int a __attribute__((unused)) = 0;
-    };
-" HAS_WORKING_UNUSED_ATTRIBUTE)
-
-check_cxx_source_compiles("
     #include <map>
     int main(void)
     {

@@ -29,7 +29,6 @@
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -124,7 +123,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() *= alpha;
   }
 
@@ -134,7 +133,7 @@ public:
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     if constexpr (XT::Common::is_vector<Vec>::value
                   && !std::is_base_of<EigenBaseVector<typename Vec::Traits, ScalarType>, Vec>::value) {
       for (size_t ii = 0; ii < size(); ++ii)
@@ -163,7 +162,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
+    [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, size());
     backend()(ii) += value;
   }
 
@@ -258,7 +257,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
@@ -273,7 +272,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 

@@ -11,9 +11,8 @@
 //   Tobias Leibner  (2014, 2018, 2020)
 
 #include "config.h"
-#include "timings.hh"
 
-#include <dune/common/version.hh>
+#include "timings.hh"
 
 #if HAVE_LIKWID && ENABLE_PERFMON
 #  include <likwid.h>
@@ -28,33 +27,18 @@
 #  define DXTC_LIKWID_CLOSE
 #endif
 
-#include <dune/common/parallel/mpihelper.hh>
-
-#include <dune/xt/common/string.hh>
+// #include <dune/xt/common/string.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/filesystem.hh>
-#include <dune/xt/common/logging.hh>
-#include <dune/xt/common/parallel/threadmanager.hh>
-#include <dune/xt/common/parallel/threadstorage.hh>
-
-#include <map>
-#include <string>
 
 #include <dune/xt/common/disable_warnings.hh>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/config.hpp>
-#include <boost/timer/timer.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 TimingData::TimingData(std::string _name)
   : timer_(new boost::timer::cpu_timer)
@@ -165,15 +149,15 @@ void Timings::set_outputdir(std::string dir)
 void Timings::output_per_rank(std::string csv_base) const
 {
   const auto rank = MPIHelper::getCollectiveCommunication().rank();
-  boost::filesystem::path dir(output_dir_);
-  boost::filesystem::path filename = dir / (boost::format("%s_p%08d.csv") % csv_base % rank).str();
-  boost::filesystem::ofstream out(filename);
+  std::filesystem::path dir(output_dir_);
+  std::filesystem::path filename = dir / (boost::format("%s_p%08d.csv") % csv_base % rank).str();
+  std::ofstream out(filename);
   output_all_measures(out, MPIHelper::getLocalCommunicator());
   std::stringstream tmp_out;
   output_all_measures(tmp_out, MPIHelper::getCommunicator());
   if (rank == 0) {
-    boost::filesystem::path a_filename = dir / (boost::format("%s.csv") % csv_base).str();
-    boost::filesystem::ofstream a_out(a_filename);
+    std::filesystem::path a_filename = dir / (boost::format("%s.csv") % csv_base).str();
+    std::ofstream a_out(a_filename);
     a_out << tmp_out.str() << std::endl;
   }
 }
@@ -247,6 +231,7 @@ OutputScopedTiming::~OutputScopedTiming()
   const auto duration = timings().stop(section_name_);
   out_ << "Executing " << section_name_ << " took " << duration / 1000.f << "s\n";
 }
+
 
 } // namespace Common
 } // namespace XT

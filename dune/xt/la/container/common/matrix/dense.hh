@@ -21,7 +21,6 @@
 #include <boost/align/aligned_allocator.hpp>
 
 #include <dune/common/ftraits.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
@@ -319,7 +318,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     for (auto& entry : backend_->entries_)
       entry *= alpha;
   }
@@ -332,7 +331,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     if constexpr (std::is_same<ThisType, OtherMatrixType>::value) {
       for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
         backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
@@ -427,7 +426,7 @@ public:
     assert(ii < rows());
     assert(jj < cols());
     if (mutexes_->size()) {
-      internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
+      [[maybe_unused]] const internal::LockGuard lock(*mutexes_, ii, rows());
       backend_->get_entry_ref(ii, jj) += value;
     } else {
       backend_->get_entry_ref(ii, jj) += value;

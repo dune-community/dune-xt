@@ -24,14 +24,13 @@
 #endif
 
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/unused.hh>
 
 #include "lapacke.hh"
 
 #if HAVE_MKL || HAVE_LAPACKE
-#  define DXTC_LAPACKE_ONLY(param) param
+#  define DXTC_LAPACKE_ONLY
 #else
-#  define DXTC_LAPACKE_ONLY(param) DXTC_UNUSED(param)
+#  define DXTC_LAPACKE_ONLY [[maybe_unused]]
 #endif
 
 namespace Dune {
@@ -72,18 +71,18 @@ int col_major()
 }
 
 
-int dgeev(int DXTC_LAPACKE_ONLY(matrix_layout),
-          char DXTC_LAPACKE_ONLY(jobvl),
-          char DXTC_LAPACKE_ONLY(jobvr),
-          int DXTC_LAPACKE_ONLY(n),
-          double* DXTC_LAPACKE_ONLY(a),
-          int DXTC_LAPACKE_ONLY(lda),
-          double* DXTC_LAPACKE_ONLY(wr),
-          double* DXTC_LAPACKE_ONLY(wi),
-          double* DXTC_LAPACKE_ONLY(vl),
-          int DXTC_LAPACKE_ONLY(ldvl),
-          double* DXTC_LAPACKE_ONLY(vr),
-          int DXTC_LAPACKE_ONLY(ldvr))
+int dgeev(DXTC_LAPACKE_ONLY int matrix_layout,
+          DXTC_LAPACKE_ONLY char jobvl,
+          DXTC_LAPACKE_ONLY char jobvr,
+          DXTC_LAPACKE_ONLY int n,
+          DXTC_LAPACKE_ONLY double* a,
+          DXTC_LAPACKE_ONLY int lda,
+          DXTC_LAPACKE_ONLY double* wr,
+          DXTC_LAPACKE_ONLY double* wi,
+          DXTC_LAPACKE_ONLY double* vl,
+          DXTC_LAPACKE_ONLY int ldvl,
+          DXTC_LAPACKE_ONLY double* vr,
+          DXTC_LAPACKE_ONLY int ldvr)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeev(matrix_layout, jobvl, jobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
@@ -92,20 +91,20 @@ int dgeev(int DXTC_LAPACKE_ONLY(matrix_layout),
   return 1;
 #endif
 }
-int dgeev_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-               char DXTC_LAPACKE_ONLY(jobvl),
-               char DXTC_LAPACKE_ONLY(jobvr),
-               int DXTC_LAPACKE_ONLY(n),
-               double* DXTC_LAPACKE_ONLY(a),
-               int DXTC_LAPACKE_ONLY(lda),
-               double* DXTC_LAPACKE_ONLY(wr),
-               double* DXTC_LAPACKE_ONLY(wi),
-               double* DXTC_LAPACKE_ONLY(vl),
-               int DXTC_LAPACKE_ONLY(ldvl),
-               double* DXTC_LAPACKE_ONLY(vr),
-               int DXTC_LAPACKE_ONLY(ldvr),
-               double* DXTC_LAPACKE_ONLY(work),
-               int DXTC_LAPACKE_ONLY(lwork))
+int dgeev_work(DXTC_LAPACKE_ONLY int matrix_layout,
+               DXTC_LAPACKE_ONLY char jobvl,
+               DXTC_LAPACKE_ONLY char jobvr,
+               DXTC_LAPACKE_ONLY int n,
+               DXTC_LAPACKE_ONLY double* a,
+               DXTC_LAPACKE_ONLY int lda,
+               DXTC_LAPACKE_ONLY double* wr,
+               DXTC_LAPACKE_ONLY double* wi,
+               DXTC_LAPACKE_ONLY double* vl,
+               DXTC_LAPACKE_ONLY int ldvl,
+               DXTC_LAPACKE_ONLY double* vr,
+               DXTC_LAPACKE_ONLY int ldvr,
+               DXTC_LAPACKE_ONLY double* work,
+               DXTC_LAPACKE_ONLY int lwork)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeev_work(matrix_layout, jobvl, jobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr, work, lwork);
@@ -116,26 +115,26 @@ int dgeev_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dgeevx(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(balanc),
-           char DXTC_LAPACKE_ONLY(jobvl),
-           char DXTC_LAPACKE_ONLY(jobvr),
-           char DXTC_LAPACKE_ONLY(sense),
-           int DXTC_LAPACKE_ONLY(n),
-           double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           double* DXTC_LAPACKE_ONLY(wr),
-           double* DXTC_LAPACKE_ONLY(wi),
-           double* DXTC_LAPACKE_ONLY(vl),
-           int DXTC_LAPACKE_ONLY(ldvl),
-           double* DXTC_LAPACKE_ONLY(vr),
-           int DXTC_LAPACKE_ONLY(ldvr),
-           int* DXTC_LAPACKE_ONLY(ilo),
-           int* DXTC_LAPACKE_ONLY(ihi),
-           double* DXTC_LAPACKE_ONLY(scale),
-           double* DXTC_LAPACKE_ONLY(abnrm),
-           double* DXTC_LAPACKE_ONLY(rconde),
-           double* DXTC_LAPACKE_ONLY(rcondv))
+int dgeevx(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char balanc,
+           DXTC_LAPACKE_ONLY char jobvl,
+           DXTC_LAPACKE_ONLY char jobvr,
+           DXTC_LAPACKE_ONLY char sense,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY double* wr,
+           DXTC_LAPACKE_ONLY double* wi,
+           DXTC_LAPACKE_ONLY double* vl,
+           DXTC_LAPACKE_ONLY int ldvl,
+           DXTC_LAPACKE_ONLY double* vr,
+           DXTC_LAPACKE_ONLY int ldvr,
+           DXTC_LAPACKE_ONLY int* ilo,
+           DXTC_LAPACKE_ONLY int* ihi,
+           DXTC_LAPACKE_ONLY double* scale,
+           DXTC_LAPACKE_ONLY double* abnrm,
+           DXTC_LAPACKE_ONLY double* rconde,
+           DXTC_LAPACKE_ONLY double* rcondv)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeevx(matrix_layout,
@@ -164,29 +163,29 @@ int dgeevx(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dgeevx_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-                char DXTC_LAPACKE_ONLY(balanc),
-                char DXTC_LAPACKE_ONLY(jobvl),
-                char DXTC_LAPACKE_ONLY(jobvr),
-                char DXTC_LAPACKE_ONLY(sense),
-                int DXTC_LAPACKE_ONLY(n),
-                double* DXTC_LAPACKE_ONLY(a),
-                int DXTC_LAPACKE_ONLY(lda),
-                double* DXTC_LAPACKE_ONLY(wr),
-                double* DXTC_LAPACKE_ONLY(wi),
-                double* DXTC_LAPACKE_ONLY(vl),
-                int DXTC_LAPACKE_ONLY(ldvl),
-                double* DXTC_LAPACKE_ONLY(vr),
-                int DXTC_LAPACKE_ONLY(ldvr),
-                int* DXTC_LAPACKE_ONLY(ilo),
-                int* DXTC_LAPACKE_ONLY(ihi),
-                double* DXTC_LAPACKE_ONLY(scale),
-                double* DXTC_LAPACKE_ONLY(abnrm),
-                double* DXTC_LAPACKE_ONLY(rconde),
-                double* DXTC_LAPACKE_ONLY(rcondv),
-                double* DXTC_LAPACKE_ONLY(work),
-                int DXTC_LAPACKE_ONLY(lwork),
-                int* DXTC_LAPACKE_ONLY(iwork))
+int dgeevx_work(DXTC_LAPACKE_ONLY int matrix_layout,
+                DXTC_LAPACKE_ONLY char balanc,
+                DXTC_LAPACKE_ONLY char jobvl,
+                DXTC_LAPACKE_ONLY char jobvr,
+                DXTC_LAPACKE_ONLY char sense,
+                DXTC_LAPACKE_ONLY int n,
+                DXTC_LAPACKE_ONLY double* a,
+                DXTC_LAPACKE_ONLY int lda,
+                DXTC_LAPACKE_ONLY double* wr,
+                DXTC_LAPACKE_ONLY double* wi,
+                DXTC_LAPACKE_ONLY double* vl,
+                DXTC_LAPACKE_ONLY int ldvl,
+                DXTC_LAPACKE_ONLY double* vr,
+                DXTC_LAPACKE_ONLY int ldvr,
+                DXTC_LAPACKE_ONLY int* ilo,
+                DXTC_LAPACKE_ONLY int* ihi,
+                DXTC_LAPACKE_ONLY double* scale,
+                DXTC_LAPACKE_ONLY double* abnrm,
+                DXTC_LAPACKE_ONLY double* rconde,
+                DXTC_LAPACKE_ONLY double* rcondv,
+                DXTC_LAPACKE_ONLY double* work,
+                DXTC_LAPACKE_ONLY int lwork,
+                DXTC_LAPACKE_ONLY int* iwork)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeevx_work(matrix_layout,
@@ -219,13 +218,13 @@ int dgeevx_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dgeqp3(int DXTC_LAPACKE_ONLY(matrix_layout),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           int* DXTC_LAPACKE_ONLY(jpvt),
-           double* DXTC_LAPACKE_ONLY(tau))
+int dgeqp3(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY int* jpvt,
+           DXTC_LAPACKE_ONLY double* tau)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeqp3(matrix_layout, m, n, a, lda, jpvt, tau);
@@ -235,15 +234,15 @@ int dgeqp3(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dgeqp3_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-                int DXTC_LAPACKE_ONLY(m),
-                int DXTC_LAPACKE_ONLY(n),
-                double* DXTC_LAPACKE_ONLY(a),
-                int DXTC_LAPACKE_ONLY(lda),
-                int* DXTC_LAPACKE_ONLY(jpvt),
-                double* DXTC_LAPACKE_ONLY(tau),
-                double* DXTC_LAPACKE_ONLY(work),
-                int DXTC_LAPACKE_ONLY(lwork))
+int dgeqp3_work(DXTC_LAPACKE_ONLY int matrix_layout,
+                DXTC_LAPACKE_ONLY int m,
+                DXTC_LAPACKE_ONLY int n,
+                DXTC_LAPACKE_ONLY double* a,
+                DXTC_LAPACKE_ONLY int lda,
+                DXTC_LAPACKE_ONLY int* jpvt,
+                DXTC_LAPACKE_ONLY double* tau,
+                DXTC_LAPACKE_ONLY double* work,
+                DXTC_LAPACKE_ONLY int lwork)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgeqp3_work(matrix_layout, m, n, a, lda, jpvt, tau, work, lwork);
@@ -253,19 +252,19 @@ int dgeqp3_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dgesvd(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(jobu),
-           char DXTC_LAPACKE_ONLY(jobvt),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           double* DXTC_LAPACKE_ONLY(s),
-           double* DXTC_LAPACKE_ONLY(u),
-           int DXTC_LAPACKE_ONLY(ldu),
-           double* DXTC_LAPACKE_ONLY(vt),
-           int DXTC_LAPACKE_ONLY(ldvt),
-           double* DXTC_LAPACKE_ONLY(superb))
+int dgesvd(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char jobu,
+           DXTC_LAPACKE_ONLY char jobvt,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY double* s,
+           DXTC_LAPACKE_ONLY double* u,
+           DXTC_LAPACKE_ONLY int ldu,
+           DXTC_LAPACKE_ONLY double* vt,
+           DXTC_LAPACKE_ONLY int ldvt,
+           DXTC_LAPACKE_ONLY double* superb)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dgesvd(matrix_layout, jobu, jobvt, m, n, a, lda, s, u, ldu, vt, ldvt, superb);
@@ -285,13 +284,13 @@ double dlamch(char DXTC_LAPACKE_ONLY(cmach))
 #endif
 }
 
-int dorgqr(int DXTC_LAPACKE_ONLY(matrix_layout),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           int DXTC_LAPACKE_ONLY(k),
-           double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           const double* DXTC_LAPACKE_ONLY(tau))
+int dorgqr(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY int k,
+           DXTC_LAPACKE_ONLY double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY const double* tau)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dorgqr(matrix_layout, m, n, k, a, lda, tau);
@@ -301,15 +300,15 @@ int dorgqr(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dorgqr_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-                int DXTC_LAPACKE_ONLY(m),
-                int DXTC_LAPACKE_ONLY(n),
-                int DXTC_LAPACKE_ONLY(k),
-                double* DXTC_LAPACKE_ONLY(a),
-                int DXTC_LAPACKE_ONLY(lda),
-                const double* DXTC_LAPACKE_ONLY(tau),
-                double* DXTC_LAPACKE_ONLY(work),
-                int DXTC_LAPACKE_ONLY(lwork))
+int dorgqr_work(DXTC_LAPACKE_ONLY int matrix_layout,
+                DXTC_LAPACKE_ONLY int m,
+                DXTC_LAPACKE_ONLY int n,
+                DXTC_LAPACKE_ONLY int k,
+                DXTC_LAPACKE_ONLY double* a,
+                DXTC_LAPACKE_ONLY int lda,
+                DXTC_LAPACKE_ONLY const double* tau,
+                DXTC_LAPACKE_ONLY double* work,
+                DXTC_LAPACKE_ONLY int lwork)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dorgqr_work(matrix_layout, m, n, k, a, lda, tau, work, lwork);
@@ -320,17 +319,17 @@ int dorgqr_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dormqr(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(side),
-           char DXTC_LAPACKE_ONLY(trans),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           int DXTC_LAPACKE_ONLY(k),
-           const double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           const double* DXTC_LAPACKE_ONLY(tau),
-           double* DXTC_LAPACKE_ONLY(c),
-           int DXTC_LAPACKE_ONLY(ldc))
+int dormqr(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char side,
+           DXTC_LAPACKE_ONLY char trans,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY int k,
+           DXTC_LAPACKE_ONLY const double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY const double* tau,
+           DXTC_LAPACKE_ONLY double* c,
+           DXTC_LAPACKE_ONLY int ldc)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dormqr(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc);
@@ -340,19 +339,19 @@ int dormqr(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dormqr_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-                char DXTC_LAPACKE_ONLY(side),
-                char DXTC_LAPACKE_ONLY(trans),
-                int DXTC_LAPACKE_ONLY(m),
-                int DXTC_LAPACKE_ONLY(n),
-                int DXTC_LAPACKE_ONLY(k),
-                const double* DXTC_LAPACKE_ONLY(a),
-                int DXTC_LAPACKE_ONLY(lda),
-                const double* DXTC_LAPACKE_ONLY(tau),
-                double* DXTC_LAPACKE_ONLY(c),
-                int DXTC_LAPACKE_ONLY(ldc),
-                double* DXTC_LAPACKE_ONLY(work),
-                int DXTC_LAPACKE_ONLY(lwork))
+int dormqr_work(DXTC_LAPACKE_ONLY int matrix_layout,
+                DXTC_LAPACKE_ONLY char side,
+                DXTC_LAPACKE_ONLY char trans,
+                DXTC_LAPACKE_ONLY int m,
+                DXTC_LAPACKE_ONLY int n,
+                DXTC_LAPACKE_ONLY int k,
+                DXTC_LAPACKE_ONLY const double* a,
+                DXTC_LAPACKE_ONLY int lda,
+                DXTC_LAPACKE_ONLY const double* tau,
+                DXTC_LAPACKE_ONLY double* c,
+                DXTC_LAPACKE_ONLY int ldc,
+                DXTC_LAPACKE_ONLY double* work,
+                DXTC_LAPACKE_ONLY int lwork)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dormqr_work(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc, work, lwork);
@@ -363,11 +362,11 @@ int dormqr_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dpotrf(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(uplo),
-           int DXTC_LAPACKE_ONLY(n),
-           double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda))
+int dpotrf(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char uplo,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY double* a,
+           DXTC_LAPACKE_ONLY int lda)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dpotrf(matrix_layout, uplo, n, a, lda);
@@ -377,11 +376,11 @@ int dpotrf(int DXTC_LAPACKE_ONLY(matrix_layout),
 #endif
 }
 
-int dpotrf_work(int DXTC_LAPACKE_ONLY(matrix_layout),
-                char DXTC_LAPACKE_ONLY(uplo),
-                int DXTC_LAPACKE_ONLY(n),
-                double* DXTC_LAPACKE_ONLY(a),
-                int DXTC_LAPACKE_ONLY(lda))
+int dpotrf_work(DXTC_LAPACKE_ONLY int matrix_layout,
+                DXTC_LAPACKE_ONLY char uplo,
+                DXTC_LAPACKE_ONLY int n,
+                DXTC_LAPACKE_ONLY double* a,
+                DXTC_LAPACKE_ONLY int lda)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dpotrf_work(matrix_layout, uplo, n, a, lda);
@@ -392,11 +391,11 @@ int dpotrf_work(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dptcon(int DXTC_LAPACKE_ONLY(n),
-           const double* DXTC_LAPACKE_ONLY(d),
-           const double* DXTC_LAPACKE_ONLY(e),
-           double DXTC_LAPACKE_ONLY(anorm),
-           double* DXTC_LAPACKE_ONLY(rcond))
+int dptcon(DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY const double* d,
+           DXTC_LAPACKE_ONLY const double* e,
+           DXTC_LAPACKE_ONLY double anorm,
+           DXTC_LAPACKE_ONLY double* rcond)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dptcon(n, d, e, anorm, rcond);
@@ -407,13 +406,13 @@ int dptcon(int DXTC_LAPACKE_ONLY(n),
 }
 
 
-int dpocon(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(uplo),
-           int DXTC_LAPACKE_ONLY(n),
-           const double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           double DXTC_LAPACKE_ONLY(anorm),
-           double* DXTC_LAPACKE_ONLY(rcond))
+int dpocon(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char uplo,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY const double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY double anorm,
+           DXTC_LAPACKE_ONLY double* rcond)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dpocon(matrix_layout, uplo, n, a, lda, anorm, rcond);
@@ -424,16 +423,16 @@ int dpocon(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dsygv(int DXTC_LAPACKE_ONLY(matrix_layout),
-          int DXTC_LAPACKE_ONLY(itype),
-          char DXTC_LAPACKE_ONLY(jobz),
-          char DXTC_LAPACKE_ONLY(uplo),
-          int DXTC_LAPACKE_ONLY(n),
-          double* DXTC_LAPACKE_ONLY(a),
-          int DXTC_LAPACKE_ONLY(lda),
-          double* DXTC_LAPACKE_ONLY(b),
-          int DXTC_LAPACKE_ONLY(ldb),
-          double* DXTC_LAPACKE_ONLY(w))
+int dsygv(DXTC_LAPACKE_ONLY int matrix_layout,
+          DXTC_LAPACKE_ONLY int itype,
+          DXTC_LAPACKE_ONLY char jobz,
+          DXTC_LAPACKE_ONLY char uplo,
+          DXTC_LAPACKE_ONLY int n,
+          DXTC_LAPACKE_ONLY double* a,
+          DXTC_LAPACKE_ONLY int lda,
+          DXTC_LAPACKE_ONLY double* b,
+          DXTC_LAPACKE_ONLY int ldb,
+          DXTC_LAPACKE_ONLY double* w)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dsygv(matrix_layout, itype, jobz, uplo, n, a, lda, b, ldb, w);
@@ -444,14 +443,14 @@ int dsygv(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dtrcon(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(norm),
-           char DXTC_LAPACKE_ONLY(uplo),
-           char DXTC_LAPACKE_ONLY(diag),
-           int DXTC_LAPACKE_ONLY(n),
-           const double* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           double* DXTC_LAPACKE_ONLY(rcond))
+int dtrcon(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char norm,
+           DXTC_LAPACKE_ONLY char uplo,
+           DXTC_LAPACKE_ONLY char diag,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY const double* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY double* rcond)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dtrcon(matrix_layout, norm, uplo, diag, n, a, lda, rcond);
@@ -462,7 +461,7 @@ int dtrcon(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int dpttrf(int DXTC_LAPACKE_ONLY(n), double* DXTC_LAPACKE_ONLY(d), double* DXTC_LAPACKE_ONLY(e))
+int dpttrf(DXTC_LAPACKE_ONLY int n, DXTC_LAPACKE_ONLY double* d, DXTC_LAPACKE_ONLY double* e)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dpttrf(n, d, e);
@@ -473,13 +472,13 @@ int dpttrf(int DXTC_LAPACKE_ONLY(n), double* DXTC_LAPACKE_ONLY(d), double* DXTC_
 }
 
 
-int dpttrs(int DXTC_LAPACKE_ONLY(matrix_layout),
-           int DXTC_LAPACKE_ONLY(n),
-           int DXTC_LAPACKE_ONLY(nrhs),
-           const double* DXTC_LAPACKE_ONLY(d),
-           const double* DXTC_LAPACKE_ONLY(e),
-           double* DXTC_LAPACKE_ONLY(b),
-           int DXTC_LAPACKE_ONLY(ldb))
+int dpttrs(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY int nrhs,
+           DXTC_LAPACKE_ONLY const double* d,
+           DXTC_LAPACKE_ONLY const double* e,
+           DXTC_LAPACKE_ONLY double* b,
+           DXTC_LAPACKE_ONLY int ldb)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_dpttrs(matrix_layout, n, nrhs, d, e, b, ldb);
@@ -490,13 +489,13 @@ int dpttrs(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int zgeqp3(int DXTC_LAPACKE_ONLY(matrix_layout),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           std::complex<double>* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           int* DXTC_LAPACKE_ONLY(jpvt),
-           std::complex<double>* DXTC_LAPACKE_ONLY(tau))
+int zgeqp3(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY std::complex<double>* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY int* jpvt,
+           DXTC_LAPACKE_ONLY std::complex<double>* tau)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_zgeqp3(matrix_layout, m, n, a, lda, jpvt, tau);
@@ -507,13 +506,13 @@ int zgeqp3(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int zungqr(int DXTC_LAPACKE_ONLY(matrix_layout),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           int DXTC_LAPACKE_ONLY(k),
-           std::complex<double>* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           const std::complex<double>* DXTC_LAPACKE_ONLY(tau))
+int zungqr(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY int k,
+           DXTC_LAPACKE_ONLY std::complex<double>* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY const std::complex<double>* tau)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_zungqr(matrix_layout, m, n, k, a, lda, tau);
@@ -524,17 +523,17 @@ int zungqr(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-int zunmqr(int DXTC_LAPACKE_ONLY(matrix_layout),
-           char DXTC_LAPACKE_ONLY(side),
-           char DXTC_LAPACKE_ONLY(trans),
-           int DXTC_LAPACKE_ONLY(m),
-           int DXTC_LAPACKE_ONLY(n),
-           int DXTC_LAPACKE_ONLY(k),
-           const std::complex<double>* DXTC_LAPACKE_ONLY(a),
-           int DXTC_LAPACKE_ONLY(lda),
-           const std::complex<double>* DXTC_LAPACKE_ONLY(tau),
-           std::complex<double>* DXTC_LAPACKE_ONLY(c),
-           int DXTC_LAPACKE_ONLY(ldc))
+int zunmqr(DXTC_LAPACKE_ONLY int matrix_layout,
+           DXTC_LAPACKE_ONLY char side,
+           DXTC_LAPACKE_ONLY char trans,
+           DXTC_LAPACKE_ONLY int m,
+           DXTC_LAPACKE_ONLY int n,
+           DXTC_LAPACKE_ONLY int k,
+           DXTC_LAPACKE_ONLY const std::complex<double>* a,
+           DXTC_LAPACKE_ONLY int lda,
+           DXTC_LAPACKE_ONLY const std::complex<double>* tau,
+           DXTC_LAPACKE_ONLY std::complex<double>* c,
+           DXTC_LAPACKE_ONLY int ldc)
 {
 #if HAVE_MKL || HAVE_LAPACKE
   return LAPACKE_zunmqr(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc);

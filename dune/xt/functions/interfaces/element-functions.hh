@@ -425,10 +425,11 @@ private:
   template <class FullType, class SingleType>
   void single_derivative_helper_call(const std::vector<FullType>& val,
                                      const size_t row,
-                                     const size_t col,
+                                     [[maybe_unused]] const size_t col,
                                      std::vector<SingleType>& ret) const
   {
     if constexpr (rC == 1) {
+      assert(col == 0);
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row];
     } else {
@@ -731,9 +732,10 @@ public:
 private:
   template <class FullType>
   static SingleDerivativeRangeType
-  single_derivative_helper_call(const FullType& val, const size_t row, const size_t col)
+  single_derivative_helper_call(const FullType& val, const size_t row, [[maybe_unused]] const size_t col)
   {
     if constexpr (rC == 1) {
+      assert(col == 0);
       return val[row];
     } else {
       SingleDerivativeRangeType ret;

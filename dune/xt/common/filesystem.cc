@@ -18,20 +18,17 @@ namespace Dune {
 namespace XT {
 namespace Common {
 
+
 //! strip filename from \path if present, return empty string if only filename present
 std::string directory_only(std::string _path)
 {
-  return boost::filesystem::path(_path).parent_path().string();
+  return std::filesystem::path(_path).parent_path().string();
 }
 
 //! return everything after the last slash
 std::string filename_only(const std::string& _path)
 {
-#if BOOST_FILESYSTEM_VERSION > 2
-  return boost::filesystem::path(_path).filename().string();
-#else // if BOOST_FILESYSTEM_VERSION > 2
-  return boost::filesystem::path(_path).filename();
-#endif // if BOOST_FILESYSTEM_VERSION > 2
+  return std::filesystem::path(_path).filename().string();
 } // filename_only
 
 //! may include filename, will be stripped
@@ -39,7 +36,7 @@ void test_create_directory(const std::string _path)
 {
   std::string pathonly = directory_only(_path);
   if (!pathonly.empty())
-    boost::filesystem::create_directories(pathonly);
+    std::filesystem::create_directories(pathonly);
 }
 
 //! pure c++ emulation of system's touch binary
@@ -48,18 +45,16 @@ bool touch(const std::string& _path)
   return std::ofstream(_path.c_str()).is_open();
 }
 
-std::unique_ptr<boost::filesystem::ofstream> make_ofstream(const boost::filesystem::path& path,
-                                                           const std::ios_base::openmode mode)
+std::unique_ptr<std::ofstream> make_ofstream(const std::filesystem::path& path, const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return std::make_unique<boost::filesystem::ofstream>(path, mode);
+  return std::make_unique<std::ofstream>(path, mode);
 }
 
-std::unique_ptr<boost::filesystem::ifstream> make_ifstream(const boost::filesystem::path& path,
-                                                           const std::ios_base::openmode mode)
+std::unique_ptr<std::ifstream> make_ifstream(const std::filesystem::path& path, const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return std::make_unique<boost::filesystem::ifstream>(path, mode);
+  return std::make_unique<std::ifstream>(path, mode);
 }
 
 //! read a file and output all lines containing filter string to a stream
@@ -88,6 +83,7 @@ void meminfo(LogStream& stream)
   file_to_stream_filtered(stream, "/proc/meminfo", "Mem");
   stream << "------------ \n\n" << std::endl;
 } // meminfo
+
 
 } // namespace Common
 } // namespace XT

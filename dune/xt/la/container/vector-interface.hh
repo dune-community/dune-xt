@@ -20,7 +20,6 @@
 #include <complex>
 
 #include <dune/common/bigunsignedint.hh>
-#include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
