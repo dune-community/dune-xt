@@ -9,29 +9,21 @@
 //   René Fritze     (2009 - 2019)
 //   Tobias Leibner  (2014, 2018, 2020)
 
-/**
- *  \file logging.hh
- *  \brief  logging
- **/
 #ifndef DUNE_XT_COMMON_LOGGING_HH
 #define DUNE_XT_COMMON_LOGGING_HH
 
 #include <map>
 #include <string>
-#include <mutex>
+#include <filesystem>
 
 #include <dune/common/visibility.hh>
-
-#include <dune/xt/common/disable_warnings.hh>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/xt/common/logstreams.hh>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 class Logging;
 //! global Logging instance
@@ -134,9 +126,9 @@ public:
   };
 
 private:
-  boost::filesystem::path filename_;
-  boost::filesystem::path filenameWoTime_;
-  boost::filesystem::ofstream logfile_;
+  std::filesystem::path filename_;
+  std::filesystem::path filenameWoTime_;
+  std::ofstream logfile_;
   typedef std::map<int, int> FlagMap;
   FlagMap flagmap_;
   typedef std::map<int, std::unique_ptr<LogStream>> StreamMap;
@@ -157,6 +149,7 @@ DUNE_EXPORT inline Logging& Logger()
   static Logging log;
   return log;
 }
+
 
 } // namespace Common
 } // namespace XT

@@ -14,9 +14,6 @@
 
 #include <cstring>
 
-#include <boost/assert.hpp>
-#include <boost/format.hpp>
-
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/exceptions.hh>
 

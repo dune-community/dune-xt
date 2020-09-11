@@ -22,6 +22,7 @@ namespace Dune {
 namespace XT {
 namespace Common {
 
+
 //! same as std::copy_if, but with move
 template <class InputIt, class OutputIt, class UnaryPredicate>
 OutputIt move_if(InputIt first, InputIt last, OutputIt d_first, UnaryPredicate pred)
@@ -42,6 +43,7 @@ SequenceType make_string_sequence(InputIt first, InputIt last)
   std::transform(first, last, std::back_inserter(ret), to_str);
   return ret;
 }
+
 
 } // namespace Common
 } // namespace XT

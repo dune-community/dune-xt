@@ -27,7 +27,7 @@ GTEST_TEST(GridProvider_{{name}}, layers)
   auto global_provider = ProviderFactory::create(config, Dune::MPIHelper::getCommunicator());
   auto& global_grid = global_provider.grid();
 
-  Dune::XT::Grid::ElementVisualization::all(global_grid,  boost::filesystem::temp_directory_path().string());
+  Dune::XT::Grid::ElementVisualization::all(global_grid,  std::filesystem::temp_directory_path().string());
 }
 
 

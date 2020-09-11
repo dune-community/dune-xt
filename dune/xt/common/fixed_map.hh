@@ -15,15 +15,14 @@
 
 #include <array>
 #include <utility>
-#include <boost/array.hpp>
-#include <boost/range/adaptor/map.hpp>
-#include <boost/iterator/iterator_facade.hpp>
+
 #include <boost/assign/list_of.hpp>
-#include <dune/common/exceptions.hh>
+#include <boost/iterator/iterator_facade.hpp>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 //! custom iterator for \ref FixedMap
 template <class FixedMapType>
@@ -117,7 +116,7 @@ public:
   static constexpr std::size_t N = nin;
 
 private:
-  typedef boost::array<value_type, nin> MapType;
+  typedef std::array<value_type, nin> MapType;
 
   template <class R>
   friend class FixedMapIterator;
@@ -238,12 +237,16 @@ private:
 } // namespace Dune
 
 namespace std {
+
+
 template <class key_imp, class T, std::size_t nin>
 inline ostream& operator<<(ostream& out, const Dune::XT::Common::FixedMap<key_imp, T, nin>& map)
 {
   map.print(out);
   return out;
 }
+
+
 } // namespace std
 
 #endif // DUNE_XT_COMMON_FIXED_MAP_HH

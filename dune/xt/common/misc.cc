@@ -26,7 +26,7 @@ namespace Dune {
 namespace XT {
 namespace Common {
 
-void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep)
+void dump_environment(std::ofstream& file, std::string csv_sep)
 {
   using namespace std;
   vector<string> header, values;

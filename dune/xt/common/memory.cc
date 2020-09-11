@@ -18,8 +18,6 @@
 #include <dune/xt/common/configuration.hh>
 
 #include <sys/resource.h>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 namespace Dune {
 namespace XT {
@@ -39,7 +37,7 @@ void mem_usage(std::string filename)
   long meanPeakMemConsumption = totalPeakMemConsumption / comm.size();
   // write output on rank zero
   if (comm.rank() == 0) {
-    std::unique_ptr<boost::filesystem::ofstream> memoryConsFile(make_ofstream(filename));
+    std::unique_ptr<std::ofstream> memoryConsFile(make_ofstream(filename));
     *memoryConsFile << "global.maxPeakMemoryConsumption,global.meanPeakMemoryConsumption\n"
                     << maxPeakMemConsumption << "," << meanPeakMemConsumption << std::endl;
   }

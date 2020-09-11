@@ -23,12 +23,12 @@
 
 #include <dune/common/timer.hh>
 
-#include "memory.hh"
-#include "string.hh"
+#include <dune/xt/common/memory.hh>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 enum LogFlags
 {
@@ -270,6 +270,7 @@ namespace {
 int dev_null_logflag;
 EmptyLogStream dev_null(dev_null_logflag);
 } // namespace
+
 
 } // namespace Common
 } // namespace XT

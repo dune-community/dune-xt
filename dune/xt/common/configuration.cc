@@ -12,6 +12,8 @@
 
 #include "config.h"
 
+#include <filesystem>
+
 #include <boost/format.hpp>
 
 #include <dune/common/parametertreeparser.hh>
@@ -23,6 +25,7 @@
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
                                              bool log_on_exit_in,
@@ -230,7 +233,7 @@ void Configuration::read_command_line(int argc, char* argv[])
     boost::format usage("usage: %s parameter.file *[-section.key override-value]");
     DUNE_THROW(Dune::Exception, (usage % argv[0]).str());
   }
-  if (boost::filesystem::exists(argv[1]))
+  if (std::filesystem::exists(argv[1]))
     Dune::ParameterTreeParser::readINITree(argv[1], *this);
   Dune::ParameterTreeParser::readOptions(argc, argv, *this);
   // datadir and logdir may be given from the command line...
@@ -245,12 +248,12 @@ void Configuration::read_options(int argc, char* argv[])
 void Configuration::setup_()
 {
   if (logfile_.empty())
-    logfile_ = boost::filesystem::path(ConfigurationDefaults().logfile).string();
+    logfile_ = std::filesystem::path(ConfigurationDefaults().logfile).string();
   if (has_key("global.datadir") && has_key("logging.dir"))
-    logfile_ = (boost::filesystem::path(get<std::string>("global.datadir")) / get<std::string>("logging.dir")
+    logfile_ = (std::filesystem::path(get<std::string>("global.datadir")) / get<std::string>("logging.dir")
                 / "dxtc_parameter.log")
                    .string();
-  logfile_ = boost::filesystem::path(logfile_).string();
+  logfile_ = std::filesystem::path(logfile_).string();
 } // ... setup_(...)
 
 void Configuration::add_tree_(const Configuration& other, const std::string sub_id, const bool overwrite)
@@ -399,6 +402,7 @@ bool operator!=(const ParameterTree& left, const ParameterTree& right)
 {
   return !(left == right);
 }
+
 
 } // namespace Dune
 namespace std {

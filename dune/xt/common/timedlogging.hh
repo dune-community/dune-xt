@@ -21,9 +21,6 @@
 #include <mutex>
 #include <atomic>
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-
 #include <dune/common/parallel/mpihelper.hh>
 #include <dune/common/timer.hh>
 #include <dune/common/visibility.hh>

@@ -21,14 +21,14 @@
 #  define DUNE_XT_COMMON_DO_TIMING 0
 #endif
 
-#include <string>
-#include <map>
-#include <vector>
-#include <ctime>
-#include <memory>
-#include <iostream>
+#include <array>
 #include <atomic>
+#include <ctime>
+#include <iostream>
+#include <map>
+#include <memory>
 #include <mutex>
+#include <string>
 
 #include <boost/noncopyable.hpp>
 #include <boost/timer/timer.hpp>
@@ -36,12 +36,12 @@
 #include <dune/common/unused.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
-#include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 
 namespace Dune {
 namespace XT {
 namespace Common {
+
 
 class Timings;
 
@@ -172,6 +172,7 @@ struct OutputScopedTiming : public ScopedTiming
 protected:
   std::ostream& out_;
 };
+
 
 } // namespace Common
 } // namespace XT

@@ -39,7 +39,6 @@
 #include <dune/xt/common/disable_warnings.hh>
 #include <boost/algorithm/string.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
-#include <boost/filesystem/fstream.hpp>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
@@ -95,7 +94,7 @@ std::array<T, N> make_array(const std::vector<T>& v)
 }
 
 //! writes process environment to file
-void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep = ",");
+void dump_environment(std::ofstream& file, std::string csv_sep = ",");
 
 } // namespace Common
 } // namespace XT

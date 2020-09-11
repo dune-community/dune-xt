@@ -13,11 +13,10 @@
 
 #include <boost/format.hpp>
 
-#include <dune/common/unused.hh>
+// #include <dune/xt/common/memory.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/filesystem.hh>
 
-#include "memory.hh"
-#include "exceptions.hh"
-#include "filesystem.hh"
 #include "logging.hh"
 
 namespace Dune {
@@ -49,7 +48,7 @@ Logging::~Logging()
 
 void Logging::create(int logflags, const std::string logfile, const std::string datadir, const std::string _logdir)
 {
-  using namespace boost::filesystem;
+  using namespace std::filesystem;
   const auto& comm = Dune::MPIHelper::getCollectiveCommunication();
   boost::format log_fn("%s%s");
   if (comm.size() > 1) {
