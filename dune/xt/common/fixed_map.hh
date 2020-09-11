@@ -16,6 +16,7 @@
 #include <array>
 #include <utility>
 
+#include <boost/array.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -116,7 +117,7 @@ public:
   static constexpr std::size_t N = nin;
 
 private:
-  typedef std::array<value_type, nin> MapType;
+  typedef boost::array<value_type, nin> MapType;
 
   template <class R>
   friend class FixedMapIterator;
