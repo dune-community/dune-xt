@@ -148,10 +148,12 @@ SparsityPatternDefault dense_pattern(const size_t rows, const size_t cols)
 SparsityPatternDefault tridiagonal_pattern(const size_t rows, const size_t cols)
 {
   SparsityPatternDefault ret(rows);
-  assert(rows <= std::numeric_limits<int>::max() && cols <= std::numeric_limits<int>::max());
-  for (int ii = 0; ii < int(rows); ++ii)
-    for (int jj = std::max(0, ii - 1); jj <= std::min(ii + 1, int(cols) - 1); ++jj)
+  for (size_t ii = 0; ii < rows; ++ii) {
+    // We have to be careful here if ii == 0 because then ii - 1 wraps around
+    const size_t col_start = (ii == 0) ? size_t(0) : ii - 1;
+    for (size_t jj = col_start; jj < std::min(ii + 2, cols); ++jj)
       ret.insert(ii, jj);
+  }
   return ret;
 }
 

@@ -242,7 +242,7 @@ inline void FieldMatrix<K, ROWS, COLS>::luDecomposition(FieldMatrix<K, ROWS, COL
     if (imax != i) {
       for (size_type j = 0; j < ROWS; j++)
         std::swap(A[i][j], A[imax][j]);
-      assert(imax < std::numeric_limits<int>::max() && i < std::numeric_limits<int>::max());
+      assert(imax < size_type(std::numeric_limits<int>::max()) && i < size_type(std::numeric_limits<int>::max()));
       func.swap(static_cast<int>(i), static_cast<int>(imax)); // swap the pivot or rhs
     }
 
@@ -256,7 +256,7 @@ inline void FieldMatrix<K, ROWS, COLS>::luDecomposition(FieldMatrix<K, ROWS, COL
       A[k][i] = factor;
       for (size_type j = i + 1; j < ROWS; j++)
         A[k][j] -= factor * A[i][j];
-      assert(k < std::numeric_limits<int>::max() && i < std::numeric_limits<int>::max());
+      assert(k < size_type(std::numeric_limits<int>::max()) && i < size_type(std::numeric_limits<int>::max()));
       func(factor, static_cast<int>(k), static_cast<int>(i));
     }
   }

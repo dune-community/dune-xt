@@ -281,7 +281,6 @@ public:
   int order(const XT::Common::Parameter& param = {}) const override final
   {
     const auto ret = Select::order(left_local_->order(param), right_local_->order(param));
-    assert(ret < std::numeric_limits<int>::max());
     return static_cast<int>(ret);
   }
 
