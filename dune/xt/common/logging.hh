@@ -14,7 +14,8 @@
 
 #include <map>
 #include <string>
-#include <filesystem>
+
+#include <boost/filesystem.hpp>
 
 #include <dune/common/visibility.hh>
 
@@ -126,9 +127,9 @@ public:
   };
 
 private:
-  std::filesystem::path filename_;
-  std::filesystem::path filenameWoTime_;
-  std::ofstream logfile_;
+  boost::filesystem::path filename_;
+  boost::filesystem::path filenameWoTime_;
+  boost::filesystem::ofstream logfile_;
   typedef std::map<int, int> FlagMap;
   FlagMap flagmap_;
   typedef std::map<int, std::unique_ptr<LogStream>> StreamMap;
