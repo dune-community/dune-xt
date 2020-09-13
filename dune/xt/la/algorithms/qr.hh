@@ -145,7 +145,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
   const size_t num_cols = M::cols(A);
   assert(tau.size() == num_cols && permutations.size() == num_cols);
   std::fill(tau.begin(), tau.end(), 0.);
-  assert(num_cols < std::numeric_limits<IndexType>::max());
+  assert(num_cols < size_t(std::numeric_limits<IndexType>::max()));
   for (size_t ii = 0; ii < num_cols; ++ii)
     VI::set_entry(permutations, ii, static_cast<IndexType>(ii));
 
@@ -259,7 +259,7 @@ struct QrHelper
 #if HAVE_LAPACKE || HAVE_MKL
     } else if (has_contiguous_storage && M::rows(A) > 10) {
       std::fill(permutations.begin(), permutations.end(), 0.);
-      assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
+      assert(std::max(M::rows(A), M::cols(A)) < size_t(std::numeric_limits<int>::max()));
       auto num_rows = static_cast<int>(M::rows(A));
       auto num_cols = static_cast<int>(M::cols(A));
       auto info = geqp3(lapacke_storage_layout(),
@@ -297,7 +297,7 @@ struct QrHelper
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)
           Mret::set_entry(ret, ii, jj, M::get_entry(QR, ii, jj));
-      assert(std::max(M::rows(QR), M::cols(QR)) < std::numeric_limits<int>::max());
+      assert(std::max(M::rows(QR), M::cols(QR)) < size_t(std::numeric_limits<int>::max()));
       auto info = calculate_q(lapacke_storage_layout(),
                               static_cast<int>(num_rows),
                               static_cast<int>(num_rows),
@@ -331,7 +331,7 @@ struct QrHelper
     } else if (has_contiguous_storage && num_rows > 10) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
-      assert(x.size() < std::numeric_limits<int>::max());
+      assert(x.size() < size_t(std::numeric_limits<int>::max()));
       const int num_rhs_rows = static_cast<int>(x.size());
       const int num_rhs_cols = 1;
       auto info = multiply_by_q(lapacke_storage_layout(),
@@ -349,7 +349,7 @@ struct QrHelper
         DUNE_THROW(Dune::MathError, "Multiplication by Q or Q^T failed");
 #endif // HAVE_LAPACKE || HAVE_MKL
     } else {
-      assert(num_cols < std::numeric_limits<int>::max());
+      assert(num_cols < size_t(std::numeric_limits<int>::max()));
       auto w = W::create(num_rows, ScalarType(0.));
       if (transpose == XT::Common::Transpose::no)
         for (int jj = static_cast<int>(num_cols) - 1; jj >= 0; --jj) {
@@ -575,7 +575,7 @@ void solve_qr_factorized(const MatrixType& QR,
   }
 
   // Undo permutations
-  assert(num_rows <= std::numeric_limits<int>::max());
+  assert(num_rows <= size_t(std::numeric_limits<int>::max()));
   for (int ii = 0; ii < static_cast<int>(num_rows); ++ii)
     V2::set_entry(x, VI::get_entry(permutations, ii), V2::get_entry(*work, ii));
 }

@@ -48,7 +48,7 @@ Logging::~Logging()
 
 void Logging::create(int logflags, const std::string logfile, const std::string datadir, const std::string _logdir)
 {
-  using namespace std::filesystem;
+  using namespace boost::filesystem;
   const auto& comm = Dune::MPIHelper::getCollectiveCommunication();
   boost::format log_fn("%s%s");
   if (comm.size() > 1) {

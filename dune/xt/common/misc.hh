@@ -94,7 +94,7 @@ std::array<T, N> make_array(const std::vector<T>& v)
 }
 
 //! writes process environment to file
-void dump_environment(std::ofstream& file, std::string csv_sep = ",");
+void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep = ",");
 
 } // namespace Common
 } // namespace XT

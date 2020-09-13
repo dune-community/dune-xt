@@ -216,7 +216,7 @@ struct CholeskySolver
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
-      assert(size <= std::numeric_limits<int>::max());
+      assert(size <= size_t(std::numeric_limits<int>::max()));
       int info = Common::Lapacke::dpotrf_work(
           lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
       if (info)
@@ -256,7 +256,7 @@ struct LDLTSolver
     if (subdiag.size() != size - 1)
       DUNE_THROW(InvalidStateException, "Wrong size of diag and subdiag!");
 #if HAVE_MKL || HAVE_LAPACKE
-    assert(size <= std::numeric_limits<int>::max());
+    assert(size <= size_t(std::numeric_limits<int>::max()));
     auto info = Common::Lapacke::dpttrf(static_cast<int>(size), Common::data(diag), Common::data(subdiag));
     if (info)
       DUNE_THROW(Dune::MathError, "Lapacke_dpptrf returned an error code!");
@@ -274,7 +274,7 @@ struct LDLTSolver
       ;
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (is_contiguous) {
-      assert(V::is_vector || std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
+      assert(V::is_vector || std::max(M::cols(rhs), size) <= size_t(std::numeric_limits<int>::max()));
       int rhs_cols = V::is_vector ? 1 : int(M::cols(rhs));
       int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),
                                          static_cast<int>(size),

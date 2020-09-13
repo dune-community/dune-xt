@@ -52,7 +52,7 @@ void backward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   typedef Common::MatrixAbstraction<MatrixType> M;
   const size_t num_rows = M::rows(A);
   const size_t num_cols = num_rows;
-  assert(num_rows < std::numeric_limits<int>::max());
+  assert(num_rows < size_t(std::numeric_limits<int>::max()));
   for (int ii = static_cast<int>(num_rows) - 1; ii >= 0.; --ii) {
     for (size_t jj = static_cast<size_t>(ii) + 1; jj < num_cols; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
@@ -119,7 +119,7 @@ backward_solve_csr(const MatrixType& A, VectorType& x, VectorType& rhs)
   const auto* entries = A.entries();
   const auto* row_pointers = A.outer_index_ptr();
   const auto* column_indices = A.inner_index_ptr();
-  assert(A.rows() <= std::numeric_limits<int>::max());
+  assert(A.rows() <= size_t(std::numeric_limits<int>::max()));
   for (int ii = static_cast<int>(A.rows()) - 1; ii >= 0; ii--) {
     // row_pointers[ii] is the diagonal entry as we assume a upper triangular matrix with non-zero entries on the
     // diagonal
@@ -140,7 +140,7 @@ backward_solve_csc(const MatrixType& A, VectorType& x, VectorType& rhs)
   const auto* entries = A.entries();
   const auto* column_pointers = A.outer_index_ptr();
   const auto* row_indices = A.inner_index_ptr();
-  assert(A.rows() <= std::numeric_limits<int>::max());
+  assert(A.rows() <= size_t(std::numeric_limits<int>::max()));
   for (int ii = static_cast<int>(A.rows()) - 1; ii >= 0; ii--) {
     // column_pointers[ii+1]-1 is the diagonal entry as we assume an upper triangular matrix with non-zero entries
     // on the diagonal
@@ -203,7 +203,7 @@ struct TriangularSolver
   {
     auto* xp = V::data(x); // get pointer to x
     auto* rhs = xp; // use x to store rhs
-    assert(std::max(M::rows(A), M::cols(A)) <= std::numeric_limits<int>::max());
+    assert(std::max(M::rows(A), M::cols(A)) <= size_t(std::numeric_limits<int>::max()));
     const int num_rows = static_cast<int>(M::rows(A));
     const int num_cols = static_cast<int>(M::cols(A));
     constexpr bool trans = (transpose == Common::Transpose::yes);

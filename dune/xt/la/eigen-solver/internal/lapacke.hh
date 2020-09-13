@@ -122,7 +122,7 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(
 #endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
   thread_local std::vector<double> real_part_of_eigenvalues(size, 0.);
   thread_local std::vector<double> imag_part_of_eigenvalues(size, 0.);
-  assert(size < std::numeric_limits<int>::max());
+  assert(size < size_t(std::numeric_limits<int>::max()));
   int storage_layout = MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout
                                == Common::StorageLayout::dense_row_major
                            ? Common::Lapacke::row_major()
@@ -243,7 +243,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
   thread_local std::vector<double> imag_part_of_eigenvalues(size);
   thread_local CommonDenseMatrix<double, MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout>
       right_eigenvectors_matrix(size, size, 0.);
-  assert(size < std::numeric_limits<int>::max());
+  assert(size < size_t(std::numeric_limits<int>::max()));
   thread_local std::vector<double> work(1);
   thread_local size_t last_size = -1;
   if (size != last_size) {

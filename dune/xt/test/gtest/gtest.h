@@ -19620,8 +19620,8 @@ struct IsRecursiveContainerImpl<C, true>
 // evaluates whether C is a recursive container type. A recursive container
 // type is a container type whose value_type is equal to the container type
 // itself. An example for a recursive container type is
-// std::filesystem::path, whose iterator has a value_type that is equal to
-// std::filesystem::path.
+// boost::filesystem::path, whose iterator has a value_type that is equal to
+// boost::filesystem::path.
 template <typename C>
 struct IsRecursiveContainer : public IsRecursiveContainerImpl<C>::type
 {};

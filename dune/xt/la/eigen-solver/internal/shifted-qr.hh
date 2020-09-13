@@ -161,7 +161,7 @@ struct RealQrEigenSolver
       // do the usual backsubstitution. If we encounter a zero on the diagonal in the process, we just assign
       // zero to that component.
       eigvec[kk] = 1.;
-      assert(kk <= std::numeric_limits<int>::max());
+      assert(kk <= size_t(std::numeric_limits<int>::max()));
       for (int rr = static_cast<int>(kk) - 1; rr >= 0; --rr) {
         eigvec[rr] = 0.;
         if (XT::Common::FloatCmp::ne(A[rr][rr], A[kk][kk])) {
