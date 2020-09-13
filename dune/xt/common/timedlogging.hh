@@ -25,8 +25,9 @@
 #include <dune/common/timer.hh>
 #include <dune/common/visibility.hh>
 
-#include <dune/xt/common/logstreams.hh>
 #include <dune/xt/common/color.hh>
+#include <dune/xt/common/logstreams.hh>
+#include <dune/xt/common/string.hh>
 
 #ifndef DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
 #  ifndef NDEBUG
