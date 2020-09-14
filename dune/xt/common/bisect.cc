@@ -16,6 +16,8 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 
+#include "bisect.hh"
+
 namespace Dune {
 namespace XT {
 namespace Common {

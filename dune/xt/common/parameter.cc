@@ -15,9 +15,11 @@
 #include <sstream>
 #include <type_traits>
 
-#include "exceptions.hh"
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/numeric_cast.hh>
+
 #include "parameter.hh"
-#include "numeric_cast.hh"
 
 namespace Dune {
 namespace XT {
