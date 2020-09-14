@@ -85,6 +85,7 @@ struct AbsoluteValue
 {
   static T result(const T& val)
   {
+    using Dune::XT::Common::internal::abs;
     using std::abs;
     return abs(val);
   }
