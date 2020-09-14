@@ -10,10 +10,8 @@
 //   Tobias Leibner  (2014, 2018, 2020)
 
 #include <config.h>
-#include "color.hh"
 
-#include <stdlib.h>
-#include <string>
+#include "color.hh"
 
 namespace Dune {
 namespace XT {

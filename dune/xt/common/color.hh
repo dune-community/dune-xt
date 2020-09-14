@@ -13,21 +13,12 @@
 #ifndef DUNE_XT_COMMON_COLOR_HH
 #define DUNE_XT_COMMON_COLOR_HH
 
-#include <sstream>
-#include <iostream>
 #include <map>
-#include <string>
-
-#ifdef __GNUC__
-#  include <cxxabi.h>
-#endif
 #include <string>
 
 namespace Dune {
 namespace XT {
 namespace Common {
-
-#define DS_CONST_CHAR const char*
 
 /**
  * @brief namespace to define color constants that can be
@@ -39,60 +30,59 @@ namespace Common {
 struct Colors
 {
   // foreground colors
-  static DS_CONST_CHAR black;
-  static DS_CONST_CHAR red;
-  static DS_CONST_CHAR green;
-  static DS_CONST_CHAR brown;
-  static DS_CONST_CHAR blue;
-  static DS_CONST_CHAR purple;
-  static DS_CONST_CHAR cyan;
-  static DS_CONST_CHAR lightgray;
+  static const char* black;
+  static const char* red;
+  static const char* green;
+  static const char* brown;
+  static const char* blue;
+  static const char* purple;
+  static const char* cyan;
+  static const char* lightgray;
   // light foreground colors
-  static DS_CONST_CHAR darkgray;
-  static DS_CONST_CHAR lightred;
-  static DS_CONST_CHAR lightgreen;
-  static DS_CONST_CHAR yellow;
-  static DS_CONST_CHAR lightblue;
-  static DS_CONST_CHAR lightpurple;
-  static DS_CONST_CHAR lightcyan;
-  static DS_CONST_CHAR white;
+  static const char* darkgray;
+  static const char* lightred;
+  static const char* lightgreen;
+  static const char* yellow;
+  static const char* lightblue;
+  static const char* lightpurple;
+  static const char* lightcyan;
+  static const char* white;
 
   // background colors
-  static DS_CONST_CHAR bblack;
-  static DS_CONST_CHAR bred;
-  static DS_CONST_CHAR bgreen;
-  static DS_CONST_CHAR bbrown;
-  static DS_CONST_CHAR bblue;
-  static DS_CONST_CHAR bpurple;
-  static DS_CONST_CHAR bcyan;
-  static DS_CONST_CHAR blightgray;
+  static const char* bblack;
+  static const char* bred;
+  static const char* bgreen;
+  static const char* bbrown;
+  static const char* bblue;
+  static const char* bpurple;
+  static const char* bcyan;
+  static const char* blightgray;
   // light background colors
-  static DS_CONST_CHAR bdarkgray;
-  static DS_CONST_CHAR blightred;
-  static DS_CONST_CHAR blightgreen;
-  static DS_CONST_CHAR byellow;
-  static DS_CONST_CHAR blightblue;
-  static DS_CONST_CHAR blightpurple;
-  static DS_CONST_CHAR blightcyan;
-  static DS_CONST_CHAR bwhite;
+  static const char* bdarkgray;
+  static const char* blightred;
+  static const char* blightgreen;
+  static const char* byellow;
+  static const char* blightblue;
+  static const char* blightpurple;
+  static const char* blightcyan;
+  static const char* bwhite;
 }; // struct Colors
 
 // modifiers
 struct StreamModifiers
 {
-  static DS_CONST_CHAR normal;
-  static DS_CONST_CHAR bold;
-  static DS_CONST_CHAR italic;
-  static DS_CONST_CHAR underline;
-  static DS_CONST_CHAR blink;
-  static DS_CONST_CHAR reverse;
-  static DS_CONST_CHAR enditalic;
-  static DS_CONST_CHAR endunderline;
-  static DS_CONST_CHAR endblink;
-  static DS_CONST_CHAR endreverse;
+  static const char* normal;
+  static const char* bold;
+  static const char* italic;
+  static const char* underline;
+  static const char* blink;
+  static const char* reverse;
+  static const char* enditalic;
+  static const char* endunderline;
+  static const char* endblink;
+  static const char* endreverse;
 }; // struct StreamModifiers
 
-#undef DS_CONST_CHAR
 
 /**
  * @brief Chooses a color from a 256 color map for a foreground color.

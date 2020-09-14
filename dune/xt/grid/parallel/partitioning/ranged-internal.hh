@@ -24,7 +24,12 @@
 #include <vector>
 
 #if HAVE_TBB
-#include <tbb/tbb_stddef.h>
+// The new TBB oneAPI does not have this file anymore
+#if __has_include(<tbb/tbb_stddef.h>)
+#  include <tbb/tbb_stddef.h>
+#  else
+#  include <tbb/blocked_range.h>
+#  endif
 #endif
 
 #include <dune/xt/grid/type_traits.hh>

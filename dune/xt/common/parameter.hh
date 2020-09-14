@@ -13,12 +13,11 @@
 #define DUNE_XT_COMMON_PARAMETER_HH
 
 #include <algorithm>
-#include <string>
 #include <map>
-#include <vector>
 #include <iosfwd>
+#include <vector>
+#include <string>
 
-#include "float_cmp.hh"
 #include "string.hh"
 
 namespace Dune {
