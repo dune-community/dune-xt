@@ -114,7 +114,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jaco
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   FunctionType default_function(3);
-  auto&& localizable_function = default_function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -127,7 +127,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order
 {
   const int expected_order = 3;
   FunctionType default_function(3);
-  auto&& localizable_function = default_function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -141,7 +141,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   FunctionType function(3);
-  auto&& localizable_function = function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -160,7 +160,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalu
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   FunctionType function(3);
-  auto&& localizable_function = function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

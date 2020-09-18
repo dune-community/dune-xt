@@ -57,7 +57,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_constructible)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
 }
 
 
@@ -69,7 +69,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_visualizable)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
   function.visualize(leaf_view, "test__ESV2007CutoffFunction_from_{{GRIDNAME}}__is_visualizable");
 }
 
@@ -80,7 +80,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_bindable)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -97,7 +97,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_order)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -115,9 +115,9 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_evaluate)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
   auto local_f = function.local_function();
-  auto local_diffusion = diffusion_function.template as_grid_function<ElementType>().local_function();
+  auto local_diffusion = diffusion_function.local_function();
   double poincare_constant_ = 1.0 / (M_PIl * M_PIl);
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -150,7 +150,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_jacobian)
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
+  FunctionType function(diffusion_function);
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

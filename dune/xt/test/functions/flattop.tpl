@@ -120,7 +120,7 @@ TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   const DomainType delta(1e-6);
   const double top_value = 20;
   FunctionType function(left, right, delta, top_value);
-  auto&& localizable_function = function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -137,7 +137,7 @@ TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   const DomainType delta(1e-6);
   const double top_value = 20;
   FunctionType function(left, right, delta, top_value);
-  auto&& localizable_function = function.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -155,7 +155,7 @@ TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
   const DomainType delta(1e-6);
   const double top_value = 20;
   FunctionType func(left, right, delta, top_value);
-  auto&& localizable_function = func.template as_grid_function<ElementType>();
+  auto localizable_function = Functions::make_grid_function<ElementType>(func);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
