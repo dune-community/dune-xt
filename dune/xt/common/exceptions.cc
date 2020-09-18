@@ -46,20 +46,6 @@ int handle_exception(const std::exception& exp)
 }
 
 
-#if HAVE_TBB && __has_include(<tbb/tbb_exception.h>)
-
-
-int handle_exception(const tbb::tbb_exception& exp)
-{
-  std::cerr << "Failed with tbb::exception" << exp.name() << ": " << exp.what();
-  DXTC_TIMINGS.output_per_rank("profiler");
-  mem_usage();
-  return abort_all_mpi_processes();
-}
-
-
-#endif // HAVE_TBB
-
 } // namespace Common
 } // namespace XT
 } // namespace Dune
