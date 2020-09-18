@@ -49,9 +49,8 @@ public:
   using GV = GridViewType;
   using E = ElementType;
 
-  ElementFunctor(const std::string& log_prefix = "", const std::string& log_id = "", const bool log_disabled = true)
-    : Common::WithLogger<ElementFunctor<GL>>(
-        log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "ElementFunctor" : log_id, log_disabled)
+  ElementFunctor(const std::string& log_prefix = "", const bool log_disabled = true)
+    : Common::WithLogger<ElementFunctor<GL>>(log_prefix.empty() ? "ElementFunctor" : log_prefix, log_disabled)
   {}
 
   ElementFunctor(const ElementFunctor<GL>&) = default;
@@ -96,11 +95,8 @@ public:
   using E = ElementType;
   using I = IntersectionType;
 
-  IntersectionFunctor(const std::string& log_prefix = "",
-                      const std::string& log_id = "",
-                      const bool log_disabled = true)
-    : Common::WithLogger<IntersectionFunctor<GL>>(
-        log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "IntersectionFunctor" : log_id, log_disabled)
+  IntersectionFunctor(const std::string& log_prefix = "", const bool log_disabled = true)
+    : Common::WithLogger<IntersectionFunctor<GL>>(log_prefix.empty() ? "IntersectionFunctor" : log_prefix, log_disabled)
   {}
 
   virtual ~IntersectionFunctor() = default;
@@ -151,12 +147,9 @@ public:
   using E = ElementType;
   using I = IntersectionType;
 
-  ElementAndIntersectionFunctor(const std::string& log_prefix = "",
-                                const std::string& log_id = "",
-                                const bool log_disabled = true)
-    : Common::WithLogger<ElementAndIntersectionFunctor<GL>>(log_prefix.empty() ? "xt.grid" : log_prefix,
-                                                            log_id.empty() ? "ElementAndIntersectionFunctor" : log_id,
-                                                            log_disabled)
+  ElementAndIntersectionFunctor(const std::string& log_prefix = "", const bool log_disabled = true)
+    : Common::WithLogger<ElementAndIntersectionFunctor<GL>>(
+        log_prefix.empty() ? "ElementAndIntersectionFunctor" : log_prefix, log_disabled)
   {}
 
   virtual ~ElementAndIntersectionFunctor() = default;

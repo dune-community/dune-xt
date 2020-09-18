@@ -44,31 +44,29 @@ public:
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           BoundaryType*&& boundary_type_ptr,
                           const std::string& logging_prefix = "")
-    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.boundarydetectorfunctor",
-               logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
+    : BaseType(logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
                /*logging_disabled=*/logging_prefix.empty())
     , Propagator(this)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type_ptr)
     , found_(0)
   {
-    LOG_(debug) << this->logging_id << "(boundary_info=" << boundary_info_ << ", boundary_type=" << *boundary_type_
+    LOG_(debug) << "BoundaryDetectorFunctor(boundary_info=" << boundary_info_ << ", boundary_type=" << *boundary_type_
                 << ")" << std::endl;
   }
 
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           const BoundaryType& boundary_type,
                           const std::string& logging_prefix = "")
-    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.boundarydetectorfunctor",
-               logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
+    : BaseType(logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
                /*logging_disabled=*/logging_prefix.empty())
     , Propagator(this)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type.copy())
     , found_(0)
   {
-    LOG_(debug) << this->logging_id << std::flush << "(boundary_info=" << std::flush << boundary_info_ << std::flush
-                << ", boundary_type=" << std::flush << *boundary_type_ << ")" << std::endl;
+    LOG_(debug) << "BoundaryDetectorFunctor(boundary_info=" << boundary_info_ << ", boundary_type=" << *boundary_type_
+                << ")" << std::endl;
   }
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;

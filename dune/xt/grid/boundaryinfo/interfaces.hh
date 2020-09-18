@@ -76,8 +76,8 @@ public:
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
 
-  BoundaryInfo(const std::string& log_prefix = "", const std::string& log_id = "", const bool logging_disabled = true)
-    : Logger(log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "BoundaryInfo" : log_id, logging_disabled)
+  BoundaryInfo(const std::string& log_prefix = "", const bool logging_disabled = true)
+    : Logger(log_prefix.empty() ? "BoundaryInfo" : log_prefix, logging_disabled)
   {}
 
   BoundaryInfo(const ThisType&) = default;

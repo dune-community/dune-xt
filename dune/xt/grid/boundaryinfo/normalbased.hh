@@ -155,14 +155,13 @@ public:
   NormalBasedBoundaryInfo(const DomainFieldType tol = 1e-10,
                           BoundaryType*&& default_boundary_type = new NoBoundary(),
                           const std::string& logging_prefix = "")
-    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.normalbasedboundaryinfo",
-               logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix,
+    : BaseType(logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix,
                /*logging_disabled=*/logging_prefix.empty())
     , tol_(tol)
     , default_boundary_type_(std::move(default_boundary_type))
   {
-    LOG_(debug) << this->logging_id << "(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_ << ")"
-                << std::endl;
+    LOG_(debug) << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_
+                << ")" << std::endl;
   }
 
   NormalBasedBoundaryInfo(const ThisType&) = delete;
