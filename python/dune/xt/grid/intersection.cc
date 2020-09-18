@@ -114,7 +114,7 @@ public:
 } // namespace Dune
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct Intersection_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
@@ -141,5 +141,5 @@ PYBIND11_MODULE(_grid_intersection, m)
 
   py::module::import("dune.xt.common");
 
-  Intersection_for_all_grids<XT::Grid::AvailableGridTypes>::bind(m);
+  Intersection_for_all_grids<>::bind(m);
 }

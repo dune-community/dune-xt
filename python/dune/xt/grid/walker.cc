@@ -13,11 +13,12 @@
 #include "config.h"
 
 #include <dune/pybindxi/pybind11.h>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "walker.hh"
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct Walker_for_all_grids
 {
   static void bind(pybind11::module& m)

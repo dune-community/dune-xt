@@ -11,10 +11,12 @@
 
 #include <dune/xt/grid/grids.hh>
 
+#include <python/dune/xt/grid/grids.bindings.hh>
+
 #include "interfaces.hh"
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct ElementFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
@@ -31,7 +33,7 @@ struct ElementFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct IntersectionFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
@@ -48,7 +50,7 @@ struct IntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct ElementAndIntersectionFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)

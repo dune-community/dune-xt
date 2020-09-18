@@ -13,6 +13,7 @@
 #define DUNE_XT_GRID_GRIDS_BINDINGS_HH
 
 #include <dune/xt/common/string.hh>
+#include <dune/xt/common/tuple.hh>
 #include <dune/xt/grid/grids.hh>
 
 
@@ -149,6 +150,30 @@ struct grid_name<UGGrid<dim>>
 
 
 #endif // HAVE_DUNE_UGGRID || HAVE_UG
+
+
+/// \attention The following choices are on purpose: only two variants per dim, one cube one simplex.
+///            In particular the grid_name<G>::value needs to be unique for all alugrid variants and the
+///            make_...grid methods need to be more general if we extend the choice of grids here!
+
+using Available1dGridTypes = std::tuple<ONED_1D>;
+
+using Available2dGridTypes = std::tuple<YASP_2D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                        ,
+                                        ALU_2D_SIMPLEX_CONFORMING
+#endif
+                                        >;
+
+using Available3dGridTypes = std::tuple<YASP_3D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                        ,
+                                        ALU_3D_SIMPLEX_CONFORMING
+#endif
+                                        >;
+
+using AvailableGridTypes = Common::tuple_cat_t<Available1dGridTypes, Available2dGridTypes, Available3dGridTypes>;
+
 
 } // namespace bindings
 } // namespace Grid

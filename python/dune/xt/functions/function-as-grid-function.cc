@@ -41,7 +41,7 @@ void addbind_for_Grid(pybind11::module& m)
 } // ... addbind_for_Grid(...)
 
 
-template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
+template <class Tuple = Dune::XT::Grid::bindings::AvailableGridTypes>
 void all_grids(pybind11::module& m)
 {
   Dune::XT::Common::bindings::guarded_bind([&]() { //  different grids but same entity

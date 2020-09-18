@@ -12,9 +12,10 @@
 #include <dune/xt/grid/grids.hh>
 
 #include <python/dune/xt/grid/filters/element.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 
-template <template <class> class Filter, class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct InitlessElementFilter_for_all_grids
 {
   static void bind(pybind11::module& m, const std::string& class_id)

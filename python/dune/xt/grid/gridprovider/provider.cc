@@ -15,9 +15,10 @@
 
 #include <python/dune/xt/grid/gridprovider.hh>
 #include <python/dune/xt/grid/filters/intersection.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 
-template <template <class> class Filter, class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct InitlessIntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m, const std::string& class_id)
@@ -35,7 +36,7 @@ struct InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct CustomBoundaryIntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m)
@@ -52,7 +53,7 @@ struct CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_nu
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct GridProvider_for_all_grids
 {
   static void bind(pybind11::module& m)

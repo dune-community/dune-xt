@@ -28,6 +28,7 @@
 #include <python/dune/xt/common/fmatrix.hh>
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/traits.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 #include <python/dune/xt/common/exceptions.bindings.hh>
 
 namespace Dune {
@@ -105,7 +106,7 @@ public:
 } // namespace Dune
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct CheckerboardFunction_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;

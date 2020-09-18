@@ -24,7 +24,7 @@ using namespace Dune::XT;
 using namespace Dune::XT::Grid::bindings;
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct AllDirichletBoundaryInfo_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;

@@ -11,10 +11,12 @@
 
 #include <dune/xt/grid/grids.hh>
 
+#include <python/dune/xt/grid/grids.bindings.hh>
+
 #include "interfaces.hh"
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct BoundaryInfo_for_all_grids
 {
   static void bind(pybind11::module& m)

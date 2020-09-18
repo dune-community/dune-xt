@@ -9,12 +9,12 @@
 
 #include "config.h"
 
-#include <dune/xt/grid/grids.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "base.hh"
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct ElementFilter_for_all_grids
 {
   static void bind(pybind11::module& m)
@@ -31,7 +31,7 @@ struct ElementFilter_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct IntersectionFilter_for_all_grids
 {
   static void bind(pybind11::module& m)

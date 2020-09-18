@@ -9,7 +9,7 @@
 
 #include "config.h"
 
-#include <dune/xt/grid/grids.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "grid-function_for_all_grids.hh"
 
@@ -23,7 +23,7 @@ PYBIND11_MODULE(_functions_interfaces_grid_function_3d, m)
   py::module::import("dune.xt.la");
 
   // All of these need to be there ...
-  GridFunctionInterface_for_all_grids<Dune::XT::Grid::Available3dGridTypes>::bind_interface(m);
+  GridFunctionInterface_for_all_grids<Dune::XT::Grid::bindings::Available3dGridTypes>::bind_interface(m);
   // ... before we start binding those.
-  GridFunctionInterface_for_all_grids<Dune::XT::Grid::Available3dGridTypes>::bind_combined(m);
+  GridFunctionInterface_for_all_grids<Dune::XT::Grid::bindings::Available3dGridTypes>::bind_combined(m);
 } // PYBIND11_MODULE(...)

@@ -25,9 +25,10 @@
 
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 
-template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
+template <class Tuple = Dune::XT::Grid::bindings::AvailableGridTypes>
 void addbind_for_Grid(pybind11::module& m, std::vector<std::string>& available_types)
 {
   using G = Dune::XT::Common::tuple_head_t<Tuple>;
