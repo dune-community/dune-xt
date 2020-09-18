@@ -54,8 +54,9 @@ class ProductFunction;
 template <class, class>
 class FractionFunction;
 
-// forward, required in FunctionInterface::as_grid_function
-template <class E, size_t r, size_t rC, class R>
+
+// remove this once removing as_grid_function
+template <class, size_t, size_t, class>
 class FunctionAsGridFunctionWrapper;
 
 
@@ -68,18 +69,20 @@ class FunctionAsGridFunctionWrapper;
  *        entities (as in: which are double-valued on intersections).
  *
  *        To turn a function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
- *        to visualize it or to use it in a discretization scheme), use as_grid_function to obtain a const reference to
- *        a wrapped version of this function:
+ *        to visualize it or to use it in a discretization scheme), use make_grid_function to obtain a wrapped version
+ *        of this function:
 \code
 auto function = ...;
 auto grid_view = ...;
 using E = XT::Grid::extract_entity_t<decltype(grid_view)>;
-const auto& grid_function = function.template as_grid_function<E>();
+auto grid_function = make_grid_function<E>(function);
 \endcode
  *
  * \sa    RangeReturnTypeSelector
  * \sa    DerivativeRangeReturnTypeSelector
  * \sa    GridFunctionInterface
+ * \sa    GridInterface
+ * \sa    make_grid_function
  **/
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class FunctionInterface : public Common::ParametricInterface
@@ -318,10 +321,13 @@ public:
    * \note This function keeps a map of all wrappers in a local static map, to avoid temporaries.
    * \todo Check if this implementation is thread safe!
    */
+  // When removing this, also remove
+  // * the dune/xt/functions/base/function-as-grid-function.hh include below and
+  // * the FunctionAsGridFunctionWrapper forward above!
   template <class E>
-  const typename std::enable_if<XT::Grid::is_entity<E>::value && E::dimension == d,
-                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
-  as_grid_function() const
+  [[deprecated("Use make_grid_function instead (18.09.2020)!")]] const typename std::
+      enable_if<XT::Grid::is_entity<E>::value && E::dimension == d, FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
+      as_grid_function() const
   {
     static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
     if (wrappers.find(this) == wrappers.end())
@@ -329,8 +335,11 @@ public:
     return *(wrappers[this]);
   }
 
+  // When removing this, also remove
+  // * the dune/xt/functions/base/function-as-grid-function.hh include below and
+  // * the FunctionAsGridFunctionWrapper forward above!
   template <class ViewTraits>
-  const typename std::enable_if<
+  [[deprecated("Use make_grid_function instead (18.09.2020)!")]] const typename std::enable_if<
       (ViewTraits::Grid::dimension == d),
       FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
   as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
@@ -342,6 +351,7 @@ public:
    * \copydoc GridFunctionInterface::visualize
    */
   template <class GridLayerType>
+  [[deprecated("Use make_grid_function(*this).visualize(...) instead (18.09.2020)!")]]
   typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
   visualize(const GridLayerType& grid_layer,
             const std::string path,
@@ -352,11 +362,11 @@ public:
         grid_layer, path, subsampling, vtk_output_type);
   }
 
-
   /**
    * \copydoc GridFunctionInterface::visualize_gradient
    */
   template <class GridLayerType>
+  [[deprecated("Use make_grid_function(*this).visualize(...) instead (18.09.2020)!")]]
   typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
   visualize_gradient(const GridLayerType& grid_layer,
                      const std::string path,
@@ -435,8 +445,6 @@ private:
 
 
 #include <dune/xt/functions/base/combined-functions.hh>
-#include <dune/xt/functions/base/function-as-grid-function.hh>
-#include <dune/xt/functions/base/function-as-flux-function.hh>
+#include <dune/xt/functions/base/function-as-grid-function.hh> // remove this once removing as_grid_function
 
-
-#endif // DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
+#endif // DUNE_XT_FUNCTIONS_INTERFACES_FUNCTION_HH
