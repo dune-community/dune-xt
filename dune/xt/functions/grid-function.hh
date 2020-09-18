@@ -12,9 +12,12 @@
 #ifndef DUNE_XT_FUNCTIONS_GRID_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_GRID_FUNCTION_HH
 
+#include <dune/grid/common/gridview.hh>
+
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
+#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/functions/base/function-as-grid-function.hh>
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/constant.hh>
@@ -617,6 +620,32 @@ private:
   std::unique_ptr<GridFunctionInterface<E, 1, 1, R>> function_;
   std::string name_;
 }; // class GridFunction<..., 1, 1, ...>
+
+
+template <class Element, size_t d, size_t r, size_t rC, class R>
+std::enable_if_t<Grid::is_entity<Element>::value && Element::dimension == d, GridFunction<Element, r, rC, R>>
+make_grid_function(const FunctionInterface<d, r, rC, R>& func)
+{
+  return GridFunction<Element, r, rC, R>(func);
+}
+
+
+template <class GridView, size_t d, size_t r, size_t rC, class R>
+std::enable_if_t<Grid::is_view<GridView>::value && GridView::dimension == d,
+                 GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>>
+make_grid_function(const FunctionInterface<d, r, rC, R>& func)
+{
+  return GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>(func);
+}
+
+
+template <size_t d, size_t r, size_t rC, class R, class GridView>
+std::enable_if_t<Grid::is_view<GridView>::value && GridView::dimension == d,
+                 GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>>
+make_grid_function(const FunctionInterface<d, r, rC, R>& func, const GridView& /*grid_view*/)
+{
+  return GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>(func);
+}
 
 
 } // namespace Functions
