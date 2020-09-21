@@ -18,6 +18,7 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/flattop.hh>
+#include <dune/xt/functions/grid-function.hh>
 
 using namespace Dune::XT;
 

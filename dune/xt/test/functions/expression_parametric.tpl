@@ -17,6 +17,7 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/expression/parametric.hh>
+#include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/common/parameter.hh>
 
 
