@@ -17,6 +17,7 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/ESV2007.hh>
+#include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/expression.hh>
 
 using namespace Dune::XT;
@@ -114,7 +115,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_evaluate)
   for (size_t dd = 0; dd < d; ++dd) {
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
-  DiffusionType diffusion_function("x", expr, 1);
+  auto diffusion_function = Functions::make_grid_function<ElementType>(DiffusionType("x", expr, 1));
   FunctionType function(diffusion_function);
   auto local_f = function.local_function();
   auto local_diffusion = diffusion_function.local_function();
