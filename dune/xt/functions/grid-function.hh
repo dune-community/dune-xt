@@ -622,28 +622,27 @@ private:
 }; // class GridFunction<..., 1, 1, ...>
 
 
-template <class Element, size_t d, size_t r, size_t rC, class R>
-std::enable_if_t<Grid::is_entity<Element>::value && Element::dimension == d, GridFunction<Element, r, rC, R>>
-make_grid_function(const FunctionInterface<d, r, rC, R>& func)
+template <class Element_or_GridView, size_t d, size_t r, size_t rC, class R>
+auto make_grid_function(const FunctionInterface<d, r, rC, R>& func)
 {
-  return GridFunction<Element, r, rC, R>(func);
-}
-
-
-template <class GridView, size_t d, size_t r, size_t rC, class R>
-std::enable_if_t<Grid::is_view<GridView>::value && GridView::dimension == d,
-                 GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>>
-make_grid_function(const FunctionInterface<d, r, rC, R>& func)
-{
-  return GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>(func);
-}
+  if constexpr (Grid::is_entity<Element_or_GridView>::value) {
+    using E = Element_or_GridView;
+    return GridFunction<E, r, rC, R>(func);
+  } else if constexpr (Grid::is_view<Element_or_GridView>::value) {
+    using GV = Element_or_GridView;
+    using E = Grid::extract_entity_t<GV>;
+    return GridFunction<E, r, rC, R>(func);
+  } else
+    static_assert(AlwaysFalse<Element_or_GridView>::value, "Element_or_GridView has to be an Element or a GridView!");
+} /// ... make_grid_function(...)
 
 
 template <size_t d, size_t r, size_t rC, class R, class GridView>
-std::enable_if_t<Grid::is_view<GridView>::value && GridView::dimension == d,
-                 GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>>
-make_grid_function(const FunctionInterface<d, r, rC, R>& func, const GridView& /*grid_view*/)
+GridFunction<Grid::extract_entity_t<GridView>, r, rC, R> make_grid_function(const FunctionInterface<d, r, rC, R>& func,
+                                                                            const GridView& /*grid_view*/)
 {
+  static_assert(Grid::is_view<GridView>::value, "");
+  static_assert(GridView::dimension == d, "");
   return GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>(func);
 }
 
