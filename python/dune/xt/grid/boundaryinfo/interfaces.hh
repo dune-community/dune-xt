@@ -44,7 +44,7 @@ public:
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
-    c.def_property_readonly("logger", [](type& self) { return self.logger; });
+    c.def_readonly("logger", &type::logger);
     c.def("__repr__", [](type& self) { return self.str(); });
 
     return c;

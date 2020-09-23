@@ -85,7 +85,7 @@ public:
           "boundary_type"_a,
           "logging_prefix"_a = "");
     c.def("__repr__", [ClassId](type&) { return ClassId + "(boundary_info=, boundary_type=, logging_prefix=)"; });
-    c.def_property_readonly("logger", [](type& self) { return self.logger; });
+    c.def_readonly("logger", &type::logger);
 
     m.def(
         ClassId.c_str(),
