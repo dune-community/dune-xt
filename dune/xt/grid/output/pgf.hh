@@ -111,15 +111,15 @@ public:
     , grid_view_(grid_view)
   {}
 
-  virtual void apply_local(const typename BaseType::ElementType& entity) override
+  void apply_local(const typename BaseType::ElementType& entity) override
   {
     const auto ent_idx = grid_view_.indexSet().index(entity);
     maybePrintEntityIndex(entity, ent_idx);
   }
 
-  virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::ElementType& /*inside_entity*/,
-                           const typename BaseType::ElementType& /*outside_entity*/) override
+  void apply_local(const typename BaseType::IntersectionType& intersection,
+                   const typename BaseType::ElementType& /*inside_entity*/,
+                   const typename BaseType::ElementType& /*outside_entity*/) override
   {
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
@@ -182,9 +182,9 @@ public:
     , level_(level)
   {}
 
-  virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::ElementType& inside_entity,
-                           const typename BaseType::ElementType& /*outside_entity*/) override
+  void apply_local(const typename BaseType::IntersectionType& intersection,
+                   const typename BaseType::ElementType& inside_entity,
+                   const typename BaseType::ElementType& /*outside_entity*/) override
   {
     const PgfCoordWrapper center(inside_entity.geometry().center());
     const auto fac = 0.16 * level_;

@@ -426,7 +426,7 @@ public:
     return backend_->nonZeros();
   }
 
-  virtual SparsityPatternDefault
+  SparsityPatternDefault
   pattern(const bool prune = false,
           const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
@@ -451,8 +451,7 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType
-  pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  ThisType pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return ThisType(*backend_, true, eps);
   }

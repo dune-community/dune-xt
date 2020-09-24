@@ -537,12 +537,12 @@ public:
     for (size_t rr = 0; rr < rows(); ++rr)
       for (size_t cc = 0; cc < cols(); ++cc)
         for (size_t kk = 0; kk < cols(); ++kk)
-          new_backend->get_entry_ref(rr, cc) += get_entry(rr, kk) * M::get_entry(other, kk, cc);
+          new_backend.get_entry_ref(rr, cc) += get_entry(rr, kk) * M::get_entry(other, kk, cc);
     *backend_ = new_backend;
   }
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
+  ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
     auto ret = this->copy();
     for (auto& entry : ret.backend_->entries_)

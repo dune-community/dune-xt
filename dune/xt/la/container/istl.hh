@@ -678,9 +678,9 @@ public:
     return backend_->nonzeroes();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     SparsityPatternDefault ret(rows());
     if (prune) {
@@ -699,8 +699,8 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return ThisType(*backend_, true, eps);
   }

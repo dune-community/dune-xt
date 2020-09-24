@@ -517,30 +517,30 @@ public:
    * \{
    **/
 
-  virtual size_t size(const Common::Parameter& /*param*/ = {}) const override
+  size_t size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
 
-  virtual size_t max_size(const Common::Parameter& /*param*/ = {}) const override
+  size_t max_size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
 
-  virtual void evaluate(const DomainType& point_in_reference_element,
-                        const StateType& u,
-                        std::vector<RangeType>& result,
-                        const Common::Parameter& param = {}) const override
+  void evaluate(const DomainType& point_in_reference_element,
+                const StateType& u,
+                std::vector<RangeType>& result,
+                const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
     result[0] = this->evaluate(point_in_reference_element, u, param);
   }
 
-  virtual void jacobian(const DomainType& point_in_reference_element,
-                        const StateType& u,
-                        std::vector<JacobianRangeType>& result,
-                        const Common::Parameter& param = {}) const override
+  void jacobian(const DomainType& point_in_reference_element,
+                const StateType& u,
+                std::vector<JacobianRangeType>& result,
+                const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);

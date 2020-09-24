@@ -419,9 +419,9 @@ public:
     return entries_->size();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
-                                                             / 1000.) const override
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
+                                                     / 1000.) const override
   {
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
@@ -450,7 +450,7 @@ public:
       for (size_t cc = 0; cc < num_cols_; ++cc) {
         new_entry = 0;
         for (size_t kk = (*row_pointers_)[rr]; kk < (*row_pointers_)[rr + 1]; ++kk)
-          new_entry += (*entries_)[kk] * other[(*column_indices_)[kk]][cc];
+          new_entry += (*entries_)[kk] * other.get_entry((*column_indices_)[kk], cc);
         if (XT::Common::FloatCmp::ne(new_entry, 0., 0., eps_ / num_cols_)) {
           new_entries->push_back(new_entry);
           new_column_indices->push_back(cc);
@@ -718,7 +718,7 @@ public:
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
   operator=(const OtherMatrixImp& other)
   {
-    assign(other, dense_pattern(num_rows_, num_cols_));
+    return assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
 
@@ -938,9 +938,9 @@ public:
     return entries_->size();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
-                                                             / 1000.) const override
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
+                                                     / 1000.) const override
   {
     SparsityPatternDefault ret(num_rows_);
     for (size_t cc = 0; cc < num_cols_; ++cc) {
@@ -1242,15 +1242,6 @@ public:
     return *this;
   }
 
-  void deep_copy(const ThisType& other)
-  {
-    num_rows_ = other.num_rows_;
-    num_cols_ = other.num_cols_;
-    sparse_ = other.sparse_;
-    sparse_matrix_.deep_copy(other.sparse_matrix_);
-    dense_matrix_.deep_copy(other.dense_matrix_);
-  }
-
   /// \name Required by ContainerInterface.
   /// \{
   inline ThisType copy() const
@@ -1356,7 +1347,7 @@ public:
     return sparse_ ? sparse_matrix_.non_zeros() : dense_matrix_.non_zeros();
   }
 
-  virtual SparsityPatternDefault
+  SparsityPatternDefault
   pattern(const bool prune = false,
           const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {

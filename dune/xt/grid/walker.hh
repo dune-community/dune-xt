@@ -514,7 +514,7 @@ public:
     prep(*element_and_intersection_functor_wrappers_);
   }
 
-  virtual void apply_local(const ElementType& element) override
+  void apply_local(const ElementType& element) override
   {
     apply_local(element, *element_functor_wrappers_, *element_and_intersection_functor_wrappers_);
   } // ... apply_local(...)
@@ -534,9 +534,9 @@ public:
     }
   } // ... apply_local(...)
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const ElementType& inside_element,
-                           const ElementType& outside_element) override
+  void apply_local(const IntersectionType& intersection,
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override
   {
     apply_local(intersection,
                 inside_element,
