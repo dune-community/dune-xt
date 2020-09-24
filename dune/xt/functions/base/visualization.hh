@@ -202,22 +202,24 @@ private:
   using DomainType = typename LocalFunctionType::DomainType;
 
 public:
-  VisualizationAdapter(const GridFunctionType& localizable_function,
+  VisualizationAdapter(const GridFunctionType& grid_function,
                        const VisualizerInterface<range_dim, range_dim_cols, RangeField>& visualizer,
                        const std::string nm = "",
                        const XT::Common::Parameter& param = {})
-    : local_function_(localizable_function.local_function())
+    : function_(grid_function.copy_as_grid_function())
+    , local_function_(function_->local_function())
     , visualizer_(visualizer)
-    , name_(nm.empty() ? localizable_function.name() : nm)
+    , name_(nm.empty() ? function_->name() : nm)
     , param_(param)
   {}
 
-  VisualizationAdapter(const GridFunctionType& localizable_function,
+  VisualizationAdapter(const GridFunctionType& grid_function,
                        const std::string nm = "",
                        const XT::Common::Parameter& param = {})
-    : local_function_(localizable_function.local_function())
+    : function_(grid_function.copy_as_grid_function())
+    , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<range_dim, range_dim_cols, RangeField>())
-    , name_(nm.empty() ? localizable_function.name() : nm)
+    , name_(nm.empty() ? function_->name() : nm)
     , param_(param)
   {}
 
@@ -239,11 +241,13 @@ public:
   }
 
 private:
+  const std::unique_ptr<GridFunctionType> function_;
   mutable std::unique_ptr<LocalFunctionType> local_function_;
   const Common::ConstStorageProvider<VisualizerInterface<range_dim, range_dim_cols, RangeField>> visualizer_;
   const std::string name_;
   const XT::Common::Parameter param_;
 }; // class VisualizationAdapter
+
 
 template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
 class GradientVisualizationAdapter : public VTKFunction<GridViewType>
@@ -261,25 +265,27 @@ private:
   using DomainType = typename LocalFunctionType::DomainType;
 
 public:
-  GradientVisualizationAdapter(const GridFunctionType& localizable_function,
+  GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const VisualizerInterface<d, 1, RangeField>& visualizer,
                                const std::string nm = "",
                                const XT::Common::Parameter& param = {})
-    : local_function_(localizable_function.local_function())
+    : function_(grid_function.copy_as_grid_function())
+    , local_function_(function_->local_function())
     , visualizer_(visualizer)
-    , name_(nm.empty() ? "grad_ " + localizable_function.name() : nm)
+    , name_(nm.empty() ? "grad_ " + function_->name() : nm)
     , param_(param)
   {
     if (range_dim > 1)
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
   }
 
-  GradientVisualizationAdapter(const GridFunctionType& localizable_function,
+  GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const std::string nm = "",
                                const XT::Common::Parameter& param = {})
-    : local_function_(localizable_function.local_function())
+    : function_(grid_function.copy_as_grid_function())
+    , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
-    , name_(nm.empty() ? "grad_" + localizable_function.name() : nm)
+    , name_(nm.empty() ? "grad_" + function_->name() : nm)
     , param_(param)
   {
     if (range_dim > 1)
@@ -304,6 +310,7 @@ public:
   }
 
 private:
+  const std::unique_ptr<GridFunctionType> function_;
   mutable std::unique_ptr<LocalFunctionType> local_function_;
   const Common::ConstStorageProvider<VisualizerInterface<d, 1, RangeField>> visualizer_;
   const std::string name_;
