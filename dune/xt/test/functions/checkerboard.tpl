@@ -20,6 +20,7 @@
 #include <dune/xt/functions/checkerboard.hh>
 #include <dune/xt/functions/visualization.hh>
 
+using namespace Dune::XT;
 using namespace Dune::XT::Functions;
 
 
@@ -33,18 +34,18 @@ struct CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Dune::XT::Functions::CheckerboardFunction<ElementType, r, rC>;
+  using FunctionType = CheckerboardFunction<ElementType, r, rC>;
 
   using RangeType = typename FunctionType::RangeType;
   using DomainType = typename FunctionType::DomainType;
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
   CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-1., 1., 4))
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
 
-  const Dune::XT::Grid::GridProvider<GridType> grid_;
+  const Grid::GridProvider<GridType> grid_;
 };
 
 
@@ -106,7 +107,7 @@ TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiz
   FunctionType function_all(lower_left_all, upper_right, num_elements, values);
 
   visualize(function, leaf_view, "test__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
-  function_all.visualize(leaf_view, "test__AllDomain__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function_all, leaf_view, "test__AllDomain__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
@@ -182,7 +183,7 @@ TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalu
         RangeType expected_value(0.);
         const auto center = element.geometry().center();
         std::vector<size_t> which_partition(d, 0);
-        if (Dune::XT::Common::FloatCmp::le(lower_left, center) && Dune::XT::Common::FloatCmp::lt(center, upper_right)) {
+        if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::lt(center, upper_right)) {
           for (size_t dd = 0; dd < d; ++dd) {
             which_partition[dd] =
                 std::min(size_t(std::floor(num_elements[dd]

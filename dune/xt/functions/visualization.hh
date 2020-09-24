@@ -183,7 +183,7 @@ void visualize_gradient(const GridFunctionInterface<E, r, rC, R>& grid_function,
 {
   static_assert(Grid::is_view<GridViewType>::value);
   auto vtk_writer = internal::create_vtkwriter(grid_view, subsampling);
-  add_gradient_to_vtkwriter(*vtk_writer, grid_function, param, visualizer);
+  internal::add_gradient_to_vtkwriter(*vtk_writer, grid_function, param, visualizer);
   internal::write_visualization(*vtk_writer, path, vtk_output_type);
 } // ... visualize_gradient(...)
 

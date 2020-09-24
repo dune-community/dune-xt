@@ -19,8 +19,10 @@
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -32,9 +34,9 @@ struct DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::tes
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
+  using IndicatorFunctionType = IndicatorGridFunction<ElementType, r, rC>;
 
-  using DifferenceFunctionType = Dune::XT::Functions::DifferenceGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
+  using DifferenceFunctionType = DifferenceGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using DomainType = typename IndicatorFunctionType::DomainType;
@@ -119,8 +121,8 @@ TEST_F(DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizab
   DifferenceFunctionType manual_difference(f, g);
   const auto& difference = f - g;
 
-  manual_difference.visualize(leaf_view, "test__DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
-  difference.visualize(leaf_view, "test__DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(manual_difference, leaf_view, "test__DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(difference, leaf_view, "test__DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)

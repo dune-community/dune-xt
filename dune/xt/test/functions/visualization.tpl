@@ -15,8 +15,10 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/generic/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -60,16 +62,16 @@ TEST_F(VisualizeGenericGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, vis
       [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
       [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 
-  function.visualize(leaf_view, "default");
+  visualize(function, leaf_view, "default");
   SumVisualizer<r, rC> sum_visualizer;
-  function.visualize(leaf_view, "sum", true, Dune::VTK::appendedraw, {}, sum_visualizer);
+  visualize(function, leaf_view, "sum", true, Dune::VTK::appendedraw, {}, sum_visualizer);
   ComponentVisualizer<r, rC> first_comp_visualizer(0);
-  function.visualize(leaf_view, "component", false, Dune::VTK::appendedraw, {}, first_comp_visualizer);
+  visualize(function, leaf_view, "component", false, Dune::VTK::appendedraw, {}, first_comp_visualizer);
   GenericVisualizer<r, rC> sin_abs_visualizer(1, [](const int, const RangeType& val) { return std::sin(val.two_norm()); });
-  function.visualize(leaf_view, "sin_abs", false, Dune::VTK::appendedraw, {}, sin_abs_visualizer);
+  visualize(function, leaf_view, "sin_abs", false, Dune::VTK::appendedraw, {}, sin_abs_visualizer);
 
   if (r == 1)
-    function.visualize_gradient(leaf_view, "gradient");
+    visualize_gradient(function, leaf_view, "gradient");
 }
 
 {% endfor  %}

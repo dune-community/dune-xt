@@ -19,8 +19,10 @@
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -32,9 +34,9 @@ struct SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::T
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
+  using IndicatorFunctionType = IndicatorGridFunction<ElementType, r, rC>;
 
-  using SumFunctionType = Dune::XT::Functions::SumGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
+  using SumFunctionType = SumGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using DomainType = typename IndicatorFunctionType::DomainType;
@@ -116,8 +118,8 @@ TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
   SumFunctionType manual_sum(f, g);
   const auto& sum = f + g;
 
-  manual_sum.visualize(leaf_view, "test__SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
-  sum.visualize(leaf_view, "test__SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(manual_sum, leaf_view, "test__SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(sum, leaf_view, "test__SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)

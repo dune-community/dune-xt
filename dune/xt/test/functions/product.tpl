@@ -19,8 +19,10 @@
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -32,10 +34,10 @@ struct ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
-  using ScalarIndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, 1, 1>;
+  using IndicatorFunctionType = IndicatorGridFunction<ElementType, r, rC>;
+  using ScalarIndicatorFunctionType = IndicatorGridFunction<ElementType, 1, 1>;
 
-  using ProductFunctionType = Dune::XT::Functions::ProductGridFunction<ScalarIndicatorFunctionType, IndicatorFunctionType>;
+  using ProductFunctionType = ProductGridFunction<ScalarIndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using ScalarRangeType = typename ScalarIndicatorFunctionType::RangeType;
@@ -122,8 +124,8 @@ TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
   ProductFunctionType manual_product(f, g);
   const auto& product = f * g;
 
-  manual_product.visualize(leaf_view, "test__ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
-  product.visualize(leaf_view, "test__ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(manual_product, leaf_view, "test__ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(product, leaf_view, "test__ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)

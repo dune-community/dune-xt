@@ -119,7 +119,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visuali
 
   FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value),
                                  std::make_tuple(middle_1, upper_right, second_value)});
-  function_overlap.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
+  visualize(function_overlap, leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
 
 TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
