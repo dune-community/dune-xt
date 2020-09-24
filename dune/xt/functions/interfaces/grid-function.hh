@@ -237,12 +237,13 @@ public:
    *        visualization may thus be a refinement of the actual grid!
    */
   template <class GridViewType>
-  void visualize(const GridViewType& grid_view,
-                 const std::string path,
-                 const bool subsampling = true,
-                 const VTK::OutputType vtk_output_type = VTK::appendedraw,
-                 const XT::Common::Parameter& param = {},
-                 const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
+  [[deprecated("Use visualize(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+  visualize(const GridViewType& grid_view,
+            const std::string path,
+            const bool subsampling = true,
+            const VTK::OutputType vtk_output_type = VTK::appendedraw,
+            const XT::Common::Parameter& param = {},
+            const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
@@ -256,12 +257,14 @@ public:
    * \note  Not yet implemented for vector-valued functions.
    */
   template <class GridViewType>
-  void visualize_gradient(const GridViewType& grid_view,
-                          const std::string path,
-                          const bool subsampling = true,
-                          const VTK::OutputType vtk_output_type = VTK::appendedraw,
-                          const XT::Common::Parameter& param = {},
-                          const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
+  [[deprecated(
+      "Use visualize_gradient(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+  visualize_gradient(const GridViewType& grid_view,
+                     const std::string path,
+                     const bool subsampling = true,
+                     const VTK::OutputType vtk_output_type = VTK::appendedraw,
+                     const XT::Common::Parameter& param = {},
+                     const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
@@ -270,8 +273,10 @@ public:
   } // ... visualize_gradient(...)
 
   template <class GridViewType>
-  std::unique_ptr<VTKWriter<GridViewType>> create_vtkwriter(const GridViewType& grid_view,
-                                                            const bool subsampling = true) const
+  [[deprecated(
+      "Use internal::create_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] std::
+      unique_ptr<VTKWriter<GridViewType>>
+      create_vtkwriter(const GridViewType& grid_view, const bool subsampling = true) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     return subsampling ? std::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
@@ -279,9 +284,11 @@ public:
   }
 
   template <class GridViewType>
-  void add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
-                        const XT::Common::Parameter& param = {},
-                        const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
+  [[deprecated(
+      "Use internal::add_to_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+  add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                   const XT::Common::Parameter& param = {},
+                   const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     const auto adapter =
@@ -291,9 +298,11 @@ public:
   }
 
   template <class GridViewType>
-  void add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
-                                 const XT::Common::Parameter& param = {},
-                                 const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
+  [[deprecated("Use internal::add_gradient_to_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead "
+               "(24.09.2020)!")]] void
+  add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                            const XT::Common::Parameter& param = {},
+                            const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     const auto adapter =
@@ -303,9 +312,11 @@ public:
   }
 
   template <class GridViewType>
-  auto write_visualization(VTKWriter<GridViewType>& vtk_writer,
-                           const std::string path,
-                           const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  [[deprecated("Use internal::write_visualization(...) from <dune/xt/functions/visualizations.hh> instead "
+               "(24.09.2020)!")]] void
+  write_visualization(VTKWriter<GridViewType>& vtk_writer,
+                      const std::string path,
+                      const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
     static_assert(Grid::is_view<GridViewType>::value);
     if (path.empty())

@@ -351,7 +351,7 @@ public:
    * \copydoc GridFunctionInterface::visualize
    */
   template <class GridLayerType>
-  [[deprecated("Use make_grid_function(*this).visualize(...) instead (18.09.2020)!")]]
+  [[deprecated("Use visualize(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]]
   typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
   visualize(const GridLayerType& grid_layer,
             const std::string path,
@@ -366,7 +366,7 @@ public:
    * \copydoc GridFunctionInterface::visualize_gradient
    */
   template <class GridLayerType>
-  [[deprecated("Use make_grid_function(*this).visualize(...) instead (18.09.2020)!")]]
+  [[deprecated("Use visualize_gradient(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]]
   typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
   visualize_gradient(const GridLayerType& grid_layer,
                      const std::string path,
