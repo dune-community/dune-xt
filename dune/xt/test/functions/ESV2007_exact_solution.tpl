@@ -19,8 +19,10 @@
 
 #include <dune/xt/functions/ESV2007.hh>
 #include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -33,7 +35,7 @@ struct ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : pu
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::ESV2007::Testcase1ExactSolution<d, r, rC>;
+  using FunctionType = ESV2007::Testcase1ExactSolution<d, r, rC>;
 
   using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
@@ -72,7 +74,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_
 {
   const auto leaf_view = grid_.leaf_view();
   FunctionType function(3);
-  function.visualize(leaf_view, "test__ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 
@@ -115,7 +117,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, glo
 TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   FunctionType default_function(3);
-  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
+  auto localizable_function = make_grid_function<ElementType>(default_function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -128,7 +130,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
 {
   const int expected_order = 3;
   FunctionType default_function(3);
-  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
+  auto localizable_function = make_grid_function<ElementType>(default_function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -142,7 +144,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
 TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   FunctionType function(3);
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -161,7 +163,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
 TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   FunctionType function(3);
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

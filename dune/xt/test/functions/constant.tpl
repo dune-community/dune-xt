@@ -17,8 +17,10 @@
 
 #include <dune/xt/functions/constant.hh>
 #include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -30,7 +32,7 @@ struct ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testi
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::ConstantFunction<d, r, rC>;
+  using FunctionType = ConstantFunction<d, r, rC>;
 
   using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
@@ -65,7 +67,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable
 {
   const auto leaf_view = grid_.leaf_view();
   FunctionType function(1.);
-  function.visualize(leaf_view, "test__ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
@@ -110,7 +112,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   FunctionType function(1.);
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -124,7 +126,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   for (auto vv : {-10., 3., 17., 41.}) {
     const RangeReturnType value(vv);
     FunctionType function(value);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -140,7 +142,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
   for (auto value : {-10., 3., 17., 41.}) {
     const RangeReturnType expected_value(value);
     FunctionType function(expected_value);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -161,7 +163,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
     DerivativeRangeReturnType expected_jacobian;
     //expected_jacobian *= 0;
     FunctionType function(value);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -184,7 +186,7 @@ struct ConstantGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::ConstantGridFunction<ElementType, r, rC>;
+  using FunctionType = ConstantGridFunction<ElementType, r, rC>;
 
   using RangeReturnType = typename FunctionType::LocalFunctionType::RangeReturnType;
   using DomainType = typename FunctionType::LocalFunctionType::DomainType;
@@ -213,7 +215,7 @@ TEST_F(ConstantGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiz
 {
   const auto leaf_view = grid_.leaf_view();
   FunctionType function(1.);
-  function.visualize(leaf_view, "test__ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(ConstantGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
@@ -290,7 +292,7 @@ struct ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::ConstantFluxFunction<ElementType, s, r, rC>;
+  using FunctionType = ConstantFluxFunction<ElementType, s, r, rC>;
 
   using RangeReturnType = typename FunctionType::LocalFunctionType::RangeReturnType;
   using DomainType = typename FunctionType::LocalFunctionType::DomainType;

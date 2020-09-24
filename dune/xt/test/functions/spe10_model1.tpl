@@ -18,8 +18,10 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/spe10/model1.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -32,7 +34,7 @@ struct Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::Spe10::Model1Function<ElementType, r, rC>;
+  using FunctionType = Spe10::Model1Function<ElementType, r, rC>;
 
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
@@ -91,7 +93,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
       {0, 0},
       {Dune::XT::Functions::Spe10::internal::model_1_length_x, Dune::XT::Functions::Spe10::internal::model_1_length_z});
   const auto leaf_view = grid_.leaf_view();
-  default_function.visualize(leaf_view, "test__Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  default_visualize(function, leaf_view, "test__Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 #else
   std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
 #endif

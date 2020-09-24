@@ -19,8 +19,10 @@
 
 #include <dune/xt/functions/expression.hh>
 #include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -107,8 +109,8 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizab
   }
   FunctionType second_function("x", expr_2, 4);
 
-  function.visualize(leaf_view, "test__ExpressionFunction_1_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__function");
-  second_function.visualize(leaf_view, "test__ExpressionFunction_2_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__id");
+  visualize(function, leaf_view, "test__ExpressionFunction_1_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__function");
+  visualize(second_function, leaf_view, "test__ExpressionFunction_2_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__id");
 }
 
 TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
@@ -200,7 +202,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   RangeExpressionType expr_1(std::string("x[0]*x[0]"));
   FunctionType default_function("x", expr_1, 2);
 
-  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
+  auto localizable_function = make_grid_function<ElementType>(default_function);
 
   auto local_f = localizable_function.local_function();
 
@@ -219,7 +221,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 
   const auto leaf_view = grid_.leaf_view();
 
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -237,7 +239,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluat
     const RangeReturnType expected_value(value);
     const RangeExpressionType constant_expr(Common::to_string(value));
     FunctionType function("x", constant_expr, 0);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
       local_f->bind(element);
@@ -262,7 +264,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobia
     DerivativeRangeExpressionType constant_grad(constant_grad_single);
     DerivativeRangeReturnType expected_jacobian(Common::FieldMatrix<double, rC, d>(0.));
     FunctionType function("x", constant_expr, constant_grad, 0);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
       local_f->bind(element);

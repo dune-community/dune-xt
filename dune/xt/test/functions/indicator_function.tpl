@@ -17,8 +17,10 @@
 
 #include <dune/xt/functions/indicator.hh>
 #include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
@@ -31,7 +33,7 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using FunctionType = Functions::IndicatorFunction<d, r, rC>;
+  using FunctionType = IndicatorFunction<d, r, rC>;
 
   using RangeType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
@@ -114,7 +116,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizabl
   RangeType second_value(2.);
 
   FunctionType function({std::make_tuple(middle_1, upper_right, first_value)});
-  function.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
   FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value), std::make_tuple(middle_1, upper_right, second_value)});
   function_overlap.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
@@ -187,7 +189,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   RangeType first_value(1.);
 
   FunctionType default_function({std::make_tuple(lower_left, upper_right, first_value)});
-  auto localizable_function = Functions::make_grid_function<ElementType>(default_function);
+  auto localizable_function = make_grid_function<ElementType>(default_function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : elements(leaf_view)) {
@@ -206,7 +208,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        auto localizable_function = Functions::make_grid_function<ElementType>(function);
+        auto localizable_function = make_grid_function<ElementType>(function);
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
@@ -230,7 +232,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        auto localizable_function = Functions::make_grid_function<ElementType>(function);
+        auto localizable_function = make_grid_function<ElementType>(function);
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
@@ -255,7 +257,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   RangeType first_value(1.);
   RangeType second_value(2.);
   FunctionType function_multiple({std::make_tuple(lower_left, middle, first_value), std::make_tuple(middle, upper_right, second_value)});
-  auto localizable_function_mult = Functions::make_grid_function<ElementType>(function_multiple);
+  auto localizable_function_mult = make_grid_function<ElementType>(function_multiple);
   auto local_f_mult = localizable_function_mult.local_function();
 
   for (auto&& element : elements(leaf_view)) {
@@ -279,7 +281,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   FunctionType function_overlap({std::make_tuple(lower_left, middle, first_value),
                                  std::make_tuple(middle, upper_right, second_value),
                                  std::make_tuple(lower_left_ol, upper_right_ol, first_value)});
-  auto localizable_function_ol = Functions::make_grid_function<ElementType>(function_overlap);
+  auto localizable_function_ol = make_grid_function<ElementType>(function_overlap);
   auto local_f_ol = localizable_function_ol.local_function();
   for (auto&& element : elements(leaf_view)) {
     // actual
@@ -314,7 +316,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
         FunctionType function({std::make_tuple(lower_left, upper_right, value)});
-        auto localizable_function = Functions::make_grid_function<ElementType>(function);
+        auto localizable_function = make_grid_function<ElementType>(function);
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);

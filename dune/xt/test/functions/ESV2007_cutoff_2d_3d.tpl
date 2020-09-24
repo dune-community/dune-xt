@@ -19,8 +19,10 @@
 #include <dune/xt/functions/ESV2007.hh>
 #include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/expression.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID in config['types'] %}
 
@@ -33,8 +35,8 @@ struct ESV2007CutoffFunction_from_{{GRIDNAME}} : public ::testing::Test
   static constexpr size_t r = d;
   static constexpr size_t rC = d;
 
-  using DiffusionType = Functions::ExpressionFunction<d, r, rC>;
-  using FunctionType = Functions::ESV2007::CutoffFunction<ElementType>;
+  using DiffusionType = ExpressionFunction<d, r, rC>;
+  using FunctionType = ESV2007::CutoffFunction<ElementType>;
 
   using MatrixRangeExpressionType = typename Dune::XT::Common::FieldMatrix<std::string, d, d>;
 
@@ -71,7 +73,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_visualizable)
   }
   DiffusionType diffusion_function("x", expr, 1);
   FunctionType function(diffusion_function);
-  function.visualize(leaf_view, "test__ESV2007CutoffFunction_from_{{GRIDNAME}}__is_visualizable");
+  visualize(function, leaf_view, "test__ESV2007CutoffFunction_from_{{GRIDNAME}}__is_visualizable");
 }
 
 TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_bindable)
@@ -115,7 +117,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_evaluate)
   for (size_t dd = 0; dd < d; ++dd) {
     expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
   }
-  auto diffusion_function = Functions::make_grid_function<ElementType>(DiffusionType("x", expr, 1));
+  auto diffusion_function = make_grid_function<ElementType>(DiffusionType("x", expr, 1));
   FunctionType function(diffusion_function);
   auto local_f = function.local_function();
   auto local_diffusion = diffusion_function.local_function();

@@ -18,8 +18,9 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/checkerboard.hh>
+#include <dune/xt/functions/visualization.hh>
 
-using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
@@ -104,7 +105,7 @@ TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiz
   // entire Domain
   FunctionType function_all(lower_left_all, upper_right, num_elements, values);
 
-  function.visualize(leaf_view, "test__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
   function_all.visualize(leaf_view, "test__AllDomain__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 

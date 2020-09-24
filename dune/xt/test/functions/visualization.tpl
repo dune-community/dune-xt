@@ -28,7 +28,7 @@ struct VisualizeGenericGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : pu
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using GenericType = Functions::GenericGridFunction<ElementType, r, rC>;
+  using GenericType = GenericGridFunction<ElementType, r, rC>;
 
   using RangeType = typename GenericType::LocalFunctionType::RangeType;
   using RangeReturnType = typename GenericType::LocalFunctionType::RangeReturnType;
@@ -61,11 +61,11 @@ TEST_F(VisualizeGenericGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, vis
       [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 
   function.visualize(leaf_view, "default");
-  Functions::SumVisualizer<r, rC> sum_visualizer;
+  SumVisualizer<r, rC> sum_visualizer;
   function.visualize(leaf_view, "sum", true, Dune::VTK::appendedraw, {}, sum_visualizer);
-  Functions::ComponentVisualizer<r, rC> first_comp_visualizer(0);
+  ComponentVisualizer<r, rC> first_comp_visualizer(0);
   function.visualize(leaf_view, "component", false, Dune::VTK::appendedraw, {}, first_comp_visualizer);
-  Functions::GenericVisualizer<r, rC> sin_abs_visualizer(1, [](const int, const RangeType& val) { return std::sin(val.two_norm()); });
+  GenericVisualizer<r, rC> sin_abs_visualizer(1, [](const int, const RangeType& val) { return std::sin(val.two_norm()); });
   function.visualize(leaf_view, "sin_abs", false, Dune::VTK::appendedraw, {}, sin_abs_visualizer);
 
   if (r == 1)

@@ -16,8 +16,10 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/indicator.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
@@ -31,7 +33,7 @@ struct IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::
   static constexpr size_t rC = {{rC}};
 
   int dummy = 0;
-  using FunctionType = Functions::IndicatorGridFunction<ElementType, r, rC>;
+  using FunctionType = IndicatorGridFunction<ElementType, r, rC>;
 
   using RangeType = typename FunctionType::RangeType;
   using DomainType = typename FunctionType::DomainType;
@@ -113,7 +115,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visuali
   RangeType second_value(2.);
 
   FunctionType function({std::make_tuple(middle_1, upper_right, first_value)});
-  function.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
   FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value),
                                  std::make_tuple(middle_1, upper_right, second_value)});

@@ -17,8 +17,10 @@
 
 #include <dune/xt/functions/generic/function.hh>
 #include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
@@ -30,7 +32,7 @@ struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   static constexpr size_t r = {{r}};
   static constexpr size_t rC = {{rC}};
 
-  using LambdaType = Functions::GenericFunction<d, r, rC>;
+  using LambdaType = GenericFunction<d, r, rC>;
 
   using RangeReturnType = typename LambdaType::RangeReturnType;
   using DomainType = typename LambdaType::DomainType;
@@ -54,7 +56,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
   const auto leaf_view = grid_.leaf_view();
   LambdaType function(1, [](const auto& /*xx*/, const auto& /*param*/) { RangeReturnType ret(1.); return ret;});
-  function.visualize(leaf_view, "test__GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  visualize(function, leaf_view, "test__GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
 TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
@@ -98,7 +100,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
 TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   LambdaType function(1.);
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -111,7 +113,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   for (auto vv : {1, 3, 5}) {
     const int expected_order = vv;
     LambdaType function(vv);
-    auto localizable_function = Functions::make_grid_function<ElementType>(function);
+    auto localizable_function = make_grid_function<ElementType>(function);
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -128,7 +130,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
                       [](const auto& xx, const auto& param) { RangeReturnType ret(std::pow(xx[0], param.get("power").at(0))); return ret;},
                       "x_power_p",
                       Common::ParameterType("power", 1));
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -152,7 +154,7 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
                       "jacobian.function",
                       {},
                       [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType();});
-  auto localizable_function = Functions::make_grid_function<ElementType>(function);
+  auto localizable_function = make_grid_function<ElementType>(function);
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
