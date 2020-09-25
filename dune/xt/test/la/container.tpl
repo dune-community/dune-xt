@@ -11,6 +11,8 @@
 
 #include <dune/xt/test/main.hxx>
 
+#include <dune/xt/common/float_cmp.hh>
+
 #include <dune/xt/test/la/container.hh>
 
 using namespace Dune;
@@ -46,8 +48,17 @@ struct ContainerTest{{NAME}} : public ::testing::Test
     [[maybe_unused]] ContainerImp d_empty;
     ContainerImp d_by_size = ContainerFactory<ContainerImp>::create(dim);
     ContainerImp d_copy_constructor(d_by_size);
-    [[maybe_unused]] ContainerImp d_copy_assignment = d_by_size;
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(d_by_size, d_copy_constructor)); // checks that copy works
+    d_copy_constructor.scal(D_ScalarType(10));
+    EXPECT_TRUE(XT::Common::FloatCmp::ne(d_by_size, d_copy_constructor)); // checks that only copied container changes
+    ContainerImp d_copy_assignment = d_by_size;
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(d_by_size, d_copy_assignment));
+    d_copy_assignment.scal(D_ScalarType(10));
+    EXPECT_TRUE(XT::Common::FloatCmp::ne(d_by_size, d_copy_assignment));
     ContainerImp d_deep_copy = d_by_size.copy();
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(d_by_size, d_deep_copy));
+    d_deep_copy.scal(D_ScalarType(10));
+    EXPECT_TRUE(XT::Common::FloatCmp::ne(d_by_size, d_deep_copy));
     d_by_size.scal(D_ScalarType(1));
     d_by_size.axpy(D_ScalarType(1), d_deep_copy);
     EXPECT_TRUE(d_by_size.has_equal_shape(d_deep_copy));

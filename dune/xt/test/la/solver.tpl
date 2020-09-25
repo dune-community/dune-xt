@@ -44,13 +44,16 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
     const MatrixType matrix = ContainerFactory<MatrixType>::create(dim);
     const RhsType rhs = ContainerFactory<RhsType>::create(dim);
     SolutionType solution = ContainerFactory<SolutionType>::create(dim);
-    solution *= 0;
 
     // dynamic test
+    // Matrix is the identity matrix, solution and rhs are initially filled with ones
     const SolverType solver(matrix);
     solver.apply(rhs, solution);
     EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
+
     solution *= 0;
+    solver.apply(rhs, solution);
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
 
     // static tests
     std::vector<std::string> types = SolverType::types();
@@ -64,14 +67,11 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
       options.report(out, "  ");
 
       // dynamic tests
-      // Matrix is the identity matrix, solution and rhs are initially filled with ones
-      // Multiply by 2 to avoid calling the istl iterative solver with an
-      // initial defect of 0 which results in undefined behavior (division-by-zero)
-      solution *= 2.;
+      solution = ContainerFactory<SolutionType>::create(dim);
       solver.apply(rhs, solution, type);
       EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
-      solution *= 0.;
 
+      solution *= 0.;
       solver.apply(rhs, solution, options);
       EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
     }
