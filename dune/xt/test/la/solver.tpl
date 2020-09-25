@@ -64,6 +64,10 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
       options.report(out, "  ");
 
       // dynamic tests
+      // Matrix is the identity matrix, solution and rhs are initially filled with ones
+      // Multiply by 2 to avoid calling the istl iterative solver with an
+      // initial defect of 0 which results in undefined behavior (division-by-zero)
+      solution *= 2.;
       solver.apply(rhs, solution, type);
       EXPECT_TRUE(XT::Common::FloatCmp::eq(solution, rhs));
       solution *= 0.;

@@ -15,8 +15,10 @@
 #include <dune/istl/operators.hh>
 #include <dune/istl/solvers.hh>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/math.hh>
+
 #include <dune/xt/la/container/istl.hh>
 #include <dune/xt/la/solver.hh>
 
@@ -82,10 +84,17 @@ public:
     auto& B1x = m_vec_1_;
     B1_.mv(x, B1x);
     // calculate A^{-1} B1 x
-    auto& AinvB1x = m_vec_2_;
-    A_inv_.apply(B1x, AinvB1x, solver_opts_);
-    // apply B2^T
-    B2_.mtv(AinvB1x, y);
+    if (XT::Common::is_zero(B1x.two_norm())) {
+      // if B1x is zero, y will also be zero
+      // this special case is here to avoid calling the dune-istl CG solver with an
+      // initial defect of 0 which causes undefined behavior (division-by-zero)
+      y *= 0.;
+    } else {
+      auto& AinvB1x = m_vec_2_;
+      A_inv_.apply(B1x, AinvB1x, solver_opts_);
+      // apply B2^T
+      B2_.mtv(AinvB1x, y);
+    }
     // calculate Cx
     auto& Cx = n_vec_1_;
     C_.mv(x, Cx);
