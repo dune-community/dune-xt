@@ -73,7 +73,7 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
     TransformedLocalFunction(const GF& function, const Transformation& transformation)
-      : BaseType(function.paramter_type())
+      : BaseType(function.parameter_type())
       , function_(function.copy_as_grid_function())
       , local_function_(function_->local_function())
       , transformation_(transformation)
@@ -120,7 +120,7 @@ public:
     : BaseType(func.parameter_type())
     , function_(func.copy_as_grid_function())
     , transformation_(transformation)
-    , name_(nm.empty() ? "transformed " + function_.name() : nm)
+    , name_(nm.empty() ? "transformed " + function_->name() : nm)
   {}
 
   TransformedGridFunction(const ThisType& other)
@@ -151,7 +151,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<TransformedLocalFunction>(function_, transformation_);
+    return std::make_unique<TransformedLocalFunction>(*function_, transformation_);
   }
 
 private:
