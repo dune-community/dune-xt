@@ -126,6 +126,8 @@ public:
   SlicedGridFunction(const ThisType& other)
     : BaseType(other)
     , function_(other.function_->copy_as_grid_function())
+    , dims_(other.dims_)
+    , name_(other.name_)
   {}
 
   SlicedGridFunction(ThisType&&) = default;
