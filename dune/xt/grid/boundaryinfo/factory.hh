@@ -44,7 +44,7 @@ public:
     else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return boundarysegment_boundaryinfo_default_config();
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return normalbased_boundaryinfo_default_config();
+      return normalbased_boundaryinfo_default_config<I::Entity::dimension>();
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");

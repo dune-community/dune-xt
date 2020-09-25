@@ -30,6 +30,7 @@ namespace XT {
 namespace Grid {
 
 
+template <size_t d>
 static inline Common::Configuration normalbased_boundaryinfo_default_config()
 {
   Common::Configuration config;
@@ -38,12 +39,18 @@ static inline Common::Configuration normalbased_boundaryinfo_default_config()
   config["compare_tolerance"] = "1e-10";
   config["0." + DirichletBoundary().id()] = "[1 0 0 0]";
   config["1." + DirichletBoundary().id()] = "[-1 0 0 0]";
-  config["2." + DirichletBoundary().id()] = "[0 1 0 0]";
-  config["3." + DirichletBoundary().id()] = "[0 -1 0 0]";
-  config["4." + DirichletBoundary().id()] = "[0 0 1 0]";
-  config["5." + DirichletBoundary().id()] = "[0 0 -1 0]";
-  config["6." + DirichletBoundary().id()] = "[0 0 0 1]";
-  config["7." + DirichletBoundary().id()] = "[0 0 0 -1]";
+  if constexpr (d >= 2) {
+    config["2." + DirichletBoundary().id()] = "[0 1 0 0]";
+    config["3." + DirichletBoundary().id()] = "[0 -1 0 0]";
+  }
+  if constexpr (d >= 3) {
+    config["4." + DirichletBoundary().id()] = "[0 0 1 0]";
+    config["5." + DirichletBoundary().id()] = "[0 0 -1 0]";
+  }
+  if constexpr (d >= 4) {
+    config["6." + DirichletBoundary().id()] = "[0 0 0 1]";
+    config["7." + DirichletBoundary().id()] = "[0 0 0 -1]";
+  }
   return config;
 }
 
@@ -79,12 +86,12 @@ public:
 
   static std::string static_id()
   {
-    return normalbased_boundaryinfo_default_config().template get<std::string>("type");
+    return normalbased_boundaryinfo_default_config<I::Entity::dimension>().template get<std::string>("type");
   }
 
   static std::unique_ptr<ThisType> create(const Common::Configuration& cfg)
   {
-    const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config();
+    const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config<I::Entity::dimension>();
     // get tolerance and default
     const auto tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
     const auto default_type = cfg.get("default", default_cfg.get<std::string>("default"));
@@ -186,7 +193,10 @@ public:
    */
   void register_new_normal(const WorldType& normal, BoundaryType*&& boundary_type)
   {
-    const auto normalized_normal = normal / normal.two_norm();
+    const auto two_norm = normal.two_norm();
+    if (XT::Common::FloatCmp::eq(two_norm, 0., tol_))
+      DUNE_THROW(InvalidStateException, "Given normal has norm 0 (up to tolerance '" << tol_ << "')!");
+    const auto normalized_normal = normal / two_norm;
     LOG_(info) << "register_new_normal(normal=" << normal << ", boundary_type=" << *boundary_type << ")" << std::endl;
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& existing_normal = normal_and_type_pair.first;
