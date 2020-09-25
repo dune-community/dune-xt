@@ -18,7 +18,9 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/fmatrix.hh>
+#include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/la/container/conversion.hh>
@@ -69,6 +71,17 @@ public:
 template <class K, int SIZE>
 class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
   : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
+{};
+
+
+template <class K>
+class EigenSolverOptions<Dune::FieldVector<K, 1>, true> : public EigenSolverOptions<Dune::FieldMatrix<K, 1, 1>, true>
+{};
+
+
+template <class K>
+class EigenSolverOptions<Dune::XT::Common::FieldVector<K, 1>, true>
+  : public EigenSolverOptions<Dune::FieldMatrix<K, 1, 1>, true>
 {};
 
 
@@ -180,6 +193,40 @@ public:
   template <class... Args>
   EigenSolver(Args&&... args)
     : EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>(std::forward<Args>(args)...)
+  {}
+};
+
+
+template <class K>
+class EigenSolver<Dune::XT::Common::FieldVector<K, 1>, true>
+  : Common::ConstStorageProvider<Dune::FieldMatrix<K, 1, 1>>
+  , public EigenSolver<Dune::FieldMatrix<K, 1, 1>>
+{
+  using Storage = Common::ConstStorageProvider<Dune::FieldMatrix<K, 1, 1>>;
+  using BaseType = EigenSolver<Dune::FieldMatrix<K, 1, 1>>;
+
+public:
+  template <class... Args>
+  EigenSolver(const Dune::XT::Common::FieldVector<K, 1>& vector, Args&&... args)
+    : Storage(vector[0])
+    , BaseType(Storage::access(), std::forward<Args>(args)...)
+  {}
+};
+
+
+template <class K>
+class EigenSolver<Dune::FieldVector<K, 1>, true>
+  : Common::ConstStorageProvider<Dune::FieldMatrix<K, 1, 1>>
+  , public EigenSolver<Dune::FieldMatrix<K, 1, 1>>
+{
+  using Storage = Common::ConstStorageProvider<Dune::FieldMatrix<K, 1, 1>>;
+  using BaseType = EigenSolver<Dune::FieldMatrix<K, 1, 1>>;
+
+public:
+  template <class... Args>
+  EigenSolver(const Dune::FieldVector<K, 1>& vector, Args&&... args)
+    : Storage(vector[0])
+    , BaseType(Storage::access(), std::forward<Args>(args)...)
   {}
 };
 

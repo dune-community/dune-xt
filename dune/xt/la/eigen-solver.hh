@@ -21,6 +21,8 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/vector.hh>
+#include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container.hh>
 
@@ -34,7 +36,11 @@ namespace LA {
  * \note  This class needs to be specialized for each MatrixType, the purpose of this variant is merely to document the
  *        expected functionality.
  */
-template <class MatrixType, bool is_matrix = XT::Common::is_matrix<MatrixType>::value>
+template <class MatrixType,
+          bool is_matrix =
+              XT::Common::is_matrix<MatrixType>::value
+              || (XT::Common::is_vector<MatrixType>::value && XT::Common::VectorAbstraction<MatrixType>::has_static_size
+                  && XT::Common::VectorAbstraction<MatrixType>::static_size == 1)>
 class EigenSolverOptions
 {
   static_assert(AlwaysFalse<MatrixType>::value,
@@ -60,7 +66,11 @@ Common::Configuration eigen_solver_options(const MatrixType& /*matrix*/, const s
 }
 
 
-template <class MatrixImp, bool is_matrix = XT::Common::is_matrix<MatrixImp>::value>
+template <class MatrixImp,
+          bool is_matrix =
+              XT::Common::is_matrix<MatrixImp>::value
+              || (XT::Common::is_vector<MatrixImp>::value && XT::Common::VectorAbstraction<MatrixImp>::has_static_size
+                  && XT::Common::VectorAbstraction<MatrixImp>::static_size == 1)>
 class EigenSolver
 {
   static_assert(AlwaysFalse<MatrixImp>::value,
