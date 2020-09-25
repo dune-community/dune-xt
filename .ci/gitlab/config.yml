@@ -53,9 +53,6 @@ cache:
         export BASEIMAGE="${MY_MODULE}-testing_${CI_IMAGE}:${CI_COMMIT_REF_NAME/\//_}"
         # get image with fallback to master branch of the super repo
         docker pull dunecommunity/${BASEIMAGE} || export BASEIMAGE="${MY_MODULE}-testing_${CI_IMAGE}:master" ; docker pull dunecommunity/${BASEIMAGE}
-        ccache --zero-stats || true
-    after_script:
-      - ccache --show-stats
     script:
       - |
         git submodule update --init --recursive
