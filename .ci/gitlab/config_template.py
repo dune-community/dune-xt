@@ -18,11 +18,6 @@ variables:
     CCACHE_DIR: "${CI_PROJECT_DIR}/.ccache"
     CCACHE_COMPILERCHECK: content
 
-cache:
-  key: "$CI_JOB_NAME"
-  paths:
-    - .ccache
-
 .image_builder:
     tags:
       - docker-in-docker
@@ -85,7 +80,10 @@ cache:
         when:
             - always
     image: $CI_REGISTRY/ag-ohlberger/dune-community/dune-xt/ci_testing_${CI_IMAGE}:${CI_COMMIT_SHORT_SHA}
-
+    cache:
+      key: "$CI_JOB_NAME"
+      paths:
+        - .ccache
     before_script:
       - |
         mkdir /home/dune-ci/testresults && chmod -R 777 /home/dune-ci/testresults
