@@ -15,6 +15,7 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/visualization.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <python/dune/xt/common/parameter.hh>
@@ -129,7 +130,7 @@ public:
     c.def(
         "visualize",
         [](const T& self, const GP& grid_provider, const std::string& filename, const bool subsampling) {
-          self.visualize(grid_provider.leaf_view(), filename, subsampling);
+          Functions::visualize(self, grid_provider.leaf_view(), filename, subsampling);
         },
         "grid"_a,
         "filename"_a,
