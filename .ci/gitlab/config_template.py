@@ -8,6 +8,7 @@ stages:
 {%- for kind in kinds %}
   - {{kind}}
 {%- endfor %}
+  - python
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -120,6 +121,21 @@ variables:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_{{kind}}.bash
 {% endfor %}
 
+{% for image in images %}
+{{ image[image.find('debian')+1+6:] }} python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: {{ image }}
+    {%- if 'gcc' in image %}
+    tags:
+        - dustin
+    {%- endif %}
+    stage: python
+    needs: ["{{image}}"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+{% endfor %}
+
 '''
 
 import os
@@ -129,7 +145,7 @@ from itertools import product
 tpl = jinja2.Template(tpl)
 images = ['debian-unstable_gcc_full', 'debian_gcc_full', 'debian_clang_full']
 subdirs = ['common', 'grid', 'functions', 'la']
-kinds = ['cpp', 'python', 'headercheck']
+kinds = ['cpp', 'headercheck']
 matrix = product(images, subdirs, kinds)
 with open(os.path.join(os.path.dirname(__file__), 'config.yml'), 'wt') as yml:
     yml.write(tpl.render(matrix=matrix, images=images, kinds=kinds))
