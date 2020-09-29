@@ -45,8 +45,8 @@ class FieldVector : public Dune::FieldVector<K, SIZE>
 {
   static_assert(SIZE >= 0, "Really?");
 
-  typedef Dune::FieldVector<K, SIZE> BaseType;
-  typedef FieldVector<K, SIZE> ThisType;
+  using BaseType = Dune::FieldVector<K, SIZE>;
+  using ThisType = FieldVector<K, SIZE>;
 
 public:
   FieldVector(const K& kk = suitable_default<K>::value())
@@ -382,7 +382,7 @@ private:
 template <class K, int SIZE, K value>
 class ValueInitFieldVector : public Dune::XT::Common::FieldVector<K, SIZE>
 {
-  typedef Dune::XT::Common::FieldVector<K, SIZE> BaseType;
+  using BaseType = Dune::XT::Common::FieldVector<K, SIZE>;
 
 public:
   ValueInitFieldVector()
@@ -802,8 +802,8 @@ typename std::enable_if<SIZE != 1, K>::type operator*(const Dune::FieldVector<K,
 template <class K, int SIZE>
 struct FieldTraits<XT::Common::FieldVector<K, SIZE>>
 {
-  typedef typename FieldTraits<K>::field_type field_type;
-  typedef typename FieldTraits<K>::real_type real_type;
+  using field_type = typename FieldTraits<K>::field_type;
+  using real_type = typename FieldTraits<K>::real_type;
 };
 
 
@@ -818,8 +818,8 @@ namespace std {
 template <class K, int SIZE>
 struct hash<Dune::FieldVector<K, SIZE>>
 {
-  typedef Dune::FieldVector<K, SIZE> argument_type;
-  typedef std::size_t result_type;
+  using argument_type = Dune::FieldVector<K, SIZE>;
+  using result_type = std::size_t;
 
   result_type operator()(argument_type const& s) const noexcept
   {
@@ -838,8 +838,8 @@ struct hash<Dune::FieldVector<K, SIZE>>
 template <class K, int SIZE>
 struct hash<Dune::XT::Common::FieldVector<K, SIZE>>
 {
-  typedef Dune::XT::Common::FieldVector<K, SIZE> argument_type;
-  typedef std::size_t result_type;
+  using argument_type = Dune::XT::Common::FieldVector<K, SIZE>;
+  using result_type = std::size_t;
 
   result_type operator()(argument_type const& s) const noexcept
   {

@@ -38,7 +38,7 @@ static inline Common::Configuration alldirichlet_boundaryinfo_default_config()
 template <class IntersectionImp>
 class AllDirichletBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
-  typedef BoundaryInfo<IntersectionImp> BaseType;
+  using BaseType = BoundaryInfo<IntersectionImp>;
 
 public:
   using typename BaseType::IntersectionType;
@@ -76,7 +76,7 @@ make_alldirichlet_boundaryinfo(GV, const Common::Configuration& /*cfg*/ = Common
 template <class IntersectionImp>
 class ProcessBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
-  typedef BoundaryInfo<IntersectionImp> BaseType;
+  using BaseType = BoundaryInfo<IntersectionImp>;
 
 public:
   using typename BaseType::IntersectionType;

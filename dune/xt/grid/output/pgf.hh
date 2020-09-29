@@ -28,7 +28,7 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-typedef std::array<std::string, 7> TexColorArrayType;
+using TexColorArrayType = std::array<std::string, 7>;
 namespace {
 const TexColorArrayType texcolors_ = {{"black", "red", "blue", "green", "yellow", "cyan", "magenta"}};
 }
@@ -98,7 +98,7 @@ private:
 template <class GridViewType>
 class PgfEntityFunctorIntersections : public ElementAndIntersectionFunctor<GridViewType>
 {
-  typedef ElementAndIntersectionFunctor<GridViewType> BaseType;
+  using BaseType = ElementAndIntersectionFunctor<GridViewType>;
 
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,
@@ -170,7 +170,7 @@ protected:
 template <class GridViewType>
 class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersections<GridViewType>
 {
-  typedef PgfEntityFunctorIntersections<GridViewType> BaseType;
+  using BaseType = PgfEntityFunctorIntersections<GridViewType>;
 
 public:
   PgfEntityFunctorIntersectionsWithShift(const GridViewType& grid_view,
@@ -276,7 +276,7 @@ public:
       file << "\\begin{tikzpicture}\n";
     grid_.globalRefine(refineLevel);
     for (int i = 0; i < refineLevel; ++i) {
-      typedef typename GridType::LevelGridView ViewType;
+      using ViewType = typename GridType::LevelGridView;
       const ViewType& view = grid_.levelGridView(i);
       Walker<ViewType> gridWalk(view);
       PgfEntityFunctorIntersectionsWithShift<ViewType> pgf(
@@ -314,7 +314,7 @@ public:
     file << "\\begin{figure}\n";
     grid_.globalRefine(refineLevel);
     for (int i = 0; i < refineLevel; ++i) {
-      typedef typename GridType::LevelGridView ViewType;
+      using ViewType = typename GridType::LevelGridView;
       {
         const ViewType& view = grid_.levelGridView(i);
         char buffer[80] = {'\0'};
@@ -325,7 +325,7 @@ public:
         gridWalk.append(thisLevel);
         gridWalk.walk();
       }
-      typedef typename GridType::LeafGridView LeafView;
+      using LeafView = typename GridType::LeafGridView;
       Walker<LeafView> leafWalk(grid_.leafGridView());
       MinMaxCoordinateFunctor<LeafView> minMaxCoord;
       leafWalk.append(minMaxCoord);

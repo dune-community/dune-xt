@@ -25,9 +25,9 @@ using namespace std;
 
 GTEST_TEST(Init, Random)
 {
-  typedef RNG_FIELD_TYPE T;
-  typedef DefaultRNG<T> RNG;
-  //  typedef typename VectorAbstraction<T>::S Scalar;
+  using T = RNG_FIELD_TYPE;
+  using RNG = DefaultRNG<T>;
+  //  using Scalar = typename VectorAbstraction<T>::S;
   const auto lower_bound = init_bound<T>(1);
   // for the int check we need at least on int in between lower and upper bound
   const auto upper_bound = init_bound<T>(3);

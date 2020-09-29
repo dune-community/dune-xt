@@ -22,30 +22,30 @@ static constexpr size_t dim = 4;
 {% for T_NAME, M_TYPE, V_TYPE in config.testtypes %}
 struct MatrixTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{M_TYPE}} MatrixImp;
-  typedef {{V_TYPE}} VectorImp;
-  typedef typename Dune::XT::LA::SparsityPatternDefault PatternType;
+  using MatrixImp = {{M_TYPE}};
+  using VectorImp = {{V_TYPE}};
+  using PatternType = typename Dune::XT::LA::SparsityPatternDefault;
 
   void fulfills_interface() const
   {
     // static tests
-    typedef typename MatrixImp::Traits Traits;
+    using Traits = typename MatrixImp::Traits;
     // * of the traits
-    typedef typename Traits::derived_type T_derived_type;
+    using T_derived_type = typename Traits::derived_type;
     static_assert(std::is_same<MatrixImp, T_derived_type>::value, "derived_type has to be the correct Type!");
-    typedef typename Traits::ScalarType T_ScalarType;
-    typedef typename Traits::RealType T_RealType;
+    using T_ScalarType = typename Traits::ScalarType;
+    using T_RealType = typename Traits::RealType;
     // * of the matrix as itself (aka the derived type)
-    typedef typename MatrixImp::ScalarType D_ScalarType;
-    typedef typename MatrixImp::RealType D_RealType;
+    using D_ScalarType = typename MatrixImp::ScalarType;
+    using D_RealType = typename MatrixImp::RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the matrix as the interface
-    typedef typename XT::LA::MatrixInterface<Traits, D_ScalarType> InterfaceType;
-    typedef typename InterfaceType::derived_type I_derived_type;
-    typedef typename InterfaceType::ScalarType I_ScalarType;
-    typedef typename InterfaceType::RealType I_RealType;
+    using InterfaceType = typename XT::LA::MatrixInterface<Traits, D_ScalarType>;
+    using I_derived_type = typename InterfaceType::derived_type;
+    using I_ScalarType = typename InterfaceType::ScalarType;
+    using I_RealType = typename InterfaceType::RealType;
     static_assert(std::is_same<MatrixImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
@@ -115,8 +115,8 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
 
   void produces_correct_results() const
   {
-    typedef typename MatrixImp::ScalarType ScalarType;
-    typedef typename MatrixImp::RealType RealType;
+    using ScalarType = typename MatrixImp::ScalarType;
+    using RealType = typename MatrixImp::RealType;
 
     // create test patterns
     PatternType dense_pattern(dim);

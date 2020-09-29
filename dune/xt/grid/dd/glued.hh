@@ -157,35 +157,35 @@ class Glued
                 "This local grid is known to fail, enable on your onw risk by disabling this check!");
 
 public:
-  typedef MacroGridImp MacroGridType;
-  typedef XT::Grid::GridProvider<MacroGridType> MacroGridProviderType;
-  typedef typename MacroGridProviderType::LeafGridViewType MacroGridViewType;
-  typedef typename MacroGridType::template Codim<0>::Entity MacroEntityType;
+  using MacroGridType = MacroGridImp;
+  using MacroGridProviderType = XT::Grid::GridProvider<MacroGridType>;
+  using MacroGridViewType = typename MacroGridProviderType::LeafGridViewType;
+  using MacroEntityType = typename MacroGridType::template Codim<0>::Entity;
 
-  typedef LocalGridImp LocalGridType;
-  typedef XT::Grid::GridProvider<LocalGridType> LocalGridProviderType;
-  typedef typename LocalGridType::LevelGridView MicroGridViewType;
+  using LocalGridType = LocalGridImp;
+  using LocalGridProviderType = XT::Grid::GridProvider<LocalGridType>;
+  using MicroGridViewType = typename LocalGridType::LevelGridView;
   using MicroEntityType = XT::Grid::extract_entity_t<MicroGridViewType>;
 
-  typedef typename MacroGridType::ctype ctype;
+  using ctype = typename MacroGridType::ctype;
   static constexpr size_t dimDomain = MacroGridType::dimension;
   static constexpr size_t dimWorld = MacroGridType::dimensionworld;
 
 public:
-  typedef typename Layer<LocalGridType, layer, Backends::view>::type LocalViewType;
+  using LocalViewType = typename Layer<LocalGridType, layer, Backends::view>::type;
 
 private:
-  typedef GridGlue::Codim1Extractor<LocalViewType> LocalExtractorType;
+  using LocalExtractorType = GridGlue::Codim1Extractor<LocalViewType>;
 
 public:
-  typedef GridGlue::GridGlue<LocalExtractorType, LocalExtractorType> GlueType;
+  using GlueType = GridGlue::GridGlue<LocalExtractorType, LocalExtractorType>;
 
 private:
   template <class GridView, class MacroIntersectionType>
   class CouplingFaceDescriptor
   {
     using LocalEntityType = XT::Grid::extract_entity_t<GridView>;
-    typedef typename GridView::ctype ctype;
+    using ctype = typename GridView::ctype;
 
   public:
     CouplingFaceDescriptor(const MacroIntersectionType& macro_intersection)
@@ -1021,12 +1021,12 @@ private:
 template <class MacroGridType, class LocalGridType, Layers layer>
 class GluedVTKWriter
 {
-  typedef typename Layer<LocalGridType, layer, Backends::view>::type LocalGridViewType;
+  using LocalGridViewType = typename Layer<LocalGridType, layer, Backends::view>::type;
 
   // we only need this class to access a protected pwrite method of VTKWriter
   class LocalVTKWriter : public VTKWriter<LocalGridViewType>
   {
-    typedef VTKWriter<LocalGridViewType> BaseType;
+    using BaseType = VTKWriter<LocalGridViewType>;
 
   public:
     LocalVTKWriter(const LocalGridViewType& local_grid_view, const size_t subdomain, const size_t num_subdomains)
@@ -1046,7 +1046,7 @@ class GluedVTKWriter
   }; // class LocalVTKWriter
 
 public:
-  typedef Glued<MacroGridType, LocalGridType, layer> GluedGridType;
+  using GluedGridType = Glued<MacroGridType, LocalGridType, layer>;
 
   GluedVTKWriter(const GluedGridType& glued_grid, const int local_level = -1)
     : glued_grid_(glued_grid)

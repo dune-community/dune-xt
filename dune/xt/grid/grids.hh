@@ -38,26 +38,26 @@
 
 
 // this is used by other headers
-typedef Dune::OneDGrid ONED_1D;
-typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>> YASP_1D_EQUIDISTANT_OFFSET;
-typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D_EQUIDISTANT_OFFSET;
-typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>> YASP_3D_EQUIDISTANT_OFFSET;
-typedef Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>> YASP_4D_EQUIDISTANT_OFFSET;
+using ONED_1D = Dune::OneDGrid;
+using YASP_1D_EQUIDISTANT_OFFSET = Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>;
+using YASP_2D_EQUIDISTANT_OFFSET = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>;
+using YASP_3D_EQUIDISTANT_OFFSET = Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>;
+using YASP_4D_EQUIDISTANT_OFFSET = Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>>;
 #if HAVE_DUNE_ALUGRID
-typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONFORMING;
-typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming> ALU_2D_SIMPLEX_NONCONFORMING;
-typedef Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming> ALU_2D_CUBE;
-typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming> ALU_3D_SIMPLEX_CONFORMING;
-typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming> ALU_3D_SIMPLEX_NONCONFORMING;
-typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming> ALU_3D_CUBE;
+using ALU_2D_SIMPLEX_CONFORMING = Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>;
+using ALU_2D_SIMPLEX_NONCONFORMING = Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>;
+using ALU_2D_CUBE = Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming>;
+using ALU_3D_SIMPLEX_CONFORMING = Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming>;
+using ALU_3D_SIMPLEX_NONCONFORMING = Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>;
+using ALU_3D_CUBE = Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>;
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
-typedef Dune::UGGrid<2> UG_2D;
-typedef Dune::UGGrid<3> UG_3D;
+using UG_2D = Dune::UGGrid<2>;
+using UG_3D = Dune::UGGrid<3>;
 #endif
 #if HAVE_ALBERTA
-typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
-typedef Dune::AlbertaGrid<3, 3> ALBERTA_3D;
+using ALBERTA_2D = Dune::AlbertaGrid<2, 2>;
+using ALBERTA_3D = Dune::AlbertaGrid<3, 3>;
 #endif
 
 

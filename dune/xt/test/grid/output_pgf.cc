@@ -24,7 +24,7 @@ using namespace Dune::XT::Grid;
 GTEST_TEST(PgfOutput, YaspGrid)
 {
   const size_t dim = 2;
-  typedef Dune::YaspGrid<dim> GridType;
+  using GridType = Dune::YaspGrid<dim>;
   std::array<int, dim> n;
   Dune::FieldVector<double, dim> h;
 

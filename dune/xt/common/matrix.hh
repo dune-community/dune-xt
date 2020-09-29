@@ -44,11 +44,11 @@ template <class MatType>
 struct MatrixAbstraction
 {
   using M = std::conditional_t<std::is_same<MatType, void>::value, int, MatType>; // avoid reference to void
-  typedef M MatrixType;
-  typedef typename Dune::FieldTraits<M>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<M>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using MatrixType = M;
+  using ScalarType = typename Dune::FieldTraits<M>::field_type;
+  using RealType = typename Dune::FieldTraits<M>::real_type;
+  using S = ScalarType;
+  using R = RealType;
 
   template <size_t rows = 0, size_t cols = 0, class FieldType = ScalarType>
   using MatrixTypeTemplate = MatrixType;
@@ -130,11 +130,11 @@ struct MatrixAbstraction
 template <class K>
 struct MatrixAbstraction<Dune::DynamicMatrix<K>>
 {
-  typedef Dune::DynamicMatrix<K> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using MatrixType = Dune::DynamicMatrix<K>;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
   template <size_t rows = 0, size_t cols = 0, class FieldType = K>
   using MatrixTypeTemplate = DynamicMatrix<K>;
 
@@ -208,11 +208,11 @@ struct MatrixAbstraction<Dune::DynamicMatrix<K>>
 template <class K, int N, int M>
 struct MatrixAbstraction<Dune::FieldMatrix<K, N, M>>
 {
-  typedef Dune::FieldMatrix<K, N, M> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using MatrixType = Dune::FieldMatrix<K, N, M>;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
   template <size_t rows = N, size_t cols = M, class FieldType = K>
   using MatrixTypeTemplate = Dune::FieldMatrix<FieldType, rows, cols>;
 

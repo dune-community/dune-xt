@@ -39,7 +39,7 @@ class TemporaryConstView
   template <bool anything>
   struct const_storage<true, false, anything>
   {
-    typedef GridLayerType type;
+    using type = GridLayerType;
 
     const_storage(const GridLayerType& grid_view)
       : value(grid_view)
@@ -51,7 +51,7 @@ class TemporaryConstView
   template <bool anything>
   struct const_storage<false, true, anything>
   {
-    typedef typename GridLayerType::GridViewType type;
+    using type = typename GridLayerType::GridViewType;
 
     const_storage(const GridLayerType& grid_part)
       : grid_part_(grid_part)
@@ -92,7 +92,7 @@ class TemporaryView : public TemporaryConstView<GridLayerType>
   template <bool anything>
   struct storage<true, false, anything>
   {
-    typedef GridLayerType type;
+    using type = GridLayerType;
 
     storage(GridLayerType& grid_view)
       : value(grid_view)
@@ -104,7 +104,7 @@ class TemporaryView : public TemporaryConstView<GridLayerType>
   template <bool anything>
   struct storage<false, true, anything>
   {
-    typedef typename GridLayerType::GridViewType type;
+    using type = typename GridLayerType::GridViewType;
 
     storage(GridLayerType& grid_part)
       : value(grid_part)

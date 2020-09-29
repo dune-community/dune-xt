@@ -23,7 +23,7 @@
 template <class GridType>
 struct GridProviderBase : public testing::Test
 {
-  typedef Dune::XT::Grid::GridProvider<GridType> GridProviderType;
+  using GridProviderType = Dune::XT::Grid::GridProvider<GridType>;
 
   static void check_layers(const GridProviderType& grid_provider)
   {

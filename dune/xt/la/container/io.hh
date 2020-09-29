@@ -72,7 +72,7 @@ typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::strin
   std::ifstream file(filename);
   if (!file.is_open())
     DUNE_THROW(IOError, "Could not open '" << filename << "' for reading!");
-  typedef typename M::ScalarType R;
+  using R = typename M::ScalarType;
   std::vector<std::tuple<size_t, size_t, R>> values;
   std::set<size_t> rows;
   size_t max_row = 0;
@@ -121,7 +121,7 @@ from_file(const std::string& filename, const ssize_t min_size = -1, const std::s
   std::ifstream file(filename);
   if (!file.is_open())
     DUNE_THROW(IOError, "Could not open '" << filename << "' for reading!");
-  typedef typename V::ScalarType R;
+  using R = typename V::ScalarType;
   std::vector<std::tuple<size_t, R>> values;
   size_t max_size = 0;
   std::string line;

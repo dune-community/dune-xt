@@ -28,7 +28,7 @@ template <class FieldVectorImp,
 struct FieldVector_type_caster
 {
   using type = FieldVectorImp;
-  typedef typename type::value_type K;
+  using K = typename type::value_type;
   static constexpr int SZ = type::dimension;
   using value_conv = make_caster<K>;
 
@@ -76,7 +76,7 @@ template <class FieldVectorImp>
 struct FieldVector_type_caster<FieldVectorImp, false>
 {
   using type = FieldVectorImp;
-  typedef typename type::value_type K;
+  using K = typename type::value_type;
   static constexpr int SZ = type::dimension;
   using value_conv = make_caster<K>;
 

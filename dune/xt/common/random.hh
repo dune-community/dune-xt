@@ -32,12 +32,12 @@ struct UniformDistributionSelector
 template <typename T>
 struct UniformDistributionSelector<T, true>
 {
-  typedef std::uniform_int_distribution<T> type;
+  using type = std::uniform_int_distribution<T>;
 };
 template <typename T>
 struct UniformDistributionSelector<T, false>
 {
-  typedef std::uniform_real_distribution<T> type;
+  using type = std::uniform_real_distribution<T>;
 };
 
 /** RandomNumberGenerator adapter
@@ -49,8 +49,8 @@ struct UniformDistributionSelector<T, false>
 template <class T, class DistributionImp, class EngineImp = std::mt19937>
 struct RNG
 {
-  typedef DistributionImp DistributionType;
-  typedef EngineImp EngineType;
+  using DistributionType = DistributionImp;
+  using EngineType = EngineImp;
   EngineType generator;
   DistributionType distribution;
   RNG(EngineType g, DistributionType d)
@@ -67,8 +67,8 @@ struct RNG
 template <class T, class DistributionImp, class EngineImp>
 struct RNG<std::complex<T>, DistributionImp, EngineImp>
 {
-  typedef DistributionImp DistributionType;
-  typedef EngineImp EngineType;
+  using DistributionType = DistributionImp;
+  using EngineType = EngineImp;
   EngineType generator;
   DistributionType distribution;
   RNG(EngineType g, DistributionType d)
@@ -93,7 +93,7 @@ const std::string other_printables("!@#$%^&*()"
 //! RNG that represents strings of given length
 class RandomStrings : public RNG<std::string, std::uniform_int_distribution<int>, std::mt19937>
 {
-  typedef RNG<std::string, std::uniform_int_distribution<int>, std::mt19937> BaseType;
+  using BaseType = RNG<std::string, std::uniform_int_distribution<int>, std::mt19937>;
   const size_t length;
 
 public:
@@ -114,7 +114,7 @@ public:
 template <class T, bool = is_vector<T>::value>
 class DefaultRNG : public RNG<T, typename UniformDistributionSelector<T>::type, std::default_random_engine>
 {
-  typedef RNG<T, typename UniformDistributionSelector<T>::type, std::default_random_engine> BaseType;
+  using BaseType = RNG<T, typename UniformDistributionSelector<T>::type, std::default_random_engine>;
 
 public:
   explicit DefaultRNG(T min = std::numeric_limits<T>::min(),
@@ -128,7 +128,7 @@ template <class T>
 class DefaultRNG<std::complex<T>, false>
   : public RNG<std::complex<T>, typename UniformDistributionSelector<T>::type, std::default_random_engine>
 {
-  typedef RNG<std::complex<T>, typename UniformDistributionSelector<T>::type, std::default_random_engine> BaseType;
+  using BaseType = RNG<std::complex<T>, typename UniformDistributionSelector<T>::type, std::default_random_engine>;
 
 public:
   DefaultRNG(T min = std::numeric_limits<T>::min(),
@@ -141,8 +141,8 @@ public:
 template <class VectorType>
 class DefaultRNG<VectorType, true>
 {
-  typedef typename VectorAbstraction<VectorType>::S T;
-  typedef DefaultRNG<T> RngType;
+  using T = typename VectorAbstraction<VectorType>::S;
+  using RngType = DefaultRNG<T>;
 
 public:
   DefaultRNG(VectorType min_vec = VectorAbstraction<VectorType>::create(VectorAbstraction<VectorType>::has_static_size

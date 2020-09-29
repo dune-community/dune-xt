@@ -26,12 +26,12 @@ namespace LA {
 class SparsityPatternDefault
 {
 private:
-  typedef std::vector<std::vector<size_t>> BaseType;
+  using BaseType = std::vector<std::vector<size_t>>;
 
 public:
-  typedef BaseType::value_type InnerType;
-  typedef typename BaseType::iterator OuterIteratorType;
-  typedef typename BaseType::const_iterator ConstOuterIteratorType;
+  using InnerType = BaseType::value_type;
+  using OuterIteratorType = typename BaseType::iterator;
+  using ConstOuterIteratorType = typename BaseType::const_iterator;
 
   explicit SparsityPatternDefault(const size_t _size = 0);
 

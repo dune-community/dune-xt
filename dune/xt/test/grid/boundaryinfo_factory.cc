@@ -23,7 +23,7 @@
 
 GTEST_TEST(BoundaryInfoFactory, all)
 {
-  typedef Dune::XT::Grid::BoundaryInfoFactory<INTERSECTIONTYPE> Factory;
+  using Factory = Dune::XT::Grid::BoundaryInfoFactory<INTERSECTIONTYPE>;
 
   for (auto type : Factory::available()) {
     auto opts = Factory::default_config(type);

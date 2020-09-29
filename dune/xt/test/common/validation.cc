@@ -33,11 +33,11 @@ constexpr const auto SEED = std::random_device::result_type(0);
 
 struct ValidationTest : public testing::Test
 {
-  typedef FIELD_TYPE T;
-  typedef DefaultRNG<T> RNGType;
+  using T = FIELD_TYPE;
+  using RNGType = DefaultRNG<T>;
   static constexpr T eps = Epsilon<T>::value;
-  typedef VectorAbstraction<T>::S S;
-  typedef std::numeric_limits<S> limit;
+  using S = VectorAbstraction<T>::S;
+  using limit = std::numeric_limits<S>;
   const int eps_fac = 4;
   const S scalar_eps = Epsilon<S>::value;
 

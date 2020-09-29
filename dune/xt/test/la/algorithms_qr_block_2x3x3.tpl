@@ -34,13 +34,13 @@ using namespace Dune::XT::Common;
 {% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
 struct QrTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{O_TYPE}} MatrixType;
-  typedef {{R_TYPE}} RhsType;
-  typedef {{S_TYPE}} SolutionType;
+  using MatrixType = {{O_TYPE}};
+  using RhsType = {{R_TYPE}};
+  using SolutionType = {{S_TYPE}};
 
-  typedef XT::Common::MatrixAbstraction<MatrixType> M;
-  typedef XT::Common::VectorAbstraction<RhsType> RhsV;
-  typedef XT::Common::VectorAbstraction<SolutionType> SolV;
+  using M = XT::Common::MatrixAbstraction<MatrixType>;
+  using RhsV = XT::Common::VectorAbstraction<RhsType>;
+  using SolV = XT::Common::VectorAbstraction<SolutionType>;
 
   static constexpr size_t dim = 6;
 

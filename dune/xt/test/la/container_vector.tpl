@@ -22,28 +22,28 @@ static constexpr size_t dim = 4;
 {% for T_NAME, V_TYPE in config.testtypes %}
 struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{V_TYPE}} VectorImp;
+  using VectorImp = {{V_TYPE}};
 
   void fulfills_interface() const
   {
     // static tests
-    typedef typename VectorImp::Traits Traits;
+    using Traits = typename VectorImp::Traits;
     // * of the traits
-    typedef typename Traits::derived_type T_derived_type;
+    using T_derived_type = typename Traits::derived_type;
     static_assert(std::is_same<VectorImp, T_derived_type>::value, "derived_type has to be the correct Type!");
-    typedef typename Traits::ScalarType T_ScalarType;
-    typedef typename Traits::RealType T_RealType;
+    using T_ScalarType = typename Traits::ScalarType;
+    using T_RealType = typename Traits::RealType;
     // * of the vector as itself (aka the derived type)
-    typedef typename VectorImp::ScalarType D_ScalarType;
-    typedef typename VectorImp::RealType D_RealType;
+    using D_ScalarType = typename VectorImp::ScalarType;
+    using D_RealType = typename VectorImp::RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the vector as the interface
-    typedef typename XT::LA::VectorInterface<Traits, D_ScalarType> InterfaceType;
-    typedef typename InterfaceType::derived_type I_derived_type;
-    typedef typename InterfaceType::ScalarType I_ScalarType;
-    typedef typename InterfaceType::RealType I_RealType;
+    using InterfaceType = typename XT::LA::VectorInterface<Traits, D_ScalarType>;
+    using I_derived_type = typename InterfaceType::derived_type;
+    using I_ScalarType = typename InterfaceType::ScalarType;
+    using I_RealType = typename InterfaceType::RealType;
     static_assert(std::is_same<VectorImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
@@ -132,8 +132,8 @@ struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
 
   void produces_correct_results() const
   {
-    typedef typename VectorImp::ScalarType ScalarType;
-    typedef typename VectorImp::RealType RealType;
+    using ScalarType = typename VectorImp::ScalarType;
+    using RealType = typename VectorImp::RealType;
     using V = XT::Common::VectorAbstraction<VectorImp>;
 
     // create test vectors

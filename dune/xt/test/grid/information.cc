@@ -29,8 +29,8 @@ struct GridInfoTest : public ::testing::Test
 {
   static constexpr size_t griddim = TESTGRIDDIM;
   static constexpr unsigned int level = 1;
-  typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
-  typedef Dimensions<typename GridType::LeafGridView> DimensionsType;
+  using GridType = Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>>;
+  using DimensionsType = Dimensions<typename GridType::LeafGridView>;
 
   const GridProvider<GridType> grid_prv;
   GridInfoTest()

@@ -23,16 +23,16 @@
 class A
 {
 public:
-  typedef int MyFancyType;
+  using MyFancyType = int;
 };
 
 class B
 {
 public:
-  typedef int MyFancyType;
+  using MyFancyType = int;
 };
 
-typedef std::tuple<A, B, B> MyTuple;
+using MyTuple = std::tuple<A, B, B>;
 
 struct print_value
 {
@@ -51,15 +51,15 @@ struct print_value
 
 GTEST_TEST(TypeTransform, All)
 {
-  [[maybe_unused]] typedef TUPLE_TYPEDEFS_2_TUPLE(MyTuple, MyFancyType) MySubTupleType;
+  using MySubTupleType [[maybe_unused]] = TUPLE_TYPEDEFS_2_TUPLE(MyTuple, MyFancyType);
 }
 
 GTEST_TEST(Product, All)
 {
   using namespace Dune::XT::Common::TupleProduct;
-  typedef boost::mpl::vector<Int<1>, Int<2>> u_types;
-  typedef boost::mpl::vector<Int<3>, Int<4>> v_types;
-  typedef Combine<u_types, v_types, print_value>::Generate<> base_generator_type;
+  using u_types = boost::mpl::vector<Int<1>, Int<2>>;
+  using v_types = boost::mpl::vector<Int<3>, Int<4>>;
+  using base_generator_type = Combine<u_types, v_types, print_value>::Generate<>;
   base_generator_type::Run();
   base_generator_type::Run(std::cerr);
 }

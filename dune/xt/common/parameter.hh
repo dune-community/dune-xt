@@ -177,7 +177,7 @@ extern template class SimpleDict<std::vector<double>>;
 
 class ParameterType : public internal::SimpleDict<size_t>
 {
-  typedef internal::SimpleDict<size_t> BaseType;
+  using BaseType = internal::SimpleDict<size_t>;
 
 public:
   ParameterType();
@@ -232,8 +232,8 @@ std::ostream& operator<<(std::ostream& out, const ParameterType& param_type);
 
 class Parameter : public internal::SimpleDict<std::vector<double>>
 {
-  typedef internal::SimpleDict<std::vector<double>> BaseType;
-  typedef std::vector<double> ValueType;
+  using BaseType = internal::SimpleDict<std::vector<double>>;
+  using ValueType = std::vector<double>;
 
 public:
   Parameter(const Parameter& other) = default;

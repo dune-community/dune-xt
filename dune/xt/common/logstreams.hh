@@ -47,10 +47,10 @@ class CombinedBuffer;
 
 class SuspendableStrBuffer : public std::basic_stringbuf<char, std::char_traits<char>>
 {
-  typedef std::basic_stringbuf<char, std::char_traits<char>> BaseType;
+  using BaseType = std::basic_stringbuf<char, std::char_traits<char>>;
 
 public:
-  typedef int PriorityType;
+  using PriorityType = int;
   static constexpr PriorityType default_suspend_priority = 0;
 
   SuspendableStrBuffer(int loglevel, int& logflags);
@@ -148,7 +148,7 @@ protected:
  */
 class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_traits<char>>
 {
-  typedef std::basic_stringbuf<char, std::char_traits<char>> BaseType;
+  using BaseType = std::basic_stringbuf<char, std::char_traits<char>>;
 
 public:
   TimedPrefixedStreamBuffer(const Timer& timer, const std::string prefix, std::ostream& out = std::cout);
@@ -171,11 +171,11 @@ class LogStream
   : StorageProvider<SuspendableStrBuffer>
   , public std::basic_ostream<char, std::char_traits<char>>
 {
-  typedef StorageProvider<SuspendableStrBuffer> StorageBaseType;
-  typedef std::basic_ostream<char, std::char_traits<char>> BaseType;
+  using StorageBaseType = StorageProvider<SuspendableStrBuffer>;
+  using BaseType = std::basic_ostream<char, std::char_traits<char>>;
 
 public:
-  typedef SuspendableStrBuffer::PriorityType PriorityType;
+  using PriorityType = SuspendableStrBuffer::PriorityType;
   static constexpr PriorityType default_suspend_priority = SuspendableStrBuffer::default_suspend_priority;
 
   explicit LogStream(SuspendableStrBuffer*&& buffer)
@@ -236,8 +236,8 @@ class TimedPrefixedLogStream
   : StorageProvider<TimedPrefixedStreamBuffer>
   , public std::basic_ostream<char, std::char_traits<char>>
 {
-  typedef StorageProvider<TimedPrefixedStreamBuffer> StorageBaseType;
-  typedef std::basic_ostream<char, std::char_traits<char>> OstreamBaseType;
+  using StorageBaseType = StorageProvider<TimedPrefixedStreamBuffer>;
+  using OstreamBaseType = std::basic_ostream<char, std::char_traits<char>>;
 
 public:
   TimedPrefixedLogStream(const Timer& timer, const std::string prefix, std::ostream& outstream);

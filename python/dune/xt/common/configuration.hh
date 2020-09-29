@@ -24,8 +24,8 @@ NAMESPACE_BEGIN(detail)
 template <>
 struct type_caster<Dune::XT::Common::Configuration>
 {
-  typedef Dune::XT::Common::Configuration type;
-  typedef std::string S;
+  using type = Dune::XT::Common::Configuration;
+  using S = std::string;
   using key_conv = make_caster<S>;
   using value_conv = make_caster<S>;
 

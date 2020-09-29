@@ -25,14 +25,14 @@ static constexpr size_t cols = 4;
 {% for T_NAME, M_TYPE, V_TYPE in config.testtypes %}
 struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{M_TYPE}} MatrixImp;
-  typedef {{V_TYPE}} VectorImp;
-  typedef typename Dune::XT::LA::SparsityPatternDefault PatternType;
+  using MatrixImp = {{M_TYPE}};
+  using VectorImp = {{V_TYPE}};
+  using PatternType = typename Dune::XT::LA::SparsityPatternDefault;
 
   void produces_correct_results() const
   {
-    typedef typename MatrixImp::ScalarType ScalarType;
-    typedef typename MatrixImp::RealType RealType;
+    using ScalarType = typename MatrixImp::ScalarType;
+    using RealType = typename MatrixImp::RealType;
 
     // create test patterns
     PatternType dense_pattern(dim);

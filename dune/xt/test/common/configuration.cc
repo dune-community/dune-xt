@@ -141,18 +141,16 @@ struct CreateByParameterTree
   }
 };
 
-typedef testing::
-    Types<double, float, std::string, std::complex<double>, int, unsigned int, unsigned long, long long, char>
-        TestTypes;
+using TestTypes =
+    testing::Types<double, float, std::string, std::complex<double>, int, unsigned int, unsigned long, long long, char>;
 
-typedef testing::Types<CreateByOperator,
-                       CreateByKeyAndValueAndAddConfiguration,
-                       CreateByKeyAndValueAndAddParameterTree,
-                       CreateByKeyAndValueVectorsAndAddParameterTree,
-                       CreateByKeysAndValues,
-                       CreateByParameterTree,
-                       CreateByOperatorAndAssign>
-    ConfigurationCreators;
+using ConfigurationCreators = testing::Types<CreateByOperator,
+                                             CreateByKeyAndValueAndAddConfiguration,
+                                             CreateByKeyAndValueAndAddParameterTree,
+                                             CreateByKeyAndValueVectorsAndAddParameterTree,
+                                             CreateByKeysAndValues,
+                                             CreateByParameterTree,
+                                             CreateByOperatorAndAssign>;
 
 constexpr const auto SEED = std::random_device::result_type(0);
 
@@ -280,7 +278,7 @@ struct ConfigTest : public testing::Test
 
 struct StaticCheck
 {
-  typedef boost::mpl::vector<Int<1>, Int<2>> Ints;
+  using Ints = boost::mpl::vector<Int<1>, Int<2>>;
 
   template <class MatrixType>
   static void check_matrix_static_size(const Configuration& config)
@@ -345,7 +343,7 @@ struct ConfigurationTest : public ::testing::Test
   template <class K, int d>
   static void check_field_vector(const Configuration& config)
   {
-    typedef FieldVector<K, d> VectorType;
+    using VectorType = FieldVector<K, d>;
     VectorType vec = config.get("vector", VectorType(), d);
     EXPECT_EQ(d, vec.size());
     for (size_t ii = 0; ii < d; ++ii)
@@ -368,7 +366,7 @@ struct ConfigurationTest : public ::testing::Test
   static void check_matrix(const Configuration& config)
   {
     MatrixType mat = config.get("matrix", MatrixType(), 1, 1);
-    typedef MatrixAbstraction<MatrixType> MT;
+    using MT = MatrixAbstraction<MatrixType>;
     EXPECT_FALSE(MT::rows(mat) != 1 || MT::cols(mat) != 1);
     EXPECT_TRUE(FloatCmp::eq(MT::get_entry(mat, 0, 0), 0.0));
     mat = config.get("matrix", MatrixType(), 1, 2);

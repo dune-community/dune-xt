@@ -28,8 +28,8 @@ template <class MatrixImp>
 struct MatrixInverterTest : public ::testing::Test
 {
   using MatrixType = MatrixImp;
-  typedef MatrixInverter<MatrixType> MatrixInverterType;
-  typedef MatrixInverterOptions<MatrixType> MatrixInverterOpts;
+  using MatrixInverterType = MatrixInverter<MatrixType>;
+  using MatrixInverterOpts = MatrixInverterOptions<MatrixType>;
 
   using M = Common::MatrixAbstraction<MatrixType>;
   using ScalarType = typename M::ScalarType;

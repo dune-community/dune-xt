@@ -29,61 +29,61 @@
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, size_t Size>
 struct RightTrimTuple
 {
-  typedef std::tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> type;
+  using type = std::tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 9>
 {
-  typedef std::tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> type;
+  using type = std::tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 8>
 {
-  typedef std::tuple<T1, T2, T3, T4, T5, T6, T7, T8> type;
+  using type = std::tuple<T1, T2, T3, T4, T5, T6, T7, T8>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 7>
 {
-  typedef std::tuple<T1, T2, T3, T4, T5, T6, T7> type;
+  using type = std::tuple<T1, T2, T3, T4, T5, T6, T7>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 6>
 {
-  typedef std::tuple<T1, T2, T3, T4, T5, T6> type;
+  using type = std::tuple<T1, T2, T3, T4, T5, T6>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 5>
 {
-  typedef std::tuple<T1, T2, T3, T4, T5> type;
+  using type = std::tuple<T1, T2, T3, T4, T5>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 4>
 {
-  typedef std::tuple<T1, T2, T3, T4> type;
+  using type = std::tuple<T1, T2, T3, T4>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 3>
 {
-  typedef std::tuple<T1, T2, T3> type;
+  using type = std::tuple<T1, T2, T3>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 2>
 {
-  typedef std::tuple<T1, T2> type;
+  using type = std::tuple<T1, T2>;
 };
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 1>
 {
-  typedef std::tuple<T1> type;
+  using type = std::tuple<T1>;
 };
 
 #define TUPLE_TYPEDEFS_2_TUPLE(t_, s_)                                                                                 \
@@ -114,13 +114,13 @@ struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 1>
  * class A
  * {
  *   public:
- *   typedef int MyFancyType;
+ *   using MyFancyType = int;
  * };
  *
  * class B
  * {
  *   public:
- *   typedef int MyFancyType;
+ *   using MyFancyType = int;
  * };
  * @endcode
  *
@@ -188,13 +188,13 @@ struct Combine
     // u_begin is not necessary ;)
     // it would be cheaper not to pre-declare all of them since we force evaluation
     // however this dramatically increase the readability
-    typedef typename begin<VTypes>::type v_begin;
+    using v_begin = typename begin<VTypes>::type;
 
-    typedef typename end<UTypes>::type u_end;
-    typedef typename end<VTypes>::type v_end;
+    using u_end = typename end<UTypes>::type;
+    using v_end = typename end<VTypes>::type;
 
-    typedef typename next<UIterator>::type u_next;
-    typedef typename next<VIterator>::type v_next;
+    using u_next = typename next<UIterator>::type;
+    using v_next = typename next<VIterator>::type;
 
     typedef
         typename if_<std::is_same<v_next, v_end>,
@@ -207,7 +207,7 @@ struct Combine
   struct Generate
   {
     //  generate <<next>> target type
-    typedef typename Next<UIterator, VIterator>::type next_type;
+    using next_type = typename Next<UIterator, VIterator>::type;
 
     static void Run()
     {

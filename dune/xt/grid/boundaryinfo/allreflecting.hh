@@ -38,7 +38,7 @@ static inline Common::Configuration allreflecting_boundaryinfo_default_config()
 template <class IntersectionImp>
 class AllReflectingBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
-  typedef BoundaryInfo<IntersectionImp> BaseType;
+  using BaseType = BoundaryInfo<IntersectionImp>;
 
 public:
   using typename BaseType::IntersectionType;

@@ -34,16 +34,16 @@ namespace bindings {
 template <class Imp, bool ctor_expects_boundary_info>
 class IntersectionFilter
 {
-  typedef typename Imp::GridViewType GL;
-  typedef typename extract_grid<GL>::type G;
-  typedef XT::Grid::IntersectionFilter<GL> InterfaceType;
+  using GL = typename Imp::GridViewType;
+  using G = typename extract_grid<GL>::type;
+  using InterfaceType = XT::Grid::IntersectionFilter<GL>;
 
 public:
-  typedef Imp type;
-  typedef pybind11::class_<type, InterfaceType> bound_type;
+  using type = Imp;
+  using bound_type = pybind11::class_<type, InterfaceType>;
 
 private:
-  typedef XT::Grid::BoundaryInfo<extract_intersection_t<GL>> BoundaryInfoType;
+  using BoundaryInfoType = XT::Grid::BoundaryInfo<extract_intersection_t<GL>>;
 
   static std::string makename(std::string class_name, std::string layer_name)
   {

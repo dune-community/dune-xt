@@ -16,16 +16,16 @@
 
 
 // this is used in other headers
-typedef Dune::XT::LA::CommonDenseVector<double> COMMON_DENSE_VECTOR;
-typedef Dune::XT::LA::CommonDenseMatrix<double> COMMON_DENSE_MATRIX;
-typedef Dune::XT::LA::CommonSparseMatrix<double> COMMON_SPARSE_MATRIX;
+using COMMON_DENSE_VECTOR = Dune::XT::LA::CommonDenseVector<double>;
+using COMMON_DENSE_MATRIX = Dune::XT::LA::CommonDenseMatrix<double>;
+using COMMON_SPARSE_MATRIX = Dune::XT::LA::CommonSparseMatrix<double>;
 #if HAVE_EIGEN
-typedef Dune::XT::LA::EigenDenseVector<double> EIGEN_DENSE_VECTOR;
-typedef Dune::XT::LA::EigenDenseMatrix<double> EIGEN_DENSE_MATRIX;
-typedef Dune::XT::LA::EigenRowMajorSparseMatrix<double> EIGEN_SPARSE_MATRIX;
+using EIGEN_DENSE_VECTOR = Dune::XT::LA::EigenDenseVector<double>;
+using EIGEN_DENSE_MATRIX = Dune::XT::LA::EigenDenseMatrix<double>;
+using EIGEN_SPARSE_MATRIX = Dune::XT::LA::EigenRowMajorSparseMatrix<double>;
 #endif
-typedef Dune::XT::LA::IstlDenseVector<double> ISTL_DENSE_VECTOR;
-typedef Dune::XT::LA::IstlRowMajorSparseMatrix<double> ISTL_SPARSE_MATRIX;
+using ISTL_DENSE_VECTOR = Dune::XT::LA::IstlDenseVector<double>;
+using ISTL_SPARSE_MATRIX = Dune::XT::LA::IstlRowMajorSparseMatrix<double>;
 
 namespace Dune {
 namespace XT {

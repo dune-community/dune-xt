@@ -38,7 +38,7 @@ static inline Common::Configuration allneumann_boundaryinfo_default_config()
 template <class IntersectionImp>
 class AllNeumannBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
-  typedef BoundaryInfo<IntersectionImp> BaseType;
+  using BaseType = BoundaryInfo<IntersectionImp>;
 
 public:
   using typename BaseType::IntersectionType;

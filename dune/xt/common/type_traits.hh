@@ -57,7 +57,7 @@
     template <typename TT_local>                                                                                       \
     struct void_                                                                                                       \
     {                                                                                                                  \
-      typedef void type;                                                                                               \
+      using type = void;                                                                                               \
     };                                                                                                                 \
                                                                                                                        \
     template <typename TT_local, typename = void>                                                                      \
@@ -79,7 +79,7 @@
   * \brief Macro to statically check a type for a typedef.
   *
   *        To check if a type Foo defines a typedef Bar, put this code somewhere, where a generated helper struct
-  *        may be defined (obviously only once for each typedef name!, note the trailing `;`!):
+  *        may be defined (obviously only once for each using ` = name!, note the trailing;`!):
 \code
 DXTC_has_typedef_initialize_once(Bar);
 \endcode
@@ -254,7 +254,7 @@ struct is_smart_ptr
   static constexpr bool value = std::is_same<std::unique_ptr<typename T::element_type>, T>::value
                                 || std::is_same<std::shared_ptr<typename T::element_type>, T>::value
                                 || std::is_same<std::weak_ptr<typename T::element_type>, T>::value;
-  typedef T type;
+  using type = T;
 };
 
 
@@ -274,20 +274,6 @@ struct PtrCaller<T, typename std::enable_if<is_smart_ptr<T>::value || std::is_po
   {
     return *ptr;
   }
-};
-
-
-//! workaround for gcc 4.7 missing underlying type, via
-//! https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum/10956467#10956467
-template <class T>
-struct underlying_type
-{
-#if __GNUC__ == 4 && (__GNUC_MINOR__ < 7)
-  typedef typename std::
-      conditional<T(-1) < T(0), typename std::make_signed<T>::type, typename std::make_unsigned<T>::type>::type type;
-#else
-  typedef typename std::underlying_type<T>::type type;
-#endif
 };
 
 
@@ -512,7 +498,7 @@ struct dependent
   template <T S>
   struct _typename
   {
-    typedef void type;
+    using type = void;
   };
 };
 

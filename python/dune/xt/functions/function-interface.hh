@@ -34,7 +34,7 @@ struct get_combined
 template <class L, class R>
 struct get_combined<L, R, CombinationType::difference>
 {
-  typedef DifferenceFunction<L, R> type;
+  using type = DifferenceFunction<L, R>;
 
   static std::string id()
   {
@@ -60,7 +60,7 @@ struct get_combined<L, R, CombinationType::difference>
 template <class L, class R>
 struct get_combined<L, R, CombinationType::sum>
 {
-  typedef SumFunction<L, R> type;
+  using type = SumFunction<L, R>;
 
   static std::string id()
   {
@@ -86,7 +86,7 @@ struct get_combined<L, R, CombinationType::sum>
 template <class L, class R>
 struct get_combined<L, R, CombinationType::product>
 {
-  typedef ProductFunction<L, R> type;
+  using type = ProductFunction<L, R>;
 
   static std::string id()
   {
@@ -126,9 +126,9 @@ bind_combined_Function(pybind11::module& m)
 {
   namespace py = pybind11;
 
-  typedef double R;
-  typedef FunctionInterface<d, lr, lrC, R> Left;
-  typedef FunctionInterface<d, rr, rrC, R> Right;
+  using R = double;
+  using Left = FunctionInterface<d, lr, lrC, R>;
+  using Right = FunctionInterface<d, rr, rrC, R>;
   static constexpr size_t r = C::range_dim;
   static constexpr size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();
@@ -152,8 +152,8 @@ void addbind_FunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
 
-  typedef FunctionInterface<d, r, rC, double> S;
-  typedef FunctionInterface<d, oR, orC, double> O;
+  using S = FunctionInterface<d, r, rC, double>;
+  using O = FunctionInterface<d, oR, orC, double>;
 
   c.def(
       internal::get_combined<S, O, comb>::op().c_str(),
@@ -168,7 +168,7 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef FunctionInterface<d, r, rC, double> C;
+  using C = FunctionInterface<d, r, rC, double>;
 
   py::class_<C> c(m,
                   std::string("FunctionInterface__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x"

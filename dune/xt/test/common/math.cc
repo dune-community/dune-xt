@@ -20,8 +20,8 @@
 
 using namespace Dune::XT::Common;
 using namespace Dune::XT::Test;
-typedef testing::Types<double, int> TestTypes;
-typedef testing::Types<std::complex<double>, double, int> ComplexTestTypes;
+using TestTypes = testing::Types<double, int>;
+using ComplexTestTypes = testing::Types<std::complex<double>, double, int>;
 
 
 template <class T>

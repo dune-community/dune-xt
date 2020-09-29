@@ -31,7 +31,7 @@ namespace Grid {
 template <class GridImp>
 class LevelBasedEOCGridProvider : public GridProvider<GridImp>
 {
-  typedef GridProvider<GridImp> BaseType;
+  using BaseType = GridProvider<GridImp>;
 
 public:
   using typename BaseType::GridType;
@@ -102,11 +102,11 @@ private:
 template <class GridImp>
 class LeafBasedEOCGridProvider
 {
-  typedef GridProvider<GridImp> GridProviderType;
+  using GridProviderType = GridProvider<GridImp>;
 
 public:
-  typedef typename GridProviderType::GridType GridType;
-  typedef typename GridProviderType::LeafGridViewType LevelGridViewType;
+  using GridType = typename GridProviderType::GridType;
+  using LevelGridViewType = typename GridProviderType::LeafGridViewType;
 
   static constexpr Layers layer_type = Layers::leaf;
 

@@ -44,14 +44,14 @@ namespace internal {
 template <class T>
 struct Typer
 {
-  typedef typename std::conditional<std::is_same<T, const char*>::value, std::string, T>::type type;
+  using type = typename std::conditional<std::is_same<T, const char*>::value, std::string, T>::type;
 };
 
 } // namespace internal
 
 class Configuration : public Dune::ParameterTree
 {
-  typedef Dune::ParameterTree BaseType;
+  using BaseType = Dune::ParameterTree;
 
 public:
   Configuration();
@@ -377,9 +377,9 @@ namespace std {
 template <>
 struct less<Dune::ParameterTree>
 {
-  typedef bool result_type;
-  typedef Dune::ParameterTree first_argument_type;
-  typedef Dune::ParameterTree second_argument_type;
+  using result_type = bool;
+  using first_argument_type = Dune::ParameterTree;
+  using second_argument_type = Dune::ParameterTree;
 
   bool operator()(const Dune::ParameterTree& lhs, const Dune::ParameterTree& rhs) const;
 }; // struct less< ParameterTree >
@@ -387,9 +387,9 @@ struct less<Dune::ParameterTree>
 template <>
 struct less<Dune::XT::Common::Configuration>
 {
-  typedef bool result_type;
-  typedef Dune::XT::Common::Configuration first_argument_type;
-  typedef Dune::XT::Common::Configuration second_argument_type;
+  using result_type = bool;
+  using first_argument_type = Dune::XT::Common::Configuration;
+  using second_argument_type = Dune::XT::Common::Configuration;
 
   bool operator()(const Dune::XT::Common::Configuration& lhs, const Dune::XT::Common::Configuration& rhs) const;
 }; // struct less< ParameterTree >

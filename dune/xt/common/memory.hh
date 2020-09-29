@@ -267,7 +267,7 @@ struct Derived
  : private ConstStorageProvider<std::vector<double>>
  , public Base
 {
-  typedef ConstStorageProvider<std::vector<double>> VectorProvider;
+  using VectorProvider = ConstStorageProvider<std::vector<double>>;
 
   Derived(const std::vector<double>& vec)
     : VectorProvider(vec)

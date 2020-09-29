@@ -36,11 +36,11 @@ auto bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
-  typedef double R;
-  typedef GridFunctionInterface<E, r, rC, R> I;
-  typedef IndicatorGridFunction<E, r, rC, R> C;
+  using E = typename G::template Codim<0>::Entity;
+  using D = typename G::ctype;
+  using R = double;
+  using I = GridFunctionInterface<E, r, rC, R>;
+  using C = IndicatorGridFunction<E, r, rC, R>;
   using DomainType = typename C::DomainType;
   using RangeType = typename C::RangeType;
   using CornerVector = std::vector<std::tuple<DomainType, DomainType, RangeType>>;
@@ -82,10 +82,10 @@ bind_IndicatorFunction(pybind11::module& m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef double D;
-  typedef double R;
-  typedef FunctionInterface<d, r, rC, R> I;
-  typedef IndicatorFunction<d, r, rC, R> C;
+  using D = double;
+  using R = double;
+  using I = FunctionInterface<d, r, rC, R>;
+  using C = IndicatorFunction<d, r, rC, R>;
   using DomainType = typename C::DomainType;
   using RangeReturnType = typename C::RangeReturnType;
   using CornerVector = std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>;

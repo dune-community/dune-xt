@@ -49,9 +49,9 @@ class GridProviderFactory
     return ret.str();
   } // ... available_as_str(...)
 
-  typedef CubeGridProviderFactory<GridType> CubeType;
-  typedef DgfGridProviderFactory<GridType> DgfType;
-  typedef GmshGridProviderFactory<GridType> GmshType;
+  using CubeType = CubeGridProviderFactory<GridType>;
+  using DgfType = DgfGridProviderFactory<GridType>;
+  using GmshType = GmshGridProviderFactory<GridType>;
 
 public:
   static std::vector<std::string> available()

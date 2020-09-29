@@ -69,12 +69,12 @@ class BoundaryInfo : public Common::WithLogger<BoundaryInfo<IntersectionImp>>
   using Logger = Common::WithLogger<BoundaryInfo<IntersectionImp>>;
 
 public:
-  typedef IntersectionImp IntersectionType;
-  typedef typename IntersectionType::ctype DomainFieldType;
+  using IntersectionType = IntersectionImp;
+  using DomainFieldType = typename IntersectionType::ctype;
   static constexpr size_t dimDomain = IntersectionType::Entity::dimension;
   static constexpr size_t dimWorld = IntersectionType::dimensionworld;
-  typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
-  typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
+  using DomainType = Common::FieldVector<DomainFieldType, dimDomain>;
+  using WorldType = Common::FieldVector<DomainFieldType, dimWorld>;
 
   BoundaryInfo(const std::string& log_prefix = "", const bool logging_disabled = true)
     : Logger(log_prefix.empty() ? "BoundaryInfo" : log_prefix, logging_disabled)

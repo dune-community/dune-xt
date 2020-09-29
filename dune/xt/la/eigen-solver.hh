@@ -77,10 +77,10 @@ class EigenSolver
                 "Please implement for given MatrixType and add the respective include below!");
 
 public:
-  typedef MatrixImp MatrixType;
-  typedef double FieldType;
-  typedef int RealMatrixType;
-  typedef int ComplexMatrixType;
+  using MatrixType = MatrixImp;
+  using FieldType = double;
+  using RealMatrixType = int;
+  using ComplexMatrixType = int;
 
   EigenSolver(const MatrixType& /*matrix*/, const std::string& /*type*/ = "")
   {

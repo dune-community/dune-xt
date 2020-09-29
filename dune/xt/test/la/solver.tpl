@@ -32,11 +32,11 @@ using namespace Dune::XT::LA;
 {% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
 struct SolverTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{O_TYPE}} MatrixType;
-  typedef {{R_TYPE}} RhsType;
-  typedef {{S_TYPE}} SolutionType;
+  using MatrixType = {{O_TYPE}};
+  using RhsType = {{R_TYPE}};
+  using SolutionType = {{S_TYPE}};
 
-  typedef Solver<MatrixType> SolverType;
+  using SolverType = Solver<MatrixType>;
 
   static void produces_correct_results()
   {

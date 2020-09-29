@@ -34,14 +34,14 @@ using namespace Dune::XT::LA;
 {% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
 struct CholeskyTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{O_TYPE}} MatrixType;
-  typedef {{R_TYPE}} RhsType;
-  typedef {{S_TYPE}} SolutionType;
+  using MatrixType = {{O_TYPE}};
+  using RhsType = {{R_TYPE}};
+  using SolutionType = {{S_TYPE}};
 
-  typedef Common::MatrixAbstraction<MatrixType> M;
-  typedef Common::VectorAbstraction<RhsType> RhsV;
-  typedef Common::VectorAbstraction<SolutionType> SolV;
-  typedef typename M::ScalarType ScalarType;
+  using M = Common::MatrixAbstraction<MatrixType>;
+  using RhsV = Common::VectorAbstraction<RhsType>;
+  using SolV = Common::VectorAbstraction<SolutionType>;
+  using ScalarType = typename M::ScalarType;
 
   static void produces_correct_results()
   {
@@ -60,7 +60,7 @@ struct CholeskyTest_{{T_NAME}} : public ::testing::Test
     EXPECT_TRUE(Common::FloatCmp::eq(L, expected_L));
     auto diag = RhsV::create<dim>(dim, 0.);
     auto subdiag = SolV::create<dim-1>(dim-1, 0.);
-    typedef Common::VectorAbstraction<decltype(subdiag)> SubV;
+    using SubV = Common::VectorAbstraction<decltype(subdiag)>;
     for (size_t ii = 0; ii < dim; ++ii)
       RhsV::set_entry(diag, ii, M::get_entry(matrix, ii, ii));
     for (size_t ii = 0; ii < dim-1; ++ii)

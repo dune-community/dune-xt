@@ -28,8 +28,8 @@ namespace Grid {
 template <class GridViewType>
 struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
 {
-  typedef ElementFunctor<GridViewType> BaseType;
-  typedef typename GridViewType::GridType GridType;
+  using BaseType = ElementFunctor<GridViewType>;
+  using GridType = typename GridViewType::GridType;
 
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
     : threshold_volume_(volume * factor)
@@ -60,7 +60,7 @@ void enforce_maximum_entity_volume(GridType& grid, const double size_factor)
   using namespace Dune::XT;
   const typename Grid::Dimensions<GridType> unrefined_dimensions(grid);
   const double unrefined_min_volume = unrefined_dimensions.entity_volume.min();
-  typedef typename GridType::LeafGridView View;
+  using View = typename GridType::LeafGridView;
   View view = grid.leafView();
   MaximumEntityVolumeRefineFunctor<View> f(grid, unrefined_min_volume, size_factor);
   while (true) {

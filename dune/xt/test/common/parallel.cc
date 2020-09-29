@@ -65,7 +65,7 @@ void check_eq(ThreadValue& foo, const typename ThreadValue::ValueType& value)
   Checker<ThreadValue>::check_eq(foo, value);
 }
 
-typedef testing::Types<PerThreadValue<int>, PerThreadValue<const int>> TLSTypes;
+using TLSTypes = testing::Types<PerThreadValue<int>, PerThreadValue<const int>>;
 
 template <class T>
 struct ThreadValueTest : public testing::Test
@@ -74,7 +74,7 @@ struct ThreadValueTest : public testing::Test
 TYPED_TEST_SUITE(ThreadValueTest, TLSTypes);
 TYPED_TEST(ThreadValueTest, All)
 {
-  typedef TypeParam PTVType;
+  using PTVType = TypeParam;
   {
     typename PTVType::ValueType value(1);
     PTVType foo(value);

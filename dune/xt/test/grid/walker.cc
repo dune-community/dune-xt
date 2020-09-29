@@ -28,15 +28,15 @@ using namespace Dune::XT::Common;
 using namespace Dune::XT::Grid;
 using namespace std;
 
-typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
+using GridDims = testing::Types<Int<1>, Int<2>, Int<3>>;
 
 template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
   static constexpr size_t griddim = T::value;
   static constexpr size_t level = 128;
-  typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
-  typedef typename GridType::LeafGridView GridLayerType;
+  using GridType = Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>>;
+  using GridLayerType = typename GridType::LeafGridView;
   using EntityType = extract_entity_t<GridLayerType>;
   using IntersectionType = extract_intersection_t<GridLayerType>;
   const GridProvider<GridType> grid_prv;

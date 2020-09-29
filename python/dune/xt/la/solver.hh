@@ -31,7 +31,7 @@ template <class M, class V = typename Container<typename M::ScalarType, M::vecto
 auto bind_Solver(pybind11::module& m)
 {
   static_assert(is_matrix<M>::value);
-  typedef Solver<M> C;
+  using C = Solver<M>;
 
   namespace py = pybind11;
   using namespace pybind11::literals;

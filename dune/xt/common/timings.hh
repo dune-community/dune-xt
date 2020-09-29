@@ -60,8 +60,8 @@ public:
 
   void stop();
 
-  typedef boost::timer::nanosecond_type TimeType;
-  typedef std::array<TimeType, 3> DeltaType;
+  using TimeType = boost::timer::nanosecond_type;
+  using DeltaType = std::array<TimeType, 3>;
 
   /** \return array{wall,user,sys}: times elapsed since object construction in
    *milliseconds
@@ -86,9 +86,9 @@ class Timings
 private:
   Timings();
 
-  typedef std::map<std::string, std::pair<std::atomic<bool>, UnsafePerThreadValue<TimingData>>> KnownTimersMap;
+  using KnownTimersMap = std::map<std::string, std::pair<std::atomic<bool>, UnsafePerThreadValue<TimingData>>>;
   //! section name -> seconds
-  typedef std::map<std::string, TimingData::DeltaType> DeltaMap;
+  using DeltaMap = std::map<std::string, TimingData::DeltaType>;
 
   const TimingData& get_timing_data(std::string section_name) const;
 

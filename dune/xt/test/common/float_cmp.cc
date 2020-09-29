@@ -134,16 +134,16 @@ struct suitable_entry<T, false, false>
 template <class T>
 struct FloatCmpTest : public testing::Test
 {
-  typedef typename std::conditional<XT::Common::is_matrix<T>::value,
-                                    typename XT::Common::MatrixAbstraction<T>::ScalarType,
-                                    typename std::conditional<XT::Common::is_vector<T>::value,
-                                                              typename XT::Common::VectorAbstraction<T>::ScalarType,
-                                                              T>::type>::type S;
-  typedef typename std::conditional<XT::Common::is_matrix<T>::value,
-                                    typename XT::Common::MatrixAbstraction<T>::RealType,
-                                    typename std::conditional<XT::Common::is_vector<T>::value,
-                                                              typename XT::Common::VectorAbstraction<T>::RealType,
-                                                              typename Dune::FieldTraits<T>::real_type>::type>::type R;
+  using S = typename std::conditional<XT::Common::is_matrix<T>::value,
+                                      typename XT::Common::MatrixAbstraction<T>::ScalarType,
+                                      typename std::conditional<XT::Common::is_vector<T>::value,
+                                                                typename XT::Common::VectorAbstraction<T>::ScalarType,
+                                                                T>::type>::type;
+  using R = typename std::conditional<XT::Common::is_matrix<T>::value,
+                                      typename XT::Common::MatrixAbstraction<T>::RealType,
+                                      typename std::conditional<XT::Common::is_vector<T>::value,
+                                                                typename XT::Common::VectorAbstraction<T>::RealType,
+                                                                typename Dune::FieldTraits<T>::real_type>::type>::type;
   static constexpr bool fieldtype_is_float = std::is_floating_point<R>::value;
 
   FloatCmpTest()

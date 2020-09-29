@@ -33,7 +33,7 @@ template <class G>
 class CutoffFunction
 {
   static_assert(XT::Grid::is_grid<G>::value, "");
-  typedef typename G::ctype D;
+  using D = typename G::ctype;
   static constexpr size_t d = G::dimension;
 
   template <bool is_correct_dim = (d == 2), bool anything = false>
@@ -44,12 +44,12 @@ class CutoffFunction
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      typedef typename G::template Codim<0>::Entity E;
-      typedef double R;
-      typedef GridFunctionInterface<E, 1, 1, R> ScalarFunction;
-      typedef GridFunctionInterface<E, d, d, R> TensorFunction;
-      typedef Functions::ESV2007::CutoffFunction<ScalarFunction, void> type_single_diffusion;
-      typedef Functions::ESV2007::CutoffFunction<ScalarFunction, TensorFunction> type;
+      using E = typename G::template Codim<0>::Entity;
+      using R = double;
+      using ScalarFunction = GridFunctionInterface<E, 1, 1, R>;
+      using TensorFunction = GridFunctionInterface<E, d, d, R>;
+      using type_single_diffusion = Functions::ESV2007::CutoffFunction<ScalarFunction, void>;
+      using type = Functions::ESV2007::CutoffFunction<ScalarFunction, TensorFunction>;
 
       py::class_<type_single_diffusion, ScalarFunction> c_single_diffusion(
           m,

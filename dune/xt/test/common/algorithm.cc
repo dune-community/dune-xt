@@ -28,8 +28,8 @@ struct Moveable
 GTEST_TEST(MoveIfTest, All)
 {
   using namespace std;
-  typedef vector<unique_ptr<Moveable>> Vec;
-  typedef Vec::value_type Ptr;
+  using Vec = vector<unique_ptr<Moveable>>;
+  using Ptr = Vec::value_type;
   const auto size = 6;
   Vec values;
   for (int i : value_range(size)) {

@@ -31,7 +31,7 @@ class FixedMapIterator
   : public boost::
         iterator_facade<FixedMapIterator<FixedMapType>, typename FixedMapType::value_type, boost::forward_traversal_tag>
 {
-  typedef FixedMapIterator<FixedMapType> ThisType;
+  using ThisType = FixedMapIterator<FixedMapType>;
 
 public:
   FixedMapIterator()
@@ -73,7 +73,7 @@ class ConstFixedMapIterator
                                   const typename FixedMapType::value_type,
                                   boost::forward_traversal_tag>
 {
-  typedef ConstFixedMapIterator<FixedMapType> ThisType;
+  using ThisType = ConstFixedMapIterator<FixedMapType>;
 
 public:
   ConstFixedMapIterator()
@@ -113,18 +113,18 @@ template <class key_imp, class T, std::size_t nin>
 class FixedMap
 {
 public:
-  typedef std::pair<key_imp, T> value_type;
+  using value_type = std::pair<key_imp, T>;
   static constexpr std::size_t N = nin;
 
 private:
-  typedef boost::array<value_type, nin> MapType;
+  using MapType = boost::array<value_type, nin>;
 
   template <class R>
   friend class FixedMapIterator;
   template <class R>
   friend class ConstFixedMapIterator;
 
-  typedef FixedMap<key_imp, T, nin> ThisType;
+  using ThisType = FixedMap<key_imp, T, nin>;
 
   std::string range_error_message([[maybe_unused]] key_imp key) const
   {
@@ -140,10 +140,10 @@ private:
   }
 
 public:
-  typedef key_imp key_type;
-  typedef T mapped_type;
-  typedef FixedMapIterator<ThisType> iterator;
-  typedef ConstFixedMapIterator<ThisType> const_iterator;
+  using key_type = key_imp;
+  using mapped_type = T;
+  using iterator = FixedMapIterator<ThisType>;
+  using const_iterator = ConstFixedMapIterator<ThisType>;
 
   FixedMap() {}
   /** inserts key-value value pairs from  initializer list

@@ -29,7 +29,7 @@ namespace LA {
 
 pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::module& m)
 {
-  typedef SparsityPatternDefault C;
+  using C = SparsityPatternDefault;
 
   namespace py = pybind11;
   using namespace pybind11::literals;

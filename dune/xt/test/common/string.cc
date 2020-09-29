@@ -70,18 +70,17 @@ struct VectorStringTestInt : public ::testing::Test
   }
 };
 
-typedef testing::
-    Types<std::vector<double>, Dune::DynamicVector<double>, Dune::FieldVector<double, 3>, FieldVector<double, 3>>
-        VectorTypesDouble;
+using VectorTypesDouble = testing::
+    Types<std::vector<double>, Dune::DynamicVector<double>, Dune::FieldVector<double, 3>, FieldVector<double, 3>>;
 
-typedef testing::Types<std::vector<int>, Dune::DynamicVector<int>, Dune::FieldVector<int, 3>, FieldVector<int, 3>>
-    VectorTypesInt;
+using VectorTypesInt =
+    testing::Types<std::vector<int>, Dune::DynamicVector<int>, Dune::FieldVector<int, 3>, FieldVector<int, 3>>;
 
-typedef testing::Types<Dune::DynamicMatrix<double>, FieldMatrix<double, 2, 2>, Dune::FieldMatrix<double, 2, 2>>
-    MatrixTypesDouble;
+using MatrixTypesDouble =
+    testing::Types<Dune::DynamicMatrix<double>, FieldMatrix<double, 2, 2>, Dune::FieldMatrix<double, 2, 2>>;
 
-typedef testing::Types<Dune::DynamicMatrix<char>, FieldMatrix<char, 2, 2>, Dune::FieldMatrix<char, 2, 2>>
-    MatrixTypesChar;
+using MatrixTypesChar =
+    testing::Types<Dune::DynamicMatrix<char>, FieldMatrix<char, 2, 2>, Dune::FieldMatrix<char, 2, 2>>;
 
 // from_string/to_string tests for vector and matrix types
 TYPED_TEST_SUITE(MatrixStringTestDouble, MatrixTypesDouble);
@@ -121,7 +120,7 @@ GTEST_TEST(StringTest, ConvertTo)
   EXPECT_EQ("0", to_string(from_string<bool>("0")));
 
   EXPECT_EQ("-1", to_string(from_string<long>("-1")));
-  typedef std::complex<double> Complex;
+  using Complex = std::complex<double>;
   EXPECT_EQ("-1.3+0i", to_string(from_string<Complex>("-1.3")));
   EXPECT_EQ("-1.3+1i", to_string(from_string<Complex>("-1.3+1i")));
   EXPECT_EQ("1.3-1i", to_string(from_string<Complex>("1.3-1i")));
@@ -142,7 +141,7 @@ GTEST_TEST(StringTest, ConvertFrom)
   EXPECT_EQ(false, from_string<bool>("false"));
   EXPECT_EQ(false, from_string<bool>("False"));
   EXPECT_THROW(from_string<int>(""), Exceptions::conversion_error);
-  typedef std::complex<double> Complex;
+  using Complex = std::complex<double>;
   EXPECT_EQ(Complex(1, -1), from_string<Complex>("+1-1i"));
   EXPECT_EQ(Complex(1, 0), from_string<Complex>("+1"));
   EXPECT_EQ(Complex(0, 1), from_string<Complex>("1i"));

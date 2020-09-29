@@ -26,19 +26,19 @@ using namespace Dune::XT::Common;
 struct PeriodicViewTest : public testing::Test
 {
   static constexpr bool codim_iters_provided = CODIM_ITERS_PROVIDED;
-  typedef TESTGRIDTYPE GridType;
-  typedef typename GridType::ctype ctype;
-  typedef typename GridType::template Codim<0>::Geometry GeometryType;
-  typedef typename GridType::LeafGridView GridViewType;
-  typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
-  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType, codim_iters_provided> PeriodicGridViewType;
-  typedef typename PeriodicGridViewType::IndexSet IndexSet;
-  typedef typename PeriodicGridViewType::template Codim<0>::Entity EntityType;
-  typedef typename PeriodicGridViewType::template Codim<0>::Iterator EntityIteratorType;
-  typedef typename Dune::XT::Grid::internal::template PeriodicIntersectionIterator<GridViewType>
-      PeriodicIntersectionIteratorType;
-  typedef typename PeriodicGridViewType::Intersection PeriodicIntersectionType;
-  typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
+  using GridType = TESTGRIDTYPE;
+  using ctype = typename GridType::ctype;
+  using GeometryType = typename GridType::template Codim<0>::Geometry;
+  using GridViewType = typename GridType::LeafGridView;
+  using DomainType = typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate;
+  using PeriodicGridViewType = typename Dune::XT::Grid::template PeriodicGridView<GridViewType, codim_iters_provided>;
+  using IndexSet = typename PeriodicGridViewType::IndexSet;
+  using EntityType = typename PeriodicGridViewType::template Codim<0>::Entity;
+  using EntityIteratorType = typename PeriodicGridViewType::template Codim<0>::Iterator;
+  using PeriodicIntersectionIteratorType =
+      typename Dune::XT::Grid::internal::template PeriodicIntersectionIterator<GridViewType>;
+  using PeriodicIntersectionType = typename PeriodicGridViewType::Intersection;
+  using CollectiveCommunication = typename GridViewType::CollectiveCommunication;
   static constexpr size_t dimDomain = GridViewType::dimension;
 
   static constexpr int factorial(int n)

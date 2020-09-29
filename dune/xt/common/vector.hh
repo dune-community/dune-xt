@@ -42,7 +42,7 @@ namespace internal {
 template <class Vector, class K>
 struct VectorAbstractionBase
 {
-  typedef Vector VectorType;
+  using VectorType = Vector;
   using ScalarType = typename Dune::FieldTraits<K>::field_type;
   using RealType = typename Dune::FieldTraits<K>::real_type;
   using S = ScalarType;
@@ -111,11 +111,11 @@ template <class VecType>
 struct VectorAbstraction
 {
   using V = std::conditional_t<std::is_same<VecType, void>::value, int, VecType>; // avoid reference to void
-  typedef V VectorType;
-  typedef typename Dune::FieldTraits<V>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<V>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using VectorType = V;
+  using ScalarType = typename Dune::FieldTraits<V>::field_type;
+  using RealType = typename Dune::FieldTraits<V>::real_type;
+  using S = ScalarType;
+  using R = RealType;
 
   static constexpr bool is_vector = false;
   static constexpr bool has_static_size = false;
@@ -333,7 +333,7 @@ template <class V, StorageLayout storage_layout = StorageLayout::dense_row_major
 typename std::enable_if<is_vector<V>::value, std::unique_ptr<typename VectorAbstraction<V>::S[]>>::type
 serialize(const V& vec)
 {
-  typedef typename VectorAbstraction<V>::S S;
+  using S = typename VectorAbstraction<V>::S;
   static_assert(storage_layout == StorageLayout::dense_row_major || storage_layout == StorageLayout::dense_column_major,
                 "You have to select either row_major or column_major as StorageLayout!");
   using Vec = VectorAbstraction<V>;

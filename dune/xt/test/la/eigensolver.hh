@@ -39,8 +39,8 @@ struct EigenSolverTest : public ::testing::Test
   using ComplexType = Common::complex_t<FieldType>;
   using EigenValuesType = std::vector<ComplexType>;
   using RealEigenValuesType = std::vector<RealType>;
-  typedef EigenSolver<MatrixType> EigenSolverType;
-  typedef EigenSolverOptions<MatrixType> EigenSolverOpts;
+  using EigenSolverType = EigenSolver<MatrixType>;
+  using EigenSolverOpts = EigenSolverOptions<MatrixType>;
 
   using M = Common::MatrixAbstraction<MatrixType>;
 

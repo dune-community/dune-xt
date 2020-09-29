@@ -33,8 +33,8 @@ template <class FirstVectorType, class SecondVectorType>
 typename Common::VectorAbstraction<FirstVectorType>::ScalarType
 partial_dot(const FirstVectorType& a, const SecondVectorType& b, const size_t begin, const size_t end)
 {
-  typedef Common::VectorAbstraction<FirstVectorType> V1;
-  typedef Common::VectorAbstraction<SecondVectorType> V2;
+  using V1 = Common::VectorAbstraction<FirstVectorType>;
+  using V2 = Common::VectorAbstraction<SecondVectorType>;
   typename V1::ScalarType ret(0);
   for (size_t ii = begin; ii < end; ++ii)
     ret += Common::conj(V1::get_entry(a, ii)) * V2::get_entry(b, ii);
@@ -49,8 +49,8 @@ void multiply_householder_from_left(FirstVectorType& x,
                                     const size_t begin,
                                     const size_t end)
 {
-  typedef Common::VectorAbstraction<FirstVectorType> V1;
-  typedef Common::VectorAbstraction<VectorType> V2;
+  using V1 = Common::VectorAbstraction<FirstVectorType>;
+  using V2 = Common::VectorAbstraction<VectorType>;
   // calculate w^T x first
   auto wT_x = partial_dot(v, x, begin, end);
   for (size_t rr = begin; rr < end; ++rr)
@@ -93,8 +93,8 @@ void multiply_householder_from_right(MatrixType& A,
                                      const size_t col_begin,
                                      const size_t col_end)
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
-  typedef Common::VectorAbstraction<VectorType> V;
+  using M = Common::MatrixAbstraction<MatrixType>;
+  using V = Common::VectorAbstraction<VectorType>;
   using W = Common::VectorAbstraction<DynamicVector<typename V::ScalarType>>;
   // calculate A w first
   auto Aw = W::create(M::rows(A), 0.);
@@ -293,7 +293,7 @@ struct QrHelper
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
       auto ret = Common::create<MatrixType, M::static_rows, M::static_rows>(num_rows, num_rows, typename M::S(0.));
-      typedef Common::MatrixAbstraction<decltype(ret)> Mret;
+      using Mret = Common::MatrixAbstraction<decltype(ret)>;
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)
           Mret::set_entry(ret, ii, jj, M::get_entry(QR, ii, jj));

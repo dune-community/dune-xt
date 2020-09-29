@@ -18,7 +18,7 @@
 
 struct GmshGridProvider : public GridProviderBase<TESTGRIDTYPE>
 {
-  typedef GridProviderBase<TESTGRIDTYPE> BaseType;
+  using BaseType = GridProviderBase<TESTGRIDTYPE>;
 
   void check_layers()
   {

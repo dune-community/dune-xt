@@ -44,15 +44,15 @@ class GridProvider
   static_assert(is_grid<GridImp>::value, "");
 
 public:
-  typedef GridProvider<GridImp> ThisType;
+  using ThisType = GridProvider<GridImp>;
 
-  typedef GridImp GridType;
+  using GridType = GridImp;
   static constexpr size_t dimDomain = GridImp::dimension;
-  typedef typename GridType::ctype DomainFieldType;
-  typedef FieldVector<DomainFieldType, dimDomain> DomainType;
-  typedef typename GridType::template Codim<0>::Entity EntityType;
-  typedef typename Layer<GridType, Layers::level, Backends::view>::type LevelGridViewType;
-  typedef typename Layer<GridType, Layers::leaf, Backends::view>::type LeafGridViewType;
+  using DomainFieldType = typename GridType::ctype;
+  using DomainType = FieldVector<DomainFieldType, dimDomain>;
+  using EntityType = typename GridType::template Codim<0>::Entity;
+  using LevelGridViewType = typename Layer<GridType, Layers::level, Backends::view>::type;
+  using LeafGridViewType = typename Layer<GridType, Layers::leaf, Backends::view>::type;
 
 
   static const std::string static_id()
@@ -165,7 +165,7 @@ private:
   template <int d, int dW>
   struct global_refine_helper<AlbertaGrid<d, dW>>
   {
-    typedef AlbertaGrid<d, dW> G;
+    using G = AlbertaGrid<d, dW>;
 
     void operator()(G& g, int count)
     {
@@ -208,7 +208,7 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
+    using BoundaryInfoFactory = XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection>;
     auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg);
     for (auto lvl : Common::value_range(max_level() + 1)) {
       auto grid_view = level_view(lvl);

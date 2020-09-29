@@ -47,8 +47,8 @@ std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_vector<Vecto
                  void>
 solve_sym_tridiag_posdef(const MatrixType& A, VectorType& x, const RhsVectorType& y)
 {
-  typedef Common::MatrixAbstraction<MatrixType> Mat;
-  typedef typename Mat::ScalarType ScalarType;
+  using Mat = Common::MatrixAbstraction<MatrixType>;
+  using ScalarType = typename Mat::ScalarType;
   const size_t num_rows = Mat::rows(A);
   std::vector<ScalarType> diag(num_rows, 0.);
   std::vector<ScalarType> sub_diag(num_rows - 1, 0.);

@@ -130,11 +130,11 @@ private:
   boost::filesystem::path filename_;
   boost::filesystem::path filenameWoTime_;
   boost::filesystem::ofstream logfile_;
-  typedef std::map<int, int> FlagMap;
+  using FlagMap = std::map<int, int>;
   FlagMap flagmap_;
-  typedef std::map<int, std::unique_ptr<LogStream>> StreamMap;
+  using StreamMap = std::map<int, std::unique_ptr<LogStream>>;
   StreamMap streammap_;
-  typedef std::vector<int> IdVec;
+  using IdVec = std::vector<int>;
   IdVec streamIDs_;
   int logflags_;
   EmptyLogStream emptyLogStream_;

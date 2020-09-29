@@ -33,11 +33,11 @@ using namespace Dune::XT::LA;
 {% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
 struct QrTest_5x3_{{T_NAME}} : public ::testing::Test
 {
-  typedef {{O_TYPE}} MatrixType;
-  typedef {{S_TYPE}} VectorType;
+  using MatrixType = {{O_TYPE}};
+  using VectorType = {{S_TYPE}};
 
-  typedef XT::Common::MatrixAbstraction<MatrixType> M;
-  typedef XT::Common::VectorAbstraction<VectorType> V;
+  using M = XT::Common::MatrixAbstraction<MatrixType>;
+  using V = XT::Common::VectorAbstraction<VectorType>;
 
   static constexpr size_t num_rows = 5;
   static constexpr size_t num_cols = 3;

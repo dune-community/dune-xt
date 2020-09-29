@@ -34,13 +34,12 @@ class AmgSolver<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::XT::L
                            Dune::XT::LA::EigenDenseVector<ElementImp>>
 {
 public:
-  typedef SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,
-                          Dune::XT::LA::EigenDenseVector<ElementImp>>
-      BaseType;
+  using BaseType =
+      SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::XT::LA::EigenDenseVector<ElementImp>>;
 
-  typedef typename BaseType::MatrixType MatrixType;
-  typedef typename BaseType::VectorType VectorType;
-  typedef typename BaseType::ScalarType ScalarType;
+  using MatrixType = typename BaseType::MatrixType;
+  using VectorType = typename BaseType::VectorType;
+  using ScalarType = typename BaseType::ScalarType;
 
   static Dune::ParameterTree defaultSettings()
   {

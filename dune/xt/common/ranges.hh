@@ -48,7 +48,7 @@ typename std::enable_if<std::is_enum<T>::value, sequence>::type value_range(
     const T end,
     const typename internal::Absretval<T>::type increment = Epsilon<typename internal::Absretval<T>::type>::value)
 {
-  typedef typename internal::Absretval<T>::type R;
+  using R = typename internal::Absretval<T>::type;
   return value_range(static_cast<R>(start), static_cast<R>(end), increment);
 }
 

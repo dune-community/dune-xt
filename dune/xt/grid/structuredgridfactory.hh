@@ -52,8 +52,8 @@ namespace Dune {
 template <class ct, int dim, template <int> class Refinement, class Comm>
 class StructuredGridFactory<SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef SPGrid<ct, dim, Refinement, Comm> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = SPGrid<ct, dim, Refinement, Comm>;
+  using ctype = typename GridType::ctype;
   static constexpr int dimworld = GridType::dimensionworld;
 
 public:
@@ -133,7 +133,7 @@ static std::array<unsigned int, GridType::dimension> default_overlap()
 template <class GridType>
 class StructuredGridFactory : public Dune::StructuredGridFactory<GridType>
 {
-  typedef typename GridType::ctype ctype;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -160,8 +160,8 @@ public:
 template <int dim>
 class StructuredGridFactory<UGGrid<dim>> : public Dune::StructuredGridFactory<UGGrid<dim>>
 {
-  typedef UGGrid<dim> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = UGGrid<dim>;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -201,8 +201,8 @@ public:
 template <int dim>
 class StructuredGridFactory<AlbertaGrid<dim, dim>> : public Dune::StructuredGridFactory<AlbertaGrid<dim, dim>>
 {
-  typedef AlbertaGrid<dim, dim> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = AlbertaGrid<dim, dim>;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -252,8 +252,8 @@ template <int dim_world, int dim, ALUGridRefinementType refineType, class Comm>
 class StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
   : public Dune::StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
 {
-  typedef ALUGrid<dim, dim_world, Dune::cube, refineType, Comm> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -279,8 +279,8 @@ template <class ct, int dim, template <int> class Refinement, class Comm>
 class StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
   : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef Dune::SPGrid<ct, dim, Refinement, Comm> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = Dune::SPGrid<ct, dim, Refinement, Comm>;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -301,8 +301,8 @@ template <int dim, class Coords>
 class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
   : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
 {
-  typedef Dune::YaspGrid<dim, Coords> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = Dune::YaspGrid<dim, Coords>;
+  using ctype = typename GridType::ctype;
 
 public:
   //! creates a non-periodic Yasp grid

@@ -73,7 +73,7 @@ class Solver
                 "the correct header for your matrix implementation!");
 
 public:
-  typedef MatrixImp MatrixType;
+  using MatrixType = MatrixImp;
 
   Solver(const MatrixType& /*matrix*/, const CommunicatorType&)
   {

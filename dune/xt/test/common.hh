@@ -59,16 +59,15 @@ struct Int
 };
 
 
-typedef std::tuple<double,
-                   float
-                   //                   , Dune::bigunsignedint
-                   ,
-                   int,
-                   unsigned int,
-                   unsigned long,
-                   long long,
-                   char>
-    BasicTypes;
+using BasicTypes = std::tuple<double,
+                              float
+                              //                   , Dune::bigunsignedint
+                              ,
+                              int,
+                              unsigned int,
+                              unsigned long,
+                              long long,
+                              char>;
 
 
 //! where sleep only counts toward wall time, this wastes actual cpu time

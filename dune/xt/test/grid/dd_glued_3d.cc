@@ -166,7 +166,7 @@ using namespace Dune::XT::Grid;
 
 
 // clang-format off
-typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
+using GridTypes = ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
                                      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>>
 #if HAVE_DUNE_ALUGRID
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
@@ -190,7 +190,7 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 #if HAVE_ALBERTA
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, AlbertaGrid<3, 3>>
 #endif
-                        > GridTypes; // clang-format on
+                        >; // clang-format on
 
 TYPED_TEST_SUITE(GluedDdGridTest, GridTypes);
 TYPED_TEST(GluedDdGridTest, setup_works)

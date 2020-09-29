@@ -47,7 +47,7 @@ GTEST_TEST(Typename, Extended)
     using namespace Dune;
     EXPECT_EQ(Typename<MPIHelper>::value(), string("Dune::MPIHelper"));
   }
-  typedef ValidateAny<int> Valid;
+  using Valid = ValidateAny<int>;
   Valid v;
   EXPECT_EQ(get_typename(v), string("Parameter::ValidateAny<T>"));
 }

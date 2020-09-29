@@ -26,19 +26,19 @@ struct ContainerTest{{NAME}} : public ::testing::Test
   {
     // static tests
     using ContainerImp = {{CIMP}};
-    typedef typename ContainerImp::Traits Traits;
+    using Traits = typename ContainerImp::Traits;
     // * of the traits
-    typedef typename Traits::derived_type T_derived_type;
+    using T_derived_type = typename Traits::derived_type;
     static_assert(std::is_same<ContainerImp, T_derived_type>::value, "derived_type has to be the correct Type!");
-    typedef typename Traits::ScalarType T_ScalarType;
+    using T_ScalarType = typename Traits::ScalarType;
     // * of the container as itself (aka the derived type)
-    typedef typename ContainerImp::ScalarType D_ScalarType;
+    using D_ScalarType = typename ContainerImp::ScalarType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     // * of the container as the interface
-    typedef typename XT::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
-    typedef typename InterfaceType::derived_type I_derived_type;
-    typedef typename InterfaceType::ScalarType I_ScalarType;
+    using InterfaceType = typename XT::LA::ContainerInterface<Traits, D_ScalarType>;
+    using I_derived_type = typename InterfaceType::derived_type;
+    using I_ScalarType = typename InterfaceType::ScalarType;
     static_assert(std::is_same<ContainerImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");

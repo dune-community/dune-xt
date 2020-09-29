@@ -112,7 +112,7 @@ using namespace Dune::XT::Grid;
 
 
 // clang-format off
-typedef ::testing::Types< std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
+using GridTypes = ::testing::Types< std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
                                      YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>
 //#if HAVE_DUNE_ALUGRID // both the conforming as well as the nonconforming alugrid don't work
 //                      , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
@@ -124,7 +124,7 @@ typedef ::testing::Types< std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<do
 #if HAVE_ALBERTA
                         , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>>
 #endif
-                        > GridTypes; // clang-format on
+                        >; // clang-format on
 
 TYPED_TEST_SUITE(GluedDdGridTest, GridTypes);
 TYPED_TEST(GluedDdGridTest, setup_works)

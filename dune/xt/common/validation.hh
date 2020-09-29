@@ -58,8 +58,8 @@ protected:
 template <class T>
 class ValidateAny : public ValidatorInterface<T, ValidateAny<T>>
 {
-  typedef ValidateAny<T> ThisType;
-  typedef ValidatorInterface<T, ThisType> BaseType;
+  using ThisType = ValidateAny<T>;
+  using BaseType = ValidatorInterface<T, ThisType>;
 
 public:
   inline ValidateAny() {}
@@ -80,9 +80,9 @@ public:
 template <class T, class ListImp = std::vector<T>>
 class ValidateInList : public ValidatorInterface<T, ValidateInList<T, ListImp>>
 {
-  typedef ValidateInList<T, ListImp> ThisType;
-  typedef ValidatorInterface<T, ThisType> BaseType;
-  typedef ListImp ListType;
+  using ThisType = ValidateInList<T, ListImp>;
+  using BaseType = ValidatorInterface<T, ThisType>;
+  using ListType = ListImp;
   ListType valid_list_;
 
 public:

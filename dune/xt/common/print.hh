@@ -406,11 +406,11 @@ class PrefixOutputIterator
   bool first;
 
 public:
-  typedef std::size_t difference_type;
-  typedef T value_type;
-  typedef T* pointer;
-  typedef T reference;
-  typedef std::output_iterator_tag iterator_category;
+  using difference_type = std::size_t;
+  using value_type = T;
+  using pointer = T*;
+  using reference = T;
+  using iterator_category = std::output_iterator_tag;
 
   PrefixOutputIterator(std::ostream& o, std::string const& p = "")
     : ostream(o)

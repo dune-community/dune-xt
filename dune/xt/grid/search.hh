@@ -38,10 +38,10 @@ class EntitySearchBase
   static_assert(is_layer<GridLayerType>::value, "");
 
 public:
-  typedef extract_entity_t<GridLayerType, codim> EntityType;
-  typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
-  typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
-  typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
+  using EntityType = extract_entity_t<GridLayerType, codim>;
+  using LocalCoordinateType = typename EntityType::Geometry::LocalCoordinate;
+  using GlobalCoordinateType = typename EntityType::Geometry::GlobalCoordinate;
+  using EntityVectorType = std::vector<std::unique_ptr<EntityType>>;
 }; // class EntitySearchBase
 
 
@@ -88,11 +88,11 @@ struct CheckInside<0>
 template <class GridLayerType, int codim = 0>
 class EntityInlevelSearch : public EntitySearchBase<GridLayerType, codim>
 {
-  typedef EntitySearchBase<GridLayerType, codim> BaseType;
-  typedef extract_iterator_t<GridLayerType, codim> IteratorType;
+  using BaseType = EntitySearchBase<GridLayerType, codim>;
+  using IteratorType = extract_iterator_t<GridLayerType, codim>;
 
 public:
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
 private:
   inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
@@ -166,11 +166,11 @@ private:
 template <class GridLayerType, int codim = 0>
 class FallbackEntityInlevelSearch : public EntitySearchBase<GridLayerType>
 {
-  typedef EntitySearchBase<GridLayerType, codim> BaseType;
-  typedef typename extract_iterator<GridLayerType, 0>::type IteratorType;
+  using BaseType = EntitySearchBase<GridLayerType, codim>;
+  using IteratorType = typename extract_iterator<GridLayerType, 0>::type;
 
 public:
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
 private:
   inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
@@ -252,7 +252,7 @@ private:
 template <class GridLayerType>
 class EntityHierarchicSearch : public EntitySearchBase<GridLayerType>
 {
-  typedef EntitySearchBase<GridLayerType> BaseType;
+  using BaseType = EntitySearchBase<GridLayerType>;
 
   const GridLayerType grid_layer_;
   const int start_level_;
@@ -263,7 +263,7 @@ public:
     , start_level_(0)
   {}
 
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points) const

@@ -36,7 +36,7 @@ template <class Traits>
 class TestInterface : public Dune::XT::Common::CRTPInterface<TestInterface<Traits>, Traits>
 {
 public:
-  typedef typename Traits::BackendType BackendType;
+  using BackendType = typename Traits::BackendType;
 
 #if defined(BOOST_CLANG) && BOOST_CLANG
 #  pragma GCC diagnostic push

@@ -355,7 +355,7 @@ template <class MatrixType>
 Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>
 copy_to_dynamic_matrix(const MatrixType& matrix)
 {
-  typedef XT::Common::MatrixAbstraction<MatrixType> MatAbstrType;
+  using MatAbstrType = XT::Common::MatrixAbstraction<MatrixType>;
   // copy matrix to DynamicMatrix
   size_t num_rows = MatAbstrType::rows(matrix);
   size_t num_cols = MatAbstrType::cols(matrix);
@@ -370,7 +370,7 @@ template <class MatrixType>
 void copy_from_dynamic_matrix(
     const Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>& dyn_matrix, MatrixType& matrix)
 {
-  typedef XT::Common::MatrixAbstraction<MatrixType> MatAbstrType;
+  using MatAbstrType = XT::Common::MatrixAbstraction<MatrixType>;
   size_t num_rows = MatAbstrType::rows(matrix);
   size_t num_cols = MatAbstrType::cols(matrix);
   assert(dyn_matrix.rows() == num_rows && dyn_matrix.cols() == num_cols);

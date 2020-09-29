@@ -37,8 +37,8 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
   using RealType = Common::real_t<FieldType>;
   using EigenValuesType = std::vector<Common::complex_t<FieldType>>;
   using RealEigenValuesType = std::vector<Common::real_t<FieldType>>;
-  typedef GeneralizedEigenSolver<MatrixType> GeneralizedEigenSolverType;
-  typedef GeneralizedEigenSolverOptions<MatrixType> GeneralizedEigenSolverOpts;
+  using GeneralizedEigenSolverType = GeneralizedEigenSolver<MatrixType>;
+  using GeneralizedEigenSolverOpts = GeneralizedEigenSolverOptions<MatrixType>;
 
   using M = Common::MatrixAbstraction<MatrixType>;
 

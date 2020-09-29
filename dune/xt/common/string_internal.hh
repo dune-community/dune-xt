@@ -163,7 +163,7 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
   if (ss.size() < 1)
     DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " (too short)");
   using namespace std;
-  typedef typename ComplexType::value_type T;
+  using T = typename ComplexType::value_type;
   T re(0), im(0);
   const auto sign_pos = ss.find("+", 1) != string::npos ? ss.find("+", 1) : ss.find("-", 1);
   auto im_pos = ss.find("i");
@@ -186,7 +186,7 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
 template <class VectorType>
 VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DEBUG_ONLY const size_t cols = 0)
 {
-  typedef typename VectorAbstraction<VectorType>::S S;
+  using S = typename VectorAbstraction<VectorType>::S;
   DXT_ASSERT(cols == 0);
   // check if this is a vector
   if (vector_str.substr(0, 1) == "[" && vector_str.substr(vector_str.size() - 1, 1) == "]") {
@@ -236,7 +236,7 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
 template <class MatrixType>
 MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const size_t cols)
 {
-  typedef typename MatrixAbstraction<MatrixType>::S S;
+  using S = typename MatrixAbstraction<MatrixType>::S;
   // check if this is a matrix
   if (matrix_str.substr(0, 1) == "[" && matrix_str.substr(matrix_str.size() - 1, 1) == "]") {
     matrix_str = matrix_str.substr(1, matrix_str.size() - 2);

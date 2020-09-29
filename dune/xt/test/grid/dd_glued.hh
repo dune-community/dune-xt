@@ -92,9 +92,9 @@ struct ExpectedResults
 template <class GridTuple>
 struct GluedDdGridTest : public ::testing::Test
 {
-  typedef typename std::tuple_element<0, GridTuple>::type MacroGridType;
-  typedef typename std::tuple_element<1, GridTuple>::type LocalGridType;
-  typedef ExpectedResults<MacroGridType, LocalGridType> Expectations;
+  using MacroGridType = typename std::tuple_element<0, GridTuple>::type;
+  using LocalGridType = typename std::tuple_element<1, GridTuple>::type;
+  using Expectations = ExpectedResults<MacroGridType, LocalGridType>;
 
   template <class G, bool anything = true>
   struct get_local_layer

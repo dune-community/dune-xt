@@ -103,13 +103,13 @@ struct AbsoluteValue<T, true>
 template <class T, bool is_enum = std::is_enum<T>::value>
 struct Absretval
 {
-  typedef T type;
+  using type = T;
 };
 
 template <class T>
 struct Absretval<T, true>
 {
-  typedef typename underlying_type<T>::type type;
+  using type = typename std::underlying_type<T>::type;
 };
 
 
@@ -120,7 +120,7 @@ struct Absretval<T, true>
 template <class T>
 typename internal::Absretval<T>::type abs(const T& val)
 {
-  typedef typename internal::Absretval<T>::type R;
+  using R = typename internal::Absretval<T>::type;
   return internal::AbsoluteValue<R>::result(static_cast<R>(val));
 }
 
@@ -147,7 +147,7 @@ class MinMaxAvg
   static_assert(!is_complex<ElementType>::value, "complex accumulation not supported");
 
 protected:
-  typedef MinMaxAvg<ElementType> ThisType;
+  using ThisType = MinMaxAvg<ElementType>;
 
 public:
   MinMaxAvg() {}
@@ -193,12 +193,11 @@ public:
   }
 
 protected:
-  typedef boost::accumulators::stats<boost::accumulators::tag::max,
-                                     boost::accumulators::tag::min,
-                                     boost::accumulators::tag::mean,
-                                     boost::accumulators::tag::count,
-                                     boost::accumulators::tag::sum>
-      StatsType;
+  using StatsType = boost::accumulators::stats<boost::accumulators::tag::max,
+                                               boost::accumulators::tag::min,
+                                               boost::accumulators::tag::mean,
+                                               boost::accumulators::tag::count,
+                                               boost::accumulators::tag::sum>;
   boost::accumulators::accumulator_set<ElementType, StatsType> acc_;
 };
 
