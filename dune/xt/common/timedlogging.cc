@@ -45,7 +45,7 @@ DefaultLogger::DefaultLogger(const std::string& prfx,
                                                    std::cerr))
   , info_enabled(!start_disabled)
   , debug_enabled(!start_disabled)
-  , warn_enabled(!start_disabled)
+  , warn_enabled(true)
 {}
 
 DefaultLogger::DefaultLogger(const DefaultLogger& other)
