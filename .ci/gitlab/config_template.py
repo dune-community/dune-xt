@@ -115,6 +115,7 @@ variables:
         - dustin
     {%- endif %}
     stage: {{kind}}
+    needs: ["{{image}}"]
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_{{kind}}.bash
 {% endfor %}
