@@ -36,7 +36,6 @@ RangeType element_integral(
     const int polynomial_order_of_the_function)
 {
   static_assert(XT::Grid::is_entity<Element>::value, "element has to be a codim-0 grid entity");
-  static_assert(Element::codimension == 0, "element has to be a codim-0 grid entity");
   RangeType result(0.), local_result;
   for (auto&& quadrature_point : QuadratureRules<typename Element::Geometry::ctype, Element::dimension>::rule(
            element.type(), polynomial_order_of_the_function)) {
@@ -61,6 +60,45 @@ double element_integral(const Element& element,
                         const int polynomial_order_of_the_function)
 {
   return element_integral<double, Element>(element, function, polynomial_order_of_the_function);
+}
+
+
+/**
+ * \brief Computes the integral of a given function over a given intersection [most general variant].
+ */
+template <class RangeType, class IntersectionType>
+RangeType intersection_integral(
+    const IntersectionType& intersection,
+    std::function<RangeType(const FieldVector<typename IntersectionType::ctype, IntersectionType::mydimension>&
+                                point_in_reference_intersection)> function,
+    const int polynomial_order_of_the_function)
+{
+  static_assert(XT::Grid::is_intersection<IntersectionType>::value, "intersection has to be a codim-1 grid entity");
+  RangeType result(0.), local_result;
+  for (auto&& quadrature_point : QuadratureRules<typename IntersectionType::ctype, IntersectionType::mydimension>::rule(
+           intersection.type(), polynomial_order_of_the_function)) {
+    const auto point_in_reference_intersection = quadrature_point.position();
+    const auto quadrature_weight = quadrature_point.weight();
+    const auto integration_factor = intersection.geometry().integrationElement(point_in_reference_intersection);
+    local_result = function(point_in_reference_intersection);
+    local_result *= quadrature_weight * integration_factor;
+    result += local_result;
+  }
+  return result;
+} // ... intersection_integral(...)
+
+
+/**
+ * \brief Computes the integral of a given function over a given intersection [uses double as FieldType].
+ */
+template <class IntersectionType>
+double intersection_integral(
+    const IntersectionType& intersection,
+    std::function<double(const FieldVector<typename IntersectionType::Geometry::ctype, IntersectionType::mydimension>&
+                             point_in_reference_intersection)> function,
+    const int polynomial_order_of_the_function)
+{
+  return intersection_integral<double, IntersectionType>(intersection, function, polynomial_order_of_the_function);
 }
 
 
