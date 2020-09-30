@@ -18,6 +18,7 @@ variables:
     CCACHE_BASEDIR: ${CI_PROJECT_DIR}
     CCACHE_DIR: "${CI_PROJECT_DIR}/.ccache"
     CCACHE_COMPILERCHECK: content
+    CCACHE_COMPRESS: "true"
 
 .image_builder:
     tags:
