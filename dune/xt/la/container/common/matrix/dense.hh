@@ -25,6 +25,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/vector.hh>
+#include <dune/xt/common/numeric.hh>
 
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/pattern.hh>
@@ -376,7 +377,7 @@ public:
         V2::set_entry(
             yy,
             rr,
-            std::inner_product(&get_entry_ref(rr, 0.), &get_entry_ref(rr + 1, 0.), V1::data(xx), ScalarType(0.)));
+            Common::transform_reduce(&get_entry_ref(rr, 0.), &get_entry_ref(rr + 1, 0.), V1::data(xx), ScalarType(0.)));
     } else {
       assert(xx.size() == cols() && yy.size() == rows());
       yy *= ScalarType(0.);

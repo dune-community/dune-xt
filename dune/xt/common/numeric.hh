@@ -10,23 +10,17 @@
 #ifndef DUNE_XT_COMMON_NUMERIC_HH
 #define DUNE_XT_COMMON_NUMERIC_HH
 
-#if defined(__has_include) && __has_include(<version>)
-#  include <version>
-#endif
-// C++17 parallel TS features
-#if defined(__has_include) && (defined(__cpp_lib_execution) || __has_include(<execution>)) && defined(__cpp_lib_parallel_algorithm)
-#  define CPP17_PARALLELISM_TS_SUPPORTED __has_include(<execution>) && __cpp_lib_parallel_algorithm >= 201603
-#else
-#  define CPP17_PARALLELISM_TS_SUPPORTED 0
-#endif
-
 #include <numeric>
+
+#define CPP17_PARALLELISM_TS_SUPPORTED defined(__cpp_lib_parallel_algorithm) && __cpp_lib_parallel_algorithm >= 201603
 
 namespace Dune {
 namespace XT {
 namespace Common {
 
 
+// Uses std::reduce if available, and falls back to std::accumulate on older compilers.
+// The std::reduce versions with an execution policy as first argument are not supported.
 template <class... Args>
 decltype(auto) reduce(Args&&... args)
 {
@@ -37,6 +31,8 @@ decltype(auto) reduce(Args&&... args)
 #endif
 }
 
+// Uses std::transform_reduce if available, and falls back to std::inner_product on older compilers.
+// The std::transform_reduce versions with an execution policy as first argument are not supported.
 template <class... Args>
 decltype(auto) transform_reduce(Args&&... args)
 {

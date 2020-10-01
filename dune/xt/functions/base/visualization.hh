@@ -17,8 +17,9 @@
 
 #include <dune/grid/io/file/vtk/function.hh>
 
-#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/numeric.hh>
 #include <dune/xt/common/parameter.hh>
 #include <dune/xt/common/unused.hh>
 
@@ -124,7 +125,7 @@ public:
   double evaluate(DXTC_DEBUG_ONLY const int& comp, const RangeType& val) const override final
   {
     assert(comp == 0);
-    return std::accumulate(val.begin(), val.end(), 0.);
+    return Common::reduce(val.begin(), val.end(), 0.);
   }
 }; // class SumVisualizer
 

@@ -29,8 +29,9 @@
 #include <dune/xt/common/densevector.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/vector.hh>
+#include <dune/xt/common/numeric.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/vector.hh>
 
 namespace Dune {
 namespace XT {
@@ -344,7 +345,7 @@ public:
 
   K operator*(const ThisType& other) const
   {
-    return std::inner_product(begin(), end(), other.begin(), 0.);
+    return Common::transform_reduce(begin(), end(), other.begin(), 0.);
   }
 
   ThisType& operator+=(const ThisType& other)

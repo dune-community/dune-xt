@@ -26,6 +26,7 @@
 #include <dune/common/ftraits.hh>
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/numeric.hh>
 
 #include <dune/xt/la/container/vector-interface.hh>
 
@@ -404,16 +405,15 @@ public:
 
   RealType l1_norm() const override final
   {
-    return std::accumulate(entries_->begin(),
-                           entries_->end(),
-                           RealType(0.),
-                           [](const RealType& a, const ScalarType& b) { return a + std::abs(b); });
+    return Common::reduce(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
+      return a + std::abs(b);
+    });
   }
 
   RealType l2_norm() const override final
   {
     return std::sqrt(
-        std::accumulate(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
+        Common::reduce(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
           return a + std::pow(std::abs(b), 2);
         }));
   }

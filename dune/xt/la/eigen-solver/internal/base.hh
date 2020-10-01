@@ -18,9 +18,10 @@
 #include <numeric>
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/numeric.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/matrix.hh>
 
 #include <dune/xt/la/container/common/vector/dense.hh>
 #include <dune/xt/la/container/conversion.hh>
@@ -532,7 +533,7 @@ protected:
               for (size_t rr = 0; rr < rows; ++rr)
                 v_i[rr] -= vj_vi / vj_vj * v_j[rr];
             } // jj
-            RealType l2_norm = std::sqrt(std::accumulate(
+            RealType l2_norm = std::sqrt(Common::reduce(
                 v_i.begin(), v_i.end(), 0., [](const RealType& a, const RealType& b) { return a + b * b; }));
             if (XT::Common::FloatCmp::ne(l2_norm, 0.))
               v_i *= 1. / l2_norm;
