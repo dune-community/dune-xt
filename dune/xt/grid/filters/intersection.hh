@@ -204,6 +204,48 @@ public:
   }
 }; // class InnerIntersectionsOnce
 
+/**
+ * \brief A filter which selects each inner intersection only once. Other than InnerIntersectionsOnce,
+ * this also works if we only walk over a subset of the grid elements (if the correct map is provided).
+ *
+ * \sa InnerIntersectionsOnce
+ */
+template <class GL>
+class InnerIntersectionsOnceMap : public IntersectionFilter<GL>
+{
+  using BaseType = IntersectionFilter<GL>;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::IntersectionType;
+
+  InnerIntersectionsOnceMap(const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore)
+    : outside_indices_to_ignore_(outside_indices_to_ignore)
+  {}
+
+  IntersectionFilter<GridViewType>* copy() const override final
+  {
+    return new InnerIntersectionsOnceMap<GridViewType>(outside_indices_to_ignore_);
+  }
+
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    if (intersection.neighbor() && !intersection.boundary()) {
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
+      const auto inside_index = grid_layer.indexSet().index(inside_element);
+      const auto outside_index = grid_layer.indexSet().index(outside_element);
+      if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
+        return false;
+      else
+        return true;
+    } else
+      return false;
+  }
+
+  const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;
+}; // class InnerIntersectionsOnceMap
+
 
 /**
  * \brief Selects each inner intersection in given partition only once.
@@ -381,6 +423,42 @@ public:
   }
 }; // class PeriodicBoundaryIntersectionsOnce
 
+template <class GL>
+class PeriodicBoundaryIntersectionsOnceMap : public IntersectionFilter<GL>
+{
+  using BaseType = IntersectionFilter<GL>;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::IntersectionType;
+
+  PeriodicBoundaryIntersectionsOnceMap(const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore)
+    : outside_indices_to_ignore_(outside_indices_to_ignore)
+  {}
+
+  IntersectionFilter<GridViewType>* copy() const override final
+  {
+    return new PeriodicBoundaryIntersectionsOnceMap<GridViewType>(outside_indices_to_ignore_);
+  }
+
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    if (intersection.neighbor() && intersection.boundary()) {
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
+      const auto inside_index = grid_layer.indexSet().index(inside_element);
+      const auto outside_index = grid_layer.indexSet().index(outside_element);
+      if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
+        return false;
+      else
+        return true;
+    } else {
+      return false;
+    }
+  }
+
+  const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;
+}; // class PeriodicBoundaryIntersectionsOnceMap
 
 /**
  * \brief A filter which selects intersections based on a lambda expression.
