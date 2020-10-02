@@ -12,19 +12,22 @@
 #ifndef DUNE_XT_LA_CONTAINER_COMMON_VECTOR_DENSE_HH
 #define DUNE_XT_LA_CONTAINER_COMMON_VECTOR_DENSE_HH
 
+#include <algorithm>
 #include <cmath>
+#include <complex>
 #include <initializer_list>
 #include <memory>
+#include <mutex>
+#include <numeric>
 #include <type_traits>
 #include <vector>
-#include <complex>
-#include <mutex>
 
 #include <dune/common/dynvector.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/numeric.hh>
 
 #include <dune/xt/la/container/vector-interface.hh>
 
@@ -41,12 +44,181 @@ class CommonDenseVector;
 namespace internal {
 
 
+template <class ScalarImp>
+struct CommonDenseVectorBackend
+{
+  using ScalarType = ScalarImp;
+  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
+  using ThisType = CommonDenseVectorBackend;
+
+  // Constructs ss elements with value value.
+  CommonDenseVectorBackend(const size_t ss = 0, const ScalarType& value = ScalarType())
+    : size_(ss)
+    , values_vector_(size_, value)
+    , values_ptr_(values_vector_.data())
+  {}
+
+  // Uses the provided buffer with size ss. The pointer values_ptr should point to the first element of the buffer.
+  // The user has to ensure that the buffer has at least ss elements, we have no way to check it here.
+  // Does not take ownership of the buffer and also does not copy the buffer, i.e.,
+  // the user has to ensure that the buffer lives at least as long as this class,
+  // and the user is reponsible for cleaning up the memory.
+  CommonDenseVectorBackend(const size_t ss, ScalarType* values_ptr)
+    : size_(ss)
+    , values_ptr_(values_ptr)
+  {}
+
+  // The copy constructor performs a deep copy of the values, even if other was constructed from a values_ptr
+  // If you do not want an actual copy, use the constructor above.
+  CommonDenseVectorBackend(const ThisType& other)
+    : size_(other.size_)
+    , values_vector_(size_)
+    , values_ptr_(values_vector_.data())
+  {
+    std::copy_n(other.values_ptr(), size_, values_ptr());
+  }
+
+  CommonDenseVectorBackend(ThisType&& other)
+    : size_(std::move(other.size_))
+    , values_vector_(std::move(other.values_vector_))
+    // If other was created from a ptr, we also want to use that pointer to avoid copying. The following assumes
+    // values_vector_.data() points to the same location as other.values_vector_.data() did before the move. This is not
+    // strictly guaranteed by the standard as of now but fulfilled in all major implementations (see
+    // https://stackoverflow.com/a/25348988 and LWG open issue 2321).
+    , values_ptr_(std::move(other.values_ptr_))
+  {}
+
+  ThisType copy()
+  {
+    return ThisType(*this);
+  }
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      size_ = other.size_;
+      values_vector_ = std::vector<ScalarType>(size_);
+      std::copy_n(other.values_ptr(), size_, values_vector_.begin());
+      values_ptr_ = values_vector_.data();
+    }
+    return *this;
+  }
+
+  ScalarType& operator[](const size_t ii)
+  {
+    return values_ptr()[ii];
+  }
+
+  const ScalarType& operator[](const size_t ii) const
+  {
+    return values_ptr()[ii];
+  }
+
+  void resize(const size_t ss)
+  {
+    DUNE_THROW_IF(values_ptr_ != values_vector_.data(),
+                  Dune::InvalidStateException,
+                  "Cannot resize vector that has been initialized from a pointer!");
+    size_ = ss;
+    values_vector_.resize(size_);
+    values_ptr_ = values_vector_.data();
+  }
+
+  size_t size() const
+  {
+    return size_;
+  }
+
+  ThisType& operator+=(const ThisType& other)
+  {
+    assert(other.size_ == size_);
+    for (size_t ii = 0; ii < size_; ++ii)
+      values_ptr()[ii] += other[ii];
+    return *this;
+  }
+
+  ThisType& operator-=(const ThisType& other)
+  {
+    assert(other.size_ == size_);
+    for (size_t ii = 0; ii < size_; ++ii)
+      values_ptr()[ii] -= other[ii];
+    return *this;
+  }
+
+  ThisType& operator*=(const ThisType& other)
+  {
+    assert(other.size_ == size_);
+    for (size_t ii = 0; ii < size_; ++ii)
+      values_ptr()[ii] *= other[ii];
+    return *this;
+  }
+
+  ThisType& operator*=(const ScalarType& val)
+  {
+    for (size_t ii = 0; ii < size_; ++ii)
+      values_ptr()[ii] *= val;
+    return *this;
+  }
+
+  ThisType& operator/=(const ThisType& other)
+  {
+    assert(other.size_ == size_);
+    for (size_t ii = 0; ii < size_; ++ii)
+      values_ptr()[ii] /= other[ii];
+    return *this;
+  }
+
+  ScalarType operator*(const ThisType& other) const
+  {
+    assert(other.size() == size_);
+    return XT::Common::transform_reduce(values_ptr(), values_ptr() + size_, other.values_ptr(), ScalarType(0.));
+  }
+
+  RealType l1_norm() const
+  {
+    return Common::reduce(values_ptr(), values_ptr() + size_, RealType(0.), [](const RealType& a, const ScalarType& b) {
+      return a + std::abs(b);
+    });
+  }
+
+  RealType l2_norm() const
+  {
+    return std::sqrt(
+        Common::reduce(values_ptr(), values_ptr() + size_, RealType(0.), [](const RealType& a, const ScalarType& b) {
+          return a + std::pow(std::abs(b), 2);
+        }));
+  }
+
+  RealType sup_norm() const
+  {
+    return std::abs(*std::max_element(values_ptr(), values_ptr() + size_, [](const ScalarType& a, const ScalarType& b) {
+      return std::abs(a) < std::abs(b);
+    }));
+  }
+
+  inline ScalarType* values_ptr()
+  {
+    assert(values_ptr_);
+    return values_ptr_;
+  }
+
+  inline const ScalarType* values_ptr() const
+  {
+    assert(values_ptr_);
+    return values_ptr_;
+  }
+
+  size_t size_;
+  std::vector<ScalarType> values_vector_;
+  ScalarType* values_ptr_;
+};
+
 /// Traits for CommonDenseVector
 template <class ScalarImp>
 class CommonDenseVectorTraits
   : public VectorTraitsBase<ScalarImp,
                             CommonDenseVector<ScalarImp>,
-                            Dune::DynamicVector<ScalarImp>,
+                            CommonDenseVectorBackend<ScalarImp>,
                             Backends::common_dense,
                             Backends::common_dense,
                             Backends::common_sparse>
@@ -105,6 +277,20 @@ public:
     }
   } // CommonDenseVector(...)
 
+  // the bool is only to disambiguate the constructors
+  explicit CommonDenseVector(const size_t ss, ScalarType* values_ptr, const size_t num_mutexes, bool /*dummy*/)
+    : backend_(new BackendType(ss, values_ptr))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
+  {} // CommonDenseVector(...)
+
+  explicit CommonDenseVector(const Dune::DynamicVector<ScalarType>& dynvec, const size_t num_mutexes = 1)
+    : backend_(new BackendType(dynvec.size()))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      (*backend_)[ii] = dynvec[ii];
+  } // CommonDenseVector(...)
+
   CommonDenseVector(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
@@ -131,6 +317,8 @@ public:
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
+  using InterfaceType::operator=;
+
   ThisType& operator=(const ThisType& other)
   {
     if (this != &other) {
@@ -152,7 +340,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    *backend_ = other;
+    *backend_ = other.copy();
     return *this;
   }
 
@@ -161,11 +349,13 @@ public:
 
   BackendType& backend()
   {
+    assert(backend_);
     return *backend_;
   }
 
   const BackendType& backend() const
   {
+    assert(backend_);
     return *backend_;
   }
 
@@ -176,7 +366,12 @@ public:
   /** \attention This makes only sense for scalar data types, not for complex! **/
   ScalarType* data()
   {
-    return &(backend()[0]);
+    return backend().values_ptr();
+  }
+
+  const ScalarType* data() const
+  {
+    return backend().values_ptr();
   }
 
   size_t data_size() const
@@ -190,7 +385,7 @@ public:
 
   ThisType copy() const
   {
-    return ThisType(*backend_);
+    return ThisType(backend_->copy());
   }
 
   void scal(const ScalarType& alpha)
@@ -201,12 +396,15 @@ public:
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    if (xx.size() != size())
+    const size_t sz = size();
+    if (xx.size() != sz)
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
-    for (size_t ii = 0; ii < backend().size(); ++ii)
-      backend()[ii] += alpha * xx.backend()[ii];
+    auto* data_ptr = data();
+    const auto* other_data_ptr = xx.data();
+    for (size_t ii = 0; ii < sz; ++ii)
+      data_ptr[ii] += alpha * other_data_ptr[ii];
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -283,25 +481,24 @@ public:
 
   RealType l1_norm() const override final
   {
-    return backend().one_norm();
+    return backend().l1_norm();
   }
 
   RealType l2_norm() const override final
   {
-    return backend().two_norm();
+    return backend().l2_norm();
   }
 
   RealType sup_norm() const override final
   {
-    return backend().infinity_norm();
+    return backend().sup_norm();
   }
 
   void iadd(const ThisType& other) override final
   {
     if (other.size() != size())
-      if (other.size() != size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
@@ -309,9 +506,8 @@ public:
   void isub(const ThisType& other) override final
   {
     if (other.size() != size())
-      if (other.size() != size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     [[maybe_unused]] const internal::VectorLockGuard guard(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
