@@ -22,7 +22,7 @@ include(Hints)
 # library checks  #########################################################################
 find_package(PkgConfig)
 
-set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem system thread timer)
+set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem python37 system thread timer)
 set(BOOST_ROOT_HINTS "$ENV{BOOST_ROOT}" ${root_hints})
 # check if any hints are provided by user
 if(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR)
@@ -72,6 +72,8 @@ if(MKL_FOUND)
 else(MKL_FOUND)
   find_package(LAPACKE)
 endif(MKL_FOUND)
+find_package(BZip2)
+dune_register_package_flags(LIBRARIES ${BZIP2_LIBRARIES})
 
 # intel mic and likwid don't mix
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "k1om")
