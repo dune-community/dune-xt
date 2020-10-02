@@ -237,7 +237,7 @@ public:
    *        visualization may thus be a refinement of the actual grid!
    */
   template <class GridViewType>
-  [[deprecated("Use visualize(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+  [[deprecated("Use visualize(*this, ...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]] void
   visualize(const GridViewType& grid_view,
             const std::string path,
             const bool subsampling = true,
@@ -258,7 +258,7 @@ public:
    */
   template <class GridViewType>
   [[deprecated(
-      "Use visualize_gradient(*this, ...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+      "Use visualize_gradient(*this, ...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]] void
   visualize_gradient(const GridViewType& grid_view,
                      const std::string path,
                      const bool subsampling = true,
@@ -274,7 +274,7 @@ public:
 
   template <class GridViewType>
   [[deprecated(
-      "Use internal::create_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] std::
+      "Use internal::create_vtkwriter(...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]] std::
       unique_ptr<VTKWriter<GridViewType>>
       create_vtkwriter(const GridViewType& grid_view, const bool subsampling = true) const
   {
@@ -285,7 +285,7 @@ public:
 
   template <class GridViewType>
   [[deprecated(
-      "Use internal::add_to_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead (24.09.2020)!")]] void
+      "Use internal::add_to_vtkwriter(...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]] void
   add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
                    const XT::Common::Parameter& param = {},
                    const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
@@ -298,7 +298,7 @@ public:
   }
 
   template <class GridViewType>
-  [[deprecated("Use internal::add_gradient_to_vtkwriter(...) from <dune/xt/functions/visualizations.hh> instead "
+  [[deprecated("Use internal::add_gradient_to_vtkwriter(...) from <dune/xt/functions/visualization.hh> instead "
                "(24.09.2020)!")]] void
   add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
                             const XT::Common::Parameter& param = {},
@@ -312,7 +312,7 @@ public:
   }
 
   template <class GridViewType>
-  [[deprecated("Use internal::write_visualization(...) from <dune/xt/functions/visualizations.hh> instead "
+  [[deprecated("Use internal::write_visualization(...) from <dune/xt/functions/visualization.hh> instead "
                "(24.09.2020)!")]] void
   write_visualization(VTKWriter<GridViewType>& vtk_writer,
                       const std::string path,
