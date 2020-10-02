@@ -111,24 +111,21 @@ private:
   public:
     int order(const XT::Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return order_(parsed_param);
+      return order_(param);
     }
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
                              const StateType& u,
                              const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return evaluate_(point_in_local_coordinates, u, parsed_param);
+      return evaluate_(point_in_local_coordinates, u, param);
     }
 
     JacobianRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
                                      const StateType& u,
                                      const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return jacobian_(point_in_local_coordinates, u, parsed_param);
+      return jacobian_(point_in_local_coordinates, u, param);
     }
 
     void evaluate(const DomainType& point_in_local_coordinates,
@@ -136,8 +133,7 @@ private:
                   DynamicRangeType& ret,
                   const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      dynamic_evaluate_(point_in_local_coordinates, u, ret, parsed_param);
+      dynamic_evaluate_(point_in_local_coordinates, u, ret, param);
     }
 
     void jacobian(const DomainType& point_in_local_coordinates,
@@ -145,8 +141,7 @@ private:
                   DynamicJacobianRangeType& ret,
                   const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return dynamic_jacobian_(point_in_local_coordinates, u, ret, parsed_param);
+      return dynamic_jacobian_(point_in_local_coordinates, u, ret, param);
     }
 
 

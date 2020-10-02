@@ -102,17 +102,17 @@ public:
 
   size_t size(const Common::Parameter& param = {}) const final
   {
-    return size_(this->parse_parameter(param));
+    return size_(param);
   }
 
   size_t max_size(const Common::Parameter& param = {}) const final
   {
-    return max_size_(this->parse_parameter(param));
+    return max_size_(param);
   }
 
   int order(const Common::Parameter& param = {}) const final
   {
-    return order_(this->parse_parameter(param));
+    return order_(param);
   }
 
   void evaluate(const DomainType& point_in_reference_element,
@@ -122,7 +122,7 @@ public:
     const auto sz = this->size(param);
     if (result.size() < sz)
       result.resize(sz);
-    evaluate_(point_in_reference_element, result, this->parse_parameter(param));
+    evaluate_(point_in_reference_element, result, param);
   }
 
   void jacobians(const DomainType& point_in_reference_element,
@@ -132,7 +132,7 @@ public:
     const auto sz = this->size(param);
     if (result.size() < sz)
       result.resize(sz);
-    jacobian_(point_in_reference_element, result, this->parse_parameter(param));
+    jacobian_(point_in_reference_element, result, param);
   }
 
   void derivatives(const std::array<size_t, d>& alpha,
@@ -143,7 +143,7 @@ public:
     const auto sz = this->size(param);
     if (result.size() < sz)
       result.resize(sz);
-    derivative_(alpha, point_in_reference_element, result, this->parse_parameter(param));
+    derivative_(alpha, point_in_reference_element, result, param);
   }
 
   /**
@@ -278,26 +278,26 @@ public:
 
   int order(const Common::Parameter& param = {}) const final
   {
-    return order_(this->parse_parameter(param));
+    return order_(param);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
                            const Common::Parameter& param = {}) const final
   {
-    return evaluate_(point_in_reference_element, this->parse_parameter(param));
+    return evaluate_(point_in_reference_element, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
                                      const Common::Parameter& param = {}) const final
   {
-    return jacobian_(point_in_reference_element, this->parse_parameter(param));
+    return jacobian_(point_in_reference_element, param);
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_reference_element,
                                        const Common::Parameter& param = {}) const final
   {
-    return derivative_(alpha, point_in_reference_element, this->parse_parameter(param));
+    return derivative_(alpha, point_in_reference_element, param);
   }
 
   /**
