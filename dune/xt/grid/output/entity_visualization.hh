@@ -16,7 +16,6 @@
 #include <boost/io/ios_state.hpp>
 
 #include <dune/grid/common/mcmgmapper.hh>
-#include <dune/grid/io/file/dgfparser/dgfparser.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/common/rangegenerators.hh>
 

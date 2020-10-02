@@ -26,6 +26,7 @@
 #include <dune/common/ftraits.hh>
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/numeric.hh>
 
 #include <dune/xt/la/container/vector-interface.hh>
@@ -405,25 +406,28 @@ public:
 
   RealType l1_norm() const override final
   {
-    return Common::reduce(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
-      return a + std::abs(b);
-    });
+    using Dune::XT::Common::abs;
+    return std::accumulate(entries_->begin(),
+                           entries_->end(),
+                           RealType(0.),
+                           [](const RealType& a, const ScalarType& b) { return a + abs(b); });
   }
 
   RealType l2_norm() const override final
   {
+    using Dune::XT::Common::abs;
     return std::sqrt(
-        Common::reduce(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
-          return a + std::pow(std::abs(b), 2);
+        std::accumulate(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
+          return a + std::pow(abs(b), 2);
         }));
   }
 
   RealType sup_norm() const override final
   {
-    auto it = std::max_element(entries_->begin(), entries_->end(), [](const ScalarType& a, const ScalarType& b) {
-      return std::abs(a) < std::abs(b);
-    });
-    return entries_->size() > 0 ? std::abs(*it) : 0.;
+    using Dune::XT::Common::abs;
+    auto it = std::max_element(
+        entries_->begin(), entries_->end(), [](const ScalarType& a, const ScalarType& b) { return abs(a) < abs(b); });
+    return entries_->size() > 0 ? abs(*it) : 0.;
   }
 
   ThisType add(const ThisType& other) const override final

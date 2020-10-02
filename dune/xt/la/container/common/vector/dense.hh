@@ -27,6 +27,7 @@
 #include <dune/common/ftraits.hh>
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/numeric.hh>
 
 #include <dune/xt/la/container/vector-interface.hh>
@@ -176,24 +177,33 @@ struct CommonDenseVectorBackend
 
   RealType l1_norm() const
   {
-    return Common::reduce(values_ptr(), values_ptr() + size_, RealType(0.), [](const RealType& a, const ScalarType& b) {
-      return a + std::abs(b);
-    });
+    using Dune::XT::Common::abs;
+    if constexpr (std::is_convertible_v<ScalarType, RealType>) {
+      return Common::reduce(values_ptr(), values_ptr() + size_, RealType(0.), [](const auto& a, const auto& b) {
+        return abs(a) + abs(b);
+      });
+    } else {
+      return std::accumulate(values_ptr(),
+                             values_ptr() + size_,
+                             RealType(0.),
+                             [](const RealType& a, const ScalarType& b) { return a + abs(b); });
+    }
   }
 
   RealType l2_norm() const
   {
+    using Dune::XT::Common::abs;
     return std::sqrt(
-        Common::reduce(values_ptr(), values_ptr() + size_, RealType(0.), [](const RealType& a, const ScalarType& b) {
-          return a + std::pow(std::abs(b), 2);
+        std::accumulate(values_ptr(), values_ptr() + size_, RealType(0.), [](const RealType& a, const ScalarType& b) {
+          return a + std::pow(abs(b), 2);
         }));
   }
 
   RealType sup_norm() const
   {
-    return std::abs(*std::max_element(values_ptr(), values_ptr() + size_, [](const ScalarType& a, const ScalarType& b) {
-      return std::abs(a) < std::abs(b);
-    }));
+    using Dune::XT::Common::abs;
+    return abs(*std::max_element(
+        values_ptr(), values_ptr() + size_, [](const ScalarType& a, const ScalarType& b) { return abs(a) < abs(b); }));
   }
 
   inline ScalarType* values_ptr()

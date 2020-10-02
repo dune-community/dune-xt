@@ -12,7 +12,11 @@
 
 #include <numeric>
 
-#define CPP17_PARALLELISM_TS_SUPPORTED defined(__cpp_lib_parallel_algorithm) && __cpp_lib_parallel_algorithm >= 201603
+#if defined(__cpp_lib_parallel_algorithm) && __cpp_lib_parallel_algorithm >= 201603
+#  define CPP17_PARALLELISM_TS_SUPPORTED 1
+#else
+#  define CPP17_PARALLELISM_TS_SUPPORTED 0
+#endif
 
 namespace Dune {
 namespace XT {
