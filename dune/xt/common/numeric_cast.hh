@@ -26,6 +26,7 @@ namespace Dune::XT::Common {
 template <class T, class S>
 T numeric_cast(S source)
 {
+#ifndef NDEBUG
   T target;
   try {
     target = boost::numeric_cast<T>(source);
@@ -35,6 +36,9 @@ T numeric_cast(S source)
                    << source << "' to '" << XT::Common::Typename<T>::value() << "':\n\n   " << ee.what());
   }
   return target;
+#else
+  return static_cast<T>(source);
+#endif
 } // ... numeric_cast(...)
 
 

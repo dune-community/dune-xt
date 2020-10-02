@@ -106,22 +106,19 @@ private:
   public:
     int order(const XT::Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return order_(parsed_param);
+      return order_(param);
     }
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
                              const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      return evaluate_(point_in_local_coordinates, parsed_param);
+      return evaluate_(point_in_local_coordinates, param);
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
                                        const Common::Parameter& param = {}) const override final
     {
-      auto parsed_param = this->parse_parameter(param);
-      auto local_jacobian = jacobian_(point_in_local_coordinates, parsed_param);
+      auto local_jacobian = jacobian_(point_in_local_coordinates, param);
       const auto J_inv_T = this->element().geometry().jacobianInverseTransposed(point_in_local_coordinates);
       DerivativeRangeReturnType global_jacobian;
       if constexpr (rC == 1) {
@@ -142,8 +139,7 @@ private:
       DUNE_THROW(Dune::NotImplemented,
                  "This function should also transform the derivatives (like the jacobian method), go ahead and "
                  "implement if you want to use this method!");
-      auto parsed_param = this->parse_parameter(param);
-      return derivative_(alpha, point_in_local_coordinates, parsed_param);
+      return derivative_(alpha, point_in_local_coordinates, param);
     }
 
   private:

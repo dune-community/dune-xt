@@ -129,33 +129,33 @@ public:
 
   int order(const Common::Parameter& param = {}) const override final
   {
-    return order_(this->parse_parameter(param));
+    return order_(param);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
                            const Common::Parameter& param = {}) const override final
   {
-    return evaluate_(point_in_global_coordinates, this->parse_parameter(param));
+    return evaluate_(point_in_global_coordinates, param);
   }
 
   void evaluate(const DomainType& point_in_global_coordinates,
                 DynamicRangeType& ret,
                 const Common::Parameter& param = {}) const override final
   {
-    dynamic_evaluate_(point_in_global_coordinates, ret, this->parse_parameter(param));
+    dynamic_evaluate_(point_in_global_coordinates, ret, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
                                      const Common::Parameter& param = {}) const override final
   {
-    return jacobian_(point_in_global_coordinates, this->parse_parameter(param));
+    return jacobian_(point_in_global_coordinates, param);
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_global_coordinates,
                                        const Common::Parameter& param = {}) const override final
   {
-    return derivative_(alpha, point_in_global_coordinates, this->parse_parameter(param));
+    return derivative_(alpha, point_in_global_coordinates, param);
   }
 
   std::string name() const override final
