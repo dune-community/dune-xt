@@ -38,10 +38,10 @@ namespace ApplyOn {
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class AllIntersections : public IntersectionFilter<GL>
+template <class GV>
+class AllIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -69,10 +69,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class AllIntersectionsOnce : public IntersectionFilter<GL>
+template <class GV>
+class AllIntersectionsOnce : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -104,10 +104,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class NoIntersections : public IntersectionFilter<GL>
+template <class GV>
+class NoIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -139,10 +139,10 @@ intersection.neighbor() && !intersection.boundary()
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class InnerIntersections : public IntersectionFilter<GL>
+template <class GV>
+class InnerIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -177,10 +177,10 @@ intersection.neighbor() && !intersection.boundary()
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class InnerIntersectionsOnce : public IntersectionFilter<GL>
+template <class GV>
+class InnerIntersectionsOnce : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -208,16 +208,43 @@ public:
  * \brief A filter which selects each inner intersection only once. Other than InnerIntersectionsOnce,
  * this also works if we only walk over a subset of the grid elements (if the correct map is provided).
  *
+ * InnerIntersectionOnce selects each inner intersection only once. However, this only works if we always
+ * visit the elements on both sides of each intersection. If we only walk over a subset of the grid elements,
+ * we will visit some of the intersections only from one side. In that case, InnerIntersectionsOnceMap can
+ * be used. However, as it is hard to tell which intersections are visited from both sides, the user has to
+ * provide a map which contains for each entity index a set of outer element indices for which the
+ * intersection should be skipped. To visit each intersection exactly once, one side of intersections which
+ * are visited from both sides has to show up in the ignore map.
+ * The map can be created from the set of entities by calling the fill_ignore_map method.
+ *
  * \sa InnerIntersectionsOnce
  */
-template <class GL>
-class InnerIntersectionsOnceMap : public IntersectionFilter<GL>
+template <class GV>
+class InnerIntersectionsOnceMap : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
+
+  static void fill_ignore_map(std::map<size_t, std::set<size_t>>& outside_indices_to_ignore,
+                              const std::set<extract_entity_t<GV>, EntityLess<GV>>& entity_range,
+                              const GV& grid_view)
+  {
+
+    for (auto&& entity : entity_range) {
+      const auto inside_index = grid_view.indexSet().index(entity);
+      outside_indices_to_ignore[inside_index] = std::set<size_t>();
+      for (auto&& intersection : intersections(grid_view, entity)) {
+        if (intersection.neighbor() && entity_range.count(intersection.outside())) {
+          const auto outside_index = grid_view.indexSet().index(intersection.outside());
+          if (inside_index > outside_index)
+            outside_indices_to_ignore[inside_index].insert(outside_index);
+        }
+      }
+    }
+  }
 
   InnerIntersectionsOnceMap(const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore)
     : outside_indices_to_ignore_(outside_indices_to_ignore)
@@ -256,10 +283,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL, class PartitionSetType>
-class PartitionSetInnerIntersectionsOnce : public IntersectionFilter<GL>
+template <class GV, class PartitionSetType>
+class PartitionSetInnerIntersectionsOnce : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -293,10 +320,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class BoundaryIntersections : public IntersectionFilter<GL>
+template <class GV>
+class BoundaryIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -322,10 +349,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class NonPeriodicBoundaryIntersections : public IntersectionFilter<GL>
+template <class GV>
+class NonPeriodicBoundaryIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -357,10 +384,10 @@ intersection.neighbor() && intersection.boundary()
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class PeriodicBoundaryIntersections : public IntersectionFilter<GL>
+template <class GV>
+class PeriodicBoundaryIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -395,10 +422,10 @@ intersection.neighbor() && intersection.boundary()
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GL>
+template <class GV>
+class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -423,14 +450,28 @@ public:
   }
 }; // class PeriodicBoundaryIntersectionsOnce
 
-template <class GL>
-class PeriodicBoundaryIntersectionsOnceMap : public IntersectionFilter<GL>
+/**
+ * \brief A filter which selects each periodic boundary intersections only once. Other than
+ * PeriodicBoundaryIntersectionsOnce, this also works if we only walk over a subset of the grid elements
+ * (if the correct map is provided).
+ *
+ * \sa InnerIntersectionsOnceMap
+ */
+template <class GV>
+class PeriodicBoundaryIntersectionsOnceMap : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
+
+  static void fill_ignore_map(std::map<size_t, std::set<size_t>>& outside_indices_to_ignore,
+                              const std::set<extract_entity_t<GV>, EntityLess<GV>>& entity_range,
+                              const GV& grid_view)
+  {
+    InnerIntersectionsOnceMap<GV>::fill_ignore_map(outside_indices_to_ignore, entity_range, grid_view);
+  }
 
   PeriodicBoundaryIntersectionsOnceMap(const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore)
     : outside_indices_to_ignore_(outside_indices_to_ignore)
@@ -466,10 +507,10 @@ public:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class GenericFilteredIntersections : public IntersectionFilter<GL>
+template <class GV>
+class GenericFilteredIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -501,11 +542,11 @@ private:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class CustomBoundaryIntersections : public IntersectionFilter<GL>
+template <class GV>
+class CustomBoundaryIntersections : public IntersectionFilter<GV>
 {
-  using ThisType = CustomBoundaryIntersections<GL>;
-  using BaseType = IntersectionFilter<GL>;
+  using ThisType = CustomBoundaryIntersections<GV>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using BaseType::logger;
@@ -565,10 +606,10 @@ protected:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class CustomBoundaryAndProcessIntersections : public IntersectionFilter<GL>
+template <class GV>
+class CustomBoundaryAndProcessIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
@@ -613,10 +654,10 @@ protected:
  * \sa Walker
  * \sa IntersectionFilter
  */
-template <class GL>
-class ProcessIntersections : public IntersectionFilter<GL>
+template <class GV>
+class ProcessIntersections : public IntersectionFilter<GV>
 {
-  using BaseType = IntersectionFilter<GL>;
+  using BaseType = IntersectionFilter<GV>;
 
 public:
   using typename BaseType::GridViewType;
