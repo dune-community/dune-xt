@@ -5,9 +5,6 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2019)
-//   René Fritze     (2018)
-//   Tobias Leibner  (2018 - 2019)
 
 #include "config.h"
 
@@ -41,11 +38,7 @@ struct make_cube_dd_grid
       return XT::Grid::DD::Glued<G,G,XT::Grid::Layers::leaf>(macro_grid, num_refinements, false, true
       );},
     "macro_grid"_a,
-//    "dimension"_a,
 //    "element_type"_a,
-//    "lower_left"_a,
-//    "upper_right"_a,
-//    "num_elements"_a,
     "num_refinements"_a = 0
 //    "overlap_size"_a = XT::Grid::cube_gridprovider_default_config().get<std::array<unsigned int, d>>("overlap_size")/*,
 //    "mpi_comm"_a = Common::MPI_Comm_Wrapper()*/
@@ -69,11 +62,7 @@ struct make_cube_dd_grid<G, void>
       return XT::Grid::DD::Glued<G,G,XT::Grid::Layers::leaf>(macro_grid, num_refinements, false, true)
       ;},
     "macro_grid"_a,
-//    "dimension"_a,
 //    "element_type"_a,
-//    "lower_left"_a,
-//    "upper_right"_a,
-//    "num_elements"_a,
     "num_refinements"_a = 0
 //    "overlap_size"_a = XT::Grid::cube_gridprovider_default_config().get<std::array<unsigned int, d>>("overlap_size")/*,
 //    "mpi_comm"_a = Common::MPI_Comm_Wrapper()*/

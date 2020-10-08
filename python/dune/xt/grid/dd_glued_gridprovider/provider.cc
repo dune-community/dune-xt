@@ -5,9 +5,6 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2019)
-//   René Fritze     (2018)
-//   Tobias Leibner  (2018 - 2019)
 
 #include "config.h"
 
@@ -70,6 +67,30 @@ public:
           return local_grid;
           },
           "macro_entity_index"_a);
+    c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
+    c.def_property_readonly("boundary_subdomains", [](type& self) {
+        std::vector<size_t> boundary_subdomains;
+        for (auto&& macro_element : elements(self.macro_grid_view()))
+          if (self.boundary(macro_element))
+            boundary_subdomains.push_back(self.subdomain(macro_element));
+          return boundary_subdomains;
+      });
+    c.def("neighbors", [](type& self, const size_t ss) {
+        DUNE_THROW_IF(ss >= self.num_subdomains(),
+                        XT::Common::Exceptions::index_out_of_range,
+                        "ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
+         std::vector<size_t> neighboring_subdomains;
+         for (auto&& macro_element : elements(self.macro_grid_view())) {
+           if (self.subdomain(macro_element) == ss) {
+             for (auto&& macro_intersection : intersections(self.macro_grid_view(), macro_element))
+               if (macro_intersection.neighbor())
+                 neighboring_subdomains.push_back(self.subdomain(macro_intersection.outside()));
+             break;
+           }
+         }
+         return neighboring_subdomains;
+    });
+
     return c;
   } // ... bind(...)
 }; // class GridProvider
