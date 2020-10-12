@@ -15,6 +15,7 @@ variables:
     CCACHE_DIR: "${CI_PROJECT_DIR}/.ccache"
     CCACHE_COMPILERCHECK: content
     CCACHE_COMPRESS: "true"
+    PYTEST_ADDOPTS: "-s"
 
 .image_builder:
     tags:
