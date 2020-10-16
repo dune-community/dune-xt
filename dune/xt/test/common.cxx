@@ -190,18 +190,16 @@ void check_eoc_study_for_success(
             << "get_unique_test_name() = " << Common::Test::get_unique_test_name();
         const auto& actual_value = actual_type_data.at(level);
         const auto& expected_value = expected_values[level];
-        if (!(expected_value < 0.0 || expected_value > 0.0)) {
-          if (std::abs(actual_value) > zero_tolerance) {
-            EXPECT_TRUE(false)
-                << "          Expected result is interpreted as zero and result is not close enough to zero!\n"
-                << "          level:    " << level << "\n"
-                << "          category: " << category << "\n"
-                << "          type:     " << type << "\n"
-                << "          zero_tolerance: " << zero_tolerance << "\n"
-                << "          actual_value   = " << actual_value << "\n"
-                << "          expected_value = " << expected_value << "\n\n"
-                << "get_unique_test_name() = " << Common::Test::get_unique_test_name();
-          }
+        if (std::abs(expected_value) < zero_tolerance && std::abs(actual_value) > zero_tolerance) {
+          EXPECT_TRUE(false)
+              << "          Expected result is interpreted as zero and result is not close enough to zero!\n"
+              << "          level:    " << level << "\n"
+              << "          category: " << category << "\n"
+              << "          type:     " << type << "\n"
+              << "          zero_tolerance: " << zero_tolerance << "\n"
+              << "          actual_value   = " << actual_value << "\n"
+              << "          expected_value = " << expected_value << "\n\n"
+              << "get_unique_test_name() = " << Common::Test::get_unique_test_name();
         } else {
           const auto actual_result = internal::convert_to_scientific(actual_value, 2);
           const auto expected_result = internal::convert_to_scientific(expected_value, 2);
