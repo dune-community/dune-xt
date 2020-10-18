@@ -259,6 +259,7 @@ class VectorView
       VectorInterface<internal::VectorViewTraits<VectorImp>, typename Common::VectorAbstraction<VectorImp>::ScalarType>;
   using ConstVectorViewType = ConstVectorView<VectorImp>;
   using ThisType = VectorView;
+  using V = Common::VectorAbstraction<VectorImp>;
 
 public:
   using ScalarType = typename BaseType::ScalarType;
@@ -281,7 +282,7 @@ public:
     , vector_(vector)
   {}
 
-  VectorView(const ThisType& other) = default;
+  VectorView(const ThisType& other) = delete;
   VectorView(ThisType&& other) = default;
   ThisType& operator=(VectorView&& other) = default;
 
@@ -293,8 +294,10 @@ public:
     return *this;
   }
 
-  inline ThisType copy() const
+  ThisType& operator=(const ScalarType& val)
   {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, val);
     return *this;
   }
 
@@ -329,13 +332,13 @@ public:
   inline void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    vector_[index(ii)] += value;
+    V::add_to_entry(vector_, index(ii), value);
   }
 
   inline void set_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    vector_[index(ii)] = value;
+    V::set_entry(vector_, index(ii), value);
   }
 
   inline ScalarType get_entry(const size_t ii) const

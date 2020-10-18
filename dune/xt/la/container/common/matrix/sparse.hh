@@ -128,7 +128,7 @@ public:
 #endif // NDEBUG
           column_indices_->push_back(columns[kk]);
         } // kk
-        entries_->resize(column_indices_->size());
+        entries_->resize(column_indices_->size(), 0.);
       } // row
     }
   } // CommonSparseMatrix(rr, cc, patt, num_mutexes)

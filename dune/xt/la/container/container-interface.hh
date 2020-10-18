@@ -53,10 +53,11 @@ struct LockGuard
 {
   LockGuard(std::vector<std::mutex>& mutexes, const size_t ii, const size_t container_size)
     : mutexes_(mutexes)
-    , index_(ii * mutexes_.size() / container_size)
   {
-    if (mutexes_.size())
+    if (mutexes_.size()) {
+      index_ = ii * mutexes_.size() / container_size;
       mutexes_[index_].lock();
+    }
   }
 
   ~LockGuard()
@@ -66,7 +67,7 @@ struct LockGuard
   }
 
   std::vector<std::mutex>& mutexes_;
-  const size_t index_;
+  size_t index_;
 }; // LockGuard
 
 

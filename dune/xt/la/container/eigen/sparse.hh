@@ -525,7 +525,7 @@ private:
 
 private:
   std::shared_ptr<BackendType> backend_;
-  std::shared_ptr<MutexesType> mutexes_;
+  std::unique_ptr<MutexesType> mutexes_;
 }; // class EigenRowMajorSparseMatrix
 
 

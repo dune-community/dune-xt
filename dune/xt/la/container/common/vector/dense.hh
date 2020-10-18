@@ -333,7 +333,6 @@ public:
   {
     if (this != &other) {
       *backend_ = *other.backend_;
-      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
   }
