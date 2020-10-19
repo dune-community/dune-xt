@@ -13,6 +13,7 @@
 # ~~~
 
 from tempfile import NamedTemporaryFile
+import numpy as np
 
 from dune.xt import guarded_import
 from dune.xt.common.vtk.plot import plot
@@ -55,3 +56,18 @@ def visualize_function(function, grid, subsampling=False):
     except AttributeError:
         GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
     return plot(tmpfile, color_attribute_name=function.name)
+
+def visualize_function_on_dd_grid(dd_grid, function, subdomains=[1]):
+    if not subdomains:
+        subdomains = list(np.arange(dd_grid.num_subdomains))
+    assert isinstance(subdomains, list), 'Please provide a list of subdomains'
+    assert all(isinstance(sd, int) for sd in subdomains)
+#    assert len(subdomains)==1, 'so far, the function can only be visualized on one domain'
+    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+    dd_grid.write_global_visualization('something', function)
+    prestring = f's{dd_grid.num_subdomains:04d}-'
+    if len(subdomains) == 1:
+        prestring += f'p{subdomains[0]-1:04d}-'
+        return plot(prestring + 'something.vtu', color_attribute_name=function.name)
+#    assert 0 'We need PUnstructuredGrid for dune/xt/common/vtk/reader.py'
+    return plot(prestring + 'something.pvtu', color_attribute_name=function.name)

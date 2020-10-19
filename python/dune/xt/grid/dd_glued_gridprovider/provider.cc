@@ -91,6 +91,12 @@ public:
          return neighboring_subdomains;
     });
 
+    c.def(
+        "write_global_visualization",
+        [](type& self, const std::string& filename_prefix, const XT::Functions::FunctionInterface<dim>& func)
+            { self.write_global_visualization(filename_prefix, func); },
+        "filename_prefix"_a,
+        "function"_a);
     return c;
   } // ... bind(...)
 }; // class GridProvider
