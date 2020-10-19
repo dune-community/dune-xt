@@ -37,6 +37,8 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/functions/base/visualization.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune::XT::Grid::DD {
 namespace Exceptions {
@@ -710,6 +712,19 @@ public:
     vtk_writer.addCellData(outside_inside_coupling_visualization, "local coupling entities (outside/inside)");
     vtk_writer.write(filename, VTK::appendedraw);
   } // ... visualize(...)
+
+
+  void write_global_visualization(const std::string& filename_prefix, const XT::Functions::FunctionInterface<dimDomain>& func)
+  {
+    GluedVTKWriter<MacroGridType, LocalGridType, layer> vtk_writer(*this);
+    for (size_t subdomain = 0; subdomain < macro_leaf_view_size_; ++subdomain) {
+        auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
+            func.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), func.name());
+        vtk_writer.addVertexData(subdomain, visualization_adapter);
+    }
+    vtk_writer.write(filename_prefix, VTK::appendedraw);
+    vtk_writer.clear();
+  } // ... write_visualization(...)
 
 private:
   template <class MacroEntityType>
