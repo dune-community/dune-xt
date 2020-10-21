@@ -1352,8 +1352,7 @@ signed char ROperation::ContainVar(const RVar& varp) const
   if (op == Var) {
     if (EqStr(pvar->name, varp.name) && pvar->pval == varp.pval)
       return 1;
-    else
-      return 0;
+    return 0;
   };
   if (mmb1 != NULL && mmb1->ContainVar(varp))
     return 1;
@@ -1367,8 +1366,7 @@ signed char ROperation::ContainFuncNoRec(const RFunction& func) const // No recu
   if (op == Fun) {
     if (*pfunc == func)
       return 1;
-    else
-      return 0;
+    return 0;
   }
   if (mmb1 != NULL && mmb1->ContainFuncNoRec(func))
     return 1;
@@ -1424,7 +1422,7 @@ int ROperation::NMembers() const // Number of members for an operation like a,b,
     return (pfunc->type == 1 ? pfunc->op.NMembers() : pfunc->type == 0 ? 1 : 0);
   if (op != Juxt)
     return 1;
-  else if (mmb2 == NULL)
+  if (mmb2 == NULL)
     return 0;
   else
     return 1 + mmb2->NMembers();
@@ -1444,7 +1442,7 @@ ROperation ROperation::NthMember(int n) const
   if (n == 1) {
     if (op != Juxt)
       return *this;
-    else if (mmb1 != NULL)
+    if (mmb1 != NULL)
       return *mmb1;
     else
       return ErrVal;
@@ -1480,6 +1478,7 @@ ROperation ROperation::Substitute(const RVar& var,
   return r;
 }
 
+#ifndef __clang_analyzer__ // tidy throws a false positive on the lambda
 ROperation ROperation::Diff(const RVar& var) const
 {
   if (!ContainVar(var))
@@ -1548,7 +1547,7 @@ ROperation ROperation::Diff(const RVar& var) const
         return ErrVal;
       if (pfunc->nvars == 0)
         return 0.;
-      else if (pfunc->op.NMembers() > 1) {
+      if (pfunc->op.NMembers() > 1) {
         j = pfunc->op.NMembers();
         ppop1 = new ROperation*[j];
         for (i = 0; i < j; i++)
@@ -1578,6 +1577,7 @@ ROperation ROperation::Diff(const RVar& var) const
       return ErrVal;
   };
 }
+#endif // __clang_analyzer__ // tidy throws a false positive on operator,
 
 char* ValToStr(double x)
 {

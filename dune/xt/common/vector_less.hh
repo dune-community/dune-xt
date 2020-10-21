@@ -30,7 +30,7 @@ struct VectorLess
     for (size_t dd = 0; dd < a.size(); ++dd) {
       if (V1::get_entry(a, dd) < V2::get_entry(b, dd))
         return true;
-      else if (V1::get_entry(a, dd) > V2::get_entry(b, dd))
+      if (V1::get_entry(a, dd) > V2::get_entry(b, dd))
         return false;
     }
     return false;
@@ -48,7 +48,7 @@ struct VectorFloatLess
     for (size_t dd = 0; dd < a.size(); ++dd) {
       if (XT::Common::FloatCmp::lt(V1::get_entry(a, dd), V2::get_entry(b, dd)))
         return true;
-      else if (XT::Common::FloatCmp::gt(V1::get_entry(a, dd), V2::get_entry(b, dd)))
+      if (XT::Common::FloatCmp::gt(V1::get_entry(a, dd), V2::get_entry(b, dd)))
         return false;
     }
     return false;

@@ -287,11 +287,10 @@ public:
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
+    Common::Configuration tmp;
+    tmp.add(config, sub_name);
+    return tmp;
+
   } // ... defaults(...)
 
   /**

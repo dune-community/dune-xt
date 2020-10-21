@@ -295,8 +295,7 @@ private:
     }
     if (validator(val))
       return val;
-    else
-      DUNE_THROW(Exceptions::configuration_error, validator.msg(val));
+    DUNE_THROW(Exceptions::configuration_error, validator.msg(val));
   } // ... get_valid_value(...)
 
   /** \brief all public get signatures call this one

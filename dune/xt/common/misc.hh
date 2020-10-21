@@ -79,7 +79,8 @@ std::array<T, N> make_array(const std::vector<T>& v)
 {
   if (v.size() == 1) {
     return make_array<T, N>(v[0]);
-  } else if (v.size() < N) {
+  }
+  if (v.size() < N) {
     std::array<T, N> error_msg;
     DUNE_THROW(Exceptions::shapes_do_not_match,
                "Trying to create a " << get_typename(error_msg) << " from a " << get_typename(v) << " of size "

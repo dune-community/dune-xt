@@ -102,8 +102,7 @@ std::string color(const std::string id)
   const auto search_result = color_map().find(id);
   if (search_result != color_map().end())
     return search_result->second;
-  else
-    return "";
+  return "";
 }
 
 std::string backcolor(size_t i)
@@ -124,11 +123,10 @@ bool terminal_supports_color()
   const char* const term = getenv("TERM");
   if (term == nullptr)
     return false;
-  else {
-    const auto term_str = std::string(term);
-    return term_str == "xterm" || term_str == "xterm-color" || term_str == "xterm-256color" || term_str == "screen"
-           || term_str == "linux" || term_str == "cygwin";
-  }
+  const auto term_str = std::string(term);
+  return term_str == "xterm" || term_str == "xterm-color" || term_str == "xterm-256color" || term_str == "screen"
+         || term_str == "linux" || term_str == "cygwin";
+
 } // ... terminal_supports_color(...)
 
 std::string highlight_template(std::string str, size_t maxlevel)
@@ -184,8 +182,7 @@ std::string color_string(const std::string str, const std::string clr)
 {
   if (terminal_supports_color())
     return clr + str + StreamModifiers::normal;
-  else
-    return str;
+  return str;
 }
 
 std::string color_string_red(const std::string str)

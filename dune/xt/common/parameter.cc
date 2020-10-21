@@ -88,9 +88,9 @@ bool ParameterType::operator==(const ParameterType& other) const
     if (this_single_element.first == other_single_element.first || this_single_element.first == "__unspecified__"
         || other_single_element.first == "__unspecified__") {
       return this_single_element.second == other_single_element.second;
-    } else {
-      return false;
     }
+    return false;
+
   } else {
     return this->dict_ == other.dict_;
   }
@@ -183,8 +183,7 @@ Parameter Parameter::operator+(const Parameter& other) const
       [](const auto& left, const auto& right) {
         if (left.size() != right.size())
           return "cannot add parameters which contain the same key with different sizes:";
-        else
-          return "cannot add parameters which contain the same key with different values:";
+        return "cannot add parameters which contain the same key with different values:";
       });
 } // ... operator+(...)
 
@@ -243,7 +242,8 @@ Parameter ParametricInterface::parse_parameter(const Parameter& mu) const
       return mu;
     if (this_single_key == "__unspecified__") {
       return mu;
-    } else if (mus_single_key == "__unspecified__") {
+    }
+    if (mus_single_key == "__unspecified__") {
       return Parameter(this_single_key, mu.get("__unspecified__"));
     }
     // both have only one key, but the keys don't match and neither is '__unspecified__'

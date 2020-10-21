@@ -123,7 +123,8 @@ public:
         // outside
         ret[0] = 0.0;
         break;
-      } else if (point < left + delta) {
+      }
+      if (point < left + delta) {
         // left boundary layer
         ret[0] *= phi_left((point - (left + delta)) / (2.0 * delta));
       } else if (point < right - delta) {
@@ -165,7 +166,7 @@ private:
   {
     if (point < -1.0)
       return 0.0;
-    else if (point > 0.0)
+    if (point > 0.0)
       return 1.0;
     else
       return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
@@ -175,7 +176,7 @@ private:
   {
     if (point < 0.0)
       return 1.0;
-    else if (point > 1.0)
+    if (point > 1.0)
       return 0.0;
     else
       return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);

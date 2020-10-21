@@ -126,7 +126,7 @@ std::string TimedPrefixedStreamBuffer::elapsed_time_str() const
   const size_t seconds(elapsed - weeks * secs_per_week - days * secs_per_day - hours * secs_per_hour - minutes * 60);
   if (elapsed > secs_per_week) // more than a week
     return (boost::format("%02dw %02dd %02d:%02d:%02d|") % weeks % days % hours % minutes % seconds).str();
-  else if (elapsed > secs_per_day) // less than a week, more than a day
+  if (elapsed > secs_per_day) // less than a week, more than a day
     return (boost::format("%02dd %02d:%02d:%02d|") % days % hours % minutes % seconds).str();
   else if (elapsed > secs_per_hour) // less than a day, more than one hour
     return (boost::format("%02d:%02d:%02d|") % hours % minutes % seconds).str();
