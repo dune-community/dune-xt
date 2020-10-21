@@ -24,7 +24,7 @@ namespace internal {
 template <class FunctionType>
 class ElementwiseMinimumFunctionHelper
 {
-  static_assert(is_element_function<FunctionType>::value, "");
+  static_assert(is_element_function<FunctionType>::value);
 
 public:
   static const constexpr size_t d = FunctionType::d;
@@ -85,7 +85,7 @@ public:
 template <class SomeFunction>
 class ElementwiseMinimumFunction : public GridFunctionInterface<typename SomeFunction::E>
 {
-  static_assert(is_function<SomeFunction>::value || is_grid_function<SomeFunction>::value, "");
+  static_assert(is_function<SomeFunction>::value || is_grid_function<SomeFunction>::value);
 
   using ThisType = ElementwiseMinimumFunction;
   using BaseType = GridFunctionInterface<typename SomeFunction::E>;
@@ -101,7 +101,7 @@ public:
   using typename BaseType::R;
 
 private:
-  static_assert(r == rC, "");
+  static_assert(r == rC);
 
   class LocalFunction : public XT::Functions::ElementFunctionInterface<E>
   {

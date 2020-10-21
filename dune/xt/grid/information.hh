@@ -92,7 +92,7 @@ size_t max_number_of_neighbors(const GridLayerType& grid_layer)
 template <class GridLayerType>
 struct Dimensions
 {
-  static_assert(is_layer<GridLayerType>::value, "");
+  static_assert(is_layer<GridLayerType>::value);
   using GridType = extract_grid_t<GridLayerType>;
   //! automatic running min/max
   using MinMaxAvgType = Dune::XT::Common::MinMaxAvg<typename GridType::ctype>;

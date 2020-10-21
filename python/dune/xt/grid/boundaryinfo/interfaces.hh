@@ -24,7 +24,7 @@ namespace Dune::XT::Grid::bindings {
 template <class G>
 class BoundaryInfo
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
   using I = extract_intersection_t<GV>;
 

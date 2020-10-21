@@ -639,8 +639,8 @@ template <size_t d, size_t r, size_t rC, class R, class GridView>
 GridFunction<Grid::extract_entity_t<GridView>, r, rC, R> make_grid_function(const FunctionInterface<d, r, rC, R>& func,
                                                                             const GridView& /*grid_view*/)
 {
-  static_assert(Grid::is_view<GridView>::value, "");
-  static_assert(GridView::dimension == d, "");
+  static_assert(Grid::is_view<GridView>::value);
+  static_assert(GridView::dimension == d);
   return GridFunction<Grid::extract_entity_t<GridView>, r, rC, R>(func);
 }
 

@@ -45,7 +45,7 @@ auto energy                 = XT::Functions::make_sliced_function<1>(u, {3},    
 template <class GF, size_t r>
 class SlicedGridFunction<GF, r, 1> : public XT::Functions::GridFunctionInterface<typename GF::E, r, 1, typename GF::R>
 {
-  static_assert(is_grid_function<GF>::value, "");
+  static_assert(is_grid_function<GF>::value);
   static_assert(r <= GF::r, "Does not make sense!");
 
   using ThisType = SlicedGridFunction;

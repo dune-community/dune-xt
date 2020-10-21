@@ -255,9 +255,9 @@ struct CombinedJac<CombinationType::sum, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
 template <class Left, class Right, typename comb>
 struct CombinedHelper
 {
-  static_assert(is_element_function<Left>::value || is_function<Left>::value || is_grid_function<Left>::value, "");
-  static_assert(is_element_function<Right>::value || is_function<Right>::value || is_grid_function<Right>::value, "");
-  static_assert(Left::d == Right::d, "");
+  static_assert(is_element_function<Left>::value || is_function<Left>::value || is_grid_function<Left>::value);
+  static_assert(is_element_function<Right>::value || is_function<Right>::value || is_grid_function<Right>::value);
+  static_assert(Left::d == Right::d);
 
   static const constexpr size_t d = Left::d;
   static const constexpr size_t L_r = Left::r;

@@ -81,9 +81,9 @@ class CombinedFunction
                              internal::CombinedHelper<LeftType, RightType, comb>::rC,
                              typename internal::CombinedHelper<LeftType, RightType, comb>::R>
 {
-  static_assert(is_function<LeftType>::value, "");
-  static_assert(is_function<RightType>::value, "");
-  static_assert(LeftType::d == RightType::d, "");
+  static_assert(is_function<LeftType>::value);
+  static_assert(is_function<RightType>::value);
+  static_assert(LeftType::d == RightType::d);
 
   using BaseType = FunctionInterface<LeftType::d,
                                      internal::CombinedHelper<LeftType, RightType, comb>::r,

@@ -336,7 +336,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
 template <class MatrixType>
 struct lapack_helper
 {
-  static_assert(Common::is_matrix<MatrixType>::value, "");
+  static_assert(Common::is_matrix<MatrixType>::value);
 
   template <class MatrixImp>
   static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& matrix)

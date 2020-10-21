@@ -21,7 +21,7 @@ namespace Dune::XT::Grid {
 template <class M, class E>
 class SubEntityIndex
 {
-  static_assert(is_entity<E>::value, "");
+  static_assert(is_entity<E>::value);
   using G = extract_grid_t<E>;
   using D = typename G::ctype;
   static const constexpr size_t d = G::dimension;

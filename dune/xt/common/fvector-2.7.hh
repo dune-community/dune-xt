@@ -535,7 +535,7 @@ namespace internal {
 template <class K>
 struct hstack_decay
 {
-  static_assert(is_arithmetic<K>::value, "");
+  static_assert(is_arithmetic<K>::value);
   using type = K;
 };
 

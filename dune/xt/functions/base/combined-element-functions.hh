@@ -30,9 +30,9 @@ class CombinedConstElementFunction
                                     internal::CombinedHelper<LeftType, RightType, comb>::rC,
                                     typename internal::CombinedHelper<LeftType, RightType, comb>::R>
 {
-  static_assert(is_element_function<LeftType>::value, "");
-  static_assert(is_element_function<RightType>::value, "");
-  static_assert(std::is_same<typename LeftType::E, typename RightType::E>::value, "");
+  static_assert(is_element_function<LeftType>::value);
+  static_assert(is_element_function<RightType>::value);
+  static_assert(std::is_same<typename LeftType::E, typename RightType::E>::value);
 
   using ThisType = CombinedConstElementFunction;
   using BaseType = ElementFunctionInterface<typename LeftType::E,

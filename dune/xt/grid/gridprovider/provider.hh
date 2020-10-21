@@ -39,7 +39,7 @@ namespace Dune::XT::Grid {
 template <class GridImp>
 class GridProvider
 {
-  static_assert(is_grid<GridImp>::value, "");
+  static_assert(is_grid<GridImp>::value);
 
 public:
   using ThisType = GridProvider<GridImp>;

@@ -142,7 +142,7 @@ public:
 template <class T, bool use_repr>
 class MatrixPrinter : public internal::DefaultPrinter<T, use_repr>
 {
-  static_assert(is_matrix<T>::value, "");
+  static_assert(is_matrix<T>::value);
 
   using M = MatrixAbstraction<T>;
 

@@ -51,7 +51,7 @@ class ElementFluxFunctionSetInterface
   : public Common::ParametricInterface
   , public XT::Grid::ElementBoundObject<Element>
 {
-  static_assert(XT::Grid::is_entity<Element>::value, "");
+  static_assert(XT::Grid::is_entity<Element>::value);
   using ThisType = ElementFluxFunctionSetInterface;
 
 public:

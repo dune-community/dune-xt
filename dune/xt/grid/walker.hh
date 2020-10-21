@@ -61,7 +61,7 @@ namespace internal {
 template <class GL>
 class ElementFunctorWrapper
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
   using ThisType = ElementFunctorWrapper;
 
 public:
@@ -102,7 +102,7 @@ private:
 template <class GL>
 class IntersectionFunctorWrapper
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
   using ThisType = IntersectionFunctorWrapper;
 
 public:
@@ -143,7 +143,7 @@ private:
 template <class GL>
 class ElementAndIntersectionFunctorWrapper
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
   using ThisType = ElementAndIntersectionFunctorWrapper;
 
 public:

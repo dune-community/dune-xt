@@ -69,9 +69,9 @@ class CombinedGridFunction
                                  internal::CombinedHelper<LeftType, RightType, comb>::rC,
                                  typename internal::CombinedHelper<LeftType, RightType, comb>::R>
 {
-  static_assert(is_grid_function<LeftType>::value, "");
-  static_assert(is_grid_function<RightType>::value, "");
-  static_assert(std::is_same<typename LeftType::E, typename RightType::E>::value, "");
+  static_assert(is_grid_function<LeftType>::value);
+  static_assert(is_grid_function<RightType>::value);
+  static_assert(std::is_same<typename LeftType::E, typename RightType::E>::value);
 
   using ThisType = CombinedGridFunction;
   using BaseType = GridFunctionInterface<typename LeftType::E,

@@ -28,7 +28,7 @@ namespace Dune::XT::Functions::bindings::ESV2007 {
 template <class G>
 class CutoffFunction
 {
-  static_assert(XT::Grid::is_grid<G>::value, "");
+  static_assert(XT::Grid::is_grid<G>::value);
   using D = typename G::ctype;
   static constexpr size_t d = G::dimension;
 

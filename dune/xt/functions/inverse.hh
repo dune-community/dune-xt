@@ -30,8 +30,7 @@ template <class FunctionType>
 class InverseFunctionHelper
 {
   static_assert(is_element_function<FunctionType>::value || is_function<FunctionType>::value
-                    || is_grid_function<FunctionType>::value,
-                "");
+                || is_grid_function<FunctionType>::value);
 
 public:
   static constexpr size_t d = FunctionType::d;
@@ -79,7 +78,7 @@ class InverseElementFunction
                                     internal::InverseFunctionHelper<ElementFunctionType>::rC,
                                     typename internal::InverseFunctionHelper<ElementFunctionType>::R>
 {
-  static_assert(is_element_function<ElementFunctionType>::value, "");
+  static_assert(is_element_function<ElementFunctionType>::value);
 
   using BaseType = ElementFunctionInterface<typename ElementFunctionType::E,
                                             internal::InverseFunctionHelper<ElementFunctionType>::r,
@@ -139,7 +138,7 @@ class InverseFunction
                              internal::InverseFunctionHelper<FunctionType>::rC,
                              typename internal::InverseFunctionHelper<FunctionType>::R>
 {
-  static_assert(is_function<FunctionType>::value, "");
+  static_assert(is_function<FunctionType>::value);
 
   using ThisType = InverseFunction;
   using BaseType = FunctionInterface<FunctionType::d,
@@ -210,7 +209,7 @@ class InverseGridFunction
                                  internal::InverseFunctionHelper<GridFunctionType>::rC,
                                  typename internal::InverseFunctionHelper<GridFunctionType>::R>
 {
-  static_assert(is_grid_function<GridFunctionType>::value, "");
+  static_assert(is_grid_function<GridFunctionType>::value);
 
   using Helper = internal::InverseFunctionHelper<GridFunctionType>;
   static const constexpr size_t r_ = GridFunctionType::r;

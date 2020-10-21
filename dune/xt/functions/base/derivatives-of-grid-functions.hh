@@ -31,7 +31,7 @@ class DerivativeGridFunction
                                  internal::DerivativeElementFunctionHelper<GridFunctionType, derivative>::rC,
                                  typename internal::DerivativeElementFunctionHelper<GridFunctionType, derivative>::R>
 {
-  static_assert(is_grid_function<GridFunctionType>::value, "");
+  static_assert(is_grid_function<GridFunctionType>::value);
 
   using ThisType = DerivativeGridFunction;
   using BaseType =

@@ -286,7 +286,7 @@ struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typenam
 template <class F>
 struct as_element_function_interface
 {
-  static_assert(is_element_function<F>::value, "");
+  static_assert(is_element_function<F>::value);
   using type = Functions::ElementFunctionInterface<typename F::E, F::r, F::rC, typename F::R>;
 };
 
@@ -297,7 +297,7 @@ using as_element_function_interface_t = typename as_element_function_interface<F
 template <class F>
 struct as_function_interface
 {
-  static_assert(is_function<F>::value, "");
+  static_assert(is_function<F>::value);
   using type = Functions::FunctionInterface<F::d, F::r, F::rC, typename F::R>;
 };
 
@@ -308,7 +308,7 @@ using as_function_interface_t = typename as_function_interface<F>::type;
 template <class F>
 struct as_grid_function_interface
 {
-  static_assert(is_grid_function<F>::value, "");
+  static_assert(is_grid_function<F>::value);
   using type = Functions::GridFunctionInterface<typename F::E, F::r, F::rC, typename F::R>;
 };
 

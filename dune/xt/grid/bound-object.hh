@@ -24,7 +24,7 @@ namespace Dune::XT::Grid {
 template <class Element>
 class ElementBoundObject /*: Common::EnableDebugLoggingForCtors<ElementBoundObject<Element>>*/
 {
-  static_assert(is_entity<Element>::value, "");
+  static_assert(is_entity<Element>::value);
 
   using ThisType = ElementBoundObject;
   //  using DebugLogging = Common::EnableDebugLoggingForCtors<ElementBoundObject<Element>>;
@@ -115,7 +115,7 @@ protected:
 template <class Intersection>
 class IntersectionBoundObject
 {
-  static_assert(is_intersection<Intersection>::value, "");
+  static_assert(is_intersection<Intersection>::value);
 
   using ThisType = IntersectionBoundObject;
 

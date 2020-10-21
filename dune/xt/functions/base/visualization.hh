@@ -190,7 +190,7 @@ private:
 template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
-  static_assert(XT::Grid::is_view<GridViewType>::value, "");
+  static_assert(XT::Grid::is_view<GridViewType>::value);
 
 public:
   using EntityType = XT::Grid::extract_entity_t<GridViewType>;
@@ -251,7 +251,7 @@ private:
 template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
 class GradientVisualizationAdapter : public VTKFunction<GridViewType>
 {
-  static_assert(XT::Grid::is_view<GridViewType>::value, "");
+  static_assert(XT::Grid::is_view<GridViewType>::value);
   static_assert(range_dim_cols == 1, "Not implemented!");
 
 public:

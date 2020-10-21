@@ -52,7 +52,7 @@ class NegatedIntersectionFilter;
 template <class GL>
 class ElementFilter
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
 
 public:
   using GridViewType = GL;
@@ -119,7 +119,7 @@ public:
 template <class GL>
 class IntersectionFilter
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
 
 public:
   using GridViewType = GL;

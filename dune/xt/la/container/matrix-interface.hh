@@ -78,7 +78,7 @@ public:
   using MutexesType = typename Traits::MutexesType;
   static constexpr Backends vector_type = Traits::vector_type;
   static constexpr bool sparse = Traits::sparse;
-  static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
+  static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value);
 
   virtual ~MatrixInterface() = default;
 

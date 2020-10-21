@@ -17,13 +17,16 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune::XT::Grid::bindings {
+namespace Dune {
+namespace XT {
+namespace Grid {
+namespace bindings {
 
 
 template <template <class> class Filter, class G>
 class InitlessElementFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:
@@ -50,6 +53,9 @@ public:
 }; // class InitlessElementFilter
 
 
-} // namespace Dune::XT::Grid::bindings
+} // namespace bindings
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
 
 #endif // PYTHON_DUNE_XT_GRID_FILTERS_ELEMENT_HH

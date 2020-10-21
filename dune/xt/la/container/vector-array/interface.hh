@@ -36,7 +36,7 @@ public:
   using VectorType = typename Traits::VectorType;
 
 private:
-  static_assert(is_vector<VectorType>::value, "");
+  static_assert(is_vector<VectorType>::value);
 
 public:
   using const_iterator = typename Traits::const_iterator;

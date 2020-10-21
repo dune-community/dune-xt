@@ -63,7 +63,7 @@ static inline Common::Configuration default_matrix_inverter_options()
 template <class MatrixImp>
 class MatrixInverterBase
 {
-  static_assert(is_matrix<MatrixImp>::value || XT::Common::is_matrix<MatrixImp>::value, "");
+  static_assert(is_matrix<MatrixImp>::value || XT::Common::is_matrix<MatrixImp>::value);
 
 public:
   using MatrixType = MatrixImp;

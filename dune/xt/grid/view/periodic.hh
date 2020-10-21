@@ -888,7 +888,7 @@ class PeriodicGridView
   : XT::Common::StorageProvider<internal::PeriodicGridViewWrapper<BaseGridViewImp, codim_iters_provided>>
   , public Dune::GridView<internal::PeriodicGridViewWrapperTraits<BaseGridViewImp, codim_iters_provided>>
 {
-  static_assert(is_view<BaseGridViewImp>::value, "");
+  static_assert(is_view<BaseGridViewImp>::value);
   using Implementation = internal::PeriodicGridViewWrapper<BaseGridViewImp, codim_iters_provided>;
   using ImplementationStorage = typename XT::Common::StorageProvider<Implementation>;
   using BaseType = Dune::GridView<internal::PeriodicGridViewWrapperTraits<BaseGridViewImp, codim_iters_provided>>;

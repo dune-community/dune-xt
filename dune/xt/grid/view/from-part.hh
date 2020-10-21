@@ -25,7 +25,7 @@ namespace Dune::XT::Grid {
 template <class GridLayerType>
 class TemporaryConstView
 {
-  static_assert(is_layer<GridLayerType>::value, "");
+  static_assert(is_layer<GridLayerType>::value);
 
   template <bool view = is_view<GridLayerType>::value, bool part = is_part<GridLayerType>::value, bool anything = true>
   struct const_storage

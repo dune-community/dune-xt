@@ -106,7 +106,7 @@ public:
   using field_type = ScalarType;
   using RealType = typename Traits::RealType;
 
-  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
+  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
   virtual ~ContainerInterface() {}
 

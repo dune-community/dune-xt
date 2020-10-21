@@ -22,7 +22,7 @@ namespace Dune::XT::Grid::bindings {
 template <class G>
 class ElementFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:
@@ -53,7 +53,7 @@ public:
 template <class G>
 class IntersectionFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:

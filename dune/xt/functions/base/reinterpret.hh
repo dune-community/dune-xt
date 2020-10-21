@@ -39,7 +39,7 @@ template <class SourceGridView,
 class ReinterpretLocalizableFunction
   : public GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>
 {
-  static_assert(XT::Grid::is_layer<SourceGridView>::value, "");
+  static_assert(XT::Grid::is_layer<SourceGridView>::value);
 
   using ThisType = ReinterpretLocalizableFunction;
   using BaseType = GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>;
