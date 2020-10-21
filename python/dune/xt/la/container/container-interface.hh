@@ -52,16 +52,16 @@ void addbind_ContainerInterface(pybind11::class_<C>& c)
   using namespace pybind11::literals;
 
   using S = typename C::ScalarType;
-
+#ifndef __clang_analyzer__ // tidy throws a false positive on the lambda
   c.def(
       "copy",
       [](C& self, const bool deep) {
         if (deep)
           return self.copy();
-        else
-          return C(self);
+        return C(self);
       },
       "deep"_a = false);
+#endif
   c.def(
       "scal", [](C& self, const S& alpha) { self.scal(alpha); }, "alpha"_a);
   c.def("axpy", [](C& self, const S& alpha, const C& xx) { self.axpy(alpha, xx); });
