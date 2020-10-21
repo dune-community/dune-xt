@@ -31,10 +31,7 @@
 #include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
@@ -655,10 +652,7 @@ public:
 }; // class GridFunction
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>

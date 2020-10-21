@@ -17,9 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -264,8 +262,6 @@ private:
 }; // class CheckerboardFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

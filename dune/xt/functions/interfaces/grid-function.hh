@@ -38,9 +38,7 @@
 
 #include "element-functions.hh"
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 // forwards, includes are below
@@ -331,9 +329,7 @@ public:
 }; // class GridFunctionInterface
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 

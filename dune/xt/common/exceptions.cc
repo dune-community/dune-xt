@@ -23,9 +23,7 @@
 
 #include "exceptions.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 int handle_exception(const Dune::Exception& exp)
@@ -46,6 +44,4 @@ int handle_exception(const std::exception& exp)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

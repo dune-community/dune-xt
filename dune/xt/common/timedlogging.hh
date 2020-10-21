@@ -37,9 +37,7 @@
 #  endif
 #endif
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 DUNE_EXPORT inline const Timer& SecondsSinceStartup()
@@ -496,9 +494,7 @@ template <class T>
 using EnableDebugLoggingForCtors = NoOpEnableDebugLoggingForCtors<T>;
 #endif
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 
 #endif // DUNE_XT_COMMON_TIMED_LOGGING_HH

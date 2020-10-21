@@ -151,9 +151,7 @@ struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 1>
  * of the tuple @c MyTuple. Enjoy it!
  */
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 // reduced from
 // http://stackoverflow.com/questions/1492204/is-it-possible-to-generate-types-with-all-combinations-of-template-arguments
@@ -466,9 +464,7 @@ using null_template_tuple = template_tuple<Dune::XT::Common::tuple_null_type>;
 template <typename... input_t>
 using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 namespace std {
 //! specialization for our custom tuple tuple_size can be use on it

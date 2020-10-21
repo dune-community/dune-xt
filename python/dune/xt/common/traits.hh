@@ -12,19 +12,13 @@
 
 #include <dune/pybindxi/pybind11.h>
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace bindings {
+namespace Dune::XT::Common::bindings {
 
 
 struct Double
 {};
 
 
-} // namespace bindings
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::bindings
 
 #endif // PYTHON_DUNE_XT_COMMON_TRAITS_HH

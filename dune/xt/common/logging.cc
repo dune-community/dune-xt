@@ -19,9 +19,7 @@
 
 #include "logging.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 Logging::Logging()
   : streamIDs_({LOG_ERROR, LOG_DEBUG, LOG_INFO})
@@ -138,6 +136,4 @@ void Logging::suspend(LogStream::PriorityType prio)
   }
 } // suspend
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

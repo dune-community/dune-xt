@@ -18,9 +18,7 @@
 
 #include "string.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 std::string to_lower(const std::string& ss)
@@ -65,6 +63,4 @@ void trim(std::vector<std::string>& v)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

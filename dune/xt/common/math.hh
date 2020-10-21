@@ -37,9 +37,7 @@
 
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 /**
@@ -348,9 +346,7 @@ inline bool is_zero(const FieldType& val)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 
 template <class T>

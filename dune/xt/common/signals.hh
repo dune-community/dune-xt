@@ -14,9 +14,7 @@
 
 #include <signal.h>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! POSIX signal management utils
 
@@ -32,8 +30,6 @@ typedef void handler_type(int);
 //! calling this from your main() will install handler as callback when signal is received
 void install_signal_handler(int signal = SIGINT, handler_type handler = handle_interrupt);
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_SIGNALS

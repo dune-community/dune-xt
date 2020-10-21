@@ -32,8 +32,7 @@ struct EpsilonType<std::complex<T>>
   using Type = std::complex<T>;
 };
 } // namespace FloatCmp
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 // forward, include is below
 template <class VecType>
@@ -42,8 +41,7 @@ struct VectorAbstraction;
 template <class MatType>
 struct MatrixAbstraction;
 
-namespace FloatCmp {
-namespace internal {
+namespace FloatCmp::internal {
 
 /**
  * Note: The organization of this file is not optimal. Currently we require a non dune_ based method for the numpy
@@ -542,10 +540,8 @@ struct cmp_type_check
   static constexpr bool value = is_ok_scalar || is_ok_vector || is_ok_matrix;
 };
 
-} // namespace internal
-} // namespace FloatCmp
-} // namespace Common
-} // namespace XT
+} // namespace FloatCmp::internal
+} // namespace XT::Common
 } // namespace Dune
 
 #include <dune/xt/common/vector.hh>

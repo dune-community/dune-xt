@@ -15,9 +15,7 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class M, class E>
@@ -81,8 +79,6 @@ size_t sub_entity_index(const Dune::Mapper<G, MapperImp, IndexType>& mapper,
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_MAPPER_HH

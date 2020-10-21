@@ -28,9 +28,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/debug.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 namespace internal {
@@ -388,9 +386,7 @@ operator<<(std::basic_ostream<CharType, CharTraits>& out, const V& vec)
 } // ... operator<<(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 
 namespace std {

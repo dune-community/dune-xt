@@ -19,9 +19,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GridLayerType>
@@ -148,8 +146,6 @@ TemporaryView<GridLayerType> make_tmp_view(GridLayerType& grid_layer)
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_VIEW_FROM_PART_HH

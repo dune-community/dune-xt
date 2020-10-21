@@ -43,9 +43,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! element-index-in-container search
@@ -97,8 +95,6 @@ std::array<T, N> make_array(const std::vector<T>& v)
 //! writes process environment to file
 void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep = ",");
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_MISC_HH

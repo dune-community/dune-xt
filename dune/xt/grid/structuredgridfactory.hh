@@ -39,86 +39,7 @@
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
 
-namespace Dune {
-
-#if HAVE_DUNE_SPGRID
-
-/** \brief Specialization of the StructuredGridFactory for SPGrid
- *
- *  This allows a SPGrid to be constructed using the
- *  StructuredGridFactory just like the unstructured Grids. Limitations:
- *  \li SPGrid does not support simplices
- */
-template <class ct, int dim, template <int> class Refinement, class Comm>
-class StructuredGridFactory<SPGrid<ct, dim, Refinement, Comm>>
-{
-  using GridType = SPGrid<ct, dim, Refinement, Comm>;
-  using ctype = typename GridType::ctype;
-  static constexpr int dimworld = GridType::dimensionworld;
-
-public:
-  /** \brief Create a structured cube grid
-   *
-   *  \param lowerLeft  Lower left corner of the grid
-   *  \param upperRight Upper right corner of the grid
-   *  \param elements   Number of elements in each coordinate direction
-   */
-  static std::shared_ptr<GridType> createCubeGrid(const FieldVector<ctype, dimworld>& lowerLeft,
-                                                  const FieldVector<ctype, dimworld>& upperRight,
-                                                  const std::array<unsigned int, dim>& elements)
-  {
-    std::array<int, dim> cells;
-    for (const auto i : XT::Common::value_range(dim))
-      cells[i] = elements[i];
-    return std::make_shared<GridType>(lowerLeft, upperRight, cells);
-  }
-
-  /** \brief Create a structured cube grid
-   *
-   *  \param lowerLeft  Lower left corner of the grid
-   *  \param upperRight Upper right corner of the grid
-   *  \param elements   Number of elements in each coordinate direction
-   *  \param overlap    Size of overlap in each coordinate direction
-   */
-  static std::shared_ptr<GridType>
-  createCubeGrid(const FieldVector<ctype, dimworld>& lowerLeft,
-                 const FieldVector<ctype, dimworld>& upperRight,
-                 const std::array<unsigned int, dim>& elements,
-                 const std::array<unsigned int, dim>& overlap,
-                 Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
-  {
-    std::array<int, dim> cells;
-    std::array<int, dim> over;
-    for (const auto i : XT::Common::value_range(dim)) {
-      cells[i] = elements[i];
-      over[i] = overlap[i];
-    }
-    return std::make_shared<GridType>(lowerLeft, upperRight, cells, over, communicator);
-  }
-
-  /** \brief Create a structured simplex grid
-   *
-   *  \param lowerLeft  Lower left corner of the grid
-   *  \param upperRight Upper right corner of the grid
-   *  \param elements   Number of elements in each coordinate direction
-   *
-   *  \note Simplices are not supported in SPGrid, so this functions
-   *        unconditionally throws a GridError.
-   */
-  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dimworld>& /*lowerLeft*/,
-                                                const FieldVector<ctype, dimworld>& /*upperRight*/,
-                                                const std::array<unsigned int, dim>& /*elements*/)
-  {
-    DUNE_THROW(GridError,
-               className<StructuredGridFactory>() << "::createSimplexGrid(): Simplices are not supported "
-                                                     "by SPGrid.");
-  }
-};
-
-#endif // HAVE_DUNE_SPGRID
-
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GridType>
@@ -333,8 +254,6 @@ public:
   }
 };
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_STRUCTUREDGRIDFACTORY_HH

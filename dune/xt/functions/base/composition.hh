@@ -21,9 +21,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/grid/search.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 namespace internal {
 
 
@@ -274,8 +272,6 @@ private:
 }; // class Composition
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_COMPOSITION_HH

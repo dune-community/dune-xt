@@ -33,9 +33,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/output/entity_visualization.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GridImp>
@@ -239,9 +237,7 @@ private:
 }; // class GridProvider
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 #endif // DUNE_XT_GRID_PROVIDER_PROVIDER_HH

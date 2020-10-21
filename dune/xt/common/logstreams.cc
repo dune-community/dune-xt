@@ -19,9 +19,7 @@
 
 #include "logstreams.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 SuspendableStrBuffer::SuspendableStrBuffer(int loglevel, int& logflags)
@@ -216,6 +214,4 @@ EmptyLogStream::EmptyLogStream(int& logflags)
 {}
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

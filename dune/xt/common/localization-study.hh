@@ -21,9 +21,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 class LocalizationStudy
 {
@@ -48,8 +46,6 @@ private:
   const std::vector<std::string> only_these_indicators_;
 }; // class LocalizationStudy
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_LOCALIZATION_STUDY_HH

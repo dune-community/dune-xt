@@ -35,9 +35,7 @@
 #include <boost/format.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 TimingData::TimingData(std::string _name)
@@ -233,6 +231,4 @@ OutputScopedTiming::~OutputScopedTiming()
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

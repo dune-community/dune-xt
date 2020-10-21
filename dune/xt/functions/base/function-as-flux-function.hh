@@ -18,9 +18,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 // wraps a function f(u) as flux function f(x, u)
@@ -122,8 +120,6 @@ private:
 }; // class FunctionAsFluxFunctionWrapper
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_BASE_SMOOTH_LOCALIZABLE_FUNCTION_HH

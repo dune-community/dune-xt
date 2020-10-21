@@ -18,9 +18,7 @@
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 static inline Common::Configuration allreflecting_boundaryinfo_default_config()
@@ -67,8 +65,6 @@ make_allreflecting_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::C
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_ALLREFLECTING_HH

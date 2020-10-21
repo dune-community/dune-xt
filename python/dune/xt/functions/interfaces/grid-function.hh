@@ -20,10 +20,7 @@
 
 #include <python/dune/xt/common/parameter.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
@@ -195,9 +192,6 @@ public:
 }; // class GridFunctionInterface
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_INTERFACES_GRID_FUNCTION_HH

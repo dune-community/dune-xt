@@ -16,9 +16,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 namespace internal {
 
 
@@ -188,8 +186,6 @@ void visualize_gradient(const GridFunctionInterface<E, r, rC, R>& grid_function,
 } // ... visualize_gradient(...)
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_VISUALIZATION_HH

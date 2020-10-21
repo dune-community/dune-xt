@@ -19,9 +19,7 @@
 
 #include "localization-study.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 LocalizationStudy::LocalizationStudy(const std::vector<std::string> only_these_indicators)
   : only_these_indicators_(only_these_indicators)
@@ -120,6 +118,4 @@ void LocalizationStudy::run(std::ostream& out)
   } // loop over all indicators
 } // ... run(...)
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

@@ -20,9 +20,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! custom iterator for \ref FixedMap
@@ -233,9 +231,7 @@ private:
 };
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 namespace std {
 

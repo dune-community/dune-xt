@@ -18,9 +18,7 @@
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 static inline Common::Configuration alldirichlet_boundaryinfo_default_config()
@@ -94,8 +92,6 @@ public:
   }
 }; // class ProcessBoundaryInfo
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_ALLDIRICHLET_HH

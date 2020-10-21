@@ -17,10 +17,7 @@
 #include "interfaces.hh"
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class G>
@@ -70,10 +67,7 @@ public:
 }; // class MaximumEntityVolumeRefineFunctor
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>

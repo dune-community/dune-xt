@@ -28,9 +28,7 @@
 #include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 struct Statistics
@@ -209,9 +207,7 @@ int parallel_size(const GridType& grid, int codim)
 {
   return parallel_size(grid, grid.maxLevel(), codim);
 }
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 template <class T>

@@ -12,9 +12,7 @@
 #include "dune/xt/common/parallel/mpi_comm_wrapper.hh"
 
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 MPI_Comm_Wrapper::MPI_Comm_Wrapper(WrappedComm comm)
   : comm_(comm)
@@ -32,6 +30,4 @@ MPI_Comm_Wrapper::WrappedComm MPI_Comm_Wrapper::get() const
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

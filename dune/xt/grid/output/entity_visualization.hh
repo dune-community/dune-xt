@@ -29,9 +29,7 @@
 #include <dune/xt/grid/capabilities.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 struct ElementVisualization
 {
@@ -350,8 +348,6 @@ void visualize_index_per_level(const GridType& grid_, std::string filename)
   }
 } // ... visualize_plain(...)
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_OUTPUT_ENTITY_VISUALIZATION_HH

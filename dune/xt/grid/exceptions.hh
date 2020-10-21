@@ -14,10 +14,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace Exceptions {
+namespace Dune::XT::Grid::Exceptions {
 
 
 class boundary_type_error : public Dune::Exception
@@ -39,9 +36,6 @@ class wrong_codimension : public Dune::Exception
 {};
 
 
-} // namespace Exceptions
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::Exceptions
 
 #endif // DUNE_XT_GRID_EXCEPTIONS_HH

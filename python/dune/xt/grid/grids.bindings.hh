@@ -17,10 +17,7 @@
 #include <dune/xt/grid/grids.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class G>
@@ -175,9 +172,6 @@ using Available3dGridTypes = std::tuple<YASP_3D_EQUIDISTANT_OFFSET
 using AvailableGridTypes = Common::tuple_cat_t<Available1dGridTypes, Available2dGridTypes, Available3dGridTypes>;
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // DUNE_XT_GRID_GRIDS_BINDINGS_HH

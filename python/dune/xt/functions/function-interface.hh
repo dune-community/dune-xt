@@ -21,9 +21,7 @@
 
 #include <dune/xt/functions/interfaces/function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 namespace internal {
 
 
@@ -192,8 +190,6 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
 } // ... bind_FunctionInterface(...)
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_INTERFACE_HH

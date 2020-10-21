@@ -18,9 +18,7 @@
 
 #include <dune/xt/functions/interfaces/element-functions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -348,8 +346,6 @@ public:
 }; // class GenericElementFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH

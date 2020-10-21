@@ -15,10 +15,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/timedlogging.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace bindings {
+namespace Dune::XT::Common::bindings {
 
 
 class DefaultLogger
@@ -49,9 +46,6 @@ public:
 }; // class DefaultLogger
 
 
-} // namespace bindings
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::bindings
 
 #endif // PYTHON_DUNE_XT_COMMON_TIMEDLOGGING_HH

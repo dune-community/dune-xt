@@ -34,9 +34,7 @@
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 // forwards, required in operator+-*
@@ -747,9 +745,7 @@ private:
 }; // class ElementFunctionInterface
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #include <dune/xt/functions/base/combined-element-functions.hh>
 

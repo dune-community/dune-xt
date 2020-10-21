@@ -26,9 +26,7 @@
 #include <dune/xt/functions/generic/function.hh>
 #include <dune/xt/functions/generic/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -647,8 +645,6 @@ GridFunction<Grid::extract_entity_t<GridView>, r, rC, R> make_grid_function(cons
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_GRID_FUNCTION_HH

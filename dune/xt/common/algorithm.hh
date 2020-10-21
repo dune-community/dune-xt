@@ -18,9 +18,7 @@
 
 #include <dune/xt/common/string.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! same as std::copy_if, but with move
@@ -45,8 +43,6 @@ SequenceType make_string_sequence(InputIt first, InputIt last)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_ALGORITHM_HH

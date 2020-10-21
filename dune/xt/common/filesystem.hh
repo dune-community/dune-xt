@@ -22,9 +22,7 @@
 
 #include <dune/xt/common/logstreams.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! strip filename from \path if present, return empty string if only filename present
@@ -52,8 +50,6 @@ void file_to_stream_filtered(std::ostream& stream, std::string filename, std::st
 void meminfo(LogStream& stream);
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_FILESYSTEM_HH

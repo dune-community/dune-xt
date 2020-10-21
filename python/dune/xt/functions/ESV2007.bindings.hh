@@ -22,11 +22,7 @@
 
 #include <dune/xt/functions/ESV2007.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
-namespace ESV2007 {
+namespace Dune::XT::Functions::bindings::ESV2007 {
 
 
 template <class G>
@@ -123,10 +119,6 @@ public:
 }; // class CutoffFunction
 
 
-} // namespace ESV2007
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings::ESV2007
 
 #endif // DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH

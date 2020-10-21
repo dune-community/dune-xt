@@ -52,8 +52,7 @@ class Intersection;
 
 
 } // namespace GridGlue
-namespace XT {
-namespace Grid {
+namespace XT::Grid {
 
 
 namespace internal {
@@ -483,8 +482,7 @@ struct EntityLess
 };
 
 
-} // namespace Grid
-} // namespace XT
+} // namespace XT::Grid
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_TYPE_TRAITS_HH

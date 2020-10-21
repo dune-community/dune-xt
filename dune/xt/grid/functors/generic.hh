@@ -16,9 +16,7 @@
 
 #include "interfaces.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GL>
@@ -185,8 +183,6 @@ private:
 ///\todo Implement lambda variants of all other functor types from functors/interfaces.hh!
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_FUNCTORS_GENERIC_HH

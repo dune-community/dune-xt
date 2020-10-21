@@ -21,9 +21,7 @@
 #include "derivatives-of-element-functions.hh"
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class GridFunctionType, DerivativeType derivative>
@@ -122,9 +120,7 @@ public:
 }; // class GradientGridFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 
 #endif // DUNE_XT_FUNCTIONS_DERIVED_HH

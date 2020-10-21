@@ -38,10 +38,7 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 template <class G>
 class GridProvider
@@ -242,9 +239,6 @@ public:
   } // ... bind(...)
 }; // class GridProvider
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH

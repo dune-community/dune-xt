@@ -24,9 +24,7 @@
 
 #include <dune/xt/functions/indicator.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class G, size_t d, size_t r, size_t rC>
@@ -101,8 +99,6 @@ bind_IndicatorFunction(pybind11::module& m)
 } // ... bind_IndicatorFunction(...)
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_INDICATOR_HH

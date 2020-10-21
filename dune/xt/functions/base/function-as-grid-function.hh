@@ -20,9 +20,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class E, size_t r, size_t rC, class R>
@@ -152,8 +150,6 @@ private:
 }; // class FunctionAsGridFunctionWrapper
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_BASE_SMOOTH_LOCALIZABLE_FUNCTION_HH

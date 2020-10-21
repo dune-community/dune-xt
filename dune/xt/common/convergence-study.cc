@@ -20,9 +20,7 @@
 
 #include "convergence-study.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 double ConvergenceStudy::expected_rate(const std::string& /*type*/, const std::string& /*id*/) const
@@ -348,6 +346,4 @@ ConvergenceStudy::run(const std::vector<std::string>& only_these, std::ostream& 
 } // ... run(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

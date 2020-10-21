@@ -21,9 +21,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/float_cmp.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 /** \brief Base class for all Validators
  *  the idea is from dune-fem, only our class is an actual interface
@@ -226,8 +224,6 @@ struct Typename<ValidateAny<T>>
   }
 };
 
-} // end namespace Common
-} // end namespace XT
-} // end namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_VALIDATION_HH

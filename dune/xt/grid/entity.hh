@@ -40,8 +40,7 @@ std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, Entit
 }
 
 
-namespace XT {
-namespace Grid {
+namespace XT::Grid {
 
 
 template <class EntityType>
@@ -98,8 +97,7 @@ auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& 
 }
 
 
-} // namespace Grid
-} // namespace XT
+} // namespace XT::Grid
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_ENTITY_HH

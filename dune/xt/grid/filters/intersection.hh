@@ -26,10 +26,7 @@
 
 #include "base.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace ApplyOn {
+namespace Dune::XT::Grid::ApplyOn {
 
 
 /**
@@ -677,9 +674,6 @@ public:
 }; // class ProcessIntersections
 
 
-} // namespace ApplyOn
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::ApplyOn
 
 #endif // DUNE_XT_GRID_FILTERS_INTERSECTION_HH

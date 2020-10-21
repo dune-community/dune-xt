@@ -21,9 +21,7 @@
 
 #include "parameter.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 namespace internal {
 
 
@@ -271,6 +269,4 @@ void ParametricInterface::extend_parameter_type(const ParameterType& additional_
 } // ... extend_parameter_type(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

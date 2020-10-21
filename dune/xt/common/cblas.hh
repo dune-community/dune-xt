@@ -12,10 +12,7 @@
 #ifndef DUNE_XT_COMMON_BLAS_HH
 #define DUNE_XT_COMMON_BLAS_HH
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Cblas {
+namespace Dune::XT::Common::Cblas {
 
 
 /**
@@ -178,9 +175,6 @@ void ztrsv(const int layout,
            const int incx);
 
 
-} // namespace Cblas
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Cblas
 
 #endif // DUNE_XT_COMMON_BLAS_HH

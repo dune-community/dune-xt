@@ -16,9 +16,7 @@
 
 #include "grids.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class G>
@@ -47,8 +45,6 @@ struct has_boundary_id<UGGrid<dim>>
 #endif // HAVE_DUNE_UGGRID || HAVE_UG
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_CAPABILITIES_HH

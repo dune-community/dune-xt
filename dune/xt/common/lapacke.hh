@@ -14,10 +14,7 @@
 
 #include <complex>
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Lapacke {
+namespace Dune::XT::Common::Lapacke {
 
 
 /**
@@ -304,9 +301,6 @@ int zunmqr(int matrix_layout,
 int zungqr(int matrix_layout, int m, int n, int k, std::complex<double>* a, int lda, const std::complex<double>* tau);
 
 
-} // namespace Lapacke
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Lapacke
 
 #endif // DUNE_XT_COMMON_LAPACKE_HH

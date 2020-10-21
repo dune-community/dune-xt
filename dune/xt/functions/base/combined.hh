@@ -16,10 +16,7 @@
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace internal {
+namespace Dune::XT::Functions::internal {
 
 
 template <typename comb, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
@@ -332,9 +329,6 @@ struct CombinedStorageProvider
 }; // struct CombinedStorageProvider
 
 
-} // namespace internal
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::internal
 
 #endif // DUNE_XT_FUNCTIONS_BASE_COMBINED_HH

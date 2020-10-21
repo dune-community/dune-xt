@@ -14,9 +14,7 @@
 
 #include <cstddef>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 /** \brief Partition that assigns each codim-0 entity in a \ref IndexSet a unique partition number,
  * its index in the set
@@ -46,8 +44,6 @@ private:
   const IndexSetType& index_set_;
 };
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_PARALLEL_PARTITIONER_HH

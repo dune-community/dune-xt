@@ -18,10 +18,7 @@
 
 #include <dune/pybindxi/pybind11.h>
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace bindings {
+namespace Dune::XT::Common::bindings {
 
 
 void guarded_bind(const std::function<void()>& registrar);
@@ -35,9 +32,6 @@ add_initialization(pybind11::module& /*m*/, std::string /*logger_name*/, std::st
 try_register(pybind11::module& m, const std::function<void(pybind11::module&)>& registrar);
 
 
-} // namespace bindings
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::bindings
 
 #endif // DUNE_XT_COMMON_PYTHON_HH

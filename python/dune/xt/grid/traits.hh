@@ -16,10 +16,7 @@
 #include <dune/geometry/type.hh>
 #include <dune/xt/common/string.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 class Simplex
@@ -43,10 +40,7 @@ class Dimension
 {};
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 
 #endif // PYTHON_DUNE_XT_GRID_TRAITS_HH

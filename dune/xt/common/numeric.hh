@@ -18,9 +18,7 @@
 #  define CPP17_PARALLELISM_TS_SUPPORTED 0
 #endif
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 // Uses std::reduce if available, and falls back to std::accumulate on older compilers.
@@ -48,8 +46,6 @@ decltype(auto) transform_reduce(Args&&... args)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_NUMERIC_HH

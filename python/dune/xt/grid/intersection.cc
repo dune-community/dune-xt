@@ -24,10 +24,7 @@
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class GV>
@@ -108,10 +105,7 @@ public:
 }; // class Intersection
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>

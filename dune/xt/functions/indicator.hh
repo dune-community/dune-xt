@@ -21,9 +21,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class E, size_t r, size_t rC = 1, class R = double>
@@ -314,8 +312,6 @@ private:
 }; // class IndicatorFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_INDICATOR_HH

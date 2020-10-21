@@ -31,10 +31,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace ESV2007 {
+namespace Dune::XT::Functions::ESV2007 {
 
 
 template <size_t d, size_t r, size_t rC = 1, class R = double>
@@ -402,9 +399,6 @@ private:
 }; // class Cutoff
 
 
-} // namespace ESV2007
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::ESV2007
 
 #endif // DUNEXT_FUNCTIONS_ESV2007_HH

@@ -20,9 +20,7 @@
 #include "filesystem.hh"
 #include "timedlogging.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 DefaultLogger::DefaultLogger(const std::string& prfx,
@@ -271,6 +269,4 @@ void TimedLogging::update_colors()
 } // ... update_colors(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

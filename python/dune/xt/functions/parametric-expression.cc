@@ -29,10 +29,7 @@
 #include <python/dune/xt/grid/traits.hh>
 #include <python/dune/xt/common/exceptions.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <size_t d, size_t r = 1, class R = double>
@@ -87,10 +84,7 @@ public:
 }; // class ParametricExpressionFunction
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 
 PYBIND11_MODULE(_functions_parametric_expression, m)

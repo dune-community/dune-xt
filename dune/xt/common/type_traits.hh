@@ -172,8 +172,7 @@ template <class K, int ROWS, int COLS>
 class FieldMatrix;
 
 
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 // forward
@@ -548,8 +547,7 @@ enum class Transpose
 };
 
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 } // namespace Dune
 
 

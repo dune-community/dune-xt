@@ -25,9 +25,7 @@
 #include "dgf.hh"
 #include "gmsh.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GridType>
@@ -112,8 +110,6 @@ public:
 }; // class GridProviderFactory
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_PROVIDER_HH

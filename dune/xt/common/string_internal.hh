@@ -35,9 +35,7 @@
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/vector.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 #ifndef DUNE_XT_COMMON_STRING_HH
 // only necessary for headercheck
@@ -423,8 +421,6 @@ convert_to_string(const M& mat, const std::size_t precision)
 
 
 } // namespace internal
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_STRING_INTERNAL_HH

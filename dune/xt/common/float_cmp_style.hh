@@ -20,10 +20,7 @@
 
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace FloatCmp {
+namespace Dune::XT::Common::FloatCmp {
 
 enum class Style
 {
@@ -59,9 +56,6 @@ struct ConvertStyle<Style::absolute>
 
 } // namespace internal
 
-} // namespace FloatCmp
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::FloatCmp
 
 #endif // DUNE_XT_COMMON_FLOAT_CMP_STYLE_HH

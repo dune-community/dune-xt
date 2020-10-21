@@ -23,9 +23,7 @@
 
 #include <dune/xt/la/container/common.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -394,8 +392,6 @@ enum class DerivativeType
 }; // enum class DerivativeType
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH

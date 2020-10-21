@@ -20,9 +20,7 @@
 
 #include "combined.hh"
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class LeftType, class RightType, typename comb>
@@ -341,8 +339,6 @@ public:
 };
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_BASE_COMBINED_HH

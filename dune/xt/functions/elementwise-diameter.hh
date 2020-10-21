@@ -12,9 +12,7 @@
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class E>
@@ -107,8 +105,6 @@ private:
 }; // class ElementwiseDiameterFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_ELEMENTWISE_DIAMETER_HH

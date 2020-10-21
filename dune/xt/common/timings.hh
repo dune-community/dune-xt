@@ -37,9 +37,7 @@
 
 #include <dune/xt/common/parallel/threadstorage.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 class Timings;
@@ -173,9 +171,7 @@ protected:
 };
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #define DXTC_TIMINGS Dune::XT::Common::timings()
 

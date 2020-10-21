@@ -61,9 +61,7 @@
 #endif
 
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 template <class InterfaceType, class TraitsImp>
@@ -100,8 +98,6 @@ std::recursive_mutex CRTPInterface<I, T>::crtp_mutex_;
 #endif
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_CRTP_HH

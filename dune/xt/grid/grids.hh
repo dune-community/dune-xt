@@ -61,9 +61,7 @@ using ALBERTA_3D = Dune::AlbertaGrid<3, 3>;
 #endif
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 namespace internal {
 
 
@@ -119,9 +117,7 @@ using Available3dGridTypes = std::tuple<YASP_3D_EQUIDISTANT_OFFSET
 using AvailableGridTypes = Common::tuple_cat_t<Available1dGridTypes, Available2dGridTypes, Available3dGridTypes>;
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 using SIMPLEXGRID_1D = ONED_1D;

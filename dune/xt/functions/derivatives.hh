@@ -17,9 +17,7 @@
 #include <dune/xt/functions/interfaces/element-functions.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class E, class R>
@@ -57,8 +55,6 @@ GradientGridFunction<GridFunctionInterface<E, 1, 1, R>> gradient(const GridFunct
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_DERIVATIVES_HH

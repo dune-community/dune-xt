@@ -18,9 +18,7 @@
 #include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 // We do not want to add a virtual destructor (to be able to use this as constexpr), so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
@@ -115,8 +113,6 @@ std::ostream& operator<<(std::ostream& out, const BoundaryInfo<I>& bi)
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_INTERFACE_HH

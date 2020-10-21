@@ -21,9 +21,7 @@
 #include <dune/xt/common/debug.hh>
 #include <dune/xt/common/math.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! get a vector with values in [start : increment : end)
 template <class T, class sequence = std::vector<T>>
@@ -66,8 +64,6 @@ typename std::enable_if<std::is_enum<T>::value, sequence>::type value_range(cons
   return value_range(T(0), end);
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_RANGES_HH

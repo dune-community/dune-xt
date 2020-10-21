@@ -13,9 +13,7 @@
 
 #include "math.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 namespace internal {
 
 
@@ -41,6 +39,4 @@ double binomial_coefficient(const double n, const size_t k)
 const std::string Epsilon<std::string, false>::value = "_";
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

@@ -25,10 +25,7 @@
 
 #include <dune/xt/grid/filters.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class Imp, bool ctor_expects_boundary_info>
@@ -93,10 +90,7 @@ public:
 }; // class WhichIntersection
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 
 // begin: this is what we need for the .so

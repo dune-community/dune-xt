@@ -16,10 +16,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace Exceptions {
+namespace Dune::XT::Functions::Exceptions {
 
 
 class wrong_input_given : public Common::Exceptions::wrong_input_given
@@ -53,9 +50,6 @@ class flux_function_error : public Dune::Exception
 {};
 
 
-} // namespace Exceptions
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::Exceptions
 
 #endif // DUNE_XT_FUNCTIONS_EXCEPTIONS_HH

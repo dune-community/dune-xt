@@ -13,10 +13,7 @@
 
 #include <python/dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
@@ -153,9 +150,6 @@ public:
 }; // class ProductGridFunction
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTION_HH

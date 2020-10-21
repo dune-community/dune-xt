@@ -33,9 +33,7 @@
 
 #include "provider.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 static inline std::string cube_gridprovider_id()
@@ -260,9 +258,7 @@ auto make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 #endif // DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH

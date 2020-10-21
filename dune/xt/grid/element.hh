@@ -15,9 +15,7 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class E>
@@ -69,8 +67,6 @@ sub_entity_center(const Dune::Entity<0, dim, GridImp, EntityImp> element, const 
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_ELEMENT_HH

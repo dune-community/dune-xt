@@ -16,10 +16,7 @@
 #include <dune/xt/grid/filters/base.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class G>
@@ -84,9 +81,6 @@ public:
 }; // class IntersectionFilter
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // PYTHON_DUNE_XT_GRID_FILTERS_BASE_HH

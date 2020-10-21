@@ -18,9 +18,7 @@
 #include <dune/xt/functions/type_traits.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -176,8 +174,6 @@ TransformedGridFunction<GridFunctionInterface<E, r, rC, R>, new_r, new_rC, new_R
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_TRANSFORMED_HH

@@ -22,9 +22,7 @@
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 namespace internal {
 
 
@@ -311,8 +309,6 @@ auto inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_INVERSE_HH

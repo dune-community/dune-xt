@@ -20,9 +20,7 @@
 
 #include <dune/xt/functions/interfaces/function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -240,8 +238,6 @@ public:
 }; // class GenericFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_GENERIC_FUNCTION_HH
