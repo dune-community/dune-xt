@@ -112,18 +112,17 @@ endmacro()
 
 macro(add_tidy_subdir _dxt_subdir)
   set(BASE ${PROJECT_SOURCE_DIR}/dune/xt/${_dxt_subdir})
-  # including the headercheck sources works around our headers needing included config.h to function adding "-extra-
-  # arg-before='-include config.h'" to TIDY_ARGS results in a tidy error despite the arg actually being applied
-  # correctly
   file(GLOB_RECURSE _files
-                    "${PROJECT_BINARY_DIR}/headercheck/dune/xt/${_dxt_subdir}/*.cc"
+                    "${BASE}/*.hh"
+                    "${BASE}/*.h"
                     "${BASE}/*.cc"
                     "${BASE}/*.cxx"
                     "${BASE}/*.cpp"
                     "${BASE}/*.c")
   set(BASE ${PROJECT_SOURCE_DIR}/python/dune/xt/${_dxt_subdir})
   file(GLOB_RECURSE _pyfiles
-                    "${PROJECT_BINARY_DIR}/headercheck/python/dune/xt/${_dxt_subdir}/*.cc"
+                    "${BASE}/*.hh"
+                    "${BASE}/*.h"
                     "${BASE}/*.cc"
                     "${BASE}/*.cxx"
                     "${BASE}/*.cpp"
@@ -133,6 +132,7 @@ macro(add_tidy_subdir _dxt_subdir)
   set(TIDY_ARGS
       -config=
       -format-style=file
+      -extra-arg-before='-includeconfig.h'
       -p=${CMAKE_CURRENT_BINARY_DIR}
       -header-filter=\".*/dune/xt/${_dxt_subdir}.*\")
   add_custom_target(tidy_${_dxt_subdir}
