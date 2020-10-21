@@ -496,7 +496,7 @@ public:
 
   void set_num_mutexes(const size_t num_mutexes)
   {
-    mutexes_ = std::make_shared<MutexesType>(num_mutexes);
+    mutexes_ = std::make_unique<MutexesType>(num_mutexes);
   }
 
   using InterfaceType::operator+;
