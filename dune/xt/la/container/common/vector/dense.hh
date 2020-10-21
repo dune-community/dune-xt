@@ -89,7 +89,7 @@ struct CommonDenseVectorBackend
     , values_ptr_(std::move(other.values_ptr_))
   {}
 
-  ThisType copy()
+  ThisType copy() const
   {
     return ThisType(*this);
   }
