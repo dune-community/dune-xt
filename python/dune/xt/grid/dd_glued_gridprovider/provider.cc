@@ -93,10 +93,14 @@ public:
 
     c.def(
         "write_global_visualization",
-        [](type& self, const std::string& filename_prefix, const XT::Functions::FunctionInterface<dim>& func)
-            { self.write_global_visualization(filename_prefix, func); },
+        [](type& self,
+           const std::string& filename_prefix,
+           const XT::Functions::FunctionInterface<dim>& func,
+           const std::list<int>& subdomains)
+            { self.write_global_visualization(filename_prefix, func, subdomains); },
         "filename_prefix"_a,
-        "function"_a);
+        "function"_a,
+        "subdomains"_a);
     return c;
   } // ... bind(...)
 }; // class GridProvider

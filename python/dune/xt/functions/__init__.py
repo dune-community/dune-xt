@@ -57,17 +57,21 @@ def visualize_function(function, grid, subsampling=False):
         GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
     return plot(tmpfile, color_attribute_name=function.name)
 
-def visualize_function_on_dd_grid(dd_grid, function, subdomains=[1]):
+def visualize_function_on_dd_grid(function, dd_grid, subdomains=None):
+    assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
+    assert function.dim_range == 1, f'Not implemented yet for {function.dim_domain}-dimensional functions!'
     if not subdomains:
-        subdomains = list(np.arange(dd_grid.num_subdomains))
+        subdomains = list(range(dd_grid.num_subdomains))
     assert isinstance(subdomains, list), 'Please provide a list of subdomains'
+    assert all(sd < dd_grid.num_subdomains for sd in subdomains)
     assert all(isinstance(sd, int) for sd in subdomains)
-#    assert len(subdomains)==1, 'so far, the function can only be visualized on one domain'
-    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-    dd_grid.write_global_visualization('something', function)
+#    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+    dd_grid.write_global_visualization('something', function, subdomains)
     prestring = f's{dd_grid.num_subdomains:04d}-'
     if len(subdomains) == 1:
-        prestring += f'p{subdomains[0]-1:04d}-'
+        prestring += f'p{subdomains[0]:04d}-'
         return plot(prestring + 'something.vtu', color_attribute_name=function.name)
-#    assert 0 'We need PUnstructuredGrid for dune/xt/common/vtk/reader.py'
-    return plot(prestring + 'something.pvtu', color_attribute_name=function.name)
+    try:
+        plot(prestring + 'something.pvtu', color_attribute_name=function.name)
+    except AttributeError:
+        print("no output generated (.pvtu file is broken). The results can be viewed via paraview")
