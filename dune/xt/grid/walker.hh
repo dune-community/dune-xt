@@ -19,7 +19,7 @@
 
 #if HAVE_TBB
 #  include <tbb/blocked_range.h>
-#  include <tbb/parallel_reduce.h>
+#  include <tbb/parallel_for.h>
 #endif
 
 #include <dune/common/version.hh>
@@ -632,7 +632,7 @@ protected:
       , partitioning_(partitioning)
     {}
 
-    Body(Body& other, tbb::split /*split*/)
+    Body(const Body& other)
       : walker_(other.walker_)
       , partitioning_(other.partitioning_)
     {}
@@ -641,12 +641,10 @@ protected:
     {
       // for all partitions in tbb-range
       for (std::size_t p = range.begin(); p != range.end(); ++p) {
-        auto partition = partitioning_.partition(p);
+        const auto partition = partitioning_.partition(p);
         walker_.walk_range(partition);
       }
     }
-
-    void join(Body& /*other*/) {}
 
     WalkerType& walker_;
     const PartioningType& partitioning_;
@@ -663,9 +661,9 @@ public:
     if ((element_functor_wrappers_->size() + intersection_functor_wrappers_->size()
          + element_and_intersection_functor_wrappers_->size())
         > 0) {
-      tbb::blocked_range<std::size_t> range(0, partitioning.partitions());
-      Body<PartioningType, ThisType> body(*this, partitioning);
-      tbb::parallel_reduce(range, body);
+      const tbb::blocked_range<std::size_t> range(0, partitioning.partitions());
+      const Body<PartioningType, ThisType> body(*this, partitioning);
+      tbb::parallel_for(range, body);
     }
 
     // finalize functors
