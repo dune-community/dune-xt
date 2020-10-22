@@ -18,6 +18,8 @@ def _read_single(filename, vtk_type=None):
     vtk_type = vtk_type or _get_vtk_type(filename)
     if vtk_type == 'UnstructuredGrid':
         reader = vtk.vtkXMLUnstructuredGridReader()
+    elif vtk_type == 'PUnstructuredGrid':
+        reader = vtk.vtkXMLPUnstructuredGridReader()
     else:
         raise NotImplementedError(f"VTK Files of type {vtk_type} can not yet be processed")
     reader.SetFileName(filename)
@@ -40,7 +42,7 @@ def _get_vtk_type(path):
     here since we can expect to encounter appended binary data in the xml
     which lxml cannot parse.
     :param path: vtk file to peek into
-    :return: None if no VTKFile element found, ellse the type attribute of the VTKFile element
+    :return: None if no VTKFile element found, else the type attribute of the VTKFile element
     '''
     parser = etree.XMLPullParser(events=('start',))
     with open(path, 'rb') as xml:
