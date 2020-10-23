@@ -20,6 +20,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/functions/interfaces/flux-function.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -191,7 +192,7 @@ public:
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericFluxFunction",
+                      const std::string& nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
@@ -207,9 +208,9 @@ public:
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericFluxFunction",
+                      const std::string& nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
-    : order_(order_func)
+    : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(default_dynamic_evaluate_function())
@@ -223,7 +224,7 @@ public:
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericFluxFunction",
+                      const std::string& nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
@@ -239,9 +240,9 @@ public:
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericFluxFunction",
+                      const std::string& nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
-    : order_(order_func)
+    : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_from_dynamic_evaluate(evaluate_func))
     , dynamic_evaluate_(evaluate_func)

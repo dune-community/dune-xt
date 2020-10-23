@@ -28,7 +28,7 @@ namespace Dune::XT::Common {
  */
 double find_largest_by_bisection(const double& left,
                                  const double& right,
-                                 std::function<bool(const double&)> condition,
+                                 const std::function<bool(const double&)>& condition,
                                  const double rel_error = FloatCmp::DefaultEpsilon<double>::value(),
                                  const double abs_error = FloatCmp::DefaultEpsilon<double>::value());
 

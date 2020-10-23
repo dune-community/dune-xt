@@ -41,7 +41,7 @@ class MatrixInverterOptions
     return std::vector<std::string>();
   }
 
-  static Common::Configuration options(const std::string /*type*/ = "")
+  static Common::Configuration options(const std::string& /*type*/ = "")
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
@@ -58,7 +58,7 @@ std::vector<std::string> matrix_inverter_types(const MatrixType& /*matrix*/)
 
 
 template <class MatrixType>
-Common::Configuration matrix_inverter_options(const MatrixType& /*matrix*/, const std::string type = "")
+Common::Configuration matrix_inverter_options(const MatrixType& /*matrix*/, const std::string& type = "")
 {
   return MatrixInverterOptions<MatrixType>::options(type);
 }
@@ -82,7 +82,7 @@ public:
                   "Please implement for given MatrixType and add the respective include below!");
   }
 
-  MatrixInverter(const MatrixType& /*matrix*/, const Common::Configuration /*opts*/)
+  MatrixInverter(const MatrixType& /*matrix*/, const Common::Configuration& /*opts*/)
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");

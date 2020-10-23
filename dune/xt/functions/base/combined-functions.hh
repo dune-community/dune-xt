@@ -98,7 +98,7 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
+  CombinedFunction(const LeftType& left, const RightType& right, const std::string& nm = "")
     : left_(std::move(left.copy_as_function()))
     , right_(std::move(right.copy_as_function()))
     , name_(nm.empty() ? "(" + left_->name() + " " + GetCombination<comb>::symbol() + " " + right_->name() + ")" : nm)
@@ -111,7 +111,7 @@ public:
     , name_(other.name_)
   {}
 
-  CombinedFunction(ThisType&& source) = default;
+  CombinedFunction(ThisType&& source) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override

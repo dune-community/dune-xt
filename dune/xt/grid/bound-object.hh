@@ -51,9 +51,9 @@ public:
     }
   }
 
-  ElementBoundObject(ThisType&& source)
+  ElementBoundObject(ThisType&& source) noexcept
     : /*DebugLogging(source)
-    ,*/
+,*/
     element_(std::move(source.element_))
     , is_bound_(source.is_bound_)
   {}
@@ -69,7 +69,7 @@ public:
     }
   }
 
-  ThisType& operator=(ThisType&& source)
+  ThisType& operator=(ThisType&& source) noexcept
   {
     //    DebugLogging::operator=(source);
     if (&source != this) {
@@ -137,7 +137,7 @@ public:
     }
   }
 
-  IntersectionBoundObject(ThisType&& source) = default;
+  IntersectionBoundObject(ThisType&& source) noexcept = default;
 
   virtual ~IntersectionBoundObject() = default;
 
@@ -149,7 +149,7 @@ public:
     }
   }
 
-  ThisType& operator=(ThisType&& source)
+  ThisType& operator=(ThisType&& source) noexcept
   {
     if (&source != this) {
       intersection_ = source.intersection_;

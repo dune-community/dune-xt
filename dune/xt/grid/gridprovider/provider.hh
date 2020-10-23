@@ -78,7 +78,7 @@ public:
   GridProvider(const ThisType& other) = default;
 
   // Manual ctor required for clang 3.8.1-12~bpo8+1 (otherwise: undefined reference).
-  GridProvider(ThisType&& source)
+  GridProvider(ThisType&& source) noexcept
     : grid_ptr_(source.grid_ptr_)
   {}
 
@@ -126,7 +126,7 @@ public:
     return Layer<GridType, Layers::leaf, Backends::view>::create(*grid_ptr_);
   }
 
-  void visualize(const std::string filename = static_id(),
+  void visualize(const std::string& filename = static_id(),
                  const Common::Configuration& boundary_info_cfg = Common::Configuration()) const
   {
     if (boundary_info_cfg.empty())
@@ -140,7 +140,7 @@ public:
     visualize_with_boundary(boundary_info_cfg, static_id());
   }
 
-  void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename) const
+  void visualize(const Common::Configuration& boundary_info_cfg, const std::string& filename) const
   {
     visualize_with_boundary(boundary_info_cfg, filename);
   }
@@ -181,7 +181,7 @@ public:
   }
 
 private:
-  void visualize_plain(const std::string filename) const
+  void visualize_plain(const std::string& filename) const
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
@@ -201,7 +201,7 @@ private:
     }
   } // ... visualize_plain(...)
 
-  void visualize_with_boundary(const Common::Configuration& boundary_info_cfg, const std::string filename) const
+  void visualize_with_boundary(const Common::Configuration& boundary_info_cfg, const std::string& filename) const
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");

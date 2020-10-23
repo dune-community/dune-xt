@@ -141,9 +141,9 @@ std::ostream& DefaultLogger::warn()
 
 
 TimedLogManager::TimedLogManager(const Timer& timer,
-                                 const std::string info_prefix,
-                                 const std::string debug_prefix,
-                                 const std::string warning_prefix,
+                                 const std::string& info_prefix,
+                                 const std::string& debug_prefix,
+                                 const std::string& warning_prefix,
                                  const ssize_t max_info_level,
                                  const ssize_t max_debug_level,
                                  const bool enable_warnings,

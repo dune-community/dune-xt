@@ -97,7 +97,7 @@ public:
     : EigenSolverBase(matrix, EigenSolverOptions<MatrixType, true>::options(type))
   {}
 
-  EigenSolverBase(const MatrixType& matrix, const Common::Configuration opts)
+  EigenSolverBase(const MatrixType& matrix, const Common::Configuration& opts)
     : matrix_(matrix)
     , stored_options_(opts)
     , options_(&stored_options_)
@@ -118,7 +118,7 @@ public:
 
   EigenSolverBase(const ThisType& other) = default;
 
-  EigenSolverBase(ThisType&& source) = default;
+  EigenSolverBase(ThisType&& source) noexcept = default;
 
   virtual ~EigenSolverBase() = default;
 

@@ -32,7 +32,7 @@ PYBIND11_MODULE(logging, m)
 
   m.def(
       "create",
-      [](int logflags, const std::string logfile, const std::string datadir, const std::string _logdir) {
+      [](int logflags, const std::string& logfile, const std::string& datadir, const std::string& _logdir) {
         Logger().create(logflags, logfile, datadir, _logdir);
       },
       "logflags"_a = LogDefault,
@@ -41,7 +41,7 @@ PYBIND11_MODULE(logging, m)
       "_logdir"_a = std::string("log"));
   m.def(
       "info",
-      [](std::string msg, std::string end) {
+      [](const std::string& msg, const std::string& end) {
         Logger().info() << msg << end;
         Logger().info().flush();
       },
@@ -49,7 +49,7 @@ PYBIND11_MODULE(logging, m)
       "end"_a = "\n");
   m.def(
       "debug",
-      [](std::string msg, std::string end) {
+      [](const std::string& msg, const std::string& end) {
         Logger().debug() << msg << end;
         Logger().debug().flush();
       },
@@ -57,7 +57,7 @@ PYBIND11_MODULE(logging, m)
       "end"_a = "\n");
   m.def(
       "error",
-      [](std::string msg, std::string end) {
+      [](const std::string& msg, const std::string& end) {
         Logger().error() << msg << end;
         Logger().error().flush();
       },

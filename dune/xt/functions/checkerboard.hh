@@ -156,7 +156,7 @@ public:
                        const DomainType& upper_right,
                        const FieldVector<size_t, domain_dim>& num_elements,
                        std::shared_ptr<std::vector<RangeType>> values,
-                       const std::string nm = "CheckerboardFunction")
+                       const std::string& nm = "CheckerboardFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , num_elements_(num_elements)
@@ -184,13 +184,13 @@ public:
                        const DomainType& upper_right,
                        const FieldVector<size_t, domain_dim>& num_elements,
                        const std::vector<RangeType>& values,
-                       const std::string nm = "CheckerboardFunction")
+                       const std::string& nm = "CheckerboardFunction")
     : CheckerboardFunction(lower_left, upper_right, num_elements, std::make_shared<std::vector<RangeType>>(values), nm)
   {}
 
   CheckerboardFunction(const ThisType& other) = default;
 
-  CheckerboardFunction(ThisType&& source) = default;
+  CheckerboardFunction(ThisType&& source) noexcept = default;
 
 
 private:

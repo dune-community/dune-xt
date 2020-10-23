@@ -36,15 +36,15 @@ void guarded_bind(const std::function<void()>& registrar)
       throw err;
 
     std::string type{};
-    left = what.find("\"");
-    right = what.rfind("\"");
+    left = what.find('\"');
+    right = what.rfind('\"');
     type = what.substr(left + 1, right - left - 1);
     DXTC_LOG_DEBUG << "try_register: added type " << type << std::endl;
   }
 } // ... guarded_bind(...)
 
 
-void add_initialization(pybind11::module& /*m*/, std::string /*logger_name*/, std::string /*so_name*/) {}
+void add_initialization(pybind11::module& /*m*/, const std::string& /*logger_name*/, const std::string& /*so_name*/) {}
 
 
 void try_register(pybind11::module& m, const std::function<void(pybind11::module&)>& registrar)
@@ -64,8 +64,8 @@ void try_register(pybind11::module& m, const std::function<void(pybind11::module
       throw err;
 
     std::string type{};
-    left = what.find("\"");
-    right = what.rfind("\"");
+    left = what.find('\"');
+    right = what.rfind('\"');
     type = what.substr(left + 1, right - left - 1);
     DXTC_LOG_DEBUG << "try_register: added type " << type << std::endl;
   }

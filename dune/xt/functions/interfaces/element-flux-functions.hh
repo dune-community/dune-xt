@@ -106,7 +106,7 @@ public:
 
   ElementFluxFunctionSetInterface(const ThisType& other) = default;
 
-  ElementFluxFunctionSetInterface(ThisType&& source) = default;
+  ElementFluxFunctionSetInterface(ThisType&& source) noexcept = default;
 
   virtual ~ElementFluxFunctionSetInterface() = default;
 
@@ -401,12 +401,12 @@ public:
   {}
 
   ElementFluxFunctionInterface(const ThisType& other) = default;
-  ElementFluxFunctionInterface(ThisType&& source) = default;
+  ElementFluxFunctionInterface(ThisType&& source) noexcept = default;
 
   virtual ~ElementFluxFunctionInterface() = default;
 
   ThisType& operator=(const ThisType& other) = default;
-  ThisType& operator=(ThisType&& source) = default;
+  ThisType& operator=(ThisType&& source) noexcept = default;
 
   using BaseType::evaluate;
   using BaseType::jacobian;

@@ -30,7 +30,7 @@ std::string filename_only(const std::string& _path)
 } // filename_only
 
 //! may include filename, will be stripped
-void test_create_directory(const std::string _path)
+void test_create_directory(const std::string& _path)
 {
   std::string pathonly = directory_only(_path);
   if (!pathonly.empty())
@@ -58,7 +58,7 @@ std::unique_ptr<boost::filesystem::ifstream> make_ifstream(const boost::filesyst
 }
 
 //! read a file and output all lines containing filter string to a stream
-void file_to_stream_filtered(std::ostream& stream, std::string filename, std::string filter)
+void file_to_stream_filtered(std::ostream& stream, const std::string& filename, const std::string& filter)
 {
   std::ifstream file(filename.c_str(), std::ifstream::in);
   std::string line;

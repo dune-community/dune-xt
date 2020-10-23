@@ -50,7 +50,7 @@ auto bind_Vector(pybind11::module& m)
   c.def(py::init([](const ssize_t size, const S& value) { return new C(Common::numeric_cast<size_t>(size), value); }),
         "size"_a = 0,
         "value"_a = 0.0);
-  c.def(py::init([](py::iterable it) {
+  c.def(py::init([](const py::iterable&& it) {
           std::vector<S> tmp;
           for (py::handle h : it)
             tmp.push_back(h.cast<S>());
@@ -207,7 +207,7 @@ auto bind_Vector(pybind11::module& m)
       "mode"_a = "ascii");
 
   c.def(py::pickle([](const C& self) { return py::make_tuple(std::vector<S>(self)); },
-                   [](py::tuple t) {
+                   [](const py::tuple&& t) {
                      if (t.size() != 1)
                        throw std::runtime_error("Invalid state!");
                      const auto data = t[0].cast<std::vector<S>>();

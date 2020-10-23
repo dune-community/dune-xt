@@ -72,14 +72,14 @@ public:
   } // ... defaults(...)
 
   Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
-                 const std::string nm = "ESV2007Testcase1Force")
+                 const std::string& nm = "ESV2007Testcase1Force")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
 
   Testcase1Force(const ThisType&) = default;
 
-  Testcase1Force(ThisType&&) = default;
+  Testcase1Force(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -170,14 +170,14 @@ public:
   } // ... defaults(...)
 
   Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
-                         const std::string nm = "ESV2007Testcase1ExactSolution")
+                         const std::string& nm = "ESV2007Testcase1ExactSolution")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
 
   Testcase1ExactSolution(const ThisType&) = default;
 
-  Testcase1ExactSolution(ThisType&&) = default;
+  Testcase1ExactSolution(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -354,7 +354,7 @@ public:
 
   CutoffFunction(GridFunction<E, d, d, R> diffusion,
                  const RangeFieldType poincare_constant = 1.0 / (M_PI * M_PI),
-                 const std::string nm = "ESV2007CutoffFunction")
+                 const std::string& nm = "ESV2007CutoffFunction")
     : BaseType(diffusion.parameter_type())
     , diffusion_(diffusion.copy_as_grid_function())
     , poincare_constant_(poincare_constant)
@@ -368,7 +368,7 @@ public:
     , name_(other.name_)
   {}
 
-  CutoffFunction(ThisType&&) = default;
+  CutoffFunction(ThisType&&) noexcept = default;
 
 
 private:

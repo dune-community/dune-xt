@@ -60,7 +60,7 @@ public:
     return ret;
   } // ... types()
 
-  static XT::Common::Configuration options(const std::string type = "")
+  static XT::Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());

@@ -48,9 +48,9 @@ namespace XT::Grid {
   **/
 template <class G, class I>
 void print_intersection(const Intersection<G, I>& intersection,
-                        const std::string name = Common::Typename<Intersection<G, I>>::value(),
+                        const std::string& name = Common::Typename<Intersection<G, I>>::value(),
                         std::ostream& out = std::cout,
-                        const std::string prefix = "")
+                        const std::string& prefix = "")
 {
   if (!name.empty())
     out << prefix << name << ":\n";

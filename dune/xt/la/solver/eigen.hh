@@ -68,7 +68,7 @@ public:
             "lu.fullpiv"};
   } // ... types(...)
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
@@ -102,7 +102,7 @@ public:
     return SolverOptions<MatrixType, CommunicatorType>::types();
   } // ... types()
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)
@@ -288,7 +288,7 @@ public:
     };
   } // ... types(...)
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     // check
@@ -350,7 +350,7 @@ public:
     return SolverOptions<MatrixType, CommunicatorType>::types();
   } // ... types()
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)

@@ -19,6 +19,7 @@
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -52,12 +53,12 @@ public:
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string nm = "smooth_lambda_function",
+                  const std::string& nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
-    , order_(order_func)
+    , order_(std::move(order_func))
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(static_to_dynamic_evaluate(evaluate_))
     , jacobian_(jacobian_func)
@@ -67,7 +68,7 @@ public:
 
   GenericFunction(int ord,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string nm = "smooth_lambda_function",
+                  const std::string& nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -82,12 +83,12 @@ public:
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string nm = "smooth_lambda_function",
+                  const std::string& nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
-    , order_(order_func)
+    , order_(std::move(order_func))
     , evaluate_(dynamic_to_static_evaluate(dynamic_evaluate_func))
     , dynamic_evaluate_(dynamic_evaluate_func)
     , jacobian_(jacobian_func)
@@ -97,7 +98,7 @@ public:
 
   GenericFunction(int ord,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string nm = "smooth_lambda_function",
+                  const std::string& nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -112,7 +113,7 @@ public:
 
   GenericFunction(const ThisType&) = default;
 
-  GenericFunction(ThisType&&) = default;
+  GenericFunction(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override

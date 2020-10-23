@@ -153,7 +153,7 @@ public:
       pairs_.emplace_back(vectors_, notes_, ii);
   } // ListVectorArray(...)
 
-  ListVectorArray(ThisType&& source)
+  ListVectorArray(ThisType&& source) noexcept
     : dim_(source.dim_)
     , len_(source.len_)
     , vectors_(std::move(source.vectors_))

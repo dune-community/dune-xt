@@ -34,9 +34,11 @@ PYBIND11_MODULE(_common_timings, m)
   bindings::guarded_bind([&]() {
     py::class_<Timings>(m, "Timings")
         .def("start", &Timings::start, "set this to begin a named section")
-        .def("reset", py::overload_cast<std::string>(&Timings::reset), "set elapsed time back to 0 for section_name")
+        .def("reset",
+             py::overload_cast<const std::string&>(&Timings::reset),
+             "set elapsed time back to 0 for section_name")
         .def("reset", py::overload_cast<>(&Timings::reset), "set elapsed time back to 0 for section_name")
-        .def("stop", py::overload_cast<std::string>(&Timings::stop), "stop all timer for given section only")
+        .def("stop", py::overload_cast<const std::string&>(&Timings::stop), "stop all timer for given section only")
         .def("stop", py::overload_cast<>(&Timings::stop), "stop all running timers")
         .def("walltime", &Timings::walltime, "get runtime of section in milliseconds")
         //! TODO this actually accepts an ostream

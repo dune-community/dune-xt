@@ -140,7 +140,7 @@ public:
                  const Common::FieldVector<size_t, domain_dim>& number_of_elements = {internal::model2_x_elements,
                                                                                       internal::model2_y_elements,
                                                                                       internal::model2_z_elements},
-                 const std::string nm = BaseType::static_id())
+                 const std::string& nm = BaseType::static_id())
     : BaseType(lower_left, upper_right, number_of_elements, read_values_from_file(filename, number_of_elements), nm)
 
   {}

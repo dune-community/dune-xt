@@ -60,7 +60,7 @@ std::vector<std::string> eigen_solver_types(const MatrixType& /*matrix*/)
 
 
 template <class MatrixType>
-Common::Configuration eigen_solver_options(const MatrixType& /*matrix*/, const std::string type = "")
+Common::Configuration eigen_solver_options(const MatrixType& /*matrix*/, const std::string& type = "")
 {
   return EigenSolverOptions<MatrixType>::options(type);
 }
@@ -88,7 +88,7 @@ public:
                   "Please implement for given MatrixType and add the respective include below!");
   }
 
-  EigenSolver(const MatrixType& /*matrix*/, const Common::Configuration /*opts*/)
+  EigenSolver(const MatrixType& /*matrix*/, const Common::Configuration& /*opts*/)
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");

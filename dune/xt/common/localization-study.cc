@@ -21,7 +21,7 @@
 
 namespace Dune::XT::Common {
 
-LocalizationStudy::LocalizationStudy(const std::vector<std::string> only_these_indicators)
+LocalizationStudy::LocalizationStudy(const std::vector<std::string>& only_these_indicators)
   : only_these_indicators_(only_these_indicators)
 {}
 
@@ -32,7 +32,7 @@ std::vector<std::string> LocalizationStudy::used_indicators() const
   if (only_these_indicators_.empty())
     return provided_indicators();
   std::vector<std::string> ret;
-  for (auto indicator : provided_indicators())
+  for (const auto& indicator : provided_indicators())
     if (std::find(only_these_indicators_.begin(), only_these_indicators_.end(), indicator)
         != only_these_indicators_.end())
       ret.push_back(indicator);
@@ -56,7 +56,7 @@ void LocalizationStudy::run(std::ostream& out)
   std::string header_line =
       std::string(" ||") + "   L^2 difference   " + "|" + "   L^oo difference  " + "|" + " standard deviation ";
   size_t first_column_size = 0;
-  for (auto id : actually_used_indicators)
+  for (const auto& id : actually_used_indicators)
     first_column_size = std::max(first_column_size, id.size());
   first_column_size = std::max(first_column_size, total_width - header_line.size() - 1);
   std::string first_column_str;

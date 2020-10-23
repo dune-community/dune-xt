@@ -55,9 +55,9 @@ class Configuration : public Dune::ParameterTree
 public:
   Configuration();
 
-  Configuration(const ParameterTree& tree, ConfigurationDefaults defaults = ConfigurationDefaults());
+  Configuration(const ParameterTree& tree, const ConfigurationDefaults& defaults = ConfigurationDefaults());
 
-  Configuration(const ParameterTree& tree_in, const std::string sub_id);
+  Configuration(const ParameterTree& tree_in, const std::string& sub_id);
 
   Configuration(const Configuration& other);
 
@@ -87,9 +87,9 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
   Configuration(int argc, char** argv, ConfigurationDefaults defaults = ConfigurationDefaults());
 
   template <class T>
-  Configuration(const std::vector<std::string> keys,
+  Configuration(const std::vector<std::string>& keys,
                 const std::initializer_list<T> values_in,
-                ConfigurationDefaults defaults = ConfigurationDefaults())
+                const ConfigurationDefaults& defaults = ConfigurationDefaults())
     : BaseType()
     , warn_on_default_access_(defaults.warn_on_default_access)
     , log_on_exit_(defaults.log_on_exit)
@@ -132,8 +132,9 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
   /**
    * @attention Please note the difference to Dune::ParameterTree::sub (return: value vs. reference)!
    */
-  Configuration
-  sub(const std::string& sub_id, bool fail_if_missing = true, Configuration default_value = Configuration()) const;
+  Configuration sub(const std::string& sub_id,
+                    bool fail_if_missing = true,
+                    const Configuration& default_value = Configuration()) const;
 
   /**
    * \}
@@ -201,7 +202,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
 
   //! set value to key in Configuration
   template <class T>
-  void set(std::string key, const T& value, const bool overwrite = false)
+  void set(const std::string& key, const T& value, const bool overwrite = false)
   {
     if (has_key(key) && !overwrite)
       DUNE_THROW(Exceptions::configuration_error,
@@ -227,14 +228,14 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
    *  \param sub_id if not empty, other.tree_ is merged in as a sub "sub_id" of tree_
    *  \param overwrite if true, existing values are overwritten by other's values to the same key
    */
-  Configuration& add(const Configuration& other, const std::string sub_id = "", const bool overwrite = false);
+  Configuration& add(const Configuration& other, const std::string& sub_id = "", const bool overwrite = false);
 
   /** \brief add a Dune::ParameterTree paramtree to this (merge tree_ and paramtree)
    *  \param paramtree ParameterTree to add
    *  \param sub_id if not empty, paramtree is merged in as a sub "sub_id" of tree_
    *  \param overwrite if true, existing values are overwritten by paramtree's values to the same key
    */
-  Configuration& add(const ParameterTree& other, const std::string sub_id = "", const bool overwrite = false);
+  Configuration& add(const ParameterTree& other, const std::string& sub_id = "", const bool overwrite = false);
 
   //! add another Configuration to this (merge tree_s and requests_map_s)
   Configuration& operator+=(const Configuration& other);
@@ -247,7 +248,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
    */
   void set_warn_on_default_access(const bool value);
   void set_log_on_exit(const bool value);
-  void set_logfile(const std::string logfile);
+  void set_logfile(const std::string& logfile);
 
   //! check if tree_ is empty
   bool empty() const;
@@ -267,7 +268,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
 private:
   void setup_();
 
-  void add_tree_(const Configuration& other, const std::string sub_id, const bool overwrite);
+  void add_tree_(const Configuration& other, const std::string& sub_id, const bool overwrite);
 
   //! get value from tree and validate with validator
   template <typename T, class Validator>
@@ -327,7 +328,7 @@ private:
   } // ... get_(...)
 
   //! read Dune::ParameterTree from file
-  static ParameterTree initialize(const std::string filename);
+  static ParameterTree initialize(const std::string& filename);
 
   //! read Dune::ParameterTree from istream
   static ParameterTree initialize(std::istream& in);
@@ -340,7 +341,7 @@ private:
 
   void report_as_sub(std::ostream& out, const std::string& prefix, const std::string& sub_path) const;
 
-  std::string find_common_prefix(const BaseType& subtree, const std::string previous_prefix) const;
+  std::string find_common_prefix(const BaseType& subtree, const std::string& previous_prefix) const;
 
   void report_flatly(const BaseType& subtree, const std::string& prefix, std::ostream& out) const;
 

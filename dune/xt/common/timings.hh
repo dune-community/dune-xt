@@ -96,18 +96,18 @@ public:
   void stop();
 
   //! set this to begin a named section
-  void start(std::string section_name);
+  void start(const std::string& section_name);
 
   //! stop named section's counter
-  long stop(std::string section_name);
+  long stop(const std::string& section_name);
 
   //! set elapsed time back to 0 for section_name
-  void reset(std::string section_name);
+  void reset(const std::string& section_name);
 
   //! get runtime of section in milliseconds
   TimingData::TimeType walltime(std::string section_name) const;
   //! get the full delta array
-  TimingData::DeltaType delta(std::string section_name) const;
+  TimingData::DeltaType delta(const std::string& section_name) const;
 
   /** creates one file local to each MPI-rank (no global averaging)
    *  one single rank-0 file with all combined/averaged measures

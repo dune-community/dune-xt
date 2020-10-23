@@ -150,7 +150,7 @@ private:
 public:
   ElementwiseMinimumFunction(GridFunction<E, r_, rC_> some_func,
                              const int search_quadrature_order,
-                             const std::string nm = "ElementwiseMinimumFunction")
+                             const std::string& nm = "ElementwiseMinimumFunction")
     : BaseType()
     , some_func_(some_func.copy_as_grid_function())
     , search_quadrature_order_(search_quadrature_order)
@@ -168,7 +168,7 @@ public:
     , name_(other.name_)
   {}
 
-  ElementwiseMinimumFunction(ThisType&&) = default;
+  ElementwiseMinimumFunction(ThisType&&) noexcept = default;
 
 
 private:

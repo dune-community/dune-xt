@@ -61,7 +61,7 @@ public:
                                const Common::ParameterType& param_type,
                                const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
-                               const std::string nm = static_id())
+                               const std::string& nm = static_id())
     : BaseType(param_type)
     , order_(ord)
     , name_(nm)
@@ -98,7 +98,7 @@ public:
     , function_(new ActualFunctionType(*other.function_))
   {}
 
-  ParametricExpressionFunction(ThisType&&) = default;
+  ParametricExpressionFunction(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override

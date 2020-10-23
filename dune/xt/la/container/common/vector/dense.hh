@@ -79,7 +79,7 @@ struct CommonDenseVectorBackend
     std::copy_n(other.values_ptr(), size_, values_ptr());
   }
 
-  CommonDenseVectorBackend(ThisType&& other)
+  CommonDenseVectorBackend(ThisType&& other) noexcept
     : size_(std::move(other.size_))
     , values_vector_(std::move(other.values_vector_))
     // If other was created from a ptr, we also want to use that pointer to avoid copying. The following assumes

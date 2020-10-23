@@ -114,7 +114,7 @@ public:
   {}
 
   ConstVectorView(const ThisType& other) = default;
-  ConstVectorView(ThisType&& other) = default;
+  ConstVectorView(ThisType&& other) noexcept = default;
   // No assigment as this is a const view
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& other) = delete;
@@ -283,8 +283,8 @@ public:
   {}
 
   VectorView(const ThisType& other) = delete;
-  VectorView(ThisType&& other) = default;
-  ThisType& operator=(VectorView&& other) = default;
+  VectorView(ThisType&& other) noexcept = default;
+  ThisType& operator=(VectorView&& other) noexcept = default;
 
   template <class Vec>
   std::enable_if_t<XT::Common::is_vector<Vec>::value, ThisType>& operator=(const Vec& other)

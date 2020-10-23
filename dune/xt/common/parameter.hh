@@ -32,7 +32,7 @@ public:
 
   SimpleDict(const SimpleDict& other) = default;
 
-  SimpleDict(SimpleDict&& source) = default;
+  SimpleDict(SimpleDict&& source) noexcept = default;
 
   SimpleDict(const std::string& key, const ValueType& value)
     : dict_({std::make_pair(key, value)})
@@ -49,7 +49,7 @@ public:
 
   SimpleDict& operator=(const SimpleDict& other) = default;
 
-  SimpleDict& operator=(SimpleDict&& source)
+  SimpleDict& operator=(SimpleDict&& source) noexcept
   {
     dict_ = std::move(source.dict_);
     keys_ = std::move(source.keys_);

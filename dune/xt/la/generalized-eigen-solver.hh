@@ -50,7 +50,7 @@ std::vector<std::string> generalized_eigen_solver_types(const MatrixType& /*matr
 
 
 template <class MatrixType>
-Common::Configuration generalized_eigen_solver_options(const MatrixType& /*matrix*/, const std::string type = "")
+Common::Configuration generalized_eigen_solver_options(const MatrixType& /*matrix*/, const std::string& type = "")
 {
   return GeneralizedEigenSolverOptions<MatrixType>::options(type);
 }
@@ -74,7 +74,7 @@ public:
                   "Please implement for given MatrixType and add the respective include below!");
   }
 
-  GeneralizedEigenSolver(const MatrixType& /*matrix*/, const Common::Configuration /*opts*/)
+  GeneralizedEigenSolver(const MatrixType& /*matrix*/, const Common::Configuration& /*opts*/)
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");

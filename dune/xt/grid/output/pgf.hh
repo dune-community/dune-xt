@@ -101,7 +101,7 @@ class PgfEntityFunctorIntersections : public ElementAndIntersectionFunctor<GridV
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,
                                 std::ostream& file,
-                                const std::string color = "black",
+                                const std::string& color = "black",
                                 const bool print_entityIndex = false)
     : file_(file)
     , color_(color)
@@ -173,7 +173,7 @@ class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersecti
 public:
   PgfEntityFunctorIntersectionsWithShift(const GridViewType& grid_view,
                                          std::ostream& file,
-                                         const std::string color = "black",
+                                         const std::string& color = "black",
                                          const int level = 0,
                                          bool print_entityIndex = false)
     : BaseType(grid_view, file, color, print_entityIndex)

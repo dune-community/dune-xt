@@ -41,7 +41,7 @@ public:
     return SolverOptions<MatrixImp, CommunicatorType>::types();
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     return SolverOptions<MatrixImp, CommunicatorType>::options(type);
   }
@@ -76,7 +76,7 @@ public:
     return SolverOptions<MatrixType, CommunicatorType>::types();
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)

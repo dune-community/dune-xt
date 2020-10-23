@@ -25,7 +25,7 @@ void guarded_bind(const std::function<void()>& registrar);
 
 
 [[deprecated("This is not required any more (08.08.2019)!")]] void
-add_initialization(pybind11::module& /*m*/, std::string /*logger_name*/, std::string /*so_name*/ = "");
+add_initialization(pybind11::module& /*m*/, const std::string& /*logger_name*/, const std::string& /*so_name*/ = "");
 
 
 [[deprecated("use guarded_bind() instead (08.08.2019)!")]] void

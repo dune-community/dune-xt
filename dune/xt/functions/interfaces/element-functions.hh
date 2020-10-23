@@ -137,7 +137,7 @@ public:
 
   ElementFunctionSetInterface(const ThisType& other) = default;
 
-  ElementFunctionSetInterface(ThisType&& source) = default;
+  ElementFunctionSetInterface(ThisType&& source) noexcept = default;
 
   virtual ~ElementFunctionSetInterface() = default;
 
@@ -493,12 +493,12 @@ public:
   {}
 
   ElementFunctionInterface(const ThisType& other) = default;
-  ElementFunctionInterface(ThisType&& source) = default;
+  ElementFunctionInterface(ThisType&& source) noexcept = default;
 
   virtual ~ElementFunctionInterface() = default;
 
   ThisType& operator=(const ThisType& other) = default;
-  ThisType& operator=(ThisType&& source) = default;
+  ThisType& operator=(ThisType&& source) noexcept = default;
 
   using BaseType::evaluate;
 

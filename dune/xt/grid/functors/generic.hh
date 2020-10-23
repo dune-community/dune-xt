@@ -13,6 +13,7 @@
 #define DUNE_XT_GRID_FUNCTORS_GENERIC_HH
 
 #include <functional>
+#include <utility>
 
 #include "interfaces.hh"
 
@@ -35,9 +36,9 @@ public:
   GenericElementFunctor(GenericPrepareFunctionType prepare_func,
                         GenericApplyFunctionType apply_func,
                         GenericFinalizeFunctionType finalize_func)
-    : prepare_func_(prepare_func)
+    : prepare_func_(std::move(prepare_func))
     , apply_func_(apply_func)
-    , finalize_func_(finalize_func)
+    , finalize_func_(std::move(finalize_func))
   {}
 
   BaseType* copy() override final
@@ -85,9 +86,9 @@ public:
   GenericIntersectionFunctor(GenericPrepareFunctionType prepare_func,
                              GenericApplyFunctionType apply_func,
                              GenericFinalizeFunctionType finalize_func)
-    : prepare_func_(prepare_func)
+    : prepare_func_(std::move(prepare_func))
     , apply_func_(apply_func)
-    , finalize_func_(finalize_func)
+    , finalize_func_(std::move(finalize_func))
   {}
 
   BaseType* copy() override final
@@ -139,10 +140,10 @@ public:
                                        GenericElementApplyFunctionType element_apply_func,
                                        GenericIntersectionApplyFunctionType intersection_apply_func,
                                        GenericFinalizeFunctionType finalize_func)
-    : prepare_func_(prepare_func)
+    : prepare_func_(std::move(prepare_func))
     , element_apply_func_(element_apply_func)
     , intersection_apply_func_(intersection_apply_func)
-    , finalize_func_(finalize_func)
+    , finalize_func_(std::move(finalize_func))
   {}
 
   void prepare() override final

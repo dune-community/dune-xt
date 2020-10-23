@@ -48,10 +48,10 @@ tokenize(const std::string& msg,
 
 namespace internal {
 
-static inline std::string trim_copy_safely(std::string str_in)
+static inline std::string trim_copy_safely(const std::string& str_in)
 {
   const std::string str_out = boost::algorithm::trim_copy(str_in);
-  if (str_out.find(";") != std::string::npos)
+  if (str_out.find(';') != std::string::npos)
     DUNE_THROW(Exceptions::conversion_error,
                "There was an error while parsing the string below. "
                    << "The value contained a ';': '" << str_out << "'!\n"
@@ -93,7 +93,7 @@ struct Helper
 template <>
 struct Helper<bool>
 {
-  static inline bool convert_from_string(std::string ss)
+  static inline bool convert_from_string(const std::string& ss)
   {
     std::string ss_lower_case = ss;
     std::transform(ss_lower_case.begin(), ss_lower_case.end(), ss_lower_case.begin(), ::tolower);
@@ -137,7 +137,7 @@ DUNE_XT_COMMON_STRING_GENERATE_HELPER(long double, ld)
 template <>
 struct Helper<unsigned int>
 {
-  static inline unsigned int convert_from_string(std::string ss)
+  static inline unsigned int convert_from_string(const std::string& ss)
   {
     try {
       return XT::Common::numeric_cast<unsigned int>(std::stoul(ss));
@@ -162,8 +162,8 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
   using namespace std;
   using T = typename ComplexType::value_type;
   T re(0), im(0);
-  const auto sign_pos = ss.find("+", 1) != string::npos ? ss.find("+", 1) : ss.find("-", 1);
-  auto im_pos = ss.find("i");
+  const auto sign_pos = ss.find('+', 1) != string::npos ? ss.find('+', 1) : ss.find('-', 1);
+  auto im_pos = ss.find('i');
   if (sign_pos == string::npos && im_pos != string::npos) {
     // pure virtual case
     im = convert_from_string<T>(ss.substr(0, im_pos));
@@ -172,7 +172,7 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
   }
   if (sign_pos != string::npos) {
     ss = ss.substr(sign_pos);
-    im_pos = ss.find("i");
+    im_pos = ss.find('i');
     if (im_pos == string::npos)
       DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " no imaginary unit");
     im = convert_from_string<T>(ss.substr(0, im_pos));
@@ -382,7 +382,7 @@ inline std::string convert_to_string(char ss, const std::size_t /*precision*/)
   return std::string(1, ss);
 }
 
-inline std::string convert_to_string(const std::string ss, const std::size_t /*precision*/)
+inline std::string convert_to_string(const std::string& ss, const std::size_t /*precision*/)
 {
   return std::string(ss);
 }

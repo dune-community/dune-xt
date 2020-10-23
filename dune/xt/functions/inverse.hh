@@ -170,7 +170,7 @@ public:
     , order_(order)
   {}
 
-  InverseFunction(ThisType&&) = default;
+  InverseFunction(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -225,13 +225,13 @@ public:
   using typename BaseType::LocalFunctionType;
   using typename BaseType::R;
 
-  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string nm = "")
+  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string& nm = "")
     : func_(func.copy_as_grid_function())
     , order_(ord)
     , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)
   {}
 
-  InverseGridFunction(GridFunctionInterface<E, r_, rC_, R>&& func, const int ord, const std::string nm = "")
+  InverseGridFunction(GridFunctionInterface<E, r_, rC_, R>&& func, const int ord, const std::string& nm = "")
     : func_(std::move(func))
     , order_(ord)
     , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)
@@ -243,7 +243,7 @@ public:
     , order_(other.order_)
   {}
 
-  InverseGridFunction(ThisType&&) = default;
+  InverseGridFunction(ThisType&&) noexcept = default;
 
 
 private:

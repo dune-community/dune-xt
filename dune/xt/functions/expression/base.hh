@@ -157,7 +157,7 @@ public:
       ret[ii] = op_[ii]->Val();
   }
 
-  void report(const std::string _name = "function.mathexpressionbase",
+  void report(const std::string& _name = "function.mathexpressionbase",
               std::ostream& stream = std::cout,
               const std::string& _prefix = "") const
   {
@@ -240,7 +240,7 @@ public:
     setup(other.variables(), other.expressions());
   }
 
-  DynamicMathExpressionBase(ThisType&&) = default;
+  DynamicMathExpressionBase(ThisType&&) noexcept = default;
 
   ~DynamicMathExpressionBase()
   {

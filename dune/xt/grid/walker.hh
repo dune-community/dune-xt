@@ -248,7 +248,7 @@ public:
     reinitialize_thread_storage();
   }
 
-  Walker(ThisType&& source) = default;
+  Walker(ThisType&& source) noexcept = default;
 
   virtual ~Walker() = default;
 
@@ -305,17 +305,17 @@ public:
    * \{
    */
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericElementApplyFunctionType apply_func,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    const ElementFilter<GV>& filter = ApplyOn::AllElements<GV>())
   {
     return this->append(new GenericElementFunctor<GV>(prepare_func, apply_func, finalize_func), filter);
   }
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericElementApplyFunctionType apply_func,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    GenericElementFilterFunctionType filter)
   {
     return this->append(new GenericElementFunctor<GV>(prepare_func, apply_func, finalize_func),
@@ -368,17 +368,17 @@ public:
    * \{
    */
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericIntersectionApplyFunctionType apply_func,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    const IntersectionFilter<GV>& filter = ApplyOn::AllIntersections<GV>())
   {
     return this->append(new GenericIntersectionFunctor<GV>(prepare_func, apply_func, finalize_func), filter);
   }
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericIntersectionApplyFunctionType apply_func,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    GenericIntersectionFilterFunctionType filter)
   {
     return this->append(new GenericIntersectionFunctor<GV>(prepare_func, apply_func, finalize_func),
@@ -455,10 +455,10 @@ public:
    * \{
    */
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericElementApplyFunctionType element_apply_on,
                    GenericIntersectionApplyFunctionType intersection_apply_on,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    const ElementFilter<GV>& element_filter = ApplyOn::AllElements<GV>(),
                    const IntersectionFilter<GV>& intersection_filter = ApplyOn::AllIntersections<GV>())
   {
@@ -468,10 +468,10 @@ public:
                         intersection_filter);
   }
 
-  ThisType& append(VoidFunctionType prepare_func,
+  ThisType& append(const VoidFunctionType& prepare_func,
                    GenericElementApplyFunctionType element_apply_on,
                    GenericIntersectionApplyFunctionType intersection_apply_on,
-                   VoidFunctionType finalize_func,
+                   const VoidFunctionType& finalize_func,
                    GenericElementFilterFunctionType element_filter,
                    GenericIntersectionFilterFunctionType intersection_filter)
   {

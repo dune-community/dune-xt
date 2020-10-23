@@ -18,6 +18,7 @@
 #include <dune/common/parametertreeparser.hh>
 
 #include <dune/xt/common/filesystem.hh>
+#include <utility>
 
 #include "configuration.hh"
 
@@ -30,7 +31,7 @@ ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
                                              std::string logfile_in)
   : warn_on_default_access(warn_on_default_access_in)
   , log_on_exit(log_on_exit_in)
-  , logfile(logfile_in)
+  , logfile(std::move(logfile_in))
 {}
 
 Configuration::Configuration()
@@ -41,7 +42,7 @@ Configuration::Configuration()
   setup_();
 }
 
-Configuration::Configuration(const Dune::ParameterTree& tree_in, ConfigurationDefaults defaults)
+Configuration::Configuration(const Dune::ParameterTree& tree_in, const ConfigurationDefaults& defaults)
   : BaseType(tree_in)
   , warn_on_default_access_(defaults.warn_on_default_access)
   , log_on_exit_(defaults.log_on_exit)
@@ -50,7 +51,7 @@ Configuration::Configuration(const Dune::ParameterTree& tree_in, ConfigurationDe
   setup_();
 }
 
-Configuration::Configuration(const ParameterTree& tree_in, const std::string sub_id)
+Configuration::Configuration(const ParameterTree& tree_in, const std::string& sub_id)
   : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
@@ -79,15 +80,15 @@ Configuration::Configuration(const std::initializer_list<std::pair<std::string, 
 }
 
 Configuration::Configuration(std::istream& in, ConfigurationDefaults defaults)
-  : Configuration(initialize(in), defaults)
+  : Configuration(initialize(in), std::move(defaults))
 {}
 
 Configuration::Configuration(const std::string& in, ConfigurationDefaults defaults)
-  : Configuration(initialize(in), defaults)
+  : Configuration(initialize(in), std::move(defaults))
 {}
 
 Configuration::Configuration(int argc, char** argv, ConfigurationDefaults defaults)
-  : Configuration::Configuration(initialize(argc, argv), defaults)
+  : Configuration::Configuration(initialize(argc, argv), std::move(defaults))
 {}
 
 Configuration::~Configuration()
@@ -110,7 +111,7 @@ void Configuration::set_log_on_exit(const bool value)
   log_on_exit_ = value;
 }
 
-void Configuration::set_logfile(const std::string logfile)
+void Configuration::set_logfile(const std::string& logfile)
 {
   if (logfile.empty())
     DUNE_THROW(Exceptions::wrong_input_given, "logfile must not be empty!");
@@ -124,7 +125,8 @@ bool Configuration::has_key(const std::string& key) const
   return BaseType::hasKey(key);
 }
 
-Configuration Configuration::sub(const std::string& sub_id, bool fail_if_missing, Configuration default_value) const
+Configuration
+Configuration::sub(const std::string& sub_id, bool fail_if_missing, const Configuration& default_value) const
 {
   if ((empty() || !has_sub(sub_id)) && !fail_if_missing)
     return default_value;
@@ -154,13 +156,13 @@ void Configuration::set(const std::string& key, const char* value, const bool ov
   set(key, std::string(value), overwrite);
 }
 
-Configuration& Configuration::add(const Configuration& other, const std::string sub_id, const bool overwrite)
+Configuration& Configuration::add(const Configuration& other, const std::string& sub_id, const bool overwrite)
 {
   add_tree_(other, sub_id, overwrite);
   return *this;
 } // ... add(...)
 
-Configuration& Configuration::add(const ParameterTree& other, const std::string sub_id, const bool overwrite)
+Configuration& Configuration::add(const ParameterTree& other, const std::string& sub_id, const bool overwrite)
 {
   add_tree_(Configuration(other), sub_id, overwrite);
   return *this;
@@ -251,7 +253,7 @@ void Configuration::setup_()
   logfile_ = boost::filesystem::path(logfile_).string();
 } // ... setup_(...)
 
-void Configuration::add_tree_(const Configuration& other, const std::string sub_id, const bool overwrite)
+void Configuration::add_tree_(const Configuration& other, const std::string& sub_id, const bool overwrite)
 {
   for (const auto& element : other.flatten()) {
     auto key = element.first;
@@ -269,7 +271,7 @@ void Configuration::add_tree_(const Configuration& other, const std::string sub_
   }
 } // ... add_tree_(...)
 
-ParameterTree Configuration::initialize(const std::string filename)
+ParameterTree Configuration::initialize(const std::string& filename)
 {
   ParameterTree param_tree;
   Dune::ParameterTreeParser::readINITree(filename, param_tree);
@@ -301,7 +303,7 @@ ParameterTree Configuration::initialize(int argc, char** argv, std::string filen
 {
   ParameterTree param_tree;
   if (argc == 1) {
-    Dune::ParameterTreeParser::readINITree(filename, param_tree);
+    Dune::ParameterTreeParser::readINITree(std::move(filename), param_tree);
   } else if (argc == 2) {
     Dune::ParameterTreeParser::readINITree(argv[1], param_tree);
   } else {
@@ -326,7 +328,7 @@ void Configuration::report_as_sub(std::ostream& out, const std::string& prefix, 
   }
 } // ... report_as_sub(...)
 
-std::string Configuration::find_common_prefix(const BaseType& subtree, const std::string previous_prefix) const
+std::string Configuration::find_common_prefix(const BaseType& subtree, const std::string& previous_prefix) const
 {
   const auto& valuekeys = subtree.getValueKeys();
   const auto& subkeys = subtree.getSubKeys();
@@ -344,10 +346,10 @@ std::string Configuration::find_common_prefix(const BaseType& subtree, const std
 void Configuration::report_flatly(const BaseType& subtree, const std::string& prefix, std::ostream& out) const
 {
   // report all the keys
-  for (auto key : subtree.getValueKeys())
+  for (const auto& key : subtree.getValueKeys())
     out << prefix << key << " = " << subtree[key] << std::endl;
   // report all the subs
-  for (auto subkey : subtree.getSubKeys()) {
+  for (const auto& subkey : subtree.getSubKeys()) {
     if (prefix.empty())
       report_flatly(subtree.sub(subkey), subkey + ".", out);
     else

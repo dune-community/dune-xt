@@ -20,6 +20,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -174,7 +175,7 @@ public:
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericGridFunction",
+                      const std::string& nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
@@ -190,11 +191,11 @@ public:
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "GenericGridFunction",
+                      const std::string& nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
-    , order_(order_func)
+    , order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , name_(nm)
@@ -204,7 +205,7 @@ public:
 
   GenericGridFunction(const ThisType&) = default;
 
-  GenericGridFunction(ThisType&&) = default;
+  GenericGridFunction(ThisType&&) noexcept = default;
 
 private:
   ThisType* copy_as_grid_function_impl() const override

@@ -123,7 +123,7 @@ public:
 
 
   ConstMatrixView(const ThisType& other) = default;
-  ConstMatrixView(ThisType&& other) = default;
+  ConstMatrixView(ThisType&& other) noexcept = default;
   // No assigment as this is a const view
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& other) = delete;
@@ -331,8 +331,8 @@ public:
   {}
 
   MatrixView(const ThisType& other) = default;
-  MatrixView(ThisType&& other) = default;
-  ThisType& operator=(MatrixView&& other) = default;
+  MatrixView(ThisType&& other) noexcept = default;
+  ThisType& operator=(MatrixView&& other) noexcept = default;
 
   ThisType& operator=(const Matrix& other)
   {
