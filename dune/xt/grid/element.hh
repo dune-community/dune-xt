@@ -24,7 +24,7 @@ class SubEntityCenter
   static_assert(is_entity<E>::value);
   using G = extract_grid_t<E>;
   using D = typename G::ctype;
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   template <int cd = d, bool anything = true>
   struct subEntity

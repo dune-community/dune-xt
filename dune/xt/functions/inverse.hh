@@ -212,8 +212,8 @@ class InverseGridFunction
   static_assert(is_grid_function<GridFunctionType>::value);
 
   using Helper = internal::InverseFunctionHelper<GridFunctionType>;
-  static const constexpr size_t r_ = GridFunctionType::r;
-  static const constexpr size_t rC_ = GridFunctionType::rC;
+  static constexpr size_t r_ = GridFunctionType::r;
+  static constexpr size_t rC_ = GridFunctionType::rC;
 
 public:
   using ThisType = InverseGridFunction;

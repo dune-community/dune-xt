@@ -42,8 +42,8 @@ class DerivativeGridFunction
 
   using Select = internal::DerivativeElementFunctionHelper<GridFunctionType, derivative>;
 
-  static const constexpr size_t r_ = GridFunctionType::r;
-  static const constexpr size_t rC_ = GridFunctionType::rC;
+  static constexpr size_t r_ = GridFunctionType::r;
+  static constexpr size_t rC_ = GridFunctionType::rC;
 
 public:
   using BaseType::r;

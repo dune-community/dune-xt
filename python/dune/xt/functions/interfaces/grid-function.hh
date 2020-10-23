@@ -27,7 +27,7 @@ template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
 class GridFunctionInterface
 {
   using GP = XT::Grid::GridProvider<G>;
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
   struct product_helper // <true, false, ...>

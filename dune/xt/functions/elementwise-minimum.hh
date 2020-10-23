@@ -27,9 +27,9 @@ class ElementwiseMinimumFunctionHelper
   static_assert(is_element_function<FunctionType>::value);
 
 public:
-  static const constexpr size_t d = FunctionType::d;
-  static const constexpr size_t r = FunctionType::r;
-  static const constexpr size_t rC = FunctionType::rC;
+  static constexpr size_t d = FunctionType::d;
+  static constexpr size_t r = FunctionType::r;
+  static constexpr size_t rC = FunctionType::rC;
   using E = typename FunctionType::E;
   using R = typename FunctionType::R;
   using DomainType = Dune::FieldVector<double, d>;
@@ -90,8 +90,8 @@ class ElementwiseMinimumFunction : public GridFunctionInterface<typename SomeFun
   using ThisType = ElementwiseMinimumFunction;
   using BaseType = GridFunctionInterface<typename SomeFunction::E>;
 
-  static const constexpr size_t r_ = SomeFunction::r;
-  static const constexpr size_t rC_ = SomeFunction::rC;
+  static constexpr size_t r_ = SomeFunction::r;
+  static constexpr size_t rC_ = SomeFunction::rC;
 
 public:
   using BaseType::r;
