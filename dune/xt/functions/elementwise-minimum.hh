@@ -70,7 +70,7 @@ public:
     }
   };
 
-public:
+
   static R compute(const FunctionType& func, const int order, const XT::Common::Parameter& param)
   {
     return dim_switch<>::compute(func, order, param);

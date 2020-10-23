@@ -348,8 +348,6 @@ struct RealQrEigenSolver
   } // void hessenberg_transformation(...)
 }; // class RealQrEigenSolver<...>
 
-template <class FieldType, class MatrixType, class VectorType>
-constexpr size_t RealQrEigenSolver<FieldType, MatrixType, VectorType>::max_iterations;
 
 template <class MatrixType>
 Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>

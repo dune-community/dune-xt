@@ -40,7 +40,7 @@ public:
   using DomainType = Dune::FieldVector<double, d>;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
 
-public:
+
   static constexpr bool available = (FunctionType::rC == FunctionType::r);
 
   static RangeReturnType compute(const RangeReturnType& value)

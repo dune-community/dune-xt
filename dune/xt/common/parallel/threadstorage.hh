@@ -377,7 +377,7 @@ public:
   ThreadResultPropagator(const ThreadResultPropagator& other)
     : imp_(other.imp_)
     , base_(other.base_)
-    , mutex_()
+
   {}
 
   Imp* copy_imp()

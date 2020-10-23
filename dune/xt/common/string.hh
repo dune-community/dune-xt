@@ -122,7 +122,7 @@ template <class T>
 std::string whitespaceify(const T& t, const char whitespace = ' ')
 {
   const std::string s = to_string(t);
-  std::string ret = "";
+  std::string ret;
   for ([[maybe_unused]] auto ii : value_range(s.size()))
     ret += whitespace;
   return ret;

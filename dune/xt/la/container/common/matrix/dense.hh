@@ -343,7 +343,7 @@ public:
     }
   } // ... axpy(...)
 
-public:
+
   template <class OtherMatrixType>
   bool has_equal_shape(const OtherMatrixType& other) const
   {

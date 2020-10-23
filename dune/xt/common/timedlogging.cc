@@ -29,7 +29,6 @@ DefaultLogger::DefaultLogger(const std::string& prfx,
                              bool global_timer)
   : prefix(prfx)
   , copy_count(0)
-  , timer_()
   , colors_(colors)
   , global_timer_(global_timer)
   , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
@@ -49,7 +48,6 @@ DefaultLogger::DefaultLogger(const std::string& prfx,
 DefaultLogger::DefaultLogger(const DefaultLogger& other)
   : prefix(other.prefix)
   , copy_count(other.copy_count + 1)
-  , timer_()
   , colors_(other.colors_)
   , global_timer_(other.global_timer_)
   , info_(

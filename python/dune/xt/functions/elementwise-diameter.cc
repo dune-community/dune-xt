@@ -45,7 +45,7 @@ public:
   using base_type = Functions::GridFunctionInterface<E>;
   using bound_type = pybind11::class_<type, base_type>;
 
-public:
+
   static bound_type bind(pybind11::module& m,
                          const std::string& grid_id = Grid::bindings::grid_name<G>::value(),
                          const std::string& layer_id = "",

@@ -451,8 +451,10 @@ protected:
   }
 
 private:
+#ifndef __clang_analyzer__ // tidy throws away the second line
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const MatrixInterface<T, S>& /*matrix*/);
+#endif // __clang_analyzer__
 }; // class MatrixInterface
 
 

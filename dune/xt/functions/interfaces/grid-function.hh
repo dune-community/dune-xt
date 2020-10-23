@@ -178,7 +178,7 @@ public:
 
   Functions::DifferenceGridFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
-    std::string derived_logging_prefix = "";
+    std::string derived_logging_prefix;
     if (this->logger.debug_enabled || other.logger.debug_enabled) {
       derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
       this->logger.debug() << logging_id() << "::operator-(other=" << &other << ")" << std::endl;
@@ -189,7 +189,7 @@ public:
 
   Functions::SumGridFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
-    std::string derived_logging_prefix = "";
+    std::string derived_logging_prefix;
     if (this->logger.debug_enabled || other.logger.debug_enabled) {
       derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
       this->logger.debug() << logging_id() << "::operator+(other=" << &other << ")" << std::endl;
@@ -204,7 +204,7 @@ public:
                    Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
   operator*(const OtherType& other) const
   {
-    std::string derived_logging_prefix = "";
+    std::string derived_logging_prefix;
     if (this->logger.debug_enabled || other.logger.debug_enabled) {
       derived_logging_prefix = "(" + this->logger.prefix + "*" + other.logger.prefix + ")";
       this->logger.debug() << logging_id() << "::operator*(other=" << &other << ")" << std::endl;
@@ -219,7 +219,7 @@ public:
                    Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
   operator/(const OtherType& other) const
   {
-    std::string derived_logging_prefix = "";
+    std::string derived_logging_prefix;
     if (this->logger.debug_enabled || other.logger.debug_enabled) {
       derived_logging_prefix = "(" + this->logger.prefix + "/" + other.logger.prefix + ")";
       this->logger.debug() << logging_id() << "::operator/(other=" << &other << ")" << std::endl;

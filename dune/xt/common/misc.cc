@@ -20,7 +20,6 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/print.hh>
 
-extern char** environ;
 
 namespace Dune::XT::Common {
 

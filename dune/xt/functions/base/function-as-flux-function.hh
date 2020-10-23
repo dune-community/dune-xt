@@ -88,7 +88,7 @@ private:
       , function_(function)
     {}
 
-  public:
+
     int order(const Common::Parameter& param = {}) const override final
     {
       return function_.order(param);

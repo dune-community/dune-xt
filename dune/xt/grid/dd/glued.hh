@@ -168,7 +168,7 @@ public:
   static constexpr size_t dimDomain = MacroGridType::dimension;
   static constexpr size_t dimWorld = MacroGridType::dimensionworld;
 
-public:
+
   using LocalViewType = typename Layer<LocalGridType, layer, Backends::view>::type;
 
 private:

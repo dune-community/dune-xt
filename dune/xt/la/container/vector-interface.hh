@@ -668,9 +668,10 @@ protected:
       }
     }
   }; // struct complex_switch
-
+#ifndef __clang_analyzer__ // tidy throws away the second line
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
+#endif // __clang_analyzer__
 }; // class VectorInterface
 
 

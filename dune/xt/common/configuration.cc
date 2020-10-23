@@ -34,8 +34,7 @@ ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
 {}
 
 Configuration::Configuration()
-  : BaseType()
-  , warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
+  : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
 {
@@ -52,8 +51,7 @@ Configuration::Configuration(const Dune::ParameterTree& tree_in, ConfigurationDe
 }
 
 Configuration::Configuration(const ParameterTree& tree_in, const std::string sub_id)
-  : BaseType()
-  , warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
+  : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
 {
@@ -69,8 +67,7 @@ Configuration::Configuration(const Configuration& other)
 {}
 
 Configuration::Configuration(const std::initializer_list<std::pair<std::string, std::string>>& key_value_pairs)
-  : BaseType()
-  , warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
+  : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
 {

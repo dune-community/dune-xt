@@ -129,7 +129,6 @@ public:
     : dim_(dm)
     , len_(lngth)
     , vectors_()
-    , notes_()
     , pairs_()
   {
     vectors_.reserve(resrv);

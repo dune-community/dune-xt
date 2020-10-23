@@ -59,7 +59,7 @@ void LocalizationStudy::run(std::ostream& out)
   for (auto id : actually_used_indicators)
     first_column_size = std::max(first_column_size, id.size());
   first_column_size = std::max(first_column_size, total_width - header_line.size() - 1);
-  std::string first_column_str = "";
+  std::string first_column_str;
   for (size_t ii = 0; ii < first_column_size; ++ii)
     first_column_str += " ";
   header_line = std::string(" ") + first_column_str + header_line;

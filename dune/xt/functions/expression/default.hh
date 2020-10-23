@@ -424,7 +424,7 @@ private:
 #endif // NDEBUG
   } // ... check_value(...)
 
-private:
+
   MathExpressionFunctionType function_;
   size_t order_;
   std::string name_;

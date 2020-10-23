@@ -523,7 +523,7 @@ private:
     return false;
   } // ... these_are_valid_indices(...)
 
-private:
+
   std::shared_ptr<BackendType> backend_;
   std::unique_ptr<MutexesType> mutexes_;
 }; // class EigenRowMajorSparseMatrix

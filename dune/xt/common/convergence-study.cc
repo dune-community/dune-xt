@@ -208,9 +208,9 @@ ConvergenceStudy::run(const std::vector<std::string>& only_these, std::ostream& 
 #endif // 0
   // - quantities
   for (const auto& id : actual_quantities) {
-    std::string first_row = "";
-    std::string second_row = "";
-    std::string third_row = "";
+    std::string first_row;
+    std::string second_row;
+    std::string third_row;
     auto words = tokenize(id, " ");
     if (id.size() <= column_width) {
       first_row = std::string(column_width, ' ');

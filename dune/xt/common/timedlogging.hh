@@ -55,7 +55,7 @@ class DefaultLogger
   static std::string build_prefix(const std::string& prfx, const size_t cnt, const std::string& clr)
   {
     const std::string actual_color = terminal_supports_color() ? color(clr) : "";
-    std::string copy_count_str = "";
+    std::string copy_count_str;
     if (cnt > 0)
       copy_count_str += "[" + to_string(cnt) + "]";
     std::string ret;
