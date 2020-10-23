@@ -257,7 +257,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage && M::rows(A) > 10) {
+    } else if (has_contiguous_storage && M::rows(A) > min_lapack_factor_size) {
       std::fill(permutations.begin(), permutations.end(), 0.);
       assert(std::max(M::rows(A), M::cols(A)) < size_t(std::numeric_limits<int>::max()));
       auto num_rows = static_cast<int>(M::rows(A));
@@ -288,7 +288,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage && M::rows(QR) > 10) {
+    } else if (has_contiguous_storage && M::rows(QR) > min_lapack_factor_size) {
       // create Q and copy values of QR to Q;
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
@@ -328,7 +328,7 @@ struct QrHelper
       V3::set_entry(y, ii, V2::get_entry(x, ii));
     if (false) {
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage && num_rows > 10) {
+    } else if (has_contiguous_storage && num_rows > min_lapack_factor_size) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
       assert(x.size() < size_t(std::numeric_limits<int>::max()));

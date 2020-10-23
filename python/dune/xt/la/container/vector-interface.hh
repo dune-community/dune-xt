@@ -67,7 +67,7 @@ auto bind_Vector(pybind11::module& m)
           ss << self[0];
         for (size_t ii = 1; ii < std::min(size_t(3), self.size()); ++ii)
           ss << " " << self[ii];
-        if (self.size() > 8) {
+        if (self.size() > max_python_print_rows) {
           ss << " ...";
         } else {
           for (ssize_t ii = std::min(size_t(3), self.size()); ii < ssize_t(self.size()) - 3; ++ii)

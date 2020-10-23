@@ -383,11 +383,11 @@ void matrix_to_gnuplot_stream(const Matrix& matrix, std::ostream& stream)
 //! maps 1,2,3 to x,y,z / X,Y,Z
 inline std::string dim_to_axis_name(const size_t dim, const bool capitalize = false)
 {
+  const size_t capitals_count{32};
   char c = 'x';
-
   c += dim;
   if (capitalize)
-    c -= 32;
+    c -= capitals_count;
   return std::string() += c;
 } // matrix_to_gnuplot_stream
 

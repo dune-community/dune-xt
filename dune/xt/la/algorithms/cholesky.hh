@@ -193,6 +193,7 @@ cholesky_csc(MatrixType& /*A*/)
   DUNE_THROW(Dune::InvalidStateException, "This only makes sense for matrices with compressed sparse column layout!");
 }
 
+
 template <class MatrixType,
           Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout>
 struct CholeskySolver
@@ -212,7 +213,7 @@ struct CholeskySolver
 #if HAVE_MKL || HAVE_LAPACKE
     } else if ((storage_layout == Common::StorageLayout::dense_row_major
                 || storage_layout == Common::StorageLayout::dense_column_major)
-               && size > 10) {
+               && size > min_lapack_factor_size) {
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();

@@ -26,6 +26,7 @@ namespace XT {
 namespace LA {
 namespace internal {
 
+constexpr const size_t min_lapack_factor_size{10};
 
 // A simple forward solve for Ax = b with a lower triangular matrix A
 // If transposed is true, A is assumed to be upper triangular and the

@@ -105,12 +105,13 @@ void LocalizationStudy::run(std::ostream& out)
                                               << ", should be " << reference_indicators.size() << ")!");
     const auto difference = reference_indicators - indicators;
     // compute L^2 difference
-    out << std::setw(18) << std::setprecision(2) << std::scientific << difference.two_norm() << std::flush;
+    const size_t out_width{18};
+    out << std::setw(out_width) << std::setprecision(2) << std::scientific << difference.two_norm() << std::flush;
     // compute L^oo difference
-    out << " | " << std::setw(18) << std::setprecision(2) << std::scientific << difference.infinity_norm()
+    out << " | " << std::setw(out_width) << std::setprecision(2) << std::scientific << difference.infinity_norm()
         << std::flush;
     // compute standard deviation
-    out << " | " << std::setw(18) << std::setprecision(2) << std::scientific
+    out << " | " << std::setw(out_width) << std::setprecision(2) << std::scientific
         << /*difference.standard_deviation()*/ std::numeric_limits<double>::infinity() << std::flush;
     if (ind < (actually_used_indicators.size() - 1))
       out << "\n" << thin_delimiter;
