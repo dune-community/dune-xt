@@ -29,7 +29,7 @@
 using namespace Dune::XT::Common;
 using namespace Dune::XT::Test;
 
-constexpr const auto SEED = std::random_device::result_type(0);
+constexpr auto SEED = std::random_device::result_type(0);
 
 struct ValidationTest : public testing::Test
 {

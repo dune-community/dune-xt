@@ -207,7 +207,7 @@ std::string demangled_type_id(T& obj)
   return demangle_typename(typeid(obj).name());
 } // demangled_type_id
 
-constexpr const size_t default_max_highlight_level{1000};
+constexpr size_t default_max_highlight_level{1000};
 //! create output for demangled typeid
 template <class T>
 void real_type_id(T& obj, const std::string& name = "", size_t maxlevel = default_max_highlight_level)

@@ -23,7 +23,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
-constexpr const size_t max_python_print_rows{8};
+constexpr size_t max_python_print_rows{8};
 
 pybind11::enum_<Backends> bind_Backends(pybind11::module& m)
 {

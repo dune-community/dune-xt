@@ -64,7 +64,7 @@ const char* StreamModifiers::endunderline = "\033[24m";
 const char* StreamModifiers::endblink = "\033[25m";
 const char* StreamModifiers::endreverse = "\033[27m";
 
-constexpr const size_t max_terminal_colors{256};
+constexpr size_t max_terminal_colors{256};
 
 std::string color(size_t i)
 {

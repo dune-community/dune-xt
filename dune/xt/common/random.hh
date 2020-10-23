@@ -175,7 +175,7 @@ private:
   std::vector<RngType> rngs_;
 };
 
-constexpr const size_t default_rng_string_length{12};
+constexpr size_t default_rng_string_length{12};
 
 template <>
 class DefaultRNG<std::string> : public RandomStrings

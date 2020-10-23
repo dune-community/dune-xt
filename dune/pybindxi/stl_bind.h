@@ -36,11 +36,10 @@ struct container_traits
   template <typename T2>
   static std::false_type test_pair(...);
 
-  static constexpr const bool is_comparable =
-      std::is_same<std::true_type, decltype(test_comparable<T>(nullptr))>::value;
-  static constexpr const bool is_pair = std::is_same<std::true_type, decltype(test_pair<T>(nullptr, nullptr))>::value;
-  static constexpr const bool is_vector = std::is_same<std::true_type, decltype(test_value<T>(nullptr))>::value;
-  static constexpr const bool is_element = !is_pair && !is_vector;
+  static constexpr bool is_comparable = std::is_same<std::true_type, decltype(test_comparable<T>(nullptr))>::value;
+  static constexpr bool is_pair = std::is_same<std::true_type, decltype(test_pair<T>(nullptr, nullptr))>::value;
+  static constexpr bool is_vector = std::is_same<std::true_type, decltype(test_value<T>(nullptr))>::value;
+  static constexpr bool is_element = !is_pair && !is_vector;
 };
 
 /* Default: is_comparable -> std::false_type */
@@ -58,14 +57,14 @@ struct is_comparable<T, enable_if_t<container_traits<T>::is_element && container
 template <typename T>
 struct is_comparable<T, enable_if_t<container_traits<T>::is_vector>>
 {
-  static constexpr const bool value = is_comparable<typename T::value_type>::value;
+  static constexpr bool value = is_comparable<typename T::value_type>::value;
 };
 
 /* For pairs, recursively check the two data types */
 template <typename T>
 struct is_comparable<T, enable_if_t<container_traits<T>::is_pair>>
 {
-  static constexpr const bool value =
+  static constexpr bool value =
       is_comparable<typename T::first_type>::value && is_comparable<typename T::second_type>::value;
 };
 

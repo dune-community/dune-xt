@@ -58,7 +58,7 @@ tokenize(const std::string& msg,
 namespace Dune::XT::Common {
 
 
-static constexpr const std::size_t default_to_string_precision = 6u;
+static constexpr std::size_t default_to_string_precision = 6u;
 
 
 /**

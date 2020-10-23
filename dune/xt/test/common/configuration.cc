@@ -152,7 +152,7 @@ using ConfigurationCreators = testing::Types<CreateByOperator,
                                              CreateByParameterTree,
                                              CreateByOperatorAndAssign>;
 
-constexpr const auto SEED = std::random_device::result_type(0);
+constexpr auto SEED = std::random_device::result_type(0);
 
 template <class T>
 static DefaultRNG<T> rng_setup()
