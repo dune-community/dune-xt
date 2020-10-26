@@ -190,8 +190,9 @@ void check_eoc_study_for_success(
             << "get_unique_test_name() = " << Common::Test::get_unique_test_name();
         const auto& actual_value = actual_type_data.at(level);
         const auto& expected_value = expected_values[level];
-        if (std::abs(expected_value) < zero_tolerance && std::abs(actual_value) > zero_tolerance) {
-          EXPECT_TRUE(false)
+        if (std::abs(expected_value) < zero_tolerance) {
+          const auto abs_of_actual_value = std::abs(actual_value);
+          EXPECT_LT(abs_of_actual_value, zero_tolerance)
               << "          Expected result is interpreted as zero and result is not close enough to zero!\n"
               << "          level:    " << level << "\n"
               << "          category: " << category << "\n"
