@@ -38,6 +38,59 @@ namespace XT {
 namespace Grid {
 namespace bindings {
 
+namespace Dune::XT::Grid{
+
+template <class MacroGV, class MicroGV>
+class MacroGridBasedBoundaryInfo : public Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MicroGV>>
+{
+  using BaseType = Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MicroGV>>;
+
+public:
+  using typename BaseType::IntersectionType;
+  using MacroBoundaryInfoType = Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MacroGV>>;
+  using MacroElementType = Dune::XT::Grid::extract_entity_t<MacroGV>;
+
+  MacroGridBasedBoundaryInfo(const MacroGV& macro_grid_view,
+                             const MacroElementType& macro_element,
+                             const MacroBoundaryInfoType& macro_boundary_info)
+    : macro_grid_view_(macro_grid_view)
+    , macro_element_(macro_element)
+    , macro_boundary_info_(macro_boundary_info)
+  {}
+
+  const Dune::XT::Grid::BoundaryType& type(const IntersectionType& intersection) const override final
+  {
+    // find out if this micro intersection lies within the macro element or on a macro intersection
+    for (auto&& macro_intersection : intersections(macro_grid_view_, macro_element_)) {
+      const size_t num_corners = intersection.geometry().corners();
+      size_t num_corners_inside = 0;
+      size_t num_corners_outside = 0;
+      for (size_t cc = 0; cc < num_corners; ++cc) {
+        const auto micro_corner = intersection.geometry().corner(cc);
+        if (XT::Grid::contains(macro_intersection, micro_corner))
+          ++num_corners_inside;
+        else
+          ++num_corners_outside;
+      }
+      if (num_corners_inside == num_corners && num_corners_outside == 0) {
+        // we found the macro intersection this micro intersection belongs to
+        return macro_boundary_info_.type(macro_intersection);
+      }
+    }
+    // we could not find a macro intersection this micro intersection belongs to
+    return no_boundary_;
+  } // ... type(...)
+
+  const MacroGV& macro_grid_view_;
+  const MacroElementType& macro_element_;
+  const MacroBoundaryInfoType& macro_boundary_info_;
+  const XT::Grid::NoBoundary no_boundary_;
+}; // class MacroGridBasedBoundaryInfo
+
+} // namespace Dune::XT::Grid
+
+namespace Dune::XT::Grid::bindings {
+
 
 template <class G>
 class GluedGridProvider
@@ -89,8 +142,29 @@ public:
            }
          }
          return neighboring_subdomains;
-    });
-
+    },
+    "ss"_a);
+    c.def("macro_based_boundary_info", [](type& self, const size_t ss) {
+        DUNE_THROW_IF(ss >= self.num_subdomains(),
+                      XT::Common::Exceptions::index_out_of_range,
+                      "ss = " << ss << "\n   self.num_subdomains() = "
+                              << self.num_subdomains());
+        using MGV = typename type::MacroGridViewType;
+        const XT::Grid::AllDirichletBoundaryInfo<XT::Grid::extract_intersection_t<MGV>> macro_boundary_info;
+//        std::unique_ptr<M> subdomain_matrix;
+        for (auto&& macro_element : elements(self.macro_grid_view())) {
+          if (self.subdomain(macro_element) == ss) {
+            // this is the subdomain we are interested in, create space
+//            auto subdomain_grid_view = self.local_grid(macro_element).leaf_view();
+//            using I = typename GV::Intersection;
+//            auto subdomain_space = make_subdomain_space(subdomain_grid_view, space_type);
+            const MacroGridBasedBoundaryInfo<MGV, GV> subdomain_boundary_info(
+                self.macro_grid_view(), macro_element, macro_boundary_info);
+            return subdomain_boundary_info;
+          }
+        }
+    },
+    "ss"_a);
     c.def(
         "write_global_visualization",
         [](type& self,
@@ -105,51 +179,65 @@ public:
   } // ... bind(...)
 }; // class GridProvider
 
+template <class G>
+struct MacroGridBasedBoundaryInfo
+{
+  using GV = typename G::LeafGridView;
+  using I = Dune::XT::Grid::extract_intersection_t<GV>;
+  using type = Dune::XT::Grid::MacroGridBasedBoundaryInfo<GV, GV>;
+//  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
+  using bound_type = pybind11::class_<type>;
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+  static bound_type bind(pybind11::module& m,
+                   const std::string& class_id = "macro_grid_based_boundary_info",
+                   const std::string& grid_id = grid_name<G>::value())
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    const std::string class_name = class_id + "_" + grid_id;
+    const auto ClassName = XT::Common::to_camel_case(class_name);
+    bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    c.def(
+        "type",
+        [](type& self,
+           const I& intersection)    // no bindings available !!
+            { self.type(intersection); },
+        "intersection"_a);
+//    c.def(
+//        py::init([](const Grid::BoundaryType& default_boundary_type, const D& tol, const std::string& logging_prefix) {
+//          return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
+//        }),
+//        "default_boundary_type"_a,
+//        "tolerance"_a = 1e-10,
+//        "logging_prefix"_a = "");
+//    c.def(
+//        "register_new_normal",
+//        [](type& self, const typename type::WorldType& normal, const Grid::BoundaryType& boundary_type) {
+//          self.register_new_normal(normal, boundary_type.copy());
+//        },
+//        "normal"_a,
+//        "boundary_type"_a);
 
+//    m.def(
+//        Common::to_camel_case(class_id).c_str(),
+//        [](const Grid::GridProvider<G>&,
+//           const Grid::BoundaryType& default_boundary_type,
+//           const D& tol,
+//           const std::string& logging_prefix) {
+//          return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
+//        },
+//        "grid_provider"_a,
+//        "default_boundary_type"_a,
+//        "tolerance"_a = 1e-10,
+//        "logging_prefix"_a = "");
+    return c;
+  } // ... bind(...)
+}; // struct NormalBasedBoundaryInfo_for_all_grids
+
+} // namespace Dune::XT::Grid::bindings
 
 
 #include <dune/xt/grid/grids.hh>
-// #include <python/dune/xt/grid/filters/intersection.hh>
-
-
-//template <template <class> class Filter, class GridTypes = Dune::XT::Grid::AvailableGridTypes>
-//struct InitlessIntersectionFilter_for_all_grids
-//{
-//  static void bind(pybind11::module& m, const std::string& class_id)
-//  {
-//    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, typename GridTypes::head_type>::bind(m, class_id);
-//    InitlessIntersectionFilter_for_all_grids<Filter, typename GridTypes::tail_type>::bind(m, class_id);
-//  }
-//};
-
-//template <template <class> class Filter>
-//struct InitlessIntersectionFilter_for_all_grids<Filter, boost::tuples::null_type>
-//{
-//  static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
-//};
-
-
-//template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
-//struct CustomBoundaryIntersectionFilter_for_all_grids
-//{
-//  static void bind(pybind11::module& m)
-//  {
-//    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<typename GridTypes::head_type>::bind(m);
-//    CustomBoundaryIntersectionFilter_for_all_grids<typename GridTypes::tail_type>::bind(m);
-//  }
-//};
-
-//template <>
-//struct CustomBoundaryIntersectionFilter_for_all_grids<boost::tuples::null_type>
-//{
-//  static void bind(pybind11::module& /*m*/) {}
-//};
-
 
 template <class GridTypes = Dune::XT::Grid::Available2dGridTypes>  // grid-glue only working 2d
 struct GluedGridProvider_for_all_grids
@@ -163,6 +251,22 @@ struct GluedGridProvider_for_all_grids
 
 template <>
 struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>  // grid-glue only working 2d
+struct MacroGridBasedBoundaryInfo_for_all_grids
+{
+  static void bind(pybind11::module& m)
+  {
+    Dune::XT::Grid::bindings::MacroGridBasedBoundaryInfo<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    MacroGridBasedBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct MacroGridBasedBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -200,4 +304,5 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
 //  CustomBoundaryIntersectionFilter_for_all_grids<>::bind(m);
 
   GluedGridProvider_for_all_grids<>::bind(m);
+  MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
 }
