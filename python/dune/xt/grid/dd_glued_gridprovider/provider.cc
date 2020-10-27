@@ -33,10 +33,70 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+
+
+/**
+ * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
+ * oriented normal.
+ *
+ * \attention Presumes that the coupling intersection lies exactly within the macro intersection!
+ */
+template <class CouplingIntersectionType, class MacroIntersectionType>
+class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
+{
+  using BaseType = CouplingIntersectionType;
+
+public:
+  using typename BaseType::GlobalCoordinate;
+  using typename BaseType::LocalCoordinate;
+
+  enum
+  {
+    dimension = MacroIntersectionType::dimension
+  };
+
+  CouplingIntersectionWithCorrectNormal(const CouplingIntersectionType& coupling_intersection,
+                                        const MacroIntersectionType& macro_intersection)
+    : BaseType(coupling_intersection)
+    , macro_intersection_(macro_intersection)
+  {}
+
+  GlobalCoordinate outerNormal(const LocalCoordinate& local) const
+  {
+    global_ = this->geometry().global(local);
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.outerNormal(local_);
+  }
+
+  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local) const
+  {
+    auto normal = this->unitOuterNormal(local);
+    const auto integration_element = BaseType::integrationOuterNormal(local).two_norm();
+    normal *= integration_element;
+    return normal;
+  }
+
+  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
+  {
+    global_ = this->geometry().global(local);
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.unitOuterNormal(local_);
+  }
+
+  GlobalCoordinate centerUnitOuterNormal() const
+  {
+    global_ = this->geometry().center();
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.unitOuterNormal(local_);
+  }
+
+private:
+  const MacroIntersectionType& macro_intersection_;
+  mutable GlobalCoordinate global_;
+  mutable LocalCoordinate local_;
+}; // class CouplingIntersectionWithCorrectNormal
+
+
 
 namespace Dune::XT::Grid{
 
@@ -86,6 +146,23 @@ public:
   const MacroBoundaryInfoType& macro_boundary_info_;
   const XT::Grid::NoBoundary no_boundary_;
 }; // class MacroGridBasedBoundaryInfo
+
+// Since CouplingIntersectionWithCorrectNormal is not derived from Dune::Intersection, we need this copy here :/
+template <class C, class I>
+double diameter(const CouplingIntersectionWithCorrectNormal<C, I>& intersection)
+{
+  auto max_dist = std::numeric_limits<typename I::ctype>::min();
+  const auto& geometry = intersection.geometry();
+  for (auto i : Common::value_range(geometry.corners())) {
+    const auto xi = geometry.corner(i);
+    for (auto j : Common::value_range(i + 1, geometry.corners())) {
+      auto xj = geometry.corner(j);
+      xj -= xi;
+      max_dist = std::max(max_dist, xj.two_norm());
+    }
+  }
+  return max_dist;
+} // diameter
 
 } // namespace Dune::XT::Grid
 
@@ -144,6 +221,44 @@ public:
          return neighboring_subdomains;
     },
     "ss"_a);
+    c.def("coupling_grid", [](type& self, const size_t ss, const size_t nn){
+        for (auto&& inside_macro_element : elements(self.macro_grid_view())) {
+          if (self.subdomain(inside_macro_element) == ss) {
+            // this is the subdomain we are interested in, create space
+//            auto inner_subdomain_grid_view = self.local_grid(inside_macro_element).leaf_view();
+//            auto inner_subdomain_space = make_subdomain_space(inner_subdomain_grid_view, space_type);
+            bool found_correct_macro_intersection = false;
+            for (auto&& macro_intersection :
+                 intersections(self.macro_grid_view(), inside_macro_element)) {
+              if (macro_intersection.neighbor()) {
+                const auto outside_macro_element = macro_intersection.outside();
+                if (self.subdomain(outside_macro_element) == nn) {
+                  found_correct_macro_intersection = true;
+                  // these are the subdomains we are interested in
+                  const auto& coupling = self.coupling(inside_macro_element, -1, outside_macro_element, -1, true);
+                  using MacroI = std::decay_t<decltype(macro_intersection)>;
+                  using CouplingI = typename type::GlueType::Intersection;
+                  using I = CouplingIntersectionWithCorrectNormal<CouplingI, MacroI>;
+                  const auto coupling_intersection_it_end = coupling.template iend<0>();
+                  for (auto coupling_intersection_it = coupling.template ibegin<0>();
+                       coupling_intersection_it != coupling_intersection_it_end;
+                       ++coupling_intersection_it) {
+//                    const auto& coupling_intersection = *coupling_intersection_it;
+                    const I coupling_intersection(*coupling_intersection_it, macro_intersection);
+                    std::cout << diameter(coupling_intersection) << std::endl;
+//                    return *coupling_intersection_it;  // no bindings available !!
+                  }
+                }
+              }
+            }
+            DUNE_THROW_IF(!found_correct_macro_intersection,
+                          XT::Common::Exceptions::index_out_of_range,
+                          "ss = " << ss << "\n   nn = " << nn);
+          }
+        }
+    },
+    "ss"_a,
+    "nn"_a);
     c.def("macro_based_boundary_info", [](type& self, const size_t ss) {
         DUNE_THROW_IF(ss >= self.num_subdomains(),
                       XT::Common::Exceptions::index_out_of_range,
