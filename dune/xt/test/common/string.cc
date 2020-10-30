@@ -38,6 +38,7 @@ struct MatrixStringTestDouble : public ::testing::Test
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("[1.0 2; 3.0 4]")));
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [   1.0    2;   3.0  4 ]  ")));
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1.0    2;   3.0  4]  ")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1.0 2;3.0  4]")));
     EXPECT_THROW(from_string<MatrixType>("[1 2; 3 4]", 3, 3), Exceptions::conversion_error);
   }
 };
@@ -50,6 +51,7 @@ struct MatrixStringTestChar : public ::testing::Test
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("[1 2; 3 4]")));
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [   1    2;   3  4 ]  ")));
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1    2;   3  4]  ")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1 2;3  4]")));
     EXPECT_THROW(from_string<MatrixType>("[1 2; 3 4]", 3, 3), Exceptions::conversion_error);
   }
 };

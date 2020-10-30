@@ -55,8 +55,7 @@ static inline std::string trim_copy_safely(std::string str_in)
     DUNE_THROW(Exceptions::conversion_error,
                "There was an error while parsing the string below. "
                    << "The value contained a ';': '" << str_out << "'!\n"
-                   << "This usually happens if you try to get a matrix expression with a vector type "
-                   << "or if you are missing the white space after the ';' in a matrix expression!\n");
+                   << "This usually happens if you try to get a matrix expression with a vector type.");
   return str_out;
 } // ... trim_copy_safely(...)
 
