@@ -128,7 +128,7 @@ public:
     , name_(other.name_)
   {}
 
-  SlicedGridFunction(ThisType&&) noexcept = default;
+  SlicedGridFunction(ThisType&&) = default;
 
 
 private:

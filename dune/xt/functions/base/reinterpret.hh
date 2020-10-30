@@ -64,7 +64,7 @@ public:
     , source_grid_view_(other.source_grid_view_)
   {}
 
-  ReinterpretLocalizableFunction(ThisType&&) noexcept = default;
+  ReinterpretLocalizableFunction(ThisType&&) = default;
 
 
 private:

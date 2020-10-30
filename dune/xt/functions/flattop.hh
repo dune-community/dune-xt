@@ -84,7 +84,7 @@ public:
 
   FlatTopFunction(const ThisType&) = default;
 
-  FlatTopFunction(ThisType&&) noexcept = default;
+  FlatTopFunction(ThisType&&) = default;
 
 private:
   ThisType* copy_as_function_impl() const override

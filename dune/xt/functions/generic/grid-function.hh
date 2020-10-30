@@ -205,7 +205,7 @@ public:
 
   GenericGridFunction(const ThisType&) = default;
 
-  GenericGridFunction(ThisType&&) noexcept = default;
+  GenericGridFunction(ThisType&&) = default;
 
 private:
   ThisType* copy_as_grid_function_impl() const override

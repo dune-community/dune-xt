@@ -59,7 +59,7 @@ public:
   {}
 
   DefaultPrinter(const ThisType&) = default;
-  DefaultPrinter(ThisType&&) noexcept = default;
+  DefaultPrinter(ThisType&&) = default;
 
   virtual ~DefaultPrinter() = default;
 

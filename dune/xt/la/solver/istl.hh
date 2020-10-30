@@ -181,7 +181,7 @@ public:
     , communicator_(communicator)
   {}
 
-  Solver(Solver&& source) noexcept = default;
+  Solver(Solver&& source) = default;
 
   static std::vector<std::string> types()
   {

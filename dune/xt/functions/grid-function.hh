@@ -220,7 +220,7 @@ public:
     , name_(other.name_)
   {}
 
-  GridFunction(ThisType&& source) noexcept = default;
+  GridFunction(ThisType&& source) = default;
 
 
 private:
@@ -405,7 +405,7 @@ public:
     , name_(other.name_)
   {}
 
-  GridFunction(ThisType&&) noexcept = default;
+  GridFunction(ThisType&&) = default;
 
 
 private:
@@ -588,7 +588,7 @@ public:
     , name_(other.name_)
   {}
 
-  GridFunction(ThisType&&) noexcept = default;
+  GridFunction(ThisType&&) = default;
 
 
 private:

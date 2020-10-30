@@ -79,7 +79,7 @@ public:
 
   Testcase1Force(const ThisType&) = default;
 
-  Testcase1Force(ThisType&&) noexcept = default;
+  Testcase1Force(ThisType&&) = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -177,7 +177,7 @@ public:
 
   Testcase1ExactSolution(const ThisType&) = default;
 
-  Testcase1ExactSolution(ThisType&&) noexcept = default;
+  Testcase1ExactSolution(ThisType&&) = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -368,7 +368,7 @@ public:
     , name_(other.name_)
   {}
 
-  CutoffFunction(ThisType&&) noexcept = default;
+  CutoffFunction(ThisType&&) = default;
 
 
 private:

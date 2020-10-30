@@ -55,7 +55,7 @@ public:
     , function_(other.function_->copy_as_function())
   {}
 
-  FunctionAsGridFunctionWrapper(ThisType&&) noexcept = default;
+  FunctionAsGridFunctionWrapper(ThisType&&) = default;
 
 
 private:

@@ -137,7 +137,7 @@ public:
     }
   }
 
-  IntersectionBoundObject(ThisType&& source) noexcept = default;
+  IntersectionBoundObject(ThisType&& source) = default;
 
   virtual ~IntersectionBoundObject() = default;
 

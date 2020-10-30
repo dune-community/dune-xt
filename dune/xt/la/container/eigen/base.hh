@@ -82,7 +82,7 @@ public:
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {}
 
-  EigenBaseVector(EigenBaseVector&& source) noexcept = default;
+  EigenBaseVector(EigenBaseVector&& source) = default;
 
   using InterfaceType::operator=;
 

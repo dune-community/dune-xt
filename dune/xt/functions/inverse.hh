@@ -170,7 +170,7 @@ public:
     , order_(order)
   {}
 
-  InverseFunction(ThisType&&) noexcept = default;
+  InverseFunction(ThisType&&) = default;
 
 private:
   ThisType* copy_as_function_impl() const override
@@ -243,7 +243,7 @@ public:
     , order_(other.order_)
   {}
 
-  InverseGridFunction(ThisType&&) noexcept = default;
+  InverseGridFunction(ThisType&&) = default;
 
 
 private:

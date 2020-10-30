@@ -240,7 +240,7 @@ public:
     setup(other.variables(), other.expressions());
   }
 
-  DynamicMathExpressionBase(ThisType&&) noexcept = default;
+  DynamicMathExpressionBase(ThisType&&) = default;
 
   ~DynamicMathExpressionBase()
   {

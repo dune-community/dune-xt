@@ -272,7 +272,7 @@ public:
   }
 
   PeriodicIndexSet(const ThisType& other) = default;
-  PeriodicIndexSet(ThisType&& other) noexcept = default;
+  PeriodicIndexSet(ThisType&& other) = default;
   // assigment currently does not work due to the reference members
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& other) = delete;
@@ -383,9 +383,9 @@ public:
   {}
 
   PeriodicIntersectionImp(const PeriodicIntersectionImp& other) = default;
-  PeriodicIntersectionImp(PeriodicIntersectionImp&& other) noexcept = default;
+  PeriodicIntersectionImp(PeriodicIntersectionImp&& other) = default;
   PeriodicIntersectionImp& operator=(const PeriodicIntersectionImp& other) = default;
-  PeriodicIntersectionImp& operator=(PeriodicIntersectionImp&& other) noexcept = default;
+  PeriodicIntersectionImp& operator=(PeriodicIntersectionImp&& other) = default;
 
   // methods that differ from BaseType
   bool neighbor() const
@@ -502,8 +502,8 @@ public:
     return *this;
   }
 
-  PeriodicIntersectionIterator(ThisType&& other) noexcept = default;
-  ThisType& operator=(ThisType&& other) noexcept = default;
+  PeriodicIntersectionIterator(ThisType&& other) = default;
+  ThisType& operator=(ThisType&& other) = default;
 
   // methods that differ from BaseType
   Intersection operator*() const
@@ -695,9 +695,9 @@ public:
   } // constructor PeriodicGridViewWrapper(...)
 
   PeriodicGridViewWrapper(const ThisType& other) = default;
-  PeriodicGridViewWrapper(ThisType&& other) noexcept = default;
+  PeriodicGridViewWrapper(ThisType&& other) = default;
   ThisType& operator=(const ThisType& other) = default;
-  ThisType& operator=(ThisType&& other) noexcept = default;
+  ThisType& operator=(ThisType&& other) = default;
 
   const BaseType& as_base_grid_view() const
   {

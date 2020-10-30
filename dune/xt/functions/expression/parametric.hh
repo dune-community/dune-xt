@@ -98,7 +98,7 @@ public:
     , function_(new ActualFunctionType(*other.function_))
   {}
 
-  ParametricExpressionFunction(ThisType&&) noexcept = default;
+  ParametricExpressionFunction(ThisType&&) = default;
 
 private:
   ThisType* copy_as_function_impl() const override

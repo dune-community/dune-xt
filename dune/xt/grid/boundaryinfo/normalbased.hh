@@ -171,7 +171,7 @@ public:
 
   NormalBasedBoundaryInfo(const ThisType&) = delete;
 
-  NormalBasedBoundaryInfo(ThisType&& source) noexcept = default;
+  NormalBasedBoundaryInfo(ThisType&& source) = default;
 
   void repr(std::ostream& out) const override final
   {

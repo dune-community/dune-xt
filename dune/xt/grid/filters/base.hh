@@ -135,7 +135,7 @@ public:
 
   IntersectionFilter(const IntersectionFilter<GL>&) = default;
 
-  IntersectionFilter(IntersectionFilter<GL>&&) noexcept = default;
+  IntersectionFilter(IntersectionFilter<GL>&&) = default;
 
   virtual ~IntersectionFilter<GridViewType>() = default;
 

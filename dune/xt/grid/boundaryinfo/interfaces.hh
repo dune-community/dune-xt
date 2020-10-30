@@ -80,7 +80,7 @@ public:
 
   BoundaryInfo(const ThisType&) = default;
 
-  BoundaryInfo(ThisType&&) noexcept = default;
+  BoundaryInfo(ThisType&&) = default;
 
   virtual ~BoundaryInfo() = default;
 

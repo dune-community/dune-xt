@@ -128,7 +128,7 @@ public:
     , name_(other.name_)
   {}
 
-  TransformedGridFunction(ThisType&&) noexcept = default;
+  TransformedGridFunction(ThisType&&) = default;
 
 
 private:

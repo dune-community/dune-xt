@@ -248,7 +248,7 @@ public:
     reinitialize_thread_storage();
   }
 
-  Walker(ThisType&& source) noexcept = default;
+  Walker(ThisType&& source) = default;
 
   virtual ~Walker() = default;
 

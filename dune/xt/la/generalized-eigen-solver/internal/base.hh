@@ -121,7 +121,7 @@ public:
 
   GeneralizedEigenSolverBase(const ThisType& other) = default;
 
-  GeneralizedEigenSolverBase(ThisType&& source) noexcept = default;
+  GeneralizedEigenSolverBase(ThisType&& source) = default;
 
   virtual ~GeneralizedEigenSolverBase() = default;
 

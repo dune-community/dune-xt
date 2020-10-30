@@ -168,7 +168,7 @@ public:
     , name_(other.name_)
   {}
 
-  ElementwiseMinimumFunction(ThisType&&) noexcept = default;
+  ElementwiseMinimumFunction(ThisType&&) = default;
 
 
 private:

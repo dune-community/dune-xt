@@ -122,7 +122,7 @@ public:
     , name_(other.name_)
   {}
 
-  CombinedGridFunction(ThisType&& source) noexcept = default;
+  CombinedGridFunction(ThisType&& source) = default;
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {

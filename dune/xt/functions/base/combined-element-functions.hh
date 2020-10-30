@@ -87,7 +87,7 @@ public:
 
   CombinedConstElementFunction(const ThisType&) = default;
 
-  CombinedConstElementFunction(ThisType&&) noexcept = default;
+  CombinedConstElementFunction(ThisType&&) = default;
 
 protected:
   void post_bind(const ElementType& /*element*/) override
@@ -178,7 +178,7 @@ public:
 
   CombinedElementFunction(const ThisType&) = default;
 
-  CombinedElementFunction(ThisType&&) noexcept = default;
+  CombinedElementFunction(ThisType&&) = default;
 
 protected:
   void post_bind(const ElementType& element) override final

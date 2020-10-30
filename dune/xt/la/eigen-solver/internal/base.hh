@@ -118,7 +118,7 @@ public:
 
   EigenSolverBase(const ThisType& other) = default;
 
-  EigenSolverBase(ThisType&& source) noexcept = default;
+  EigenSolverBase(ThisType&& source) = default;
 
   virtual ~EigenSolverBase() = default;
 
