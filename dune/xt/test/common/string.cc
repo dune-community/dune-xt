@@ -36,6 +36,8 @@ struct MatrixStringTestDouble : public ::testing::Test
   void check() const
   {
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("[1.0 2; 3.0 4]")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [   1.0    2;   3.0  4 ]  ")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1.0    2;   3.0  4]  ")));
     EXPECT_THROW(from_string<MatrixType>("[1 2; 3 4]", 3, 3), Exceptions::conversion_error);
   }
 };
@@ -46,6 +48,8 @@ struct MatrixStringTestChar : public ::testing::Test
   void check() const
   {
     EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("[1 2; 3 4]")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [   1    2;   3  4 ]  ")));
+    EXPECT_EQ("[1 2; 3 4]", to_string(from_string<MatrixType>("  [1    2;   3  4]  ")));
     EXPECT_THROW(from_string<MatrixType>("[1 2; 3 4]", 3, 3), Exceptions::conversion_error);
   }
 };
@@ -56,6 +60,8 @@ struct VectorStringTestDouble : public ::testing::Test
   void check() const
   {
     EXPECT_EQ("[1 2 3]", to_string(from_string<VectorType>("[1.0 2 3.0]")));
+    EXPECT_EQ(VectorType({1., 2., 3.}), from_string<VectorType>("[   1.0  2 3.0  ]"));
+    EXPECT_EQ(VectorType({1., 2., 3.}), from_string<VectorType>("  [1.0  2 3.0]  "));
     EXPECT_THROW(from_string<VectorType>("[1.0 2 3.0]", 4), Exceptions::conversion_error);
   }
 };
@@ -66,6 +72,8 @@ struct VectorStringTestInt : public ::testing::Test
   void check() const
   {
     EXPECT_EQ("[1 2 3]", to_string(from_string<VectorType>("[1 2 3]")));
+    EXPECT_EQ(VectorType({1, 2, 3}), from_string<VectorType>("[   1  2 3  ]"));
+    EXPECT_EQ(VectorType({1, 2, 3}), from_string<VectorType>("  [1  2 3]  "));
     EXPECT_THROW(from_string<VectorType>("[1 2 3]", 4), Exceptions::conversion_error);
   }
 };

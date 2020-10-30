@@ -187,8 +187,10 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
   using S = typename VectorAbstraction<VectorType>::S;
   DXT_ASSERT(cols == 0);
   // check if this is a vector
+  boost::algorithm::trim(vector_str);
   if (vector_str.substr(0, 1) == "[" && vector_str.substr(vector_str.size() - 1, 1) == "]") {
     vector_str = vector_str.substr(1, vector_str.size() - 2);
+    boost::algorithm::trim(vector_str);
     // we treat this as a vector and split along ' '
     const auto tokens = tokenize<std::string>(vector_str, " ", boost::algorithm::token_compress_on);
     if (size > 0 && tokens.size() < size)
@@ -211,7 +213,8 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
     for (size_t ii = 0; ii < actual_size; ++ii)
       ret[ii] = convert_from_string<S>(trim_copy_safely(tokens[ii]));
     return ret;
-  } // we treat this as a scalar
+  }
+  // we treat this as a scalar
   const auto val = convert_from_string<S>(trim_copy_safely(vector_str));
   const size_t automatic_size = (size == 0 ? 1 : size);
   const size_t actual_size =
@@ -235,8 +238,10 @@ MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const s
 {
   using S = typename MatrixAbstraction<MatrixType>::S;
   // check if this is a matrix
+  boost::algorithm::trim(matrix_str);
   if (matrix_str.substr(0, 1) == "[" && matrix_str.substr(matrix_str.size() - 1, 1) == "]") {
     matrix_str = matrix_str.substr(1, matrix_str.size() - 2);
+    boost::algorithm::trim(matrix_str);
     // we treat this as a matrix and split along ';' to obtain the rows
     const auto row_tokens = tokenize<std::string>(matrix_str, ";", boost::algorithm::token_compress_on);
     if (rows > 0 && row_tokens.size() < rows)
@@ -289,7 +294,8 @@ MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const s
             ret, rr, cc, convert_from_string<S>(trim_copy_safely(column_tokens[cc])));
     }
     return ret;
-  } // we treat this as a scalar
+  }
+  // we treat this as a scalar
   const S val = convert_from_string<S>(trim_copy_safely(matrix_str));
   const size_t automatic_rows = (rows == 0 ? 1 : rows);
   const size_t actual_rows =
