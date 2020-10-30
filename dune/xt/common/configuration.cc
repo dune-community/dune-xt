@@ -35,7 +35,8 @@ ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
 {}
 
 Configuration::Configuration()
-  : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
+  : BaseType()
+  , warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
 {
