@@ -148,7 +148,7 @@ function(dune_pybindxi_add_module target_name)
   set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
   set_target_properties(${target_name} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
 
-  if(WIN32 OR CYGWIN)
+  if(NOT DXT_DONT_LINK_PYTHON_LIB AND (WIN32 OR CYGWIN))
     # Link against the Python shared library on Windows
     target_link_libraries(${target_name} ${PYTHON_LIBRARIES})
   elseif(APPLE)

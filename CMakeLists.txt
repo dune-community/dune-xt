@@ -82,7 +82,9 @@ elseif(APPLE)
   target_link_libraries(dunepybindximodule INTERFACE "-undefined dynamic_lookup")
 endif()
 
-target_link_libraries(dunepybindxiembed INTERFACE pybind11::pybind11 $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+if(NOT DXT_DONT_LINK_PYTHON_LIB)
+  target_link_libraries(dunepybindxiembed INTERFACE pybind11::pybind11 $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+endif()
 add_library(pybind11::embed ALIAS dunepybindxiembed)
 target_link_libraries(dunepybindxi dunepybindxiembed)
 
