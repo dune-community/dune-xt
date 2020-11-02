@@ -190,13 +190,8 @@ public:
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
     c.def_property_readonly("dimension", [](type&) { return dim; });
-    c.def(
-          "local_grid",
-          [](type& self, const size_t macro_entity_index) {
-          auto local_grid = self.local_grid(macro_entity_index);
-          return local_grid;
-          },
-          "macro_entity_index"_a);
+    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
+    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
     c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
     c.def_property_readonly("boundary_subdomains", [](type& self) {
         std::vector<size_t> boundary_subdomains;
@@ -280,16 +275,7 @@ public:
         }
     },
     "ss"_a);
-    c.def(
-        "write_global_visualization",
-        [](type& self,
-           const std::string& filename_prefix,
-           const XT::Functions::FunctionInterface<dim>& func,
-           const std::list<int>& subdomains)
-            { self.write_global_visualization(filename_prefix, func, subdomains); },
-        "filename_prefix"_a,
-        "function"_a,
-        "subdomains"_a);
+    c.def("write_global_visualization", &type::write_global_visualization);
     return c;
   } // ... bind(...)
 }; // class GridProvider
@@ -398,26 +384,7 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
   py::module::import("dune.xt.grid._grid_filters_base");
 
-//#define BIND_(NAME) InitlessIntersectionFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-
-//  BIND_(AllIntersections);
-//  BIND_(AllIntersectionsOnce);
-//  BIND_(NoIntersections);
-//  BIND_(InnerIntersections);
-//  BIND_(InnerIntersectionsOnce);
-//  //  BIND_(PartitionSetInnerIntersectionsOnce); <- requires partition set as template argument
-//  BIND_(BoundaryIntersections);
-//  BIND_(NonPeriodicBoundaryIntersections);
-//  BIND_(PeriodicBoundaryIntersections);
-//  BIND_(PeriodicBoundaryIntersectionsOnce);
-//  //  BIND_(GenericFilteredIntersections); <- requires lambda in init
-//  //  BIND_(CustomBoundaryAndProcessIntersections); <- requires boundary type and info in init
-//  BIND_(ProcessIntersections);
-
 //#undef BIND_
-
-//  CustomBoundaryIntersectionFilter_for_all_grids<>::bind(m);
-
   GluedGridProvider_for_all_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
 }
