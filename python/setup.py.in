@@ -15,6 +15,7 @@
 import sys
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
+from setuptools.command.install import install
 
 requires=['binpacking==1.3', 'cython', 'jinja2', 'docopt', 'pylicense3>=0.4.1',
                         'ipython', 'pytest', 'pytest-cov', 'cmake_format==0.4.1',
@@ -26,11 +27,20 @@ if '${HAVE_MPI}' == 'TRUE':
 
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name"""
-    def has_ext_modules(_):
+    def is_pure(self):
+        return False
+    def has_ext_modules(self):
         return True
 
+
+class InstallPlatlib(install):
+    def finalize_options(self):
+        install.finalize_options(self)
+        self.install_lib = self.install_platlib
+
+
 setup(name='dune.xt',
-      version='2.4',
+      version='${DUNE_XT_VERSION}',
       namespace_packages=['dune'],
       setup_requires=['wheel'],
       description='Python for Dune-Xt',
@@ -39,11 +49,15 @@ setup(name='dune.xt',
       url='https://github.com/dune-community/dune-xt',
       packages = find_packages(),
       package_data = {'': ['*.so']},
+      include_package_data=True,
+      cmdclass={
+          'install': InstallPlatlib,
+      },
+      distclass=BinaryDistribution,
       install_requires=requires,
       extras_require={'parallel': extras_require},
       scripts=['./scripts/generate_compare_functions.py',
                './scripts/distribute_testing.py',
                './scripts/dxt_code_generation.py',
                './scripts/numa_speedup.py',
-             './wrapper/dune_xt_execute.py'],
-      distclass=BinaryDistribution)
+             './wrapper/dune_xt_execute.py'])
