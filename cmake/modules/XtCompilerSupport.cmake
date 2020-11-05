@@ -67,3 +67,8 @@ check_cxx_source_compiles("
       return 0;
     };
 " HAVE_MAP_EMPLACE)
+
+check_cxx_source_compiles("
+    void foo([[maybe_unused]] arg) {}
+    int main(void){};
+" HAS_WORKING_UNUSED_ATTRIBUTE)
