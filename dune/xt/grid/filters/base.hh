@@ -128,8 +128,8 @@ public:
   mutable Common::DefaultLogger logger;
 
   IntersectionFilter(const std::string& logging_prefix = "xt.grid.intersectionfilter",
-                     const bool logging_disabled = true)
-    : logger(logging_prefix, logging_disabled)
+                     const std::array<bool, 3>& logging_state = {false, false, true})
+    : logger(logging_prefix, logging_state)
   {}
 
   IntersectionFilter(const IntersectionFilter<GL>&) = default;
