@@ -24,6 +24,7 @@
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/gridprovider/glued_provider.hh>
 #include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/filters/intersection.hh>
 #include <dune/xt/grid/mapper.hh>
@@ -169,18 +170,19 @@ double diameter(const CouplingIntersectionWithCorrectNormal<C, I>& intersection)
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class MG, class G>
 class GluedGridProvider
 {
 public:
-  using type = Grid::DD::Glued<G, G, XT::Grid::Layers::leaf>;
+//  using type = GluedGridProvider<MG, G>;
+  using type = Grid::DD::Glued<MG, G, XT::Grid::Layers::leaf>;
   using bound_type = pybind11::class_<type>;
 
   using GV = typename type::LocalViewType;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "glued_grid_provider",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<MG>::value())
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -191,7 +193,8 @@ public:
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
     c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
-    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
+//    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
+//    c.def("local_grid", (typename type::LocalGridProviderType& (type::*)(size_t)) & type::local_grid);
     c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
     c.def_property_readonly("boundary_subdomains", [](type& self) {
         std::vector<size_t> boundary_subdomains;
@@ -345,7 +348,7 @@ struct GluedGridProvider_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::GluedGridProvider<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    Dune::XT::Grid::bindings::GluedGridProvider<Dune::XT::Common::tuple_head_t<GridTypes>,Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
     GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
