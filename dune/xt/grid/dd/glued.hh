@@ -374,32 +374,32 @@ public:
     return *global_to_local_indices_;
   }
 
-  const LocalGridProviderType& local_grid(const MacroEntityType& macro_entity) const
+  const std::unique_ptr<LocalGridProviderType> local_grid(const MacroEntityType& macro_entity) const
   {
     assert_macro_grid_state();
     assert(macro_leaf_view_.indexSet().contains(macro_entity));
     return local_grid(macro_leaf_view_.indexSet().index(macro_entity));
   }
 
-  LocalGridProviderType& local_grid(const MacroEntityType& macro_entity)
+  std::unique_ptr<LocalGridProviderType> local_grid(const MacroEntityType& macro_entity)
   {
     assert_macro_grid_state();
     assert(macro_leaf_view_.indexSet().contains(macro_entity));
     return local_grid(macro_leaf_view_.indexSet().index(macro_entity));
   }
 
-  LocalGridProviderType& local_grid(const size_t macro_entity_index)
+  std::unique_ptr<LocalGridProviderType> local_grid(const size_t macro_entity_index)
   {
     assert_macro_grid_state();
     assert(macro_entity_index < macro_leaf_view_size_);
-    return *(local_grids_.at(macro_entity_index));
+    return std::make_unique<LocalGridProviderType>(*(local_grids_.at(macro_entity_index)));
   }
 
-  const LocalGridProviderType& local_grid(const size_t macro_entity_index) const
+  std::unique_ptr<LocalGridProviderType> local_grid(const size_t macro_entity_index) const
   {
     assert_macro_grid_state();
     assert(macro_entity_index < macro_leaf_view_size_);
-    return *(local_grids_.at(macro_entity_index));
+    return std::make_unique<LocalGridProviderType>(*(local_grids_.at(macro_entity_index)));
   }
 
   /**
@@ -447,8 +447,8 @@ public:
         DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                    "local_level_macro_neighbor has to be -1 (is " << local_level_macro_neighbor << ")!");
       // since the local leaf views may have been adapted, we use their respective sizes as keys for the glue map
-      local_entity_grid_level *= local_grid(macro_entity).leaf_view().indexSet().size(0);
-      local_neighbor_grid_level *= local_grid(macro_neighbor).leaf_view().indexSet().size(0);
+      local_entity_grid_level *= local_grid(macro_entity)->leaf_view().indexSet().size(0);
+      local_neighbor_grid_level *= local_grid(macro_neighbor)->leaf_view().indexSet().size(0);
     }
     const auto entity_index = macro_index_set.index(macro_entity);
     const auto neighbor_index = macro_index_set.index(macro_neighbor);
@@ -514,7 +514,7 @@ public:
     if (layer == Layers::leaf)
       return -1;
     else
-      return local_grid(macro_entity).grid().maxLevel();
+      return local_grid(macro_entity)->grid().maxLevel();
   }
 
   int max_local_level(const size_t macro_entity_index) const
@@ -523,7 +523,7 @@ public:
     if (layer == Layers::leaf)
       return -1;
     else
-      return local_grid(macro_entity_index).grid().maxLevel();
+      return local_grid(macro_entity_index)->grid().maxLevel();
   }
 
   const std::vector<std::pair<MicroEntityType, std::vector<int>>>&
@@ -848,8 +848,8 @@ private:
     assert(local_neighbor_level <= max_local_level(macro_neighbor));
     const auto& local_entity_grid = local_grid(macro_entity);
     const auto& local_neighbor_grid = local_grid(macro_neighbor);
-    auto local_entity_view = extract_local_view<layer>()(local_entity_grid, local_entity_level);
-    auto local_neighbor_view = extract_local_view<layer>()(local_neighbor_grid, local_neighbor_level);
+    auto local_entity_view = extract_local_view<layer>()(*local_entity_grid, local_entity_level);
+    auto local_neighbor_view = extract_local_view<layer>()(*local_neighbor_grid, local_neighbor_level);
     // create descriptors, these can be discarded after creating the extractors
     auto entity_descriptor = create_descriptor(local_entity_view, macro_intersection);
     auto neighbor_descriptor = create_descriptor(local_neighbor_view, macro_intersection);
@@ -1218,7 +1218,7 @@ private:
     for (auto&& macro_entity : elements(glued_grid_.macro_grid_view())) {
       const size_t subdomain = glued_grid_.subdomain(macro_entity);
       local_vtk_writers_.emplace_back(new LocalVTKWriter(
-          extract_local_view<layer>()(glued_grid_.local_grid(macro_entity), local_levels_[subdomain]),
+          extract_local_view<layer>()(*glued_grid_.local_grid(macro_entity), local_levels_[subdomain]),
           subdomain,
           glued_grid_.num_subdomains()));
     }
