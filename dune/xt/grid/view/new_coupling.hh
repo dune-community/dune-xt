@@ -564,15 +564,22 @@ public:
   using IndexSet = PeriodicIndexSet<BaseGridViewType>;
   using CollectiveCommunication = extract_collective_communication_t<BaseGridViewType>;
   using BaseGridViewTraits = typename BaseGridViewType::Traits;
+  using LocalElementType = typename GridGlueType::MicroEntityType;
 //  static constexpr size_t num_geometries = GlobalGeometryTypeIndex::size(BaseGridViewImp::dimension);
 
-//  template <int cd>
-//  struct Codim : public BaseGridViewTraits::template Codim<cd>
-//  {
-//    // We need to define these in case BaseGridViewImp is a grid part.
-//    using Entity = extract_entity_t<BaseGridViewImp, cd>;
-//    using Geometry = extract_geometry_t<BaseGridViewImp, cd>;
-//    using LocalGeometry = extract_local_geometry_t<BaseGridViewImp, cd>;
+  using GlueType = typename GridGlueType::GlueType;
+  using CouplingIntersectionType = typename GlueType::Intersection;
+  using IntersectionIterator = typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator;
+
+  template <int cd>
+  struct Codim : public BaseGridViewTraits::template Codim<cd>
+  {
+    // We need to define these in case BaseGridViewImp is a grid part.
+    using Entity = extract_entity_t<BaseGridViewImp, cd>;
+    using Geometry = extract_geometry_t<BaseGridViewImp, cd>;
+    using LocalGeometry = extract_local_geometry_t<BaseGridViewImp, cd>;
+
+    using Iterator = typename std::vector<LocalElementType>::const_iterator;
 
 //    /* PeriodicIterator is the same as the Iterator of the BaseGridViewType, except that it visits only one entity of
 //     * several periodically equivalent entities */
@@ -628,7 +635,7 @@ public:
 //    {
 //      using Iterator = PeriodicIterator<pit>;
 //    }; // struct Partition
-//  }; // ... struct Codim ...
+  }; // ... struct Codim ...
 
   enum
   {
@@ -688,9 +695,9 @@ public:
   // TODO: add the macro intersection to use CorrectedCouplingIntersection
 //    using CorrectedCouplingIntersectionType = CouplingIntersectionWithCorrectNormal<CouplingIntersectionType, MacroIntersectionType>;
 
-//  template <int cd>
-//  struct Codim : public Traits::template Codim<cd>
-//  {};
+  template <int cd>
+  struct Codim : public Traits::template Codim<cd>
+  {};
 
 //private:
 //  // compile time for loop to loop over the codimensions in constructor, see http://stackoverflow.com/a/11081785
@@ -802,32 +809,32 @@ public:
     DUNE_THROW(NotImplemented,"");
   }
 
-  template<int cd>  // fake template
-  typename std::vector<LocalElementType>::iterator begin() { return inside_elements_.begin(); };
+//  template<int cd>  // fake template
+//  typename std::vector<LocalElementType>::iterator begin() { return inside_elements_.begin(); };
 
-  template<int cd>  // fake template
-  typename std::vector<LocalElementType>::iterator end() { return inside_elements_.end(); };
+//  template<int cd>  // fake template
+//  typename std::vector<LocalElementType>::iterator end() { return inside_elements_.end(); };
 
-  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::iterator ibegin(LocalElementType& inside_element) {
+  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator ibegin(const LocalElementType& inside_element) const
+  {
       return coupling_intersections_[local_to_inside_index(inside_element)].begin();
   };
-  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::iterator iend(LocalElementType& inside_element) {
+  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator iend(const LocalElementType& inside_element) const
+  {
       return coupling_intersections_[local_to_inside_index(inside_element)].end();
   };
 
-//  template <int cd>
-//  typename Codim<cd>::Iterator begin() const
-//  {
-//    return typename Codim<cd>::Iterator(
-//        BaseType::template begin<cd>(), entities_to_skip_.get(), &BaseType::indexSet(), BaseType::template end<cd>());
-//  }
+  template <int cd>
+  typename Codim<cd>::Iterator begin() const
+  {
+      return inside_elements_.begin();
+  }
 
-//  template <int cd>
-//  typename Codim<cd>::Iterator end() const
-//  {
-//    return typename Codim<cd>::Iterator(
-//        BaseType::template end<cd>(), entities_to_skip_.get(), &BaseType::indexSet(), BaseType::template end<cd>());
-//  }
+  template <int cd>
+  typename Codim<cd>::Iterator end() const
+  {
+      return inside_elements_.end();
+  }
 
 //  template <int cd, PartitionIteratorType pitype>
 //  typename Codim<cd>::template Partition<pitype>::Iterator begin() const
