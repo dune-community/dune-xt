@@ -28,7 +28,11 @@
 #  endif
 #endif
 
-#if !(defined(_MSC_VER) && __cplusplus == 199711L) && !defined(__INTEL_COMPILER)
+#if defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1900
+#  if __cplusplus >= 201402L
+#    define PYBIND11_CPP14
+#  endif
+#elif !(defined(_MSC_VER) && __cplusplus == 199711L)
 #  if __cplusplus >= 201402L
 #    define PYBIND11_CPP14
 #    if __cplusplus >= 201703L
