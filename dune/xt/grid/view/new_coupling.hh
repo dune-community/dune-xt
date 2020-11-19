@@ -883,9 +883,9 @@ public:
 private:
     const MacroElementType& inside_element_;
     const MacroElementType& outside_element_;
-    const GridGlueType& dd_grid_;
+    GridGlueType& dd_grid_;
     const MacroGridViewType& macro_grid_view_;
-    const std::unique_ptr<LocalGridProviderType> local_inside_grid_;
+    const std::shared_ptr<LocalGridProviderType> local_inside_grid_;
     std::vector<LocalElementType> inside_elements_;
     std::vector<int> inside_elements_ids_;
     std::vector<std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>> coupling_intersections_;
@@ -913,7 +913,7 @@ public:
   using MacroGridType = typename GridGlueType::MacroGridType;
   using MacroElementType = typename MacroGridType::template Codim<0>::Entity;
 
-  CouplingGridView(const BaseType& base_grid_view,
+  CouplingGridView(const BaseGridViewType& base_grid_view,
                    const MacroElementType& ss,
                    const MacroElementType& nn,
                    GridGlueType& dd_grid)
@@ -943,7 +943,7 @@ public:
 
 template <class MG, class GT, class E>
 CouplingGridView<MG, GT>
-make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, const GT& dd_grid)
+make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, GT& dd_grid)
 {
   return CouplingGridView<MG, GT>(base_grid_view, ss, nn, dd_grid);
 }
