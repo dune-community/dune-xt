@@ -22,6 +22,10 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/glued.hh>
 
+//#include <dune/xt/grid/view/new_coupling.hh>
+#include <dune/xt/grid/view/coupling.hh>
+#include <dune/xt/grid/view/periodic.hh>
+
 /**
  * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
  * oriented normal.
@@ -83,27 +87,27 @@ private:
   mutable LocalCoordinate local_;
 }; // class CouplingIntersectionWithCorrectNormal
 
-template <class Intersection>
-struct CompareType
-{
-  bool operator()(const Intersection& one, const Intersection& other) const
-  {
-    return (std::addressof(one) < std::addressof(other));
-    // does there exist a better way for this????
+//template <class Intersection>
+//struct CompareType
+//{
+//  bool operator()(const Intersection& one, const Intersection& other) const
+//  {
+//    return (std::addressof(one) < std::addressof(other));
+//    // does there exist a better way for this????
 
-//    std::cout << "one center " << one.geometry().center() << std::endl;
-//    std::cout << "other center " << other.geometry().center() << std::endl;
-////    std::cout << "seed " << (one.inside().seed() == other.inside().seed()) << std::endl;
-//    auto one_center = one.geometry().center();
-//    auto other_center = other.geometry().center();
-////    auto decision = (Dune::XT::Common::FloatCmp::lt(one_center[0], other_center[0]) && Dune::XT::Common::FloatCmp::ne(one_center, other_center));
-////    if (!decision)
-////        std::cout << "I do not add this" << std::endl;
-////    auto decision = Dune::XT::Common::FloatCmp::ne(one.geometry().center(), other.geometry().center());
-////    std::cout << "my decision is " << decision << std::endl;
-//    return decision;
-  }
-};
+////    std::cout << "one center " << one.geometry().center() << std::endl;
+////    std::cout << "other center " << other.geometry().center() << std::endl;
+//////    std::cout << "seed " << (one.inside().seed() == other.inside().seed()) << std::endl;
+////    auto one_center = one.geometry().center();
+////    auto other_center = other.geometry().center();
+//////    auto decision = (Dune::XT::Common::FloatCmp::lt(one_center[0], other_center[0]) && Dune::XT::Common::FloatCmp::ne(one_center, other_center));
+//////    if (!decision)
+//////        std::cout << "I do not add this" << std::endl;
+//////    auto decision = Dune::XT::Common::FloatCmp::ne(one.geometry().center(), other.geometry().center());
+//////    std::cout << "my decision is " << decision << std::endl;
+////    return decision;
+//  }
+//};
 
 template<class E>
 class Iterator {
@@ -339,10 +343,10 @@ public:
             }
         }
     }
-    template<int cd>
+    template<int cd>  // fake template
     typename std::vector<LocalElementType>::iterator begin() { return inside_elements_.begin(); };
 
-    template<int cd>
+    template<int cd>  // fake template
     typename std::vector<LocalElementType>::iterator end() { return inside_elements_.end(); };
 
     typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::iterator ibegin(LocalElementType& inside_element) {
@@ -351,14 +355,6 @@ public:
     typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::iterator iend(LocalElementType& inside_element) {
         return coupling_intersections_[local_to_inside_index(inside_element)].end();
     };
-
-//    typename std::set<MacroIntersectionType, CompareType<MacroIntersectionType>>::iterator mibegin(MacroElementType& element) {
-//        return macro_intersections_[subdomain(element)].begin();
-//    };
-//    typename std::set<MacroIntersectionType, CompareType<MacroIntersectionType>>::iterator miend(MacroElementType& element) {
-//        return macro_intersections_[subdomain(element)].end();
-//    };
-//    // Note: stoped hear because I realized that this is not neccessary. A coupling gridview only needs to be defined wrt a neighbor.
 private:
     size_t local_to_inside_index(const LocalElementType& local_element) const
     {
@@ -535,7 +531,26 @@ GTEST_TEST(empty, main) {
                     std::cout << "center of the corresponding intersection: " << intersection->geometry().center() << std::endl;
                 }
             }
+        }
+    }
 
+    // use the gridview from view/coupling.hh
+    for (auto&& macro_element : Dune::elements(mgv)) {
+        for (auto& macro_intersection : Dune::intersections(mgv, macro_element)) {
+            if (macro_intersection.boundary()) {
+                std::cout << "skip this intersection, it is not inside the domain" << std::endl;
+                continue;
+            }
+            auto inside_element = macro_intersection.inside();
+            auto outside_element = macro_intersection.outside();
+            auto pgv = Dune::XT::Grid::make_periodic_grid_view<GridViewType>(mgv);
+//            auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridViewType, GridGlueType, ElementType>(mgv, inside_element, outside_element, *dd_grid);
+//            Dune::XT::Grid::CouplingGridView<GridViewType, GridGlueType> cgv(mgv, inside_element, outside_element, *dd_grid);
+//            if(mgv == cgv)
+//                int a = 0;
+//            for (auto&& inside_element : Dune::elements(cgv)) {
+//                std::cout << "I arrived at an element with center: " << inside_element.geometry().center() << std::endl;
+//            }
         }
     }
 
