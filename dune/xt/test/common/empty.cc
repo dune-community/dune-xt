@@ -22,9 +22,9 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/glued.hh>
 
-//#include <dune/xt/grid/view/new_coupling.hh>
-#include <dune/xt/grid/view/coupling.hh>
-#include <dune/xt/grid/view/periodic.hh>
+#include <dune/xt/grid/view/new_coupling.hh>
+//#include <dune/xt/grid/view/coupling.hh>
+//#include <dune/xt/grid/view/periodic.hh>
 
 /**
  * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
@@ -534,6 +534,7 @@ GTEST_TEST(empty, main) {
         }
     }
 
+    std::cout << " ____ NOW WE TRY TO PUT IT INTO A GRIDVIEW INTERFACE ____" << std::endl;
     // use the gridview from view/coupling.hh
     for (auto&& macro_element : Dune::elements(mgv)) {
         for (auto& macro_intersection : Dune::intersections(mgv, macro_element)) {
@@ -543,8 +544,8 @@ GTEST_TEST(empty, main) {
             }
             auto inside_element = macro_intersection.inside();
             auto outside_element = macro_intersection.outside();
-            auto pgv = Dune::XT::Grid::make_periodic_grid_view<GridViewType>(mgv);
-//            auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridViewType, GridGlueType, ElementType>(mgv, inside_element, outside_element, *dd_grid);
+//            auto pgv = Dune::XT::Grid::make_periodic_grid_view<GridViewType>(mgv);
+            auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridViewType, GridGlueType, ElementType>(mgv, inside_element, outside_element, *dd_grid);
 //            Dune::XT::Grid::CouplingGridView<GridViewType, GridGlueType> cgv(mgv, inside_element, outside_element, *dd_grid);
 //            if(mgv == cgv)
 //                int a = 0;
