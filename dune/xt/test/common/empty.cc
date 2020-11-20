@@ -22,6 +22,10 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/glued.hh>
 
+#include <dune/xt/grid/walker.hh>
+#include <dune/xt/grid/functors/interfaces.hh>
+#include <dune/xt/grid/functors/generic.hh>
+
 #include <dune/xt/grid/view/new_coupling.hh>
 //#include <dune/xt/grid/view/coupling.hh>
 //#include <dune/xt/grid/view/periodic.hh>
@@ -378,6 +382,7 @@ private:
     std::vector<std::pair<size_t, size_t>> local_to_inside_indices_;
 };
 
+
 GTEST_TEST(empty, main) {
     using GridType = YASP_2D_EQUIDISTANT_OFFSET;
     using ElementType = typename GridType::template Codim<0>::Entity;
@@ -535,7 +540,9 @@ GTEST_TEST(empty, main) {
     }
 
     std::cout << " ____ NOW WE TRY TO PUT IT INTO A GRIDVIEW INTERFACE ____" << std::endl;
-    // use the gridview from view/coupling.hh
+    using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<GridViewType, GridGlueType>;
+
+    // use the gridview from view/new_coupling.hh
     for (auto&& macro_element : Dune::elements(mgv)) {
         for (auto& macro_intersection : Dune::intersections(mgv, macro_element)) {
             printf("_______\n");
@@ -553,6 +560,28 @@ GTEST_TEST(empty, main) {
                     std::cout << "I arrived at an intersection with center: " << intersection.geometry().center() << std::endl;
                 }
             }
+//            auto functor = Dune::XT::Grid::GenericElementFunctor<CouplingGridViewType>([] {},
+//                [](const auto& element) {
+//                std::cout << "WALKER: Element : " << element.geometry().center() << std::endl; },
+//                [] {});
+
+            auto functor = Dune::XT::Grid::GenericElementAndIntersectionFunctor<CouplingGridViewType>([] {},
+                [](const auto& element) {
+                std::cout << "WALKER: Element : " << element.geometry().center() << std::endl; },
+                [](const auto& intersection, const ElementType&, const ElementType&) {
+                std::cout << "WALKER:      Intersection : " << intersection.geometry().center() << std::endl; },
+                [] {});
+
+//            auto functor = Dune::XT::Grid::GenericIntersectionFunctor<CouplingGridViewType>([] {},
+////                [](const auto& element) {
+////                std::cout << "WALKER: Element : " << element.geometry().center() << std::endl; },
+//                [](const auto&, const auto&, const auto&) {
+//                std::cout << "WALKER:      Intersection : " << std::endl; }, //<< intersection.geometry().center() << std::endl; },
+//                [] {});
+
+            auto walker = Dune::XT::Grid::Walker<CouplingGridViewType>(cgv);
+            walker.append(functor);
+            walker.walk();
         }
     }
 
