@@ -569,6 +569,7 @@ public:
 
   using GlueType = typename GridGlueType::GlueType;
   using CouplingIntersectionType = typename GlueType::Intersection;
+  using Intersection = CouplingIntersectionType;
   using IntersectionIterator = typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator;
 
   template <int cd>
@@ -630,11 +631,11 @@ public:
 
 //    using Iterator = PeriodicIterator<All_Partition>;
 
-//    template <PartitionIteratorType pit>
-//    struct Partition : public BaseGridViewTraits::template Codim<cd>::template Partition<pit>
-//    {
-//      using Iterator = PeriodicIterator<pit>;
-//    }; // struct Partition
+    template <PartitionIteratorType pit>
+    struct Partition : public BaseGridViewTraits::template Codim<cd>::template Partition<pit>
+    {
+      using Iterator = typename std::vector<LocalElementType>::const_iterator;
+    }; // struct Partition
   }; // ... struct Codim ...
 
   enum
@@ -669,16 +670,20 @@ class CouplingGridViewWrapper : public BaseGridViewImp
   using Traits = CouplingGridViewWrapperTraits<BaseType, GridGlueType>;
 
 public:
+  using GlueType = typename GridGlueType::GlueType;
+  using CouplingIntersectionType = typename GlueType::Intersection;
+  using IntersectionType = CouplingIntersectionType;
+
   using Grid = extract_grid_t<BaseType>;
   using IndexSet = PeriodicIndexSet<BaseType>;
   using ElementType = extract_entity_t<BaseType, 0>;
-  using IntersectionIterator = PeriodicIntersectionIterator<BaseType>;
-  using BaseIntersectionType = typename IntersectionIterator::BaseIntersectionType;
+//  using IntersectionIterator = PeriodicIntersectionIterator<BaseType>;
+//  using BaseIntersectionType = typename IntersectionIterator::BaseIntersectionType;
   using IndexType = typename Traits::IndexSet::IndexType;
-  using DomainType = typename BaseIntersectionType::GlobalCoordinate;
-  using Intersection = Dune::Intersection<Grid, PeriodicIntersectionImp<BaseIntersectionType>>;
-  using ElementPtrVectorType = std::vector<std::shared_ptr<const ElementType>>;
-  static constexpr size_t dimDomain = BaseType::dimension;
+//  using DomainType = typename BaseIntersectionType::GlobalCoordinate;
+//  using Intersection = Dune::Intersection<Grid, PeriodicIntersectionImp<BaseIntersectionType>>;
+//  using ElementPtrVectorType = std::vector<std::shared_ptr<const ElementType>>;
+//  static constexpr size_t dimDomain = BaseType::dimension;
 
   using MacroGridViewType = typename GridGlueType::MacroGridViewType;
   using MacroGridType = typename GridGlueType::MacroGridType;
@@ -690,8 +695,6 @@ public:
   using LocalGridViewType = typename GridGlueType::MicroGridViewType;
   using LocalElementType = typename GridGlueType::MicroEntityType;
 
-  using GlueType = typename GridGlueType::GlueType;
-  using CouplingIntersectionType = typename GlueType::Intersection;
   // TODO: add the macro intersection to use CorrectedCouplingIntersection
 //    using CorrectedCouplingIntersectionType = CouplingIntersectionWithCorrectNormal<CouplingIntersectionType, MacroIntersectionType>;
 
@@ -836,24 +839,26 @@ public:
       return inside_elements_.end();
   }
 
-//  template <int cd, PartitionIteratorType pitype>
-//  typename Codim<cd>::template Partition<pitype>::Iterator begin() const
-//  {
+  template <int cd, PartitionIteratorType pitype>
+  typename Codim<cd>::template Partition<pitype>::Iterator begin() const
+  {
+    return inside_elements_.begin();
 //    return typename Codim<cd>::template Partition<pitype>::Iterator(BaseType::template begin<cd, pitype>(),
 //                                                                    entities_to_skip_.get(),
 //                                                                    &BaseType::indexSet(),
 //                                                                    BaseType::template end<cd, pitype>());
-//  }
+  }
 
 
-//  template <int cd, PartitionIteratorType pitype>
-//  typename Codim<cd>::template Partition<pitype>::Iterator end() const
-//  {
+  template <int cd, PartitionIteratorType pitype>
+  typename Codim<cd>::template Partition<pitype>::Iterator end() const
+  {
+    return inside_elements_.end();
 //    return typename Codim<cd>::template Partition<pitype>::Iterator(BaseType::template end<cd, pitype>(),
 //                                                                    entities_to_skip_.get(),
 //                                                                    &BaseType::indexSet(),
 //                                                                    BaseType::template end<cd, pitype>());
-//  }
+  }
 
   const IndexSet& indexSet() const
   {
