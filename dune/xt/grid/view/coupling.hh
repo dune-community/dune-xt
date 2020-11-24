@@ -44,6 +44,68 @@ struct CompareType
 namespace Dune::XT::Grid {
 namespace internal {
 
+/**
+ * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
+ * oriented normal.
+ *
+ * \attention Presumes that the coupling intersection lies exactly within the macro intersection!
+ */
+template <class CouplingIntersectionType, class MacroIntersectionType>
+class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
+{
+  using BaseType = CouplingIntersectionType;
+
+public:
+  using typename BaseType::GlobalCoordinate;
+  using typename BaseType::LocalCoordinate;
+
+  enum
+  {
+    dimension = MacroIntersectionType::dimension
+  };
+
+  CouplingIntersectionWithCorrectNormal(const CouplingIntersectionType& coupling_intersection,
+                                        const MacroIntersectionType& macro_intersection)
+    : BaseType(coupling_intersection)
+    , macro_intersection_(macro_intersection)
+  {}
+
+  GlobalCoordinate outerNormal(const LocalCoordinate& local) const
+  {
+    global_ = this->geometry().global(local);
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.outerNormal(local_);
+  }
+
+  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local) const
+  {
+    auto normal = this->unitOuterNormal(local);
+    const auto integration_element = BaseType::integrationOuterNormal(local).two_norm();
+    normal *= integration_element;
+    return normal;
+  }
+
+  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
+  {
+    global_ = this->geometry().global(local);
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.unitOuterNormal(local_);
+  }
+
+  GlobalCoordinate centerUnitOuterNormal() const
+  {
+    global_ = this->geometry().center();
+    local_ = macro_intersection_.geometry().local(global_);
+    return macro_intersection_.unitOuterNormal(local_);
+  }
+
+private:
+  const MacroIntersectionType& macro_intersection_;
+  mutable GlobalCoordinate global_;
+  mutable LocalCoordinate local_;
+}; // class CouplingIntersectionWithCorrectNormal
+
+
 // forward for Traits
 template <class GridGlueImp>
 class CouplingGridViewWrapper;
@@ -65,8 +127,10 @@ public:
 
   using GlueType = typename GridGlueType::GlueType;
   using CouplingIntersectionType = typename GlueType::Intersection;
-  using Intersection = CouplingIntersectionType;
-  using IntersectionIterator = typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator;
+  using MacroInterSectionType = typename BaseGridViewTraits::Intersection;
+  using CorrectedCouplingIntersectionType = CouplingIntersectionWithCorrectNormal<CouplingIntersectionType, MacroInterSectionType>;
+  using Intersection = CorrectedCouplingIntersectionType;
+  using IntersectionIterator = typename std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>::const_iterator;
 
   template <int cd>
   struct Codim : public BaseGridViewTraits::template Codim<cd>
@@ -133,8 +197,8 @@ public:
   using LocalGridViewType = typename GridGlueType::MicroGridViewType;
   using LocalElementType = typename GridGlueType::MicroEntityType;
 
-//  TODO: add the macro intersection to use CorrectedCouplingIntersection
-//  using CorrectedCouplingIntersectionType = CouplingIntersectionWithCorrectNormal<CouplingIntersectionType, MacroIntersectionType>;
+  using IntersectionIterator = typename Traits::IntersectionIterator;
+  using CorrectedCouplingIntersectionType = CouplingIntersectionWithCorrectNormal<CouplingIntersectionType, MacroIntersectionType>;
 
   template <int cd>
   struct Codim : public Traits::template Codim<cd>
@@ -144,11 +208,13 @@ public:
   CouplingGridViewWrapper(const BaseType& base_grid_view,
                           const MacroElementType& ss,
                           const MacroElementType& nn,
-                          GridGlueType& dd_grid)
+                          GridGlueType& dd_grid,
+                          const MacroIntersectionType& macro_intersection)
     : BaseType(base_grid_view),
       inside_element_(ss),
       outside_element_(nn),
       dd_grid_(dd_grid),
+      macro_intersection_(macro_intersection),
       macro_grid_view_(dd_grid.macro_grid_view()),
       local_inside_grid_(dd_grid.local_grid(ss))
 
@@ -186,7 +252,7 @@ public:
               if (local_inside_grid_->leaf_view().indexSet().index(*el) == *id) {
                   // This is the inside element we are searching for.. add it to the vector
                   inside_elements_.push_back(*el);
-                  std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>> coupling_intersection_set;
+                  std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>> coupling_intersection_set;
                   // now iteratate over all intersections to find all coupling intersections
                   for (auto coupling_intersection_it = coupling.template ibegin<0>();
                        coupling_intersection_it != coupling.template iend<0>();
@@ -194,8 +260,8 @@ public:
                       auto inside = coupling_intersection_it->inside();
                       auto inside_id = local_inside_grid_->leaf_view().indexSet().index(inside);
                       if (inside_id == *id) {
-//                            CorrectedCouplingIntersectionType coupling_intersection(*coupling_intersection_it, macro_intersection_);
-                          coupling_intersection_set.insert(*coupling_intersection_it);
+                          CorrectedCouplingIntersectionType coupling_intersection(*coupling_intersection_it, macro_intersection_);
+                          coupling_intersection_set.insert(coupling_intersection);
                       }
                   }
                   coupling_intersections_.push_back(coupling_intersection_set);
@@ -235,13 +301,13 @@ public:
   }
 
   // define IntersectionIterator type
-  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator ibegin(const LocalElementType& inside_element) const
+  IntersectionIterator ibegin(const LocalElementType& inside_element) const
   {
       return coupling_intersections_[local_to_inside_index(inside_element)].begin();
   };
 
   // define IntersectionIterator type
-  typename std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>::const_iterator iend(const LocalElementType& inside_element) const
+  IntersectionIterator iend(const LocalElementType& inside_element) const
   {
       return coupling_intersections_[local_to_inside_index(inside_element)].end();
   };
@@ -279,11 +345,12 @@ private:
     const MacroElementType& inside_element_;
     const MacroElementType& outside_element_;
     GridGlueType& dd_grid_;
+    const MacroIntersectionType& macro_intersection_;
     const MacroGridViewType& macro_grid_view_;
     const std::shared_ptr<LocalGridProviderType> local_inside_grid_;
     std::vector<LocalElementType> inside_elements_;
     std::vector<int> inside_elements_ids_;
-    std::vector<std::set<CouplingIntersectionType, CompareType<CouplingIntersectionType>>> coupling_intersections_;
+    std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>> coupling_intersections_;
     std::vector<std::pair<size_t, size_t>> local_to_inside_indices_;
 }; // ... class CouplingGridViewWrapper ...
 
@@ -307,12 +374,14 @@ public:
   using BaseGridViewType = typename GridGlueImp::MacroGridViewType;
   using MacroGridType = typename GridGlueType::MacroGridType;
   using MacroElementType = typename MacroGridType::template Codim<0>::Entity;
+  using MacroIntersectionType = typename BaseGridViewType::Traits::Intersection;
 
   CouplingGridView(const BaseGridViewType& base_grid_view,
                    const MacroElementType& ss,
                    const MacroElementType& nn,
-                   GridGlueType& dd_grid)
-    : ImplementationStorage(new Implementation(base_grid_view, ss, nn, dd_grid))
+                   GridGlueType& dd_grid,
+                   const MacroIntersectionType& macro_intersection)
+    : ImplementationStorage(new Implementation(base_grid_view, ss, nn, dd_grid, macro_intersection))
     , BaseType(ImplementationStorage::access())
   {}
 
@@ -336,11 +405,11 @@ public:
 //  return CouplingGridView<GL, codim_iters_provided>(base_grid_view, periodic_directions);
 //}
 
-template <class MG, class GT, class E>
+template <class MG, class GT, class E, class IT>
 CouplingGridView<GT>
-make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, GT& dd_grid)
+make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
 {
-  return CouplingGridView<GT>(base_grid_view, ss, nn, dd_grid);
+  return CouplingGridView<GT>(base_grid_view, ss, nn, dd_grid, macro_intersection);
 }
 
 } // namespace Dune::XT::Grid
