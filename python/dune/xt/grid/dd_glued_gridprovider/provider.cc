@@ -181,7 +181,7 @@ public:
   using GV = typename type::LocalViewType;
   using MacroGV = typename type::MacroGridViewType;
   using ElementType = typename type::MacroEntityType;
-  using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<MacroGV, type>;
+  using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<type>;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "glued_grid_provider",
@@ -378,7 +378,7 @@ struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 using GridGlue2dYaspYasp = Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
 using AvailableGridGlueTypes = std::tuple<GridGlue2dYaspYasp>;
 
-using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<typename GridGlue2dYaspYasp::MacroGridViewType, GridGlue2dYaspYasp>;
+using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
 
 using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp>;
 
