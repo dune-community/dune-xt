@@ -172,8 +172,8 @@ public:
                 if (self.subdomain(outside_macro_element) == nn) {
                   found_correct_macro_intersection = true;
                   // these are the subdomains we are interested in
-                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<MacroGV, type, ElementType, IntersectionType>(
-                              self.macro_grid_view(), inside_macro_element, outside_macro_element, self, macro_intersection);
+                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<type, ElementType, IntersectionType>(
+                              inside_macro_element, outside_macro_element, self, macro_intersection);
                   Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
                   return coupling_provider;
                 }
