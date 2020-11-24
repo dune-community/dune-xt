@@ -26,9 +26,8 @@
 #include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/functors/generic.hh>
 
-#include <dune/xt/grid/view/new_coupling.hh>
-//#include <dune/xt/grid/view/coupling.hh>
-//#include <dune/xt/grid/view/periodic.hh>
+#include <dune/xt/grid/view/coupling.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
 
 /**
  * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
@@ -572,17 +571,15 @@ GTEST_TEST(empty, main) {
                 std::cout << "WALKER:      Intersection : " << intersection.geometry().center() << std::endl; },
                 [] {});
 
-//            auto functor = Dune::XT::Grid::GenericIntersectionFunctor<CouplingGridViewType>([] {},
-////                [](const auto& element) {
-////                std::cout << "WALKER: Element : " << element.geometry().center() << std::endl; },
-//                [](const auto&, const auto&, const auto&) {
-//                std::cout << "WALKER:      Intersection : " << std::endl; }, //<< intersection.geometry().center() << std::endl; },
-//                [] {});
+            // these lines are not required !!! but they test the CouplingGridProvider
+            Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
+            auto cgv_c = coupling_provider.coupling_view();
 
-            auto walker = Dune::XT::Grid::Walker<CouplingGridViewType>(cgv);
+            auto walker = Dune::XT::Grid::Walker<CouplingGridViewType>(cgv_c); // or cgv itself
             walker.append(functor);
             walker.walk();
         }
     }
+
 
 }
