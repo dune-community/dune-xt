@@ -552,7 +552,7 @@ GTEST_TEST(empty, main) {
             auto inside_element = macro_intersection.inside();
             auto outside_element = macro_intersection.outside();
 //            auto pgv = Dune::XT::Grid::make_periodic_grid_view<GridViewType>(mgv);
-            auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridViewType, GridGlueType, ElementType>(mgv, inside_element, outside_element, *dd_grid);
+            auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridViewType, GridGlueType, ElementType>(mgv, inside_element, outside_element, *dd_grid, macro_intersection);
             for (auto&& inside_element : Dune::elements(cgv)) {
                 std::cout << "I arrived at an element with center: " << inside_element.geometry().center() << std::endl;
                 for (auto&& intersection : Dune::intersections(cgv, inside_element)) {

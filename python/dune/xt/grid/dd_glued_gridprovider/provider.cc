@@ -36,69 +36,6 @@
 
 #include <dune/xt/grid/view/coupling.hh>
 
-/**
- * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
- * oriented normal.
- *
- * \attention Presumes that the coupling intersection lies exactly within the macro intersection!
- */
-template <class CouplingIntersectionType, class MacroIntersectionType>
-class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
-{
-  using BaseType = CouplingIntersectionType;
-
-public:
-  using typename BaseType::GlobalCoordinate;
-  using typename BaseType::LocalCoordinate;
-
-  enum
-  {
-    dimension = MacroIntersectionType::dimension
-  };
-
-  CouplingIntersectionWithCorrectNormal(const CouplingIntersectionType& coupling_intersection,
-                                        const MacroIntersectionType& macro_intersection)
-    : BaseType(coupling_intersection)
-    , macro_intersection_(macro_intersection)
-  {}
-
-  GlobalCoordinate outerNormal(const LocalCoordinate& local) const
-  {
-    global_ = this->geometry().global(local);
-    local_ = macro_intersection_.geometry().local(global_);
-    return macro_intersection_.outerNormal(local_);
-  }
-
-  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local) const
-  {
-    auto normal = this->unitOuterNormal(local);
-    const auto integration_element = BaseType::integrationOuterNormal(local).two_norm();
-    normal *= integration_element;
-    return normal;
-  }
-
-  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
-  {
-    global_ = this->geometry().global(local);
-    local_ = macro_intersection_.geometry().local(global_);
-    return macro_intersection_.unitOuterNormal(local_);
-  }
-
-  GlobalCoordinate centerUnitOuterNormal() const
-  {
-    global_ = this->geometry().center();
-    local_ = macro_intersection_.geometry().local(global_);
-    return macro_intersection_.unitOuterNormal(local_);
-  }
-
-private:
-  const MacroIntersectionType& macro_intersection_;
-  mutable GlobalCoordinate global_;
-  mutable LocalCoordinate local_;
-}; // class CouplingIntersectionWithCorrectNormal
-
-
-
 namespace Dune::XT::Grid{
 
 template <class MacroGV, class MicroGV>
@@ -150,7 +87,7 @@ public:
 
 // Since CouplingIntersectionWithCorrectNormal is not derived from Dune::Intersection, we need this copy here :/
 template <class C, class I>
-double diameter(const CouplingIntersectionWithCorrectNormal<C, I>& intersection)
+double diameter(const internal::CouplingIntersectionWithCorrectNormal<C, I>& intersection)
 {
   auto max_dist = std::numeric_limits<typename I::ctype>::min();
   const auto& geometry = intersection.geometry();
@@ -182,6 +119,7 @@ public:
   using MacroGV = typename type::MacroGridViewType;
   using ElementType = typename type::MacroEntityType;
   using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<type>;
+  using IntersectionType = typename MacroGV::Intersection;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "glued_grid_provider",
@@ -234,8 +172,8 @@ public:
                 if (self.subdomain(outside_macro_element) == nn) {
                   found_correct_macro_intersection = true;
                   // these are the subdomains we are interested in
-                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<MacroGV, type, ElementType>(
-                              self.macro_grid_view(), inside_macro_element, outside_macro_element, self);
+                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<MacroGV, type, ElementType, IntersectionType>(
+                              self.macro_grid_view(), inside_macro_element, outside_macro_element, self, macro_intersection);
                   Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
                   return coupling_provider;
                 }
