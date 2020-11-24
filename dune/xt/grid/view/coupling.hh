@@ -205,12 +205,11 @@ public:
   {};
 
 public:
-  CouplingGridViewWrapper(const BaseType& base_grid_view,
-                          const MacroElementType& ss,
+  CouplingGridViewWrapper(const MacroElementType& ss,
                           const MacroElementType& nn,
                           GridGlueType& dd_grid,
                           const MacroIntersectionType& macro_intersection)
-    : BaseType(base_grid_view),
+    : BaseType(dd_grid.macro_grid_view()),
       inside_element_(ss),
       outside_element_(nn),
       dd_grid_(dd_grid),
@@ -219,7 +218,7 @@ public:
       local_inside_grid_(dd_grid.local_grid(ss))
 
   {
-    if (base_grid_view.comm().size() > 1)
+    if (macro_grid_view_.comm().size() > 1)
       DUNE_THROW(Dune::NotImplemented, "CouplingGridView does not work for MPI-distributed grids!");
     this->update();
   } // constructor CouplingGridViewWrapper(...)
@@ -376,12 +375,11 @@ public:
   using MacroElementType = typename MacroGridType::template Codim<0>::Entity;
   using MacroIntersectionType = typename BaseGridViewType::Traits::Intersection;
 
-  CouplingGridView(const BaseGridViewType& base_grid_view,
-                   const MacroElementType& ss,
+  CouplingGridView(const MacroElementType& ss,
                    const MacroElementType& nn,
                    GridGlueType& dd_grid,
                    const MacroIntersectionType& macro_intersection)
-    : ImplementationStorage(new Implementation(base_grid_view, ss, nn, dd_grid, macro_intersection))
+    : ImplementationStorage(new Implementation(ss, nn, dd_grid, macro_intersection))
     , BaseType(ImplementationStorage::access())
   {}
 
@@ -405,11 +403,11 @@ public:
 //  return CouplingGridView<GL, codim_iters_provided>(base_grid_view, periodic_directions);
 //}
 
-template <class MG, class GT, class E, class IT>
+template <class GT, class E, class IT>
 CouplingGridView<GT>
-make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
+make_coupling_grid_view(const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
 {
-  return CouplingGridView<GT>(base_grid_view, ss, nn, dd_grid, macro_intersection);
+  return CouplingGridView<GT>(ss, nn, dd_grid, macro_intersection);
 }
 
 } // namespace Dune::XT::Grid
