@@ -539,7 +539,7 @@ GTEST_TEST(empty, main) {
     }
 
     std::cout << " ____ NOW WE TRY TO PUT IT INTO A GRIDVIEW INTERFACE ____" << std::endl;
-    using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<GridViewType, GridGlueType>;
+    using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<GridGlueType>;
 
     // use the gridview from view/new_coupling.hh
     for (auto&& macro_element : Dune::elements(mgv)) {

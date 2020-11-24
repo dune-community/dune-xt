@@ -45,17 +45,18 @@ namespace Dune::XT::Grid {
 namespace internal {
 
 // forward for Traits
-template <class BaseGridViewImp, class GridGlueType>
+template <class GridGlueImp>
 class CouplingGridViewWrapper;
 
 //! Traits for CouplingGridViewWrapper
-template <class BaseGridViewImp, class GridGlueType>
-class CouplingGridViewWrapperTraits : public BaseGridViewImp::Traits
+template <class GridGlueImp>
+class CouplingGridViewWrapperTraits : public GridGlueImp::MacroGridViewType::Traits
 {
 public:
-  using BaseGridViewType = BaseGridViewImp;
+  using BaseGridViewType = typename GridGlueImp::MacroGridViewType;
+  using GridGlueType = GridGlueImp;
   // use types from BaseGridViewType...
-  using GridViewImp = CouplingGridViewWrapper<BaseGridViewType, GridGlueType>;
+  using GridViewImp = CouplingGridViewWrapper<GridGlueType>;
   using Grid = extract_grid_t<BaseGridViewType>;
   using IndexSet = typename BaseGridViewType::IndexSet;
   using CollectiveCommunication = extract_collective_communication_t<BaseGridViewType>;
@@ -71,9 +72,9 @@ public:
   struct Codim : public BaseGridViewTraits::template Codim<cd>
   {
     // We need to define these in case BaseGridViewImp is a grid part.
-    using Entity = extract_entity_t<BaseGridViewImp, cd>;
-    using Geometry = extract_geometry_t<BaseGridViewImp, cd>;
-    using LocalGeometry = extract_local_geometry_t<BaseGridViewImp, cd>;
+    using Entity = extract_entity_t<BaseGridViewType, cd>;
+    using Geometry = extract_geometry_t<BaseGridViewType, cd>;
+    using LocalGeometry = extract_local_geometry_t<BaseGridViewType, cd>;
 
     using Iterator = typename std::vector<LocalElementType>::const_iterator;
 
@@ -105,12 +106,12 @@ public:
 /** \brief Actual Implementation of CouplingGridView
  *  \see CouplingGridView
  */
-template <class BaseGridViewImp, class GridGlueType>
-class CouplingGridViewWrapper : public BaseGridViewImp
+template <class GridGlueType>
+class CouplingGridViewWrapper : public GridGlueType::MacroGridViewType
 {
-  using BaseType = BaseGridViewImp;
+  using BaseType = typename GridGlueType::MacroGridViewType;
   using ThisType = CouplingGridViewWrapper;
-  using Traits = CouplingGridViewWrapperTraits<BaseType, GridGlueType>;
+  using Traits = CouplingGridViewWrapperTraits<GridGlueType>;
 
 public:
   using GlueType = typename GridGlueType::GlueType;
@@ -290,20 +291,20 @@ private:
 } // namespace internal
 
 
-template <class BaseGridViewImp, class GridGlueImp>
+template <class GridGlueImp>
 class CouplingGridView
-  : XT::Common::StorageProvider<internal::CouplingGridViewWrapper<BaseGridViewImp, GridGlueImp>>
-  , public Dune::GridView<internal::CouplingGridViewWrapperTraits<BaseGridViewImp, GridGlueImp>>
+  : XT::Common::StorageProvider<internal::CouplingGridViewWrapper<GridGlueImp>>
+  , public Dune::GridView<internal::CouplingGridViewWrapperTraits<GridGlueImp>>
 {
-  static_assert(is_view<BaseGridViewImp>::value);
-  using Implementation = internal::CouplingGridViewWrapper<BaseGridViewImp, GridGlueImp>;
+  static_assert(is_view<typename GridGlueImp::MacroGridViewType>::value);
+  using Implementation = internal::CouplingGridViewWrapper<GridGlueImp>;
   using ImplementationStorage = typename XT::Common::StorageProvider<Implementation>;
-  using BaseType = Dune::GridView<internal::CouplingGridViewWrapperTraits<BaseGridViewImp, GridGlueImp>>;
+  using BaseType = Dune::GridView<internal::CouplingGridViewWrapperTraits<GridGlueImp>>;
 
 public:
   using GridGlueType = GridGlueImp;
   using BaseType::dimension;
-  using BaseGridViewType = BaseGridViewImp;
+  using BaseGridViewType = typename GridGlueImp::MacroGridViewType;
   using MacroGridType = typename GridGlueType::MacroGridType;
   using MacroElementType = typename MacroGridType::template Codim<0>::Entity;
 
@@ -336,10 +337,10 @@ public:
 //}
 
 template <class MG, class GT, class E>
-CouplingGridView<MG, GT>
+CouplingGridView<GT>
 make_coupling_grid_view(const MG& base_grid_view, const E& ss, const E& nn, GT& dd_grid)
 {
-  return CouplingGridView<MG, GT>(base_grid_view, ss, nn, dd_grid);
+  return CouplingGridView<GT>(base_grid_view, ss, nn, dd_grid);
 }
 
 } // namespace Dune::XT::Grid
