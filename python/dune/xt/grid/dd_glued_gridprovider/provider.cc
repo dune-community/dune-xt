@@ -24,7 +24,7 @@
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
-#include <dune/xt/grid/gridprovider/glued_provider.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/filters/intersection.hh>
 #include <dune/xt/grid/mapper.hh>
@@ -34,7 +34,7 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-
+#include <dune/xt/grid/view/coupling.hh>
 
 /**
  * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
@@ -179,6 +179,9 @@ public:
   using bound_type = pybind11::class_<type>;
 
   using GV = typename type::LocalViewType;
+  using MacroGV = typename type::MacroGridViewType;
+  using ElementType = typename type::MacroEntityType;
+  using CouplingGridViewType = Dune::XT::Grid::CouplingGridView<MacroGV, type>;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "glued_grid_provider",
@@ -222,9 +225,7 @@ public:
     c.def("coupling_grid", [](type& self, const size_t ss, const size_t nn){
         for (auto&& inside_macro_element : elements(self.macro_grid_view())) {
           if (self.subdomain(inside_macro_element) == ss) {
-            // this is the subdomain we are interested in, create space
-//            auto inner_subdomain_grid_view = self.local_grid(inside_macro_element).leaf_view();
-//            auto inner_subdomain_space = make_subdomain_space(inner_subdomain_grid_view, space_type);
+            // this is the subdomain we are interested in
             bool found_correct_macro_intersection = false;
             for (auto&& macro_intersection :
                  intersections(self.macro_grid_view(), inside_macro_element)) {
@@ -233,19 +234,10 @@ public:
                 if (self.subdomain(outside_macro_element) == nn) {
                   found_correct_macro_intersection = true;
                   // these are the subdomains we are interested in
-                  const auto& coupling = self.coupling(inside_macro_element, -1, outside_macro_element, -1, true);
-                  using MacroI = std::decay_t<decltype(macro_intersection)>;
-                  using CouplingI = typename type::GlueType::Intersection;
-                  using I = CouplingIntersectionWithCorrectNormal<CouplingI, MacroI>;
-                  const auto coupling_intersection_it_end = coupling.template iend<0>();
-                  for (auto coupling_intersection_it = coupling.template ibegin<0>();
-                       coupling_intersection_it != coupling_intersection_it_end;
-                       ++coupling_intersection_it) {
-//                    const auto& coupling_intersection = *coupling_intersection_it;
-                    const I coupling_intersection(*coupling_intersection_it, macro_intersection);
-                    std::cout << diameter(coupling_intersection) << std::endl;
-//                    return *coupling_intersection_it;  // no bindings available !!
-                  }
+                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<MacroGV, type, ElementType>(
+                              self.macro_grid_view(), inside_macro_element, outside_macro_element, self);
+                  Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
+                  return coupling_provider;
                 }
               }
             }
@@ -282,6 +274,28 @@ public:
     return c;
   } // ... bind(...)
 }; // class GridProvider
+
+template <class GV>
+class CouplingGridProvider
+{
+public:
+  using type = Dune::XT::Grid::CouplingGridProvider<GV>;
+  using bound_type = pybind11::class_<type>;
+
+  static bound_type bind(pybind11::module& m,
+                         const std::string& class_id = "coupling_grid_provider",
+                         const std::string& grid_id = grid_name<typename GV::MacroGridType>::value())
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+
+    const std::string class_name = class_id + "_" + grid_id;
+    const auto ClassName = XT::Common::to_camel_case(class_name);
+    bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    c.def("alive", [](type& self){std::cout << "I am alive" << std::endl;});
+    return c;
+  } // ... bind(...)
+}; // class CouplingGridProvider
 
 template <class G>
 struct MacroGridBasedBoundaryInfo
@@ -359,6 +373,32 @@ struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
   static void bind(pybind11::module& /*m*/) {}
 };
 
+// COUPLINGGRIDPROVIDER
+
+using GridGlue2dYaspYasp = Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
+using AvailableGridGlueTypes = std::tuple<GridGlue2dYaspYasp>;
+
+using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<typename GridGlue2dYaspYasp::MacroGridViewType, GridGlue2dYaspYasp>;
+
+using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp>;
+
+template <class CouplingGridViewTypes = AvailableCouplingGridViewTypes>
+struct CouplingGridProvider_for_all_grids
+{
+  static void bind(pybind11::module& m)
+  {
+    Dune::XT::Grid::bindings::CouplingGridProvider<Dune::XT::Common::tuple_head_t<CouplingGridViewTypes>>::bind(m);
+    CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<CouplingGridViewTypes>>::bind(m);
+  }
+};
+
+template <>
+struct CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>  // grid-glue only working 2d
 struct MacroGridBasedBoundaryInfo_for_all_grids
 {
@@ -390,4 +430,5 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
 //#undef BIND_
   GluedGridProvider_for_all_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
+  CouplingGridProvider_for_all_grids<>::bind(m);
 }
