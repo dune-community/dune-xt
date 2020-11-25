@@ -469,7 +469,7 @@ using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 namespace std {
 //! specialization for our custom tuple tuple_size can be use on it
 template <class... Types>
-class tuple_size<Dune::XT::Common::template_tuple<Types...>>
+struct tuple_size<Dune::XT::Common::template_tuple<Types...>>
   : public std::integral_constant<std::size_t, sizeof...(Types)>
 {};
 
