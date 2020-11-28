@@ -238,6 +238,22 @@ public:
     return matrix;
   }
 };
+
+template <class S>
+class ContainerFactory<Dune::XT::LA::EigenColMajorSparseMatrix<S>>
+{
+public:
+  static Dune::XT::LA::EigenColMajorSparseMatrix<S> create(const size_t size)
+  {
+    Dune::XT::LA::SparsityPatternDefault pattern(size);
+    for (size_t ii = 0; ii < size; ++ii)
+      pattern.inner(ii).push_back(ii);
+    Dune::XT::LA::EigenColMajorSparseMatrix<S> matrix(size, size, pattern);
+    for (size_t ii = 0; ii < size; ++ii)
+      matrix.unit_row(ii);
+    return matrix;
+  }
+};
 #endif // HAVE_EIGEN
 
 #define EXPECT_DOUBLE_OR_COMPLEX_EQ(expected, actual)                                                                  \

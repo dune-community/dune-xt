@@ -19,7 +19,7 @@ def matrices(cache):
         'CommonSparseOrDenseMatrixCsc'
     ]
     if codegen.have_eigen(cache):
-        mat.extend(['EigenRowMajorSparseMatrix', 'EigenDenseMatrix'])
+        mat.extend(['EigenRowMajorSparseMatrix', 'EigenColMajorSparseMatrix', 'EigenDenseMatrix'])
     if codegen.have_istl(cache):
         mat.append('IstlRowMajorSparseMatrix')
     return mat
