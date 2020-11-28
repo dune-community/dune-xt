@@ -15,7 +15,7 @@
 #ifndef NDEBUG
 #  define DXTC_DEBUG_ONLY
 #else
-#  if HAS_WORKING_UNUSED_ATTRIBUTE
+#  if defined(HAS_WORKING_UNUSED_ATTRIBUTE) && HAS_WORKING_UNUSED_ATTRIBUTE
 #    define DXTC_DEBUG_ONLY [[maybe_unused]]
 #  else
 #    define DXTC_DEBUG_ONLY __attribute__((unused))
@@ -25,7 +25,7 @@
 #if defined(HAVE_MPI) && HAVE_MPI
 #  define DXTC_MPI_ONLY
 #else
-#  if HAS_WORKING_UNUSED_ATTRIBUTE
+#  if defined(HAS_WORKING_UNUSED_ATTRIBUTE) && HAS_WORKING_UNUSED_ATTRIBUTE
 #    define DXTC_DEBUG_ONLY [[maybe_unused]]
 #  else
 #    define DXTC_MPI_ONLY __attribute__((unused))
