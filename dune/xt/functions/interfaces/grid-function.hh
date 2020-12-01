@@ -105,7 +105,7 @@ private:
 public:
   GridFunctionInterface(const Common::ParameterType& param_type = {},
                         const std::string& logging_prefix = "",
-                        const std::array<bool, 3>& logging_state = {false, false, true})
+                        const std::array<bool, 3>& logging_state = {{false, false, true}})
     : Common::ParametricInterface(param_type)
     , Logger(logging_prefix.empty() ? "GridFunctionInterface" : logging_prefix, logging_state)
   {
@@ -178,25 +178,23 @@ public:
 
   Functions::DifferenceGridFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
-    std::string derived_logging_prefix = "";
-    if (this->logger.debug_enabled || other.logger.debug_enabled) {
-      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
-      this->logger.debug() << logging_id() << "::operator-(other=" << &other << ")" << std::endl;
-    }
-    return Functions::DifferenceGridFunction<ThisType, ThisType>(
-        *this, other, "(" + this->name() + " - " + other.name() + ")", derived_logging_prefix);
-  }
+    LOG_(debug) << "operator-(other=" << &other << ")" << std::endl;
+    return Functions::DifferenceGridFunction<ThisType, ThisType>(*this,
+                                                                 other,
+                                                                 this->name() + " - " + other.name(),
+                                                                 this->logger.prefix + " - " + other.logger.prefix,
+                                                                 this->logger.get_state_or(other.logger.state));
+  } // ... operator-(...)
 
   Functions::SumGridFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
-    std::string derived_logging_prefix = "";
-    if (this->logger.debug_enabled || other.logger.debug_enabled) {
-      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
-      this->logger.debug() << logging_id() << "::operator+(other=" << &other << ")" << std::endl;
-    }
-    return Functions::SumGridFunction<ThisType, ThisType>(
-        *this, other, "(" + this->name() + " + " + other.name() + ")", derived_logging_prefix);
-  }
+    LOG_(debug) << "operator+(other=" << &other << ")" << std::endl;
+    return Functions::SumGridFunction<ThisType, ThisType>(*this,
+                                                          other,
+                                                          this->name() + " + " + other.name(),
+                                                          this->logger.prefix + " + " + other.logger.prefix,
+                                                          this->logger.get_state_or(other.logger.state));
+  } // ... operator+(...)
 
   template <class OtherType>
   std::enable_if_t<is_grid_function<OtherType>::value
@@ -204,14 +202,14 @@ public:
                    Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
   operator*(const OtherType& other) const
   {
-    std::string derived_logging_prefix = "";
-    if (this->logger.debug_enabled || other.logger.debug_enabled) {
-      derived_logging_prefix = "(" + this->logger.prefix + "*" + other.logger.prefix + ")";
-      this->logger.debug() << logging_id() << "::operator*(other=" << &other << ")" << std::endl;
-    }
+    LOG_(debug) << "operator*(other=" << &other << ")" << std::endl;
     return Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
-        *this, other, "(" + this->name() + "*" + other.name() + ")", derived_logging_prefix);
-  }
+        *this,
+        other,
+        "(" + this->name() + ")*(" + other.name() + ")",
+        "(" + this->logger.prefix + ")*(" + other.logger.prefix + ")",
+        this->logger.get_state_or(other.logger.state));
+  } // ... operator*(...)
 
   template <class OtherType>
   std::enable_if_t<is_grid_function<OtherType>::value
@@ -219,14 +217,14 @@ public:
                    Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>>
   operator/(const OtherType& other) const
   {
-    std::string derived_logging_prefix = "";
-    if (this->logger.debug_enabled || other.logger.debug_enabled) {
-      derived_logging_prefix = "(" + this->logger.prefix + "/" + other.logger.prefix + ")";
-      this->logger.debug() << logging_id() << "::operator/(other=" << &other << ")" << std::endl;
-    }
-    return Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
-        *this, other, "(" + this->name() + "/" + other.name() + ")", derived_logging_prefix);
-  }
+    LOG_(debug) << "operator/(other=" << &other << ")" << std::endl;
+    return Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
+        *this,
+        other,
+        "(" + this->name() + ")/(" + other.name() + ")",
+        "(" + this->logger.prefix + ")/(" + other.logger.prefix + ")",
+        this->logger.get_state_or(other.logger.state));
+  } // ... operator/(...)
 
   /// \}
 

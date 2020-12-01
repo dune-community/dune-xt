@@ -47,6 +47,13 @@ DUNE_EXPORT inline const Timer& SecondsSinceStartup()
 }
 
 
+DUNE_EXPORT inline std::array<bool, 3>& default_logger_state()
+{
+  static std::array<bool, 3> state_{{true, false, true}};
+  return state_;
+}
+
+
 /**
  * \brief A logging manager that provides info, debug and warning streams
  */
@@ -73,8 +80,8 @@ public:
   size_t copy_count;
 
   DefaultLogger(const std::string& prfx = "",
-                const std::array<bool, 3>& initial_state = {true, true, true},
-                const std::array<std::string, 3>& colors = {"blue", "darkgray", "red"},
+                const std::array<bool, 3>& initial_state = default_logger_state(),
+                const std::array<std::string, 3>& colors = {{"blue", "darkgray", "red"}},
                 bool global_timer = true);
 
   DefaultLogger(const DefaultLogger&);
@@ -163,7 +170,7 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-  WithLogger(const std::string& id, const std::array<bool, 3>& initial_state = {true, true, true})
+  WithLogger(const std::string& id, const std::array<bool, 3>& initial_state = {{true, true, true}})
     : logger(id, initial_state)
   {
     LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;

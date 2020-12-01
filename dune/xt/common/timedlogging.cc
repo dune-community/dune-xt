@@ -92,7 +92,7 @@ DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
 
 void DefaultLogger::enable(const std::string& prfx)
 {
-  state = {true, true, true};
+  state = default_logger_state();
   if (!prfx.empty()) {
     prefix = prfx;
     copy_count = 0;
@@ -143,7 +143,7 @@ void DefaultLogger::state_and(const std::array<bool, 3>& other_state)
 
 void DefaultLogger::disable()
 {
-  state = {false, false, false};
+  state = {{false, false, false}};
 }
 
 std::ostream& DefaultLogger::info()

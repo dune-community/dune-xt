@@ -47,7 +47,7 @@ public:
   using GV = GridViewType;
   using E = ElementType;
 
-  ElementFunctor(const std::string& log_prefix = "", const std::array<bool, 3>& logging_state = {false, false, true})
+  ElementFunctor(const std::string& log_prefix = "", const std::array<bool, 3>& logging_state = {{false, false, true}})
     : Common::WithLogger<ElementFunctor<GL>>(log_prefix.empty() ? "ElementFunctor" : log_prefix, logging_state)
   {}
 
@@ -94,7 +94,7 @@ public:
   using I = IntersectionType;
 
   IntersectionFunctor(const std::string& log_prefix = "",
-                      const std::array<bool, 3>& logging_state = {false, false, true})
+                      const std::array<bool, 3>& logging_state = {{false, false, true}})
     : Common::WithLogger<IntersectionFunctor<GL>>(log_prefix.empty() ? "IntersectionFunctor" : log_prefix,
                                                   logging_state)
   {}
@@ -148,7 +148,7 @@ public:
   using I = IntersectionType;
 
   ElementAndIntersectionFunctor(const std::string& log_prefix = "",
-                                const std::array<bool, 3>& logging_state = {false, false, true})
+                                const std::array<bool, 3>& logging_state = {{false, false, true}})
     : Common::WithLogger<ElementAndIntersectionFunctor<GL>>(
         log_prefix.empty() ? "ElementAndIntersectionFunctor" : log_prefix, logging_state)
   {}

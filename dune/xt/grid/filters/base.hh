@@ -128,7 +128,7 @@ public:
   mutable Common::DefaultLogger logger;
 
   IntersectionFilter(const std::string& logging_prefix = "xt.grid.intersectionfilter",
-                     const std::array<bool, 3>& logging_state = {false, false, true})
+                     const std::array<bool, 3>& logging_state = {{false, false, true}})
     : logger(logging_prefix, logging_state)
   {}
 
