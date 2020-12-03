@@ -197,7 +197,7 @@
   // we need the hack below.
   #define TBB_USE_GLIBCXX_VERSION 40902
   // new versions of tbb do not have tbb_stddef.h anymore
-  #if __has_include("tbb.version.h")
+  #if __has_include("tbb/version.h")
   #  include "tbb/version.h"
   #else
   #  include "tbb/tbb_stddef.h"
