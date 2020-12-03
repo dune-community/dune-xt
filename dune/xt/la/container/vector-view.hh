@@ -113,9 +113,18 @@ public:
     , past_last_entry_(past_last_entry)
   {}
 
-  ConstVectorView(const ThisType& other) = default;
+  // We cannot copy a view (we could make a shallow copy, but that is error-prone).
+  // However, the VectorInterface does not compile for non-copyable types, so we fail at runtime here.
+  ConstVectorView(const ThisType& other)
+    : vector_(other.vector_)
+    , first_entry_(other.first_entry_)
+    , past_last_entry_(other.past_last_entry_)
+  {
+    DUNE_THROW(Dune::NotImplemented, "Copying is disabled, simply create a new view!");
+  }
+  // Moving from another view is fine
   ConstVectorView(ThisType&& other) = default;
-  // No assigment as this is a const view
+  // No assignment as this is a const view
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& other) = delete;
 
@@ -282,16 +291,32 @@ public:
     , vector_(vector)
   {}
 
-  VectorView(const ThisType& other) = delete;
+  // We cannot copy a view (we could make a shallow copy, but that is error-prone).
+  // However, the VectorInterface does not compile for non-copyable types, so we fail at runtime here.
+  VectorView(const ThisType& other)
+    : const_vector_view_(other.const_vector_view_)
+    , vector_(other.vector_)
+  {
+    DUNE_THROW(Dune::NotImplemented, "Copying is disabled, simply create a new view!");
+  }
+
+  // Moving from another view is fine
   VectorView(ThisType&& other) = default;
   ThisType& operator=(VectorView&& other) = default;
 
+  // Allow copy assignment from any vector
   template <class Vec>
   std::enable_if_t<XT::Common::is_vector<Vec>::value, ThisType>& operator=(const Vec& other)
   {
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, other.get_entry(ii));
     return *this;
+  }
+
+  // Ensure assignment from another view copies the contents
+  ThisType& operator=(const ThisType& other)
+  {
+    return operator=<ThisType>(other);
   }
 
   ThisType& operator=(const ScalarType& val)
