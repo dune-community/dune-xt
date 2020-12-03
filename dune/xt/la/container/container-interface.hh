@@ -109,6 +109,7 @@ public:
 
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
+  ContainerInterface() = default;
   virtual ~ContainerInterface() {}
 
   ThisType& operator=(const ThisType& other)
@@ -123,6 +124,11 @@ public:
     return *this;
   }
 
+protected:
+  ContainerInterface(const ThisType& other) = default;
+  ContainerInterface(ThisType&& other) = default;
+
+public:
   /// \name Have to be implemented by a derived class!
   /// \{
 
