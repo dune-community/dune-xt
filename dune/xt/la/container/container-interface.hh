@@ -98,6 +98,7 @@ template <class TraitsImp, class ScalarImp = typename TraitsImp::ScalarType>
 class ContainerInterface : public Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>
 {
   using CRTP = Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>;
+  using ThisType = ContainerInterface;
 
 public:
   using typename CRTP::derived_type;
@@ -109,6 +110,18 @@ public:
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
   virtual ~ContainerInterface() {}
+
+  ThisType& operator=(const ThisType& other)
+  {
+    this->as_imp() = other.as_imp();
+    return *this;
+  }
+
+  ThisType& operator=(ThisType&& other)
+  {
+    this->as_imp() = std::move(other.as_imp());
+    return *this;
+  }
 
   /// \name Have to be implemented by a derived class!
   /// \{

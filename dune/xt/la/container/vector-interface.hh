@@ -93,6 +93,14 @@ public:
     return this->as_imp();
   }
 
+  template <class T, class S>
+  derived_type& operator=(const VectorInterface<T, S>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, other.get_entry(ii));
+    return this->as_imp();
+  }
+
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
   /// \{
 
@@ -454,14 +462,6 @@ public:
   virtual ScalarType operator*(const derived_type& other) const
   {
     return dot(other);
-  }
-
-  template <class T, class S>
-  derived_type& operator=(const VectorInterface<T, S>& other)
-  {
-    for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, other.get_entry(ii));
-    return this->as_imp();
   }
 
   /**

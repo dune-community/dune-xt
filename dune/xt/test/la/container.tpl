@@ -67,6 +67,8 @@ struct ContainerTest{{NAME}} : public ::testing::Test
     ContainerImp i_deep_copy = i_by_size.copy();
     i_by_size.scal(I_ScalarType(1));
     i_by_size.axpy(I_ScalarType(1), i_deep_copy);
+    i_by_size = d_copy_constructor;
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(d_by_size, d_copy_constructor));
   } // void fulfills_interface() const
 }; // struct ContainerTest
 

@@ -99,8 +99,10 @@ struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
     // * of the vector as the interface
     VectorImp d_by_size_2(dim);
     VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
+    d_ones = VectorImp(dim, I_ScalarType(1));
     InterfaceType& i_by_size = static_cast<InterfaceType&>(d_by_size_2);
     InterfaceType& i_by_size_and_value = static_cast<InterfaceType&>(d_by_size_and_value_2);
+    InterfaceType& i_ones = static_cast<InterfaceType&>(d_ones);
     EXPECT_TRUE(i_by_size.almost_equal(d_by_size_2));
     i_by_size_and_value.scal(I_ScalarType(0));
     EXPECT_TRUE(i_by_size_and_value.almost_equal(d_by_size_2));
@@ -112,7 +114,6 @@ struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_l2_norm);
     I_ScalarType i_sup_norm = i_by_size.sup_norm();
     EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_sup_norm);
-    VectorImp i_ones(dim, I_ScalarType(1));
     std::pair<size_t, I_ScalarType> i_amax = i_ones.amax();
     EXPECT_EQ(0, i_amax.first);
     EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(1), i_amax.second);
@@ -128,6 +129,12 @@ struct LaContainerVectorTest_{{T_NAME}} : public ::testing::Test
     EXPECT_TRUE(i_subtracted.almost_equal(d_by_size_and_value_2));
     i_subtracted.isub(d_by_size_2);
     EXPECT_TRUE(i_subtracted.almost_equal(i_ones));
+    // check operator= works for interface
+    i_ones = VectorImp(dim, D_ScalarType(1));
+    d_by_size_and_value = VectorImp(dim, D_ScalarType(0));
+    EXPECT_TRUE(XT::Common::FloatCmp::ne(d_ones, d_by_size_and_value));
+    i_ones = d_by_size_and_value;
+    EXPECT_TRUE(XT::Common::FloatCmp::eq(d_ones, d_by_size_and_value));
   } // void fulfills_interface() const
 
   void produces_correct_results() const
