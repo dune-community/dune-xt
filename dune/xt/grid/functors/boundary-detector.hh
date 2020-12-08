@@ -42,7 +42,7 @@ public:
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           BoundaryType*&& boundary_type_ptr,
                           const std::string& logging_prefix = "",
-                          const std::array<bool, 3>& logging_state = {{false, false, true}})
+                          const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix, logging_state)
     , Propagator(this)
     , boundary_info_(boundary_info)
@@ -56,7 +56,7 @@ public:
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           const BoundaryType& boundary_type,
                           const std::string& logging_prefix = "",
-                          const std::array<bool, 3>& logging_state = {{false, false, true}})
+                          const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix, logging_state)
     , Propagator(this)
     , boundary_info_(boundary_info)

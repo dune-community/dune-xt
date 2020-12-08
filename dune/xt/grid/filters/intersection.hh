@@ -556,7 +556,7 @@ public:
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
                                        BoundaryType*&& boundary_type,
                                        const std::string& logging_prefix = "",
-                                       const std::array<bool, 3>& logging_state = {{false, false, true}})
+                                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix, logging_state)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
@@ -565,7 +565,7 @@ public:
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
                                        const std::shared_ptr<BoundaryType>& boundary_type,
                                        const std::string& logging_prefix = "",
-                                       const std::array<bool, 3>& logging_state = {{false, false, true}})
+                                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix, logging_state)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)

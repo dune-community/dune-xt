@@ -49,7 +49,7 @@ DUNE_EXPORT inline const Timer& SecondsSinceStartup()
 
 DUNE_EXPORT inline std::array<bool, 3>& default_logger_state()
 {
-  static std::array<bool, 3> state_{{true, false, true}};
+  static std::array<bool, 3> state_{{false, false, true}};
   return state_;
 }
 

@@ -87,7 +87,7 @@ public:
                        const RightType& right,
                        const std::string nm = "",
                        const std::string& logging_prefix = "",
-                       const std::array<bool, 3>& logging_state = {{false, false, true}})
+                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(left.parameter_type() + right.parameter_type(),
                logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
@@ -104,7 +104,7 @@ public:
                        RightType*&& right,
                        const std::string nm = "",
                        const std::string& logging_prefix = "",
-                       const std::array<bool, 3>& logging_state = {{false, false, true}})
+                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(left->parameter_type() + right->parameter_type(),
                logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
