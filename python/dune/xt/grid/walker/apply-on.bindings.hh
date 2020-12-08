@@ -42,7 +42,7 @@ public:
 private:
   using BoundaryInfoType = XT::Grid::BoundaryInfo<extract_intersection_t<GL>>;
 
-  static std::string makename(std::string class_name, std::string layer_name)
+  static std::string makename(const std::string& class_name, const std::string& layer_name)
   {
     return std::string("make_apply_on_") + class_name + "_" + layer_name + "_"
            + XT::Grid::bindings::grid_name<G>::value();
@@ -56,7 +56,7 @@ private:
       m.def(
           makename(class_name, layer_name).c_str(),
           [](const BoundaryInfoType& boundary_info, XT::Grid::BoundaryType*&& boundary_type) {
-            return new type(boundary_info, std::move(boundary_type));
+            return new type(boundary_info, boundary_type);
           },
           "boundary_info"_a,
           "boundary_type"_a);

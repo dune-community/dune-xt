@@ -97,7 +97,7 @@ public:
     : EigenSolverBase(matrix, EigenSolverOptions<MatrixType, true>::options(type))
   {}
 
-  EigenSolverBase(const MatrixType& matrix, const Common::Configuration opts)
+  EigenSolverBase(const MatrixType& matrix, const Common::Configuration& opts)
     : matrix_(matrix)
     , stored_options_(opts)
     , options_(&stored_options_)
@@ -688,7 +688,7 @@ protected:
 
   static void complex_eigendecomposition_check(const ThisType& self, const double& tolerance)
   {
-    const constexpr bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value;
+    constexpr bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value;
     self.invert_eigenvectors();
     if constexpr (upcast_required) {
       self.assert_eigendecomposition(Dune::XT::LA::convert_to<ComplexMatrixType>(self.matrix_),

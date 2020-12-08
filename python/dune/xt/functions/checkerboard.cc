@@ -83,7 +83,7 @@ public:
            const typename type::DomainType& upper_right,
            const FieldVector<size_t, d>& num_elements,
            const std::vector<typename type::RangeType>& values,
-           const std::string name = "checkerboard") {
+           const std::string& name = "checkerboard") {
           return new type(lower_left, upper_right, num_elements, values, name);
         },
         "grid"_a,

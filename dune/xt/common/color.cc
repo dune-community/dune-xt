@@ -64,6 +64,8 @@ const char* StreamModifiers::endunderline = "\033[24m";
 const char* StreamModifiers::endblink = "\033[25m";
 const char* StreamModifiers::endreverse = "\033[27m";
 
+constexpr size_t max_terminal_colors{256};
+
 std::string color(size_t i)
 {
   return "\033[38;5;" + std::to_string(i) + "m";
@@ -110,7 +112,7 @@ std::string backcolor(size_t i)
 
 size_t template_color_chooser(size_t i)
 {
-  return i % 256;
+  return i % max_terminal_colors;
 }
 
 /**
@@ -157,12 +159,12 @@ std::string highlight_template(std::string str, size_t maxlevel)
 
 std::string highlight_string(std::string str, size_t colornr)
 {
-  return "\033[38;5;" + std::to_string(colornr % 256) + "m" + str + "\033[0m"; //"\033[38;5;0m";
+  return "\033[38;5;" + std::to_string(colornr % max_terminal_colors) + "m" + str + "\033[0m"; //"\033[38;5;0m";
 }
 
 std::string highlight_search_string(std::string str, std::string substr, size_t colornr)
 {
-  std::string dummy = "\033[38;5;" + std::to_string(colornr % 256) + "m";
+  std::string dummy = "\033[38;5;" + std::to_string(colornr % max_terminal_colors) + "m";
   std::string dummy2 = "\033[0m";
   str.insert(0, dummy2);
 

@@ -17,6 +17,7 @@
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/functions/interfaces/element-functions.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -56,9 +57,9 @@ public:
       GenericDerivativeFunctionType derivative_func = default_derivative_function(),
       GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
-    , size_(size_func)
-    , max_size_(max_size_func)
-    , order_(order_func)
+    , size_(std::move(size_func))
+    , max_size_(std::move(max_size_func))
+    , order_(std::move(order_func))
     , evaluate_(evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
@@ -232,7 +233,7 @@ public:
       GenericDerivativeFunctionType derivative_func = default_derivative_function(),
       GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
-    , order_(order_func)
+    , order_(std::move(order_func))
     , evaluate_(evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)

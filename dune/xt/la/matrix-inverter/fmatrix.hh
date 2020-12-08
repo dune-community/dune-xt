@@ -45,7 +45,7 @@ public:
     };
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string actual_type = type.empty() ? types()[0] : type;
     internal::ensure_matrix_inverter_type(actual_type, types());

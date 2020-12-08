@@ -35,7 +35,7 @@ namespace Dune::XT::Functions::bindings {
 template <size_t d, size_t r = 1, class R = double>
 class ParametricExpressionFunction
 {
-  static const constexpr size_t rC = 1;
+  static constexpr size_t rC = 1;
 
   using type = Functions::ParametricExpressionFunction<d, r, rC, R>;
   using base_type = Functions::FunctionInterface<d, r, rC, R>;

@@ -129,8 +129,8 @@ struct CombinedEval
   using R = typename std::conditional<std::is_same<CombinationType::fraction, comb>::value,
                                       typename Common::multiplication_promotion<L_R, R_R>::type,
                                       typename Common::plus_promotion<L_R, R_R>::type>::type;
-  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
-  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
+  static constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
+  static constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
 
   template <class Left, class Right, class D>
   static auto compute(const Left& left, const Right& right, const D& point, const Common::Parameter& param)
@@ -142,8 +142,8 @@ struct CombinedEval
 template <class L_R, class R_R, size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
 struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::r();
-  static const constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::rC();
+  static constexpr size_t r = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::r();
+  static constexpr size_t rC = CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>::rC();
   using R = typename Common::multiplication_promotion<L_R, R_R>::type;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
   template <class Left, class Right, class D>
@@ -194,8 +194,8 @@ template <class comb,
           typename anything = void>
 struct CombinedJac
 {
-  static const constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
-  static const constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
+  static constexpr size_t r = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::r();
+  static constexpr size_t rC = CombinedDim<comb, L_r, L_rC, R_r, R_rC>::rC();
 
   using R = typename CombinedEval<comb, L_R, R_R, L_r, L_rC, R_r, R_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -214,8 +214,8 @@ struct CombinedJac
 template <class L_R, class R_R, size_t d, size_t L_r, size_t L_rC, typename a>
 struct CombinedJac<CombinationType::difference, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::r();
-  static const constexpr size_t rC = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::rC();
+  static constexpr size_t r = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::r();
+  static constexpr size_t rC = CombinedDim<CombinationType::difference, L_r, L_rC, L_r, L_rC>::rC();
 
   using R = typename CombinedEval<CombinationType::difference, L_R, R_R, L_r, L_rC, L_r, L_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -231,8 +231,8 @@ struct CombinedJac<CombinationType::difference, L_R, R_R, d, L_r, L_rC, L_r, L_r
 template <class L_R, class R_R, size_t d, size_t L_r, size_t L_rC, typename a>
 struct CombinedJac<CombinationType::sum, L_R, R_R, d, L_r, L_rC, L_r, L_rC, a>
 {
-  static const constexpr size_t r = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::r();
-  static const constexpr size_t rC = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::rC();
+  static constexpr size_t r = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::r();
+  static constexpr size_t rC = CombinedDim<CombinationType::sum, L_r, L_rC, L_r, L_rC>::rC();
 
   using R = typename CombinedEval<CombinationType::sum, L_R, R_R, L_r, L_rC, L_r, L_rC>::R;
   using DerivativeRangeReturnType = typename DerivativeRangeTypeSelector<d, R, r, rC>::return_type;
@@ -259,16 +259,16 @@ struct CombinedHelper
   static_assert(is_element_function<Right>::value || is_function<Right>::value || is_grid_function<Right>::value);
   static_assert(Left::d == Right::d);
 
-  static const constexpr size_t d = Left::d;
-  static const constexpr size_t L_r = Left::r;
-  static const constexpr size_t L_rC = Left::rC;
-  static const constexpr size_t R_r = Right::r;
-  static const constexpr size_t R_rC = Right::rC;
+  static constexpr size_t d = Left::d;
+  static constexpr size_t L_r = Left::r;
+  static constexpr size_t L_rC = Left::rC;
+  static constexpr size_t R_r = Right::r;
+  static constexpr size_t R_rC = Right::rC;
 
   using CombinedDimHelper = CombinedDim<comb, L_r, L_rC, R_r, R_rC>;
-  static const constexpr bool available = CombinedDimHelper::available();
-  static const constexpr size_t r = CombinedDimHelper::r();
-  static const constexpr size_t rC = CombinedDimHelper::rC();
+  static constexpr bool available = CombinedDimHelper::available();
+  static constexpr size_t r = CombinedDimHelper::r();
+  static constexpr size_t rC = CombinedDimHelper::rC();
 
   static int order(const Left& left, const Right& right, const Common::Parameter& param)
   {

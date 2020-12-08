@@ -218,7 +218,7 @@ public:
   CompositionFunction(const InnerType inner_function,
                       const OuterType outer_function,
                       const OuterGridViewType outer_grid_view,
-                      const std::string nm = static_id())
+                      const std::string& nm = static_id())
     : inner_function_(inner_function)
     , outer_function_(outer_function)
     , element_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
@@ -226,7 +226,7 @@ public:
   {}
 
   // constructor without grid view, only makes sense if OuterType is derived from FunctionInterface
-  CompositionFunction(const InnerType local_func, const OuterType global_func, const std::string nm = static_id())
+  CompositionFunction(const InnerType local_func, const OuterType global_func, const std::string& nm = static_id())
     : inner_function_(local_func)
     , outer_function_(global_func)
     , name_(nm)

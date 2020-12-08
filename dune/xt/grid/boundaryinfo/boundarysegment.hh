@@ -58,7 +58,7 @@ public:
   }
 
   static std::unique_ptr<ThisType>
-  create(const Common::Configuration cfg = boundarysegment_boundaryinfo_default_config())
+  create(const Common::Configuration& cfg = boundarysegment_boundaryinfo_default_config())
   {
     const Common::Configuration default_cfg = boundarysegment_boundaryinfo_default_config();
     // get default

@@ -180,7 +180,7 @@ public:
     return GridProvider<GridType>(factory.createGrid());
   } // ... create(...)
 
-  static GridProvider<GridType> create(const Common::Configuration cfg = default_config())
+  static GridProvider<GridType> create(const Common::Configuration& cfg = default_config())
   {
     return create(cfg.get("filename_prefix", default_config().template get<std::string>("filename_prefix")));
   }

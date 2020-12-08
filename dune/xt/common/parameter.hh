@@ -49,7 +49,7 @@ public:
 
   SimpleDict& operator=(const SimpleDict& other) = default;
 
-  SimpleDict& operator=(SimpleDict&& source)
+  SimpleDict& operator=(SimpleDict&& source) noexcept
   {
     dict_ = std::move(source.dict_);
     keys_ = std::move(source.keys_);

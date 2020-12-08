@@ -38,7 +38,7 @@ public:
   {
     if (std::find(opts.begin(), opts.end(), type) == opts.end()) {
       std::stringstream ss;
-      for (auto opt : opts)
+      for (const auto& opt : opts)
         ss << opt << " ";
       DUNE_THROW(Common::Exceptions::configuration_error,
                  "Given type '" << type << "' not supported (see below for a list of supported ones). "
@@ -99,7 +99,7 @@ public:
                    << Common::Typename<MatrixType>::value() << "'!");
   }
 
-  static Common::Configuration options(const std::string /*type*/ = "")
+  static Common::Configuration options(const std::string& /*type*/ = "")
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "

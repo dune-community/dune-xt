@@ -203,7 +203,7 @@ private:
 public:
   VisualizationAdapter(const GridFunctionType& grid_function,
                        const VisualizerInterface<range_dim, range_dim_cols, RangeField>& visualizer,
-                       const std::string nm = "",
+                       const std::string& nm = "",
                        const XT::Common::Parameter& param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
@@ -213,7 +213,7 @@ public:
   {}
 
   VisualizationAdapter(const GridFunctionType& grid_function,
-                       const std::string nm = "",
+                       const std::string& nm = "",
                        const XT::Common::Parameter& param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
@@ -266,7 +266,7 @@ private:
 public:
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const VisualizerInterface<d, 1, RangeField>& visualizer,
-                               const std::string nm = "",
+                               const std::string& nm = "",
                                const XT::Common::Parameter& param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
@@ -279,7 +279,7 @@ public:
   }
 
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
-                               const std::string nm = "",
+                               const std::string& nm = "",
                                const XT::Common::Parameter& param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())

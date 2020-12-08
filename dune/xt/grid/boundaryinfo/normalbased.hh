@@ -163,7 +163,7 @@ public:
                           const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix, logging_state)
     , tol_(tol)
-    , default_boundary_type_(std::move(default_boundary_type))
+    , default_boundary_type_(default_boundary_type)
   {
     LOG_(debug) << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_
                 << ")" << std::endl;
@@ -202,7 +202,7 @@ public:
         DUNE_THROW(InvalidStateException, "Given normals are too close for given tolerance '" << tol_ << "'!");
     }
     LOG_(debug) << "  does not coincide with already registered normal, registering." << std::endl;
-    normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(std::move(boundary_type)));
+    normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(boundary_type));
   } // ... void register_new_normal(...)
 
   const BoundaryType& type(const IntersectionType& intersection) const override final

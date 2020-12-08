@@ -98,7 +98,7 @@ public:
 
   GeneralizedEigenSolverBase(const MatrixType& lhs_matrix,
                              const MatrixType& rhs_matrix,
-                             const Common::Configuration opts)
+                             const Common::Configuration& opts)
     : lhs_matrix_(lhs_matrix)
     , rhs_matrix_(rhs_matrix)
     , stored_options_(opts)

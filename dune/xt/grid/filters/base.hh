@@ -19,6 +19,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/grid/common/partitionset.hh>
+#include <utility>
 
 namespace Dune::XT::Grid {
 namespace internal {
@@ -204,7 +205,7 @@ public:
                              std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(right.copy())
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   CombinedIntersectionFilter(const BaseType& left,
@@ -212,7 +213,7 @@ public:
                              std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   CombinedIntersectionFilter(const BaseType& left,
@@ -220,7 +221,7 @@ public:
                              std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   IntersectionFilter<GridViewType>* copy() const override final
@@ -254,7 +255,7 @@ public:
                         std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(right.copy())
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   CombinedElementFilter(const BaseType& left,
@@ -262,7 +263,7 @@ public:
                         std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   CombinedElementFilter(const BaseType& left,
@@ -270,7 +271,7 @@ public:
                         std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
-    , combine_lambda_(combine_lambda)
+    , combine_lambda_(std::move(combine_lambda))
   {}
 
   ElementFilter<GridViewType>* copy() const override final

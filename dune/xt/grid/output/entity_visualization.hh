@@ -28,6 +28,7 @@
 #include <dune/xt/grid/boundaryinfo/types.hh>
 #include <dune/xt/grid/capabilities.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Grid {
 
@@ -59,8 +60,8 @@ struct ElementVisualization
   {
   public:
     using Element = extract_entity_t<GridViewType>;
-    FunctorBase(std::string filename = "Functor", const std::string dirname = ".")
-      : filename_(filename)
+    FunctorBase(std::string filename = "Functor", const std::string& dirname = ".")
+      : filename_(std::move(filename))
       , dir_(dirname)
     {}
 
@@ -93,7 +94,7 @@ struct ElementVisualization
   {
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    VolumeFunctor(std::string filename = "VolumeFunctor", const std::string dirname = ".")
+    VolumeFunctor(const std::string& filename = "VolumeFunctor", const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
     {}
 
@@ -108,7 +109,7 @@ struct ElementVisualization
   {
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    ProcessIdFunctor(std::string filename = "ProcessIDFunctor", const std::string dirname = ".")
+    ProcessIdFunctor(const std::string& filename = "ProcessIDFunctor", const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
     {}
 
@@ -126,8 +127,8 @@ struct ElementVisualization
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
     BoundaryIDFunctor(const GridViewType& view,
-                      std::string filename = "BoundaryIDFunctor",
-                      const std::string dirname = ".")
+                      const std::string& filename = "BoundaryIDFunctor",
+                      const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
       , gridview_(view)
     {}
@@ -160,8 +161,8 @@ struct ElementVisualization
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
     BoundaryIDFunctor(const GridViewType& view,
-                      std::string filename = "BoundaryIDFunctor",
-                      const std::string dirname = ".")
+                      const std::string& filename = "BoundaryIDFunctor",
+                      const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
       , gridview_(view)
     {
@@ -187,11 +188,11 @@ struct ElementVisualization
     BoundaryTypeFunctor(const GridViewType& view,
                         const BoundaryInfoType& boundaryInfo,
                         std::string type,
-                        std::string filename = "BoundaryTypeFunctor",
-                        const std::string dirname = ".")
+                        const std::string& filename = "BoundaryTypeFunctor",
+                        const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
       , gridview_(view)
-      , type_(type)
+      , type_(std::move(type))
       , boundaryInfo_(boundaryInfo)
     {}
 
@@ -218,7 +219,7 @@ struct ElementVisualization
 
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    AreaMarker(std::string filename = "AreaFunctor", const std::string dirname = ".")
+    AreaMarker(const std::string& filename = "AreaFunctor", const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
     {}
 
@@ -250,7 +251,7 @@ struct ElementVisualization
   {
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    GeometryFunctor(std::string filename = "GeometryFunctor", const std::string dirname = ".")
+    GeometryFunctor(const std::string& filename = "GeometryFunctor", const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
     {}
 
@@ -276,7 +277,7 @@ struct ElementVisualization
   {
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    PartitionTypeFunctor(std::string filename = "PartitionTypeFunctor", const std::string dirname = ".")
+    PartitionTypeFunctor(const std::string& filename = "PartitionTypeFunctor", const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
     {}
 
@@ -295,7 +296,9 @@ struct ElementVisualization
 
   public:
     using Element = typename FunctorBase<GridViewType>::Element;
-    IndexFunctor(const GridViewType& view, std::string filename = "IndexFunctor", const std::string dirname = ".")
+    IndexFunctor(const GridViewType& view,
+                 const std::string& filename = "IndexFunctor",
+                 const std::string& dirname = ".")
       : FunctorBase<GridViewType>(filename, dirname)
       , gridview_(view)
     {}
@@ -309,7 +312,7 @@ struct ElementVisualization
 
   //! supply functor
   template <class Grid>
-  static void all(const Grid& grid, const std::string outputDir = "visualisation")
+  static void all(const Grid& grid, const std::string& outputDir = "visualisation")
   {
     // make function objects
     BoundaryIDFunctor<Grid> boundaryFunctor(grid, "boundaryFunctor", outputDir);
@@ -331,7 +334,7 @@ struct ElementVisualization
 };
 
 template <class GridType>
-void visualize_index_per_level(const GridType& grid_, std::string filename)
+void visualize_index_per_level(const GridType& grid_, const std::string& filename)
 {
   if (GridType::dimension > 3)
     DUNE_THROW(NotImplemented, "For grids of dimension > 3!");

@@ -16,6 +16,7 @@
 // #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/filesystem.hh>
+#include <utility>
 
 #include "logging.hh"
 
@@ -44,7 +45,7 @@ Logging::~Logging()
   deinit();
 }
 
-void Logging::create(int logflags, const std::string logfile, const std::string datadir, const std::string _logdir)
+void Logging::create(int logflags, const std::string& logfile, const std::string& datadir, const std::string& _logdir)
 {
   using namespace boost::filesystem;
   const auto& comm = Dune::MPIHelper::getCollectiveCommunication();
@@ -72,7 +73,7 @@ void Logging::create(int logflags, const std::string logfile, const std::string 
 void Logging::set_prefix(std::string prefix)
 {
   deinit();
-  create(logflags_, prefix);
+  create(logflags_, std::move(prefix));
 } // set_prefix
 
 void Logging::set_stream_flags(int streamID, int flags)

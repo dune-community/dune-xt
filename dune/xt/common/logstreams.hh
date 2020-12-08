@@ -149,7 +149,7 @@ class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_tr
   using BaseType = std::basic_stringbuf<char, std::char_traits<char>>;
 
 public:
-  TimedPrefixedStreamBuffer(const Timer& timer, const std::string prefix, std::ostream& out = std::cout);
+  TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out = std::cout);
 
   virtual int sync();
 
@@ -238,7 +238,7 @@ class TimedPrefixedLogStream
   using OstreamBaseType = std::basic_ostream<char, std::char_traits<char>>;
 
 public:
-  TimedPrefixedLogStream(const Timer& timer, const std::string prefix, std::ostream& outstream);
+  TimedPrefixedLogStream(const Timer& timer, const std::string& prefix, std::ostream& outstream);
 
   virtual ~TimedPrefixedLogStream();
 }; // TimedPrefixedLogStream

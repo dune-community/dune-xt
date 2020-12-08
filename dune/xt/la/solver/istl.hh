@@ -126,7 +126,7 @@ public:
     return ret;
   } // ... types(...)
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
@@ -188,7 +188,7 @@ public:
     return SolverOptions<MatrixType, CommunicatorType>::types();
   } // ... types()
 
-  static XT::Common::Configuration options(const std::string type = "")
+  static XT::Common::Configuration options(const std::string& type = "")
   {
     return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)

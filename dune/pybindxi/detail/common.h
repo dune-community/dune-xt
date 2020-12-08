@@ -28,7 +28,11 @@
 #  endif
 #endif
 
-#if !(defined(_MSC_VER) && __cplusplus == 199711L) && !defined(__INTEL_COMPILER)
+#if defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1900
+#  if __cplusplus >= 201402L
+#    define PYBIND11_CPP14
+#  endif
+#elif !(defined(_MSC_VER) && __cplusplus == 199711L)
 #  if __cplusplus >= 201402L
 #    define PYBIND11_CPP14
 #    if __cplusplus >= 201703L
@@ -898,8 +902,8 @@ NAMESPACE_END(detail)
 template <typename T>
 struct format_descriptor<T, detail::enable_if_t<std::is_arithmetic<T>::value>>
 {
-  static constexpr const char c = "?bBhHiIqQfdg"[detail::is_fmt_numeric<T>::index];
-  static constexpr const char value[2] = {c, '\0'};
+  static constexpr char c = "?bBhHiIqQfdg"[detail::is_fmt_numeric<T>::index];
+  static constexpr char value[2] = {c, '\0'};
   static std::string format()
   {
     return std::string(1, c);
@@ -909,7 +913,7 @@ struct format_descriptor<T, detail::enable_if_t<std::is_arithmetic<T>::value>>
 #if !defined(PYBIND11_CPP17)
 
 template <typename T>
-constexpr const char format_descriptor<T, detail::enable_if_t<std::is_arithmetic<T>::value>>::value[2];
+constexpr char format_descriptor<T, detail::enable_if_t<std::is_arithmetic<T>::value>>::value[2];
 
 #endif
 

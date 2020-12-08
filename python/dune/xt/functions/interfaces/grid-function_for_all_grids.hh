@@ -20,7 +20,7 @@
 template <size_t ii>
 struct Int
 {
-  static const constexpr size_t value = ii;
+  static constexpr size_t value = ii;
 };
 
 
@@ -30,12 +30,12 @@ struct GridFunctionInterface_for_all_grids
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
   using GV = typename G::LeafGridView;
   using E = Dune::XT::Grid::extract_entity_t<GV>;
-  static const constexpr size_t d = G::dimension;
+  static constexpr size_t d = G::dimension;
 
   template <size_t r, class Dims = std::tuple<Int<1>, Int<2>, Int<3>>>
   struct for_all_rC
   {
-    static const constexpr size_t rC = Dune::XT::Common::tuple_head_t<Dims>::value;
+    static constexpr size_t rC = Dune::XT::Common::tuple_head_t<Dims>::value;
 
     template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
     struct product_helper // <true, false, ...>
@@ -121,7 +121,7 @@ struct GridFunctionInterface_for_all_grids
   template <class Dims = std::tuple<Int<1>, Int<2>, Int<3>>, bool anything = false>
   struct for_all_r_and_rC
   {
-    static const constexpr size_t r = Dune::XT::Common::tuple_head_t<Dims>::value;
+    static constexpr size_t r = Dune::XT::Common::tuple_head_t<Dims>::value;
 
     static void bind_interface(pybind11::module& m)
     {

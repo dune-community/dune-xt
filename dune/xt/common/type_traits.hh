@@ -207,10 +207,10 @@ std::string demangled_type_id(T& obj)
   return demangle_typename(typeid(obj).name());
 } // demangled_type_id
 
-
+constexpr size_t default_max_highlight_level{1000};
 //! create output for demangled typeid
 template <class T>
-void real_type_id(T& obj, std::string name = "", size_t maxlevel = 10000)
+void real_type_id(T& obj, const std::string& name = "", size_t maxlevel = default_max_highlight_level)
 {
   std::cout << name << (name == "" ? "" : "'s type is ") << highlight_template(demangled_type_id(obj), maxlevel)
             << std::endl;
@@ -439,7 +439,8 @@ template <class T>
 T create_real_or_complex_number(const std::enable_if_t<std::is_arithmetic<T>::value, real_t<T>> real_part,
                                 const real_t<T> imag_part)
 {
-  DUNE_THROW_IF(std::abs(imag_part) > 1e-15,
+  const double minimal_imaginary_abs{1e-15};
+  DUNE_THROW_IF(std::abs(imag_part) > minimal_imaginary_abs,
                 Dune::MathError,
                 "You are trying to create a real number with non-zero imaginary part!");
   return real_part;

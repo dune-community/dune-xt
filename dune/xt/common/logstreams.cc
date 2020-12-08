@@ -78,7 +78,7 @@ int SuspendableStrBuffer::pubsync()
   return 0;
 }
 
-TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, const std::string prefix, std::ostream& out)
+TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out)
   : timer_(timer)
   , prefix_(prefix)
   , out_(out)
@@ -138,7 +138,7 @@ LogStream& LogStream::flush()
   return *this;
 }
 
-TimedPrefixedLogStream::TimedPrefixedLogStream(const Timer& timer, const std::string prefix, std::ostream& outstream)
+TimedPrefixedLogStream::TimedPrefixedLogStream(const Timer& timer, const std::string& prefix, std::ostream& outstream)
   : StorageBaseType(new TimedPrefixedStreamBuffer(timer, prefix, outstream))
   , OstreamBaseType(&this->access())
 {}

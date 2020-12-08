@@ -106,7 +106,7 @@ public:
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
                      const size_t ord,
-                     const std::string nm = static_id())
+                     const std::string& nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
@@ -129,7 +129,7 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const size_t ord,
-                     const std::string nm = static_id())
+                     const std::string& nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
@@ -274,7 +274,7 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::Configuration defaults(const std::string sub_name = "")
+  static Common::Configuration defaults(const std::string& sub_name = "")
   {
     Common::Configuration config;
     config["type"] = static_id();
@@ -307,7 +307,7 @@ public:
                      const Common::FieldVector<std::string, r>& expressions,
                      const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
                      const size_t ord,
-                     const std::string nm = static_id())
+                     const std::string& nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
@@ -324,7 +324,7 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldVector<std::string, r>& expressions,
                      const size_t ord,
-                     const std::string nm = static_id())
+                     const std::string& nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
@@ -424,7 +424,7 @@ private:
 #endif // NDEBUG
   } // ... check_value(...)
 
-private:
+
   MathExpressionFunctionType function_;
   size_t order_;
   std::string name_;

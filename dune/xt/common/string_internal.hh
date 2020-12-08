@@ -48,15 +48,14 @@ tokenize(const std::string& msg,
 
 namespace internal {
 
-static inline std::string trim_copy_safely(std::string str_in)
+static inline std::string trim_copy_safely(const std::string& str_in)
 {
   const std::string str_out = boost::algorithm::trim_copy(str_in);
-  if (str_out.find(";") != std::string::npos)
+  if (str_out.find(';') != std::string::npos)
     DUNE_THROW(Exceptions::conversion_error,
                "There was an error while parsing the string below. "
                    << "The value contained a ';': '" << str_out << "'!\n"
-                   << "This usually happens if you try to get a matrix expression with a vector type "
-                   << "or if you are missing the white space after the ';' in a matrix expression!\n");
+                   << "This usually happens if you try to get a matrix expression with a vector type.");
   return str_out;
 } // ... trim_copy_safely(...)
 
@@ -94,7 +93,7 @@ struct Helper
 template <>
 struct Helper<bool>
 {
-  static inline bool convert_from_string(std::string ss)
+  static inline bool convert_from_string(const std::string& ss)
   {
     std::string ss_lower_case = ss;
     std::transform(ss_lower_case.begin(), ss_lower_case.end(), ss_lower_case.begin(), ::tolower);
@@ -138,7 +137,7 @@ DUNE_XT_COMMON_STRING_GENERATE_HELPER(long double, ld)
 template <>
 struct Helper<unsigned int>
 {
-  static inline unsigned int convert_from_string(std::string ss)
+  static inline unsigned int convert_from_string(const std::string& ss)
   {
     try {
       return XT::Common::numeric_cast<unsigned int>(std::stoul(ss));
@@ -163,8 +162,8 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
   using namespace std;
   using T = typename ComplexType::value_type;
   T re(0), im(0);
-  const auto sign_pos = ss.find("+", 1) != string::npos ? ss.find("+", 1) : ss.find("-", 1);
-  auto im_pos = ss.find("i");
+  const auto sign_pos = ss.find('+', 1) != string::npos ? ss.find('+', 1) : ss.find('-', 1);
+  auto im_pos = ss.find('i');
   if (sign_pos == string::npos && im_pos != string::npos) {
     // pure virtual case
     im = convert_from_string<T>(ss.substr(0, im_pos));
@@ -173,7 +172,7 @@ ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const
   }
   if (sign_pos != string::npos) {
     ss = ss.substr(sign_pos);
-    im_pos = ss.find("i");
+    im_pos = ss.find('i');
     if (im_pos == string::npos)
       DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " no imaginary unit");
     im = convert_from_string<T>(ss.substr(0, im_pos));
@@ -187,8 +186,10 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
   using S = typename VectorAbstraction<VectorType>::S;
   DXT_ASSERT(cols == 0);
   // check if this is a vector
+  boost::algorithm::trim(vector_str);
   if (vector_str.substr(0, 1) == "[" && vector_str.substr(vector_str.size() - 1, 1) == "]") {
     vector_str = vector_str.substr(1, vector_str.size() - 2);
+    boost::algorithm::trim(vector_str);
     // we treat this as a vector and split along ' '
     const auto tokens = tokenize<std::string>(vector_str, " ", boost::algorithm::token_compress_on);
     if (size > 0 && tokens.size() < size)
@@ -211,7 +212,8 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
     for (size_t ii = 0; ii < actual_size; ++ii)
       ret[ii] = convert_from_string<S>(trim_copy_safely(tokens[ii]));
     return ret;
-  } // we treat this as a scalar
+  }
+  // we treat this as a scalar
   const auto val = convert_from_string<S>(trim_copy_safely(vector_str));
   const size_t automatic_size = (size == 0 ? 1 : size);
   const size_t actual_size =
@@ -235,8 +237,10 @@ MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const s
 {
   using S = typename MatrixAbstraction<MatrixType>::S;
   // check if this is a matrix
+  boost::algorithm::trim(matrix_str);
   if (matrix_str.substr(0, 1) == "[" && matrix_str.substr(matrix_str.size() - 1, 1) == "]") {
     matrix_str = matrix_str.substr(1, matrix_str.size() - 2);
+    boost::algorithm::trim(matrix_str);
     // we treat this as a matrix and split along ';' to obtain the rows
     const auto row_tokens = tokenize<std::string>(matrix_str, ";", boost::algorithm::token_compress_on);
     if (rows > 0 && row_tokens.size() < rows)
@@ -289,7 +293,8 @@ MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const s
             ret, rr, cc, convert_from_string<S>(trim_copy_safely(column_tokens[cc])));
     }
     return ret;
-  } // we treat this as a scalar
+  }
+  // we treat this as a scalar
   const S val = convert_from_string<S>(trim_copy_safely(matrix_str));
   const size_t automatic_rows = (rows == 0 ? 1 : rows);
   const size_t actual_rows =
@@ -377,7 +382,7 @@ inline std::string convert_to_string(char ss, const std::size_t /*precision*/)
   return std::string(1, ss);
 }
 
-inline std::string convert_to_string(const std::string ss, const std::size_t /*precision*/)
+inline std::string convert_to_string(const std::string& ss, const std::size_t /*precision*/)
 {
   return std::string(ss);
 }

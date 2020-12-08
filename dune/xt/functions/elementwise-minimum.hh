@@ -27,9 +27,9 @@ class ElementwiseMinimumFunctionHelper
   static_assert(is_element_function<FunctionType>::value);
 
 public:
-  static const constexpr size_t d = FunctionType::d;
-  static const constexpr size_t r = FunctionType::r;
-  static const constexpr size_t rC = FunctionType::rC;
+  static constexpr size_t d = FunctionType::d;
+  static constexpr size_t r = FunctionType::r;
+  static constexpr size_t rC = FunctionType::rC;
   using E = typename FunctionType::E;
   using R = typename FunctionType::R;
   using DomainType = Dune::FieldVector<double, d>;
@@ -70,7 +70,7 @@ public:
     }
   };
 
-public:
+
   static R compute(const FunctionType& func, const int order, const XT::Common::Parameter& param)
   {
     return dim_switch<>::compute(func, order, param);
@@ -90,8 +90,8 @@ class ElementwiseMinimumFunction : public GridFunctionInterface<typename SomeFun
   using ThisType = ElementwiseMinimumFunction;
   using BaseType = GridFunctionInterface<typename SomeFunction::E>;
 
-  static const constexpr size_t r_ = SomeFunction::r;
-  static const constexpr size_t rC_ = SomeFunction::rC;
+  static constexpr size_t r_ = SomeFunction::r;
+  static constexpr size_t rC_ = SomeFunction::rC;
 
 public:
   using BaseType::r;
@@ -150,7 +150,7 @@ private:
 public:
   ElementwiseMinimumFunction(GridFunction<E, r_, rC_> some_func,
                              const int search_quadrature_order,
-                             const std::string nm = "ElementwiseMinimumFunction")
+                             const std::string& nm = "ElementwiseMinimumFunction")
     : BaseType()
     , some_func_(some_func.copy_as_grid_function())
     , search_quadrature_order_(search_quadrature_order)

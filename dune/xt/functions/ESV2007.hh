@@ -72,7 +72,7 @@ public:
   } // ... defaults(...)
 
   Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
-                 const std::string nm = "ESV2007Testcase1Force")
+                 const std::string& nm = "ESV2007Testcase1Force")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
@@ -170,7 +170,7 @@ public:
   } // ... defaults(...)
 
   Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
-                         const std::string nm = "ESV2007Testcase1ExactSolution")
+                         const std::string& nm = "ESV2007Testcase1ExactSolution")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
@@ -354,7 +354,7 @@ public:
 
   CutoffFunction(GridFunction<E, d, d, R> diffusion,
                  const RangeFieldType poincare_constant = 1.0 / (M_PI * M_PI),
-                 const std::string nm = "ESV2007CutoffFunction")
+                 const std::string& nm = "ESV2007CutoffFunction")
     : BaseType(diffusion.parameter_type())
     , diffusion_(diffusion.copy_as_grid_function())
     , poincare_constant_(poincare_constant)

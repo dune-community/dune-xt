@@ -45,7 +45,7 @@ public:
     return tps;
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string actual_type = type.empty() ? types()[0] : type;
     internal::ensure_eigen_solver_type(actual_type, types());

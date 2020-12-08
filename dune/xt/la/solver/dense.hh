@@ -42,7 +42,7 @@ public:
     return {"qr.householder"};
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
@@ -76,7 +76,7 @@ public:
     return {"qr.householder"};
   }
 
-  static Common::Configuration options(const std::string type = "")
+  static Common::Configuration options(const std::string& type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());

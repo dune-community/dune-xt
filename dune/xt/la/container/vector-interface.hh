@@ -93,6 +93,14 @@ public:
     return this->as_imp();
   }
 
+  template <class T, class S>
+  derived_type& operator=(const VectorInterface<T, S>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, other.get_entry(ii));
+    return this->as_imp();
+  }
+
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
   /// \{
 
@@ -456,14 +464,6 @@ public:
     return dot(other);
   }
 
-  template <class T, class S>
-  derived_type& operator=(const VectorInterface<T, S>& other)
-  {
-    for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, other.get_entry(ii));
-    return this->as_imp();
-  }
-
   /**
    *  \brief  Adds another vector to this, in-place variant.
    *  \param  other The second summand.
@@ -668,9 +668,10 @@ protected:
       }
     }
   }; // struct complex_switch
-
+#ifndef __clang_analyzer__ // tidy throws away the second line
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
+#endif // __clang_analyzer__
 }; // class VectorInterface
 
 

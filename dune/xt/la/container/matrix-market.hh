@@ -29,7 +29,7 @@ namespace LA {
 
 
 template <class MatrixType>
-MatrixType read_matrix_market(const std::string filename)
+MatrixType read_matrix_market(const std::string& filename)
 {
   using M = XT::Common::MatrixAbstraction<MatrixType>;
   using RealType = typename M::RealType;
@@ -218,7 +218,7 @@ MatrixType read_matrix_market(const std::string filename)
 
 
 template <class MatrixType>
-void write_matrix_market(const MatrixType& mat, const std::string filename, const int precision = 20)
+void write_matrix_market(const MatrixType& mat, const std::string& filename, const int precision = 20)
 {
   using M = XT::Common::MatrixAbstraction<MatrixType>;
   using ScalarType = typename M::ScalarType;

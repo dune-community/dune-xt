@@ -122,11 +122,25 @@ public:
   {}
 
 
-  ConstMatrixView(const ThisType& other) = default;
+  // We cannot copy a view (we could make a shallow copy, but that is error-prone).
+  // However, the MatrixInterface does not compile for non-copyable types, so we fail at runtime here.
+  ConstMatrixView(const ThisType& other)
+    : matrix_(other.matrix_)
+    , first_row_(0)
+    , past_last_row_(0)
+    , first_col_(0)
+    , past_last_col_(0)
+    , pattern_(nullptr)
+  {
+    DUNE_THROW(Dune::NotImplemented, "Copying is disabled, simply create a new view!");
+  }
+
+  // Moving from another view is fine
   ConstMatrixView(ThisType&& other) = default;
-  // No assigment as this is a const view
+  ThisType& operator=(ThisType&& other) = default;
+
+  // No assignment as this is a const view
   ThisType& operator=(const ThisType& other) = delete;
-  ThisType& operator=(ThisType&& other) = delete;
 
   inline ThisType copy() const
   {
@@ -330,11 +344,22 @@ public:
     , matrix_(matrix)
   {}
 
-  MatrixView(const ThisType& other) = default;
-  MatrixView(ThisType&& other) = default;
-  ThisType& operator=(MatrixView&& other) = default;
+  // We cannot copy a view (we could make a shallow copy, but that is error-prone).
+  // However, the MatrixInterface does not compile for non-copyable types, so we fail at runtime here.
+  MatrixView(const ThisType& other)
+    : const_matrix_view_(other.const_matrix_view_)
+    , matrix_(other.matrix_)
+  {
+    DUNE_THROW(Dune::NotImplemented, "Copying is disabled, simply create a new view!");
+  }
 
-  ThisType& operator=(const Matrix& other)
+  // Moving from another view is fine
+  MatrixView(ThisType&& other) = default;
+  ThisType& operator=(ThisType&& other) = default;
+
+  // Allow copy assignment from any dune-xt-la matrix
+  template <class Mat>
+  std::enable_if_t<XT::LA::is_matrix<Mat>::value, ThisType>& operator=(const Mat& other)
   {
     const auto& patt = get_pattern();
     assert(pattern_assignable(other));
@@ -342,6 +367,12 @@ public:
       for (auto&& jj : patt.inner(ii))
         set_entry(ii, jj, other.get_entry(ii, jj));
     return *this;
+  }
+
+  // Ensure assignment from another view copies the contents
+  ThisType& operator=(const ThisType& other)
+  {
+    return operator=<ThisType>(other);
   }
 
   inline ThisType copy() const

@@ -69,7 +69,7 @@ void print_row_sparsely(const M& self, const size_t row, std::stringstream& ss)
     ss << self.get_entry(row, 0);
   for (size_t ii = 1; ii < std::min(size_t(3), self.cols()); ++ii)
     ss << " " << self.get_entry(row, ii);
-  if (self.cols() > 8) {
+  if (self.cols() > max_python_print_rows) {
     ss << " ...";
   } else {
     for (ssize_t ii = std::min(size_t(3), self.cols()); ii < ssize_t(self.cols()) - 3; ++ii)
@@ -120,7 +120,7 @@ auto bind_Matrix(pybind11::module& m)
           internal::print_row_sparsely(self, ii, ss);
           ss << "\n";
         }
-        if (self.rows() > 8) {
+        if (self.rows() > max_python_print_rows) {
           ss << "   ...\n";
         } else {
           for (ssize_t ii = std::min(size_t(3), self.rows()); ii < ssize_t(self.rows()) - 3; ++ii) {

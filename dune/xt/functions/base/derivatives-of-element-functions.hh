@@ -35,7 +35,7 @@ private:
   using D = typename ElementFunctionType::D;
   static constexpr size_t d = ElementFunctionType::d;
 
-private:
+
   template <class F>
   class DimSwitch
   {

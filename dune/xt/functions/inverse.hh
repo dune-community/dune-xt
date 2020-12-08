@@ -40,7 +40,7 @@ public:
   using DomainType = Dune::FieldVector<double, d>;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
 
-public:
+
   static constexpr bool available = (FunctionType::rC == FunctionType::r);
 
   static RangeReturnType compute(const RangeReturnType& value)
@@ -212,8 +212,8 @@ class InverseGridFunction
   static_assert(is_grid_function<GridFunctionType>::value);
 
   using Helper = internal::InverseFunctionHelper<GridFunctionType>;
-  static const constexpr size_t r_ = GridFunctionType::r;
-  static const constexpr size_t rC_ = GridFunctionType::rC;
+  static constexpr size_t r_ = GridFunctionType::r;
+  static constexpr size_t rC_ = GridFunctionType::rC;
 
 public:
   using ThisType = InverseGridFunction;
@@ -225,13 +225,13 @@ public:
   using typename BaseType::LocalFunctionType;
   using typename BaseType::R;
 
-  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string nm = "")
+  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string& nm = "")
     : func_(func.copy_as_grid_function())
     , order_(ord)
     , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)
   {}
 
-  InverseGridFunction(GridFunctionInterface<E, r_, rC_, R>&& func, const int ord, const std::string nm = "")
+  InverseGridFunction(GridFunctionInterface<E, r_, rC_, R>&& func, const int ord, const std::string& nm = "")
     : func_(std::move(func))
     , order_(ord)
     , name_(nm.empty() ? ("inverse of " + func_->name()) : nm)

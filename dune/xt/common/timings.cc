@@ -34,13 +34,14 @@
 #include <dune/xt/common/disable_warnings.hh>
 #include <boost/format.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
+#include <utility>
 
 namespace Dune::XT::Common {
 
 
 TimingData::TimingData(std::string _name)
   : timer_(new boost::timer::cpu_timer)
-  , name(_name)
+  , name(std::move(_name))
 {
   timer_->start();
 }
@@ -58,7 +59,7 @@ TimingData::DeltaType TimingData::delta() const
   return {{cast(elapsed.wall * scale), cast(elapsed.user * scale), cast(elapsed.system * scale)}};
 }
 
-void Timings::reset(std::string section_name)
+void Timings::reset(const std::string& section_name)
 {
   try {
     stop(section_name);
@@ -68,7 +69,7 @@ void Timings::reset(std::string section_name)
   commited_deltas_[section_name] = {{0, 0, 0}};
 }
 
-void Timings::start(std::string section_name)
+void Timings::start(const std::string& section_name)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -85,7 +86,7 @@ void Timings::start(std::string section_name)
   DXTC_LIKWID_BEGIN_SECTION(section_name)
 } // StartTiming
 
-long Timings::stop(std::string section_name)
+long Timings::stop(const std::string& section_name)
 {
   DXTC_LIKWID_END_SECTION(section_name)
   if (known_timers_map_.find(section_name) == known_timers_map_.end())
@@ -106,10 +107,10 @@ long Timings::stop(std::string section_name)
 
 TimingData::TimeType Timings::walltime(std::string section_name) const
 {
-  return delta(section_name)[0];
+  return delta(std::move(section_name))[0];
 }
 
-TimingData::DeltaType Timings::delta(std::string section_name) const
+TimingData::DeltaType Timings::delta(const std::string& section_name) const
 {
   DeltaMap::const_iterator section = commited_deltas_.find(section_name);
   if (section == commited_deltas_.end()) {
@@ -140,7 +141,7 @@ void Timings::reset()
 
 void Timings::set_outputdir(std::string dir)
 {
-  output_dir_ = dir;
+  output_dir_ = std::move(dir);
   test_create_directory(output_dir_);
 }
 
@@ -227,7 +228,8 @@ OutputScopedTiming::OutputScopedTiming(const std::string& section_name, std::ost
 OutputScopedTiming::~OutputScopedTiming()
 {
   const auto duration = timings().stop(section_name_);
-  out_ << "Executing " << section_name_ << " took " << duration / 1000.f << "s\n";
+  const double millis_per_s{1000.f};
+  out_ << "Executing " << section_name_ << " took " << duration / millis_per_s << "s\n";
 }
 
 

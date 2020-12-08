@@ -175,11 +175,13 @@ private:
   std::vector<RngType> rngs_;
 };
 
+constexpr size_t default_rng_string_length{12};
+
 template <>
 class DefaultRNG<std::string> : public RandomStrings
 {
 public:
-  DefaultRNG(size_t ilength = 12, std::random_device::result_type seed = std::random_device()())
+  DefaultRNG(size_t ilength = default_rng_string_length, std::random_device::result_type seed = std::random_device()())
     : RandomStrings(ilength, seed)
   {}
 };

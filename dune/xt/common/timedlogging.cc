@@ -30,7 +30,6 @@ DefaultLogger::DefaultLogger(const std::string& prfx,
   : prefix(prfx)
   , state(initial_state)
   , copy_count(0)
-  , timer_()
   , colors_(colors)
   , global_timer_(global_timer)
   , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
@@ -48,7 +47,6 @@ DefaultLogger::DefaultLogger(const DefaultLogger& other)
   : prefix(other.prefix)
   , state(other.state)
   , copy_count(other.copy_count + 1)
-  , timer_()
   , colors_(other.colors_)
   , global_timer_(other.global_timer_)
   , info_(
@@ -169,9 +167,9 @@ std::ostream& DefaultLogger::warn()
 
 
 TimedLogManager::TimedLogManager(const Timer& timer,
-                                 const std::string info_prefix,
-                                 const std::string debug_prefix,
-                                 const std::string warning_prefix,
+                                 const std::string& info_prefix,
+                                 const std::string& debug_prefix,
+                                 const std::string& warning_prefix,
                                  const ssize_t max_info_level,
                                  const ssize_t max_debug_level,
                                  const bool enable_warnings,

@@ -113,6 +113,8 @@ void ConvergenceStudy::print_eoc(std::ostream& out,
                                  const std::string& id,
                                  const std::string& target_id) const
 {
+  const int inf_rate_threshold{999};
+  const double expected_rate_tolerance{0.9};
   auto& self = *this;
   const double quantity_old = extract(data, level - 1, type, id);
   if (FloatCmp::eq(quantity_old, 0.))
@@ -123,16 +125,16 @@ void ConvergenceStudy::print_eoc(std::ostream& out,
     const auto target_new = extract(data, level, "target", target_id);
     const double eoc_value = std::log(quantity_new / quantity_old) / std::log(target_new / target_old);
     std::stringstream eoc_str;
-    if (eoc_value < -999)
+    if (eoc_value < -inf_rate_threshold)
       eoc_str << "-inf";
-    else if (eoc_value > 9999)
+    else if (eoc_value > inf_rate_threshold)
       eoc_str << "inf";
     else
       eoc_str << std::setprecision(static_cast<int>(len - /*dot*/ 1 - /*sign*/ (eoc_value > 0 ? 0 : 1)
                                                     - /*prefix*/ std::ceil(std::abs(std::log10(std::abs(eoc_value))))))
               << std::fixed << eoc_value;
     // color string
-    if (eoc_value > (0.9 * self.expected_rate(type, id)))
+    if (eoc_value > (expected_rate_tolerance * self.expected_rate(type, id)))
       out << color_string(lfill(eoc_str.str(), len), Colors::green);
     else if (eoc_value > 0.0)
       out << color_string(lfill(eoc_str.str(), len), Colors::brown);
@@ -208,9 +210,9 @@ ConvergenceStudy::run(const std::vector<std::string>& only_these, std::ostream& 
 #endif // 0
   // - quantities
   for (const auto& id : actual_quantities) {
-    std::string first_row = "";
-    std::string second_row = "";
-    std::string third_row = "";
+    std::string first_row;
+    std::string second_row;
+    std::string third_row;
     auto words = tokenize(id, " ");
     if (id.size() <= column_width) {
       first_row = std::string(column_width, ' ');

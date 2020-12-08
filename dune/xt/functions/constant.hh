@@ -53,7 +53,7 @@ public:
     return config;
   } // ... defaults(...)
 
-  explicit ConstantFunction(const RangeReturnType& value, const std::string nm = "")
+  explicit ConstantFunction(const RangeReturnType& value, const std::string& nm = "")
     : value_(value)
     , name_(nm.empty() ? ((r == 1 && rC == 1) ? std::string("ConstantFunction(" + Common::to_string(value) + ")")
                                               : "ConstantFunction")
@@ -112,7 +112,7 @@ class ConstantGridFunction : public FunctionAsGridFunctionWrapper<E, r, rC, R>
 public:
   using typename BaseType::LocalFunctionType;
 
-  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType value, const std::string nm = "")
+  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType value, const std::string& nm = "")
     : BaseType(ConstantFunction<E::dimension, r, rC, R>(
         value,
         nm.empty() ? ((r == 1 && rC == 1) ? std::string("ConstantGridFunction(" + Common::to_string(value) + ")")
@@ -142,7 +142,7 @@ public:
   using typename BaseType::LocalFunctionType;
 
   ConstantFluxFunction(const typename LocalFunctionType::RangeReturnType constant,
-                       const std::string name_in = static_id())
+                       const std::string& name_in = static_id())
     : constant_function_(constant, name_in)
     , constant_flux_function_(constant_function_)
   {}

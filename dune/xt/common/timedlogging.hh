@@ -62,7 +62,7 @@ class DefaultLogger
   static std::string build_prefix(const std::string& prfx, const size_t cnt, const std::string& clr)
   {
     const std::string actual_color = terminal_supports_color() ? color(clr) : "";
-    std::string copy_count_str = "";
+    std::string copy_count_str;
     if (cnt > 0)
       copy_count_str += "[" + to_string(cnt) + "]";
     std::string ret;
@@ -182,7 +182,7 @@ public:
     LOG_(debug) << "WithLogger(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
-  WithLogger(ThisType&& source)
+  WithLogger(ThisType&& source) noexcept
     : logger(std::move(source.logger))
   {
     LOG_(debug) << "WithLogger(this=" << this << ", source=" << &source << ")" << std::endl;
@@ -198,7 +198,7 @@ public:
     LOG_(debug) << "WithLogger.operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
-  ThisType& operator=(ThisType&& source)
+  ThisType& operator=(ThisType&& source) noexcept
   {
     LOG_(debug) << "WithLogger.operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
@@ -214,9 +214,9 @@ class TimedLogManager
 {
 public:
   TimedLogManager(const Timer& timer,
-                  const std::string info_prefix,
-                  const std::string debug_prefix,
-                  const std::string warning_prefix,
+                  const std::string& info_prefix,
+                  const std::string& debug_prefix,
+                  const std::string& warning_prefix,
                   const ssize_t max_info_level,
                   const ssize_t max_debug_level,
                   const bool enable_warnings,
@@ -472,7 +472,7 @@ public:
     logger_.debug() << class_id_ << "(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
-  ActiveEnableDebugLoggingForCtors(ThisType&& source)
+  ActiveEnableDebugLoggingForCtors(ThisType&& source) noexcept
     : logger_(std::move(source.logger_))
     , class_id_(std::move(source.class_id_))
   {
@@ -489,7 +489,7 @@ public:
     logger_.debug() << class_id_ << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
-  ThisType& operator=(ThisType&& source)
+  ThisType& operator=(ThisType&& source) noexcept
   {
     logger_.debug() << class_id_ << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }

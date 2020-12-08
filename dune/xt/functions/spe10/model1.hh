@@ -110,7 +110,7 @@ public:
              const DomainType& upperRight,
              const RangeFieldType min,
              const RangeFieldType max,
-             const std::string nm,
+             const std::string& nm,
              const RangeType& unit_range)
     : BaseType(lowerLeft,
                upperRight,
@@ -156,7 +156,7 @@ public:
                  const Common::FieldVector<DomainFieldType, domain_dim>& upper_right,
                  const RangeFieldType min = internal::model1_min_value,
                  const RangeFieldType max = internal::model1_max_value,
-                 const std::string nm = BaseType::static_id())
+                 const std::string& nm = BaseType::static_id())
     : BaseType(filename, lower_left, upper_right, min, max, nm, unit_matrix())
   {}
 
