@@ -218,7 +218,7 @@ public:
   operator/(const OtherType& other) const
   {
     LOG_(debug) << "operator/(other=" << &other << ")" << std::endl;
-    return Functions::ProductGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
+    return Functions::FractionGridFunction<ThisType, as_grid_function_interface_t<OtherType>>(
         *this,
         other,
         "(" + this->name() + ")/(" + other.name() + ")",
