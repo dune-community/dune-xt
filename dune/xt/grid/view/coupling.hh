@@ -99,6 +99,28 @@ public:
     return macro_intersection_.unitOuterNormal(local_);
   }
 
+  bool boundary () const
+  {
+    return this->macro_intersection_.boundary();
+  }
+
+  size_t boundarySegmentIndex () const
+  {
+    return this->macro_intersection_.boundarySegmentIndex();
+  }
+
+  //! Compares two intersections for equality. copied from dune/grid/common/intersection
+  bool operator==(const CouplingIntersectionWithCorrectNormal& other) const
+  {
+    DUNE_THROW(NotImplemented,"");
+  }
+
+  //! Compares two intersections for inequality. copied from dune/grid/common/intersection
+  bool operator!=(const CouplingIntersectionWithCorrectNormal& other) const
+  {
+    DUNE_THROW(NotImplemented,"");
+  }
+
 private:
   const MacroIntersectionType& macro_intersection_;
   mutable GlobalCoordinate global_;
