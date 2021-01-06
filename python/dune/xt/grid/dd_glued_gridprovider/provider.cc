@@ -19,14 +19,14 @@
 #include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/la/container/common/vector/dense.hh>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/element.hh>
 #include <dune/xt/grid/exceptions.hh>
-#include <dune/xt/grid/gridprovider/dgf.hh>
-#include <dune/xt/grid/gridprovider/provider.hh>
-#include <dune/xt/grid/gridprovider/coupling.hh>
-#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/filters/intersection.hh>
+#include <dune/xt/grid/gridprovider/dgf.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/mapper.hh>
 #include <dune/xt/functions/generic/grid-function.hh>
 
@@ -213,16 +213,16 @@ public:
   } // ... bind(...)
 }; // class GridProvider
 
-template <class GV>
+template <class CGV>
 class CouplingGridProvider
 {
 public:
-  using type = Dune::XT::Grid::CouplingGridProvider<GV>;
+  using type = Dune::XT::Grid::CouplingGridProvider<CGV>;
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "coupling_grid_provider",
-                         const std::string& grid_id = grid_name<typename GV::MacroGridType>::value())
+                         const std::string& grid_id = grid_name<typename CGV::MacroGridType>::value(),
+                         const std::string& class_id = "coupling_grid_provider")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -241,12 +241,12 @@ struct MacroGridBasedBoundaryInfo
   using GV = typename G::LeafGridView;
   using I = Dune::XT::Grid::extract_intersection_t<GV>;
   using type = Dune::XT::Grid::MacroGridBasedBoundaryInfo<GV, GV>;
-//  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
+  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                   const std::string& class_id = "macro_grid_based_boundary_info",
-                   const std::string& grid_id = grid_name<G>::value())
+                   const std::string& grid_id = grid_name<G>::value(),
+                   const std::string& class_id = "macro_grid_based_boundary_info")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -256,39 +256,12 @@ struct MacroGridBasedBoundaryInfo
     c.def(
         "type",
         [](type& self,
-           const I& intersection)    // no bindings available !!
+           const I& intersection)
             { self.type(intersection); },
         "intersection"_a);
-//    c.def(
-//        py::init([](const Grid::BoundaryType& default_boundary_type, const D& tol, const std::string& logging_prefix) {
-//          return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
-//        }),
-//        "default_boundary_type"_a,
-//        "tolerance"_a = 1e-10,
-//        "logging_prefix"_a = "");
-//    c.def(
-//        "register_new_normal",
-//        [](type& self, const typename type::WorldType& normal, const Grid::BoundaryType& boundary_type) {
-//          self.register_new_normal(normal, boundary_type.copy());
-//        },
-//        "normal"_a,
-//        "boundary_type"_a);
-
-//    m.def(
-//        Common::to_camel_case(class_id).c_str(),
-//        [](const Grid::GridProvider<G>&,
-//           const Grid::BoundaryType& default_boundary_type,
-//           const D& tol,
-//           const std::string& logging_prefix) {
-//          return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
-//        },
-//        "grid_provider"_a,
-//        "default_boundary_type"_a,
-//        "tolerance"_a = 1e-10,
-//        "logging_prefix"_a = "");
     return c;
   } // ... bind(...)
-}; // struct NormalBasedBoundaryInfo_for_all_grids
+}; // struct MacroGridBasedBoundaryInfo
 
 } // namespace Dune::XT::Grid::bindings
 
@@ -314,11 +287,14 @@ struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 // COUPLINGGRIDPROVIDER
 
 using GridGlue2dYaspYasp = Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
-using AvailableGridGlueTypes = std::tuple<GridGlue2dYaspYasp>;
+using GridGlue2dAluSCAluSC = Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
+using GridGlue2dAluCAluC = Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
 
 using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
+using CouplingGridView2dAluSCAluSC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluSCAluSC>;
+using CouplingGridView2dAluCAluC= Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
 
-using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp>;
+using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp,CouplingGridView2dAluSCAluSC,CouplingGridView2dAluCAluC>;
 
 template <class CouplingGridViewTypes = AvailableCouplingGridViewTypes>
 struct CouplingGridProvider_for_all_grids
@@ -337,7 +313,7 @@ struct CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>  // grid-glue only working 2d
+template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
 struct MacroGridBasedBoundaryInfo_for_all_grids
 {
   static void bind(pybind11::module& m)
