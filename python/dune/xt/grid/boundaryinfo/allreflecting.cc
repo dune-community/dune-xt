@@ -15,41 +15,85 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/boundaryinfo/allreflecting.hh>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 using namespace Dune::XT;
 using namespace Dune::XT::Grid::bindings;
 
+namespace Dune::XT::Grid::bindings {
+
+template<class GV>
+class AllReflectingBoundaryInfo
+{
+    using G = Dune::XT::Grid::extract_grid_t<GV>;
+    using I = Dune::XT::Grid::extract_intersection_t<GV>;
+
+  public:
+    using type = Dune::XT::Grid::AllReflectingBoundaryInfo<I>;
+    using bound_type = pybind11::class_<type>;
+
+    static bound_type bind(pybind11::module& m,
+                           const std::string& grid_id = grid_name<G>::value(),
+                           const std::string& layer_id = "",
+                           const std::string& class_id = "all_reflecting_boundary_info")
+    {
+      namespace py = pybind11;
+      using namespace pybind11::literals;
+
+      std::string class_name = class_id;
+      class_name += "_" + grid_id;
+      if (!layer_id.empty())
+        class_name += "_" + layer_id;
+      const auto ClassName = XT::Common::to_camel_case(class_name);
+      bound_type c(m, ClassName.c_str(), ClassName.c_str());
+      c.def(py::init([]() { return std::make_unique<type>(); }));
+      return c;
+    }
+
+    static bound_type bind_leaf_factory(pybind11::module& m,
+                                        const std::string& class_id = "all_reflecting_boundary_info")
+    {
+        using namespace pybind11::literals;
+        // factories
+        m.def(
+            Common::to_camel_case(class_id).c_str(),
+            [](GridProvider<G>&) { return new type(); },
+            "grid_provider"_a);
+    }
+
+    static bound_type bind_coupling_factory(pybind11::module& m,
+                                            const std::string& class_id = "all_reflecting_boundary_info")
+    {
+        using namespace pybind11::literals;
+        // factories
+        m.def(
+            Common::to_camel_case(class_id).c_str(),
+            [](CouplingGridProvider<GV>&) {
+                  return new type(); },
+            "coupling_grid_provider"_a);
+    }
+};
+
+}  // namespace bindings
 
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct AllReflectingBoundaryInfo_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
   using GV = typename G::LeafGridView;
-  using I = Dune::XT::Grid::extract_intersection_t<GV>;
-  using type = Dune::XT::Grid::AllReflectingBoundaryInfo<I>;
-  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
 
-  static void bind(pybind11::module& m,
-                   const std::string& class_id = "all_reflecting_boundary_info",
-                   const std::string& grid_id = grid_name<G>::value())
+  static void bind(pybind11::module& m)
   {
-    namespace py = pybind11;
-    using namespace pybind11::literals;
-
-    auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
-    pybind11::class_<type, base_type> c(m, ClassName.c_str(), ClassName.c_str());
-    c.def(py::init([]() { return std::make_unique<type>(); }));
-
-    m.def(
-        Common::to_camel_case(class_id).c_str(),
-        [](const Grid::GridProvider<G>&) { return type(); },
-        "grid_provider"_a);
-
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<GV>::bind_leaf_factory(m);
     AllReflectingBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -60,6 +104,27 @@ struct AllReflectingBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_null_type
   static void bind(pybind11::module& /*m*/) {}
 };
 
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct AllReflectingBoundaryInfo_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<CGV>::bind_coupling_factory(m);
+    AllReflectingBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct AllReflectingBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
 
 PYBIND11_MODULE(_grid_boundaryinfo_allreflecting, m)
 {
@@ -69,4 +134,6 @@ PYBIND11_MODULE(_grid_boundaryinfo_allreflecting, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_interfaces");
 
   AllReflectingBoundaryInfo_for_all_grids<>::bind(m);
+  AllReflectingBoundaryInfo_for_all_coupling_grids<>::bind(m);
 }
+

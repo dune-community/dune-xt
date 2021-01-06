@@ -15,11 +15,11 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/boundaryinfo/alldirichlet.hh>
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/gridprovider/provider.hh>
-#include <dune/xt/grid/gridprovider/coupling.hh>
-#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/dd/glued.hh>
+#include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
@@ -40,9 +40,9 @@ class AllDirichletBoundaryInfo
     using bound_type = pybind11::class_<type>;
 
     static bound_type bind(pybind11::module& m,
-                           const std::string& class_id = "all_dirichlet_boundary_info",
                            const std::string& grid_id = grid_name<G>::value(),
-                           const std::string& layer_id = "")
+                           const std::string& layer_id = "",
+                           const std::string& class_id = "all_dirichlet_boundary_info")
     {
       namespace py = pybind11;
       using namespace pybind11::literals;
@@ -108,16 +108,14 @@ template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
 struct AllDirichletBoundaryInfo_for_all_coupling_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
-
   using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
   using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
 
   static void bind(pybind11::module& m)
   {
     using Dune::XT::Grid::bindings::grid_name;
-    Dune::XT::Grid::bindings::AllDirichletBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::AllDirichletBoundaryInfo<GV>::bind_coupling_factory(m);
+    Dune::XT::Grid::bindings::AllDirichletBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    Dune::XT::Grid::bindings::AllDirichletBoundaryInfo<CGV>::bind_coupling_factory(m);
     AllDirichletBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -136,6 +134,5 @@ PYBIND11_MODULE(_grid_boundaryinfo_alldirichlet, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_interfaces");
 
   AllDirichletBoundaryInfo_for_all_grids<>::bind(m);
-  // TODO: include CorrectedCouplingIntersection in is_intersection in type traits
-//  AllDirichletBoundaryInfo_for_all_coupling_grids<>::bind(m);
+  AllDirichletBoundaryInfo_for_all_coupling_grids<>::bind(m);
 }

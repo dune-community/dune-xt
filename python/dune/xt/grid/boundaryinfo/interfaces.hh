@@ -14,19 +14,19 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
+#include <dune/xt/grid/type_traits.hh>
 #include <python/dune/xt/common/timedlogging.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class GV>
 class BoundaryInfo
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
   using I = extract_intersection_t<GV>;
 
 public:
@@ -34,13 +34,18 @@ public:
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "boundary_info",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "boundary_info")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
-    auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    std::string class_name = class_id;
+    class_name += "_" + grid_id;
+    if (!layer_id.empty())
+      class_name += "_" + layer_id;
+    const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
     c.def_readonly("logger", &type::logger);
     c.def("__repr__", [](type& self) { return self.str(); });

@@ -10,7 +10,9 @@
 
 #include "config.h"
 
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
 
@@ -20,9 +22,13 @@
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct BoundaryInfo_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::BoundaryInfo<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::BoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
     BoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -33,6 +39,26 @@ struct BoundaryInfo_for_all_grids<Dune::XT::Common::tuple_null_type>
   static void bind(pybind11::module& /*m*/) {}
 };
 
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct BoundaryInfo_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::BoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    BoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct BoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
 
 PYBIND11_MODULE(_grid_boundaryinfo_interfaces, m)
 {
@@ -41,4 +67,5 @@ PYBIND11_MODULE(_grid_boundaryinfo_interfaces, m)
   py::module::import("dune.xt.common.timedlogging");
 
   BoundaryInfo_for_all_grids<>::bind(m);
+  BoundaryInfo_for_all_coupling_grids<>::bind(m);
 }
