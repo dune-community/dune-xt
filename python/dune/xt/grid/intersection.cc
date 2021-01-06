@@ -49,8 +49,8 @@ public:
   using GlobalCoordinateType = FieldVector<D, d>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& layer_id = "",
                          const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
                          const std::string& class_id = "intersection")
   {
     namespace py = pybind11;
