@@ -28,7 +28,7 @@ struct InitlessIntersectionFilter_for_all_grids
   static void bind(pybind11::module& m, const std::string& class_id)
   {
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind(m, class_id);
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind_leaf_factory(m, class_id);
+//    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind_leaf_factory(m, class_id);
     InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
@@ -50,7 +50,7 @@ struct InitlessIntersectionFilter_for_all_coupling_grids
   static void bind(pybind11::module& m, const std::string& class_id)
   {
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id);
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
+//    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
     InitlessIntersectionFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
@@ -72,7 +72,7 @@ struct CustomBoundaryIntersectionFilter_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<GV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<GV>::bind_leaf_factory(m);
+//    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<GV>::bind_leaf_factory(m);
     CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -95,7 +95,7 @@ struct CustomBoundaryIntersectionFilter_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind(m, grid_name<G>::value(), "coupling");
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind_coupling_factory(m);
+//    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind_coupling_factory(m);
     CustomBoundaryIntersectionFilter_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -137,7 +137,7 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_filters_base");
 
 #define BIND_(NAME) InitlessIntersectionFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-#define BIND_(NAME) InitlessIntersectionFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
+//#define BIND_(NAME) InitlessIntersectionFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
 
   BIND_(AllIntersections);
   BIND_(AllIntersectionsOnce);
@@ -156,7 +156,7 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
 #undef BIND_
 
   CustomBoundaryIntersectionFilter_for_all_grids<>::bind(m);
-  CustomBoundaryIntersectionFilter_for_all_coupling_grids<>::bind(m);
+//  CustomBoundaryIntersectionFilter_for_all_coupling_grids<>::bind(m);
 
   GridProvider_for_all_grids<>::bind(m);
 }
