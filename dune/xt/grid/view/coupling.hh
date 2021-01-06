@@ -56,6 +56,9 @@ class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
   using BaseType = CouplingIntersectionType;
 
 public:
+  using Entity = typename MacroIntersectionType::Entity;
+  enum { dimensionworld=MacroIntersectionType::dimensionworld };
+
   using typename BaseType::GlobalCoordinate;
   using typename BaseType::LocalCoordinate;
 
