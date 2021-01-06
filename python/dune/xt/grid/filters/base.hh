@@ -20,24 +20,27 @@
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class GV>
 class ElementFilter
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
 
 public:
   using type = Grid::ElementFilter<GV>;
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "element_filter",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "element_filter")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
     c.def("not", [](type& self) { return !self; });
@@ -51,24 +54,27 @@ public:
 }; // class ElementFilter
 
 
-template <class G>
+template <class GV>
 class IntersectionFilter
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
 
 public:
   using type = Grid::IntersectionFilter<GV>;
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "intersection_filter",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "intersection_filter")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
     c.def("not", [](type& self) { return !self; });

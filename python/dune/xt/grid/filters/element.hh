@@ -15,6 +15,7 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/filters/element.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
@@ -24,33 +25,55 @@ namespace Grid {
 namespace bindings {
 
 
-template <template <class> class Filter, class G>
+template <template <class> class Filter, class GV>
 class InitlessElementFilter
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
 
 public:
   using type = Filter<GV>;
   using base_type = Grid::ElementFilter<GV>;
   using bound_type = pybind11::class_<type, base_type>;
 
-  static bound_type
-  bind(pybind11::module& m, const std::string& class_id, const std::string& grid_id = grid_name<G>::value())
+  static bound_type bind(pybind11::module& m,
+                         const std::string& class_id,
+                         const std::string& layer_id = "",
+                         const std::string& grid_id = grid_name<G>::value())
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
 
-    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return new type(); });
-
     return c;
   } // ... bind(...)
+
+  static bound_type bind_leaf_factory(pybind11::module& m,
+                                      const std::string& class_id)
+  {
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](const GridProvider<G>&) { return new type(); });
+  }
+
+  static bound_type bind_coupling_factory(pybind11::module& m,
+                                          const std::string& class_id = "Walker")
+  {
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](const CouplingGridProvider<GV>&) {
+                return new type(); });
+  }
+
 }; // class InitlessElementFilter
 
 
