@@ -124,7 +124,7 @@ struct NormalBasedBoundaryInfo_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind_leaf_factory(m);
+//    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind_leaf_factory(m);
     NormalBasedBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -146,7 +146,7 @@ struct NormalBasedBoundaryInfo_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
-    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind_coupling_factory(m);
+//    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind_coupling_factory(m);
     NormalBasedBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

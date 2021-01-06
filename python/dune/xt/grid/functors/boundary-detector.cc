@@ -45,6 +45,8 @@ public:
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([](const BoundaryInfo<I>& boundary_info,
                       const BoundaryType& boundary_type,
@@ -133,7 +135,7 @@ struct BoundaryDetectorFunctor_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind_leaf_factory(m);
+//    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind_leaf_factory(m);
     BoundaryDetectorFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -156,7 +158,7 @@ struct BoundaryDetectorFunctor_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
-    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind_coupling_factory(m);
+//    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind_coupling_factory(m);
     BoundaryDetectorFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
