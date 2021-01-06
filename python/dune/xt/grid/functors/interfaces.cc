@@ -10,8 +10,9 @@
 
 #include "config.h"
 
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
-
+#include <dune/xt/grid/view/coupling.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "interfaces.hh"
@@ -20,9 +21,13 @@
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct ElementFunctor_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::ElementFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::ElementFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
     ElementFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -34,12 +39,38 @@ struct ElementFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct ElementFunctor_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::ElementFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    ElementFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct ElementFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct IntersectionFunctor_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::IntersectionFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::IntersectionFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
     IntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -51,12 +82,38 @@ struct IntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
 };
 
 
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct IntersectionFunctor_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::IntersectionFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    IntersectionFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct IntersectionFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct ElementAndIntersectionFunctor_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
     ElementAndIntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -68,9 +125,34 @@ struct ElementAndIntersectionFunctor_for_all_grids<Dune::XT::Common::tuple_null_
 };
 
 
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct ElementAndIntersectionFunctor_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    ElementAndIntersectionFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct ElementAndIntersectionFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
 PYBIND11_MODULE(_grid_functors_interfaces, m)
 {
   ElementFunctor_for_all_grids<>::bind(m);
+  ElementFunctor_for_all_coupling_grids<>::bind(m);
   IntersectionFunctor_for_all_grids<>::bind(m);
+  IntersectionFunctor_for_all_coupling_grids<>::bind(m);
   ElementAndIntersectionFunctor_for_all_grids<>::bind(m);
+  ElementAndIntersectionFunctor_for_all_coupling_grids<>::bind(m);
 }

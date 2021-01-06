@@ -11,7 +11,9 @@
 #include "config.h"
 
 #include <dune/pybindxi/pybind11.h>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/functors/boundary-detector.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
 
@@ -21,11 +23,11 @@
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class GV>
 class BoundaryDetectorFunctor
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
   using I = extract_intersection_t<GV>;
 
 public:
@@ -34,8 +36,9 @@ public:
   using bound_type = pybind11::class_<type, base_type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "boundary_detector_functor",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "boundary_detector_functor")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -71,6 +74,49 @@ public:
 
     return c;
   } // ... bind(...)
+
+  static bound_type bind_leaf_factory(pybind11::module& m,
+                                      const std::string& class_id = "boundary_detector_functor")
+  {
+      namespace py = pybind11;
+      using namespace pybind11::literals;
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](const GridProvider<G>&,
+             const BoundaryInfo<I>& boundary_info,
+             const BoundaryType& boundary_type,
+             const std::string& logging_prefix) {
+          return std::make_unique<type>(boundary_info, boundary_type.copy(), logging_prefix);
+        },
+          "grid_provider"_a,
+          "boundary_info"_a,
+          "boundary_type"_a,
+          "logging_prefix"_a = "",
+          py::keep_alive<0, 2>());
+  }
+
+  static bound_type bind_coupling_factory(pybind11::module& m,
+                                          const std::string& class_id = "boundary_detector_functor")
+  {
+      namespace py = pybind11;
+      using namespace pybind11::literals;
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](const CouplingGridProvider<GV>&,
+             const BoundaryInfo<I>& boundary_info,
+             const BoundaryType& boundary_type,
+             const std::string& logging_prefix) {
+          return std::make_unique<type>(boundary_info, boundary_type.copy(), logging_prefix);
+        },
+          "coupling_grid_provider"_a,
+          "boundary_info"_a,
+          "boundary_type"_a,
+          "logging_prefix"_a = "",
+          py::keep_alive<0, 2>());
+  }
+
 }; // class BoundaryDetectorFunctor
 
 
@@ -80,15 +126,43 @@ public:
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct BoundaryDetectorFunctor_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind_leaf_factory(m);
     BoundaryDetectorFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
 struct BoundaryDetectorFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
+template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
+struct BoundaryDetectorFunctor_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind_coupling_factory(m);
+    BoundaryDetectorFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct BoundaryDetectorFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -104,4 +178,5 @@ PYBIND11_MODULE(_grid_functors_boundary_detector, m)
   py::module::import("dune.xt.grid._grid_functors_interfaces");
 
   BoundaryDetectorFunctor_for_all_grids<>::bind(m);
+  BoundaryDetectorFunctor_for_all_coupling_grids<>::bind(m);
 }

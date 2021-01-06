@@ -11,9 +11,11 @@
 #include "config.h"
 
 #include <dune/pybindxi/pybind11.h>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/functors/refinement.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include "interfaces.hh"
 
@@ -21,11 +23,11 @@
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class GV>
 class MaximumEntityVolumeRefineFunctor
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
   using I = extract_intersection_t<GV>;
 
 public:
@@ -34,14 +36,17 @@ public:
   using bound_type = pybind11::class_<type, base_type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "maximum_element_volume_refine_functor",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "maximum_element_volume_refine_functor")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     const std::string doc{ClassId + "( " + grid_id + " variant)"};
     bound_type c(m, ClassName.c_str(), doc.c_str());
     c.def(py::init([](GridProvider<G>& grid_provider, const double& volume) {
@@ -65,6 +70,38 @@ public:
 
     return c;
   } // ... bind(...)
+
+  static bound_type bind_leaf_factory(pybind11::module& m,
+                                      const std::string& class_id = "maximum_element_volume_refine_functor")
+  {
+      namespace py = pybind11;
+      using namespace pybind11::literals;
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](GridProvider<G>& grid_provider, const double& volume) {
+            return std::make_unique<type>(grid_provider.grid(), volume, 1.);
+          },
+          "grid_provider"_a,
+          "volume"_a,
+          py::keep_alive<0, 1>());
+  }
+
+  static bound_type bind_coupling_factory(pybind11::module& m,
+                                          const std::string& class_id = "maximum_element_volume_refine_functor")
+  {
+      namespace py = pybind11;
+      using namespace pybind11::literals;
+      // factories
+      m.def(
+          Common::to_camel_case(class_id).c_str(),
+          [](CouplingGridProvider<G>& coupling_grid_provider, const double& volume) {
+            return std::make_unique<type>(coupling_grid_provider.grid(), volume, 1.);
+          },
+          "coupling_grid_provider"_a,
+          "volume"_a,
+          py::keep_alive<0, 1>());
+  }
 }; // class MaximumEntityVolumeRefineFunctor
 
 
@@ -74,15 +111,43 @@ public:
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
 struct MaximumEntityVolumeRefineFunctor_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GV = typename G::LeafGridView;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<GV>::bind_leaf_factory(m);
     MaximumEntityVolumeRefineFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
 struct MaximumEntityVolumeRefineFunctor_for_all_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
+
+
+template <class GridTypes = Dune::XT::Grid::Available2dGridTypes>
+struct MaximumEntityVolumeRefineFunctor_for_all_coupling_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
+  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+
+  static void bind(pybind11::module& m)
+  {
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<CGV>::bind_coupling_factory(m);
+    MaximumEntityVolumeRefineFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct MaximumEntityVolumeRefineFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -98,4 +163,5 @@ PYBIND11_MODULE(_grid_functors_refinement, m)
   py::module::import("dune.xt.grid._grid_functors_interfaces");
 
   MaximumEntityVolumeRefineFunctor_for_all_grids<>::bind(m);
+  MaximumEntityVolumeRefineFunctor_for_all_coupling_grids<>::bind(m);
 }
