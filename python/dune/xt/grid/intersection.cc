@@ -19,11 +19,11 @@
 #include <dune/pybindxi/operators.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/print.hh>
-#include <dune/xt/grid/dd/glued.hh>
+#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/common/fvector.hh>
@@ -49,9 +49,9 @@ public:
   using GlobalCoordinateType = FieldVector<D, d>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "intersection",
-                         const std::string& grid_id = XT::Grid::bindings::grid_name<G>::value(),
-                         const std::string& layer_id = "")
+                         const std::string& layer_id = "",
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& class_id = "intersection")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -138,8 +138,6 @@ template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
 struct Intersection_for_all_coupling_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
-
   using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
   using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
 

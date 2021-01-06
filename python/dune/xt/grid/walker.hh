@@ -14,8 +14,8 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/functional.h>
 
-#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/gridprovider/coupling.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/walker.hh>
 
 namespace Dune::XT::Grid::bindings {
@@ -91,7 +91,7 @@ public:
   } // ... addbind_methods(...)
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& grid_id,
+                         const std::string& grid_id = grid_name<G>::value(),
                          const std::string& layer_id = "",
                          const std::string& class_id = "Walker")
   {
@@ -103,7 +103,7 @@ public:
       ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
-    // for CGV, we need to call coupling_view()
+//  // for CGV, we need to call coupling_view()
 //    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
 //          "grid_provider"_a);
 
@@ -134,7 +134,6 @@ public:
                 return new type(coupling_grid_provider.coupling_view()); },
           "coupling_grid_provider"_a);
   }
-
 
 }; // class Walker
 

@@ -13,10 +13,9 @@
 #include "config.h"
 
 #include <dune/pybindxi/pybind11.h>
-#include <python/dune/xt/grid/grids.bindings.hh>
-
 #include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/view/coupling.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "walker.hh"
 
@@ -30,7 +29,6 @@ struct Walker_for_all_grids
   static void bind(pybind11::module& m)
   {
     using Dune::XT::Grid::bindings::grid_name;
-
     Dune::XT::Grid::bindings::Walker<GV>::bind(m, grid_name<G>::value(), "leaf");
 //    Dune::XT::Grid::bindings::Walker<GV>::bind_leaf_factory(m);
     Walker_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
@@ -47,8 +45,6 @@ template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
 struct Walker_for_all_coupling_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
-
   using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
   using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
 
