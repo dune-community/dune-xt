@@ -47,7 +47,7 @@ public:
         "append",
         [](T& self, ElementFunctor<GV>& functor, const ElementFilter<GV>& filter) { self.append(functor, filter); },
         "element_functor"_a,
-        "element_filter"_a = ApplyOn::AllElements<GV>());
+        "element_filter"_a); // = ApplyOn::AllElements<GV>()   TODO
     c.def(
         "append",
         [](T& self, std::function<void(const E&)> generic_element_function, const ElementFilter<GV>& filter) {
@@ -61,7 +61,7 @@ public:
           self.append(functor, filter);
         },
         "intersection_functor"_a,
-        "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
+        "intersection_filter"_a ); //= ApplyOn::AllIntersections<GV>() TODO
     c.def(
         "append",
         [](T& self,
@@ -78,8 +78,8 @@ public:
            const IntersectionFilter<GV>& intersection_filter,
            const ElementFilter<GV>& element_filter) { self.append(functor, intersection_filter, element_filter); },
         "element_and_intersection_functor"_a,
-        "intersection_filter"_a = ApplyOn::AllIntersections<GV>(),
-        "element_filter"_a = ApplyOn::AllElements<GV>());
+        "intersection_filter"_a , // = ApplyOn::AllIntersections<GV>()
+        "element_filter"_a ); // = ApplyOn::AllElements<GV>()
     c.def(
         "walk",
         [](T& self, const bool thread_parallel = false, const bool clear_functors_after_walk = true) {
@@ -112,22 +112,20 @@ public:
     return c;
   } // ... bind(...)
 
-  static bound_type bind_leaf_factory(pybind11::module& m,
-                                      const std::string& class_id = "Walker")
+  static void bind_leaf_factory(pybind11::module& m,
+                                const std::string& class_id = "Walker")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
           "grid_provider"_a);
   }
 
-  static bound_type bind_coupling_factory(pybind11::module& m,
-                                          const std::string& class_id = "Walker")
+  static void bind_coupling_factory(pybind11::module& m,
+                                    const std::string& class_id = "Walker")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](CouplingGridProvider<GV>& coupling_grid_provider) {
