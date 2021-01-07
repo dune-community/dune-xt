@@ -76,8 +76,8 @@ public:
     return c;
   } // ... bind(...)
 
-  static bound_type bind_leaf_factory(pybind11::module& m,
-                                      const std::string& class_id = "boundary_detector_functor")
+  static void bind_leaf_factory(pybind11::module& m,
+                                const std::string& class_id = "boundary_detector_functor")
   {
       namespace py = pybind11;
       using namespace pybind11::literals;
@@ -97,8 +97,8 @@ public:
           py::keep_alive<0, 2>());
   }
 
-  static bound_type bind_coupling_factory(pybind11::module& m,
-                                          const std::string& class_id = "boundary_detector_functor")
+  static void bind_coupling_factory(pybind11::module& m,
+                                    const std::string& class_id = "boundary_detector_functor")
   {
       namespace py = pybind11;
       using namespace pybind11::literals;
@@ -134,7 +134,7 @@ struct BoundaryDetectorFunctor_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
-//    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<GV>::bind_leaf_factory(m);
     BoundaryDetectorFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -157,7 +157,7 @@ struct BoundaryDetectorFunctor_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
-//    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind_coupling_factory(m);
+    Dune::XT::Grid::bindings::BoundaryDetectorFunctor<CGV>::bind_coupling_factory(m);
     BoundaryDetectorFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
