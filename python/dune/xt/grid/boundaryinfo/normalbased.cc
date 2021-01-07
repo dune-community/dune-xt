@@ -72,11 +72,10 @@ class NormalBasedBoundaryInfo
       return c;
     }
 
-    static bound_type bind_leaf_factory(pybind11::module& m,
-                                        const std::string& class_id = "normal_based_boundary_info")
+    static void bind_leaf_factory(pybind11::module& m,
+                                  const std::string& class_id = "normal_based_boundary_info")
     {
         using namespace pybind11::literals;
-
         m.def(
             Common::to_camel_case(class_id).c_str(),
             [](const Grid::GridProvider<G>&,
@@ -91,11 +90,10 @@ class NormalBasedBoundaryInfo
             "logging_prefix"_a = "");
     }
 
-    static bound_type bind_coupling_factory(pybind11::module& m,
-                                            const std::string& class_id = "normal_based_boundary_info")
+    static void bind_coupling_factory(pybind11::module& m,
+                                      const std::string& class_id = "normal_based_boundary_info")
     {
         using namespace pybind11::literals;
-
         m.def(
             Common::to_camel_case(class_id).c_str(),
             [](const CouplingGridProvider<GV>&,
@@ -124,7 +122,7 @@ struct NormalBasedBoundaryInfo_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
-//    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<GV>::bind_leaf_factory(m);
     NormalBasedBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -146,7 +144,7 @@ struct NormalBasedBoundaryInfo_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
-//    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind_coupling_factory(m);
+    Dune::XT::Grid::bindings::NormalBasedBoundaryInfo<CGV>::bind_coupling_factory(m);
     NormalBasedBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

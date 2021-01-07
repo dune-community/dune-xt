@@ -27,7 +27,7 @@ struct InitlessElementFilter_for_all_grids
   static void bind(pybind11::module& m, const std::string& class_id)
   {
     Dune::XT::Grid::bindings::InitlessElementFilter<Filter, GV>::bind(m, class_id, "leaf");
-//    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, GV>::bind_leaf_factory(m, class_id);
+    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, GV>::bind_leaf_factory(m, class_id);
     InitlessElementFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
@@ -48,7 +48,7 @@ struct InitlessElementFilter_for_all_coupling_grids
   static void bind(pybind11::module& m, const std::string& class_id)
   {
     Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind(m, class_id, "coupling");
-//    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
+    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
     InitlessElementFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };

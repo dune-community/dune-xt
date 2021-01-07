@@ -57,22 +57,20 @@ class AllReflectingBoundaryInfo
       return c;
     }
 
-    static bound_type bind_leaf_factory(pybind11::module& m,
-                                        const std::string& class_id = "all_reflecting_boundary_info")
+    static void bind_leaf_factory(pybind11::module& m,
+                                  const std::string& class_id = "all_reflecting_boundary_info")
     {
         using namespace pybind11::literals;
-        // factories
         m.def(
             Common::to_camel_case(class_id).c_str(),
             [](GridProvider<G>&) { return new type(); },
             "grid_provider"_a);
     }
 
-    static bound_type bind_coupling_factory(pybind11::module& m,
-                                            const std::string& class_id = "all_reflecting_boundary_info")
+    static void bind_coupling_factory(pybind11::module& m,
+                                      const std::string& class_id = "all_reflecting_boundary_info")
     {
         using namespace pybind11::literals;
-        // factories
         m.def(
             Common::to_camel_case(class_id).c_str(),
             [](CouplingGridProvider<GV>&) {
@@ -93,7 +91,7 @@ struct AllReflectingBoundaryInfo_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
-//    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<GV>::bind_leaf_factory(m);
     AllReflectingBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -115,7 +113,7 @@ struct AllReflectingBoundaryInfo_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
-//    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<CGV>::bind_coupling_factory(m);
+    Dune::XT::Grid::bindings::AllReflectingBoundaryInfo<CGV>::bind_coupling_factory(m);
     AllReflectingBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

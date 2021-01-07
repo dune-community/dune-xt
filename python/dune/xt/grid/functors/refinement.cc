@@ -71,12 +71,11 @@ public:
     return c;
   } // ... bind(...)
 
-  static bound_type bind_leaf_factory(pybind11::module& m,
-                                      const std::string& class_id = "maximum_element_volume_refine_functor")
+  static void bind_leaf_factory(pybind11::module& m,
+                                const std::string& class_id = "maximum_element_volume_refine_functor")
   {
       namespace py = pybind11;
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](GridProvider<G>& grid_provider, const double& volume) {
@@ -87,12 +86,11 @@ public:
           py::keep_alive<0, 1>());
   }
 
-  static bound_type bind_coupling_factory(pybind11::module& m,
-                                          const std::string& class_id = "maximum_element_volume_refine_functor")
+  static void bind_coupling_factory(pybind11::module& m,
+                                    const std::string& class_id = "maximum_element_volume_refine_functor")
   {
       namespace py = pybind11;
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](CouplingGridProvider<G>& coupling_grid_provider, const double& volume) {
@@ -118,7 +116,7 @@ struct MaximumEntityVolumeRefineFunctor_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<GV>::bind(m, grid_name<G>::value(), "leaf");
-//    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<GV>::bind_leaf_factory(m);
     MaximumEntityVolumeRefineFunctor_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -141,7 +139,7 @@ struct MaximumEntityVolumeRefineFunctor_for_all_coupling_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
-//    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<CGV>::bind_coupling_factory(m);
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<CGV>::bind_coupling_factory(m);
     MaximumEntityVolumeRefineFunctor_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

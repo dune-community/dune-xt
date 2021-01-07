@@ -105,7 +105,7 @@ struct IntersectionFilter_for_all_coupling_grids<Dune::XT::Common::tuple_null_ty
 PYBIND11_MODULE(_grid_filters_base, m)
 {
   ElementFilter_for_all_grids<>::bind(m);
-//  ElementFilter_for_all_coupling_grids<>::bind(m);
+  ElementFilter_for_all_coupling_grids<>::bind(m);
   IntersectionFilter_for_all_grids<>::bind(m);
-//  IntersectionFilter_for_all_coupling_grids<>::bind(m);
+  IntersectionFilter_for_all_coupling_grids<>::bind(m);
 }

@@ -55,21 +55,19 @@ public:
     return c;
   } // ... bind(...)
 
-  static bound_type bind_leaf_factory(pybind11::module& m,
-                                      const std::string& class_id = "bounding_box_functor")
+  static void bind_leaf_factory(pybind11::module& m,
+                                const std::string& class_id = "bounding_box_functor")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](GridProvider<G>&) { return new type(); }, "grid_provider"_a);
   }
 
-  static bound_type bind_coupling_factory(pybind11::module& m,
-                                          const std::string& class_id = "bounding_box_functor")
+  static void bind_coupling_factory(pybind11::module& m,
+                                    const std::string& class_id = "bounding_box_functor")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](CouplingGridProvider<GV>&) { return new type(); }, "coupling_grid_provider"_a);
