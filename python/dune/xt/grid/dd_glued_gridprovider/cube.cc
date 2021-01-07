@@ -32,38 +32,17 @@ struct make_cube_dd_grid
     using D = typename G::ctype;
     static const size_t d = G::dimension;
 
-    m.def("make_cube_dd_grid",
-          [](XT::Grid::GridProvider<G>& macro_grid,
-          const unsigned int num_refinements) {
-      return std::make_unique<XT::Grid::DD::Glued<G,G,XT::Grid::Layers::leaf>>(macro_grid, num_refinements, false, true);
-    },
-    "macro_grid"_a,
-    "num_refinements"_a = 0,
-    py::keep_alive<0, 1>()
-    );
+    m.def(
+        "make_cube_dd_grid",
+        [](XT::Grid::GridProvider<G>& macro_grid, const unsigned int num_refinements) {
+          return std::make_unique<XT::Grid::DD::Glued<G, G, XT::Grid::Layers::leaf>>(
+              macro_grid, num_refinements, false, true);
+        },
+        "macro_grid"_a,
+        "num_refinements"_a = 0,
+        py::keep_alive<0, 1>());
   } // ... bind(...)
 }; // struct make_cube_dd_grid<...>
-
-//template <class G>
-//struct make_cube_dd_grid<G, void>
-//{
-//  static void bind(pybind11::module& m)
-//  {
-//    namespace py = pybind11;
-//    using namespace pybind11::literals;
-//    using D = typename G::ctype;
-//    static const size_t d = G::dimension;
-
-//    m.def("make_cube_dd_grid",
-//          [](XT::Grid::GridProvider<G>& macro_grid,
-//          const unsigned int num_refinements) {
-//      return std::make_unique<XT::Grid::DD::Glued<G,G,XT::Grid::Layers::leaf>>(macro_grid, num_refinements, false, true);
-//    },
-//    "macro_grid"_a,
-//    "num_refinements"_a = 0
-//    );
-//  } // ... bind(...)
-//}; // struct make_cube_dd_grid<..., void>
 
 
 PYBIND11_MODULE(_grid_dd_glued_gridprovider_cube, m)
@@ -74,7 +53,7 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_cube, m)
   py::module::import("dune.xt.grid._grid_dd_glued_gridprovider_provider");
   py::module::import("dune.xt.grid._grid_traits");
 
-//  make_cube_dd_grid<ONED_1D, void>::bind(m);  // so far only 2d grid
+  //  make_cube_dd_grid<ONED_1D, void>::bind(m);  // so far only 2d grid
   make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, Cube>::bind(m);
 //  make_cube_dd_grid<YASP_3D_EQUIDISTANT_OFFSET, Cube>::bind(m);
 #if HAVE_DUNE_ALUGRID
