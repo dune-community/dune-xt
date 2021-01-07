@@ -23,12 +23,20 @@ template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindi
 struct InitlessIntersectionFilter_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
 
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind(m, class_id, "leaf");
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind_leaf_factory(m, class_id);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind(m, class_id, "leaf");
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind_leaf_factory(m, class_id);
+    if constexpr (d == 2) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id, "coupling");
+      Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
+    }
     InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
@@ -40,68 +48,30 @@ struct InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_
 };
 
 
-template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
-struct InitlessIntersectionFilter_for_all_coupling_grids
-{
-  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
-  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
-
-  static void bind(pybind11::module& m, const std::string& class_id)
-  {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id, "coupling");
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
-    InitlessIntersectionFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
-  }
-};
-
-template <template <class> class Filter>
-struct InitlessIntersectionFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_null_type>
-{
-  static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
-};
-
-
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct CustomBoundaryIntersectionFilter_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
 
   static void bind(pybind11::module& m)
   {
     using Dune::XT::Grid::bindings::grid_name;
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<GV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind_leaf_factory(m);
+    if constexpr (d == 2) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind(m, grid_name<G>::value(), "coupling");
+      Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind_coupling_factory(m);
+    }
     CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
 struct CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_null_type>
-{
-  static void bind(pybind11::module& /*m*/) {}
-};
-
-
-template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
-struct CustomBoundaryIntersectionFilter_for_all_coupling_grids
-{
-  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
-  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
-
-  static void bind(pybind11::module& m)
-  {
-    using Dune::XT::Grid::bindings::grid_name;
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind(m, grid_name<G>::value(), "coupling");
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind_coupling_factory(m);
-    CustomBoundaryIntersectionFilter_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
-  }
-};
-
-template <>
-struct CustomBoundaryIntersectionFilter_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -153,24 +123,8 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   BIND_(ProcessIntersections);
 
 #undef BIND_
-#define BIND_(NAME) InitlessIntersectionFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-
-  BIND_(AllIntersections);
-  BIND_(AllIntersectionsOnce);
-  BIND_(NoIntersections);
-  BIND_(InnerIntersections);
-  BIND_(InnerIntersectionsOnce);
-  //  BIND_(PartitionSetInnerIntersectionsOnce); <- requires partition set as template argument
-  BIND_(BoundaryIntersections);
-  BIND_(NonPeriodicBoundaryIntersections);
-  BIND_(PeriodicBoundaryIntersections);
-  BIND_(PeriodicBoundaryIntersectionsOnce);
-  //  BIND_(GenericFilteredIntersections); <- requires lambda in init
-  //  BIND_(CustomBoundaryAndProcessIntersections); <- requires boundary type and info in init
-  BIND_(ProcessIntersections);
 
   CustomBoundaryIntersectionFilter_for_all_grids<>::bind(m);
-  CustomBoundaryIntersectionFilter_for_all_coupling_grids<>::bind(m);
 
   GridProvider_for_all_grids<>::bind(m);
 }

@@ -85,13 +85,20 @@ template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct AllNeumannBoundaryInfo_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
 
   static void bind(pybind11::module& m)
   {
     using Dune::XT::Grid::bindings::grid_name;
-    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<GV>::bind(m, grid_name<G>::value(), "leaf");
-    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<GV>::bind_leaf_factory(m);
+    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<LGV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<LGV>::bind_leaf_factory(m);
+    if constexpr (d == 2) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
+      Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<CGV>::bind_coupling_factory(m);
+    }
     AllNeumannBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -102,27 +109,6 @@ struct AllNeumannBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_null_type>
   static void bind(pybind11::module& /*m*/) {}
 };
 
-template <class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
-struct AllNeumannBoundaryInfo_for_all_coupling_grids
-{
-  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
-  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
-
-  static void bind(pybind11::module& m)
-  {
-    using Dune::XT::Grid::bindings::grid_name;
-    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
-    Dune::XT::Grid::bindings::AllNeumannBoundaryInfo<CGV>::bind_coupling_factory(m);
-    AllNeumannBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
-  }
-};
-
-template <>
-struct AllNeumannBoundaryInfo_for_all_coupling_grids<Dune::XT::Common::tuple_null_type>
-{
-  static void bind(pybind11::module& /*m*/) {}
-};
 
 PYBIND11_MODULE(_grid_boundaryinfo_allneumann, m)
 {
@@ -132,5 +118,4 @@ PYBIND11_MODULE(_grid_boundaryinfo_allneumann, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_interfaces");
 
   AllNeumannBoundaryInfo_for_all_grids<>::bind(m);
-  AllNeumannBoundaryInfo_for_all_coupling_grids<>::bind(m);
 }

@@ -103,34 +103,33 @@ public:
       ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
-//  // for CGV, we need to call coupling_view()
-//    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
-//          "grid_provider"_a);
+    //  // for CGV, we need to call coupling_view()
+    //    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
+    //          "grid_provider"_a);
 
     addbind_methods(c);
 
     return c;
   } // ... bind(...)
 
-  static void bind_leaf_factory(pybind11::module& m,
-                                const std::string& class_id = "Walker")
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
-          "grid_provider"_a);
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
+        "grid_provider"_a);
   }
 
-  static void bind_coupling_factory(pybind11::module& m,
-                                    const std::string& class_id = "Walker")
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](CouplingGridProvider<GV>& coupling_grid_provider) {
-                return new type(coupling_grid_provider.coupling_view()); },
-          "coupling_grid_provider"_a);
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](CouplingGridProvider<GV>& coupling_grid_provider) {
+          return new type(coupling_grid_provider.coupling_view());
+        },
+        "coupling_grid_provider"_a);
   }
 
 }; // class Walker

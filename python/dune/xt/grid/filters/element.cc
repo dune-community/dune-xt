@@ -22,39 +22,26 @@ template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindi
 struct InitlessElementFilter_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
 
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, GV>::bind(m, class_id, "leaf");
-    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, GV>::bind_leaf_factory(m, class_id);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, LGV>::bind(m, class_id, "leaf");
+    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, LGV>::bind_leaf_factory(m, class_id);
+    if constexpr (d == 2) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind(m, class_id, "coupling");
+      Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
+    }
     InitlessElementFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
 
 template <template <class> class Filter>
 struct InitlessElementFilter_for_all_grids<Filter, Dune::XT::Common::tuple_null_type>
-{
-  static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
-};
-
-template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindings::Available2dGridTypes>
-struct InitlessElementFilter_for_all_coupling_grids
-{
-  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GridGlueType = Dune::XT::Grid::DD::Glued<G,G,Dune::XT::Grid::Layers::leaf>;
-  using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
-
-  static void bind(pybind11::module& m, const std::string& class_id)
-  {
-    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind(m, class_id, "coupling");
-    Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
-    InitlessElementFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
-  }
-};
-
-template <template <class> class Filter>
-struct InitlessElementFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/, const std::string& /*class_id*/) {}
 };
@@ -69,15 +56,6 @@ PYBIND11_MODULE(_grid_filters_element, m)
   py::module::import("dune.xt.grid._grid_filters_base");
 
 #define BIND_(NAME) InitlessElementFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-
-  BIND_(AllElements);
-  BIND_(NoElements);
-  BIND_(BoundaryElements);
-  //  BIND_(GenericFilteredElements); <- not initless
-  //  BIND_(PartitionSetElements); <- requires partitionset template parameter
-
-#undef BIND_
-#define BIND_(NAME) InitlessElementFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
 
   BIND_(AllElements);
   BIND_(NoElements);
