@@ -47,7 +47,7 @@ public:
         "append",
         [](T& self, ElementFunctor<GV>& functor, const ElementFilter<GV>& filter) { self.append(functor, filter); },
         "element_functor"_a,
-        "element_filter"_a); // = ApplyOn::AllElements<GV>()   TODO
+        "element_filter"_a = ApplyOn::AllElements<GV>());
     c.def(
         "append",
         [](T& self, std::function<void(const E&)> generic_element_function, const ElementFilter<GV>& filter) {
@@ -61,7 +61,7 @@ public:
           self.append(functor, filter);
         },
         "intersection_functor"_a,
-        "intersection_filter"_a ); //= ApplyOn::AllIntersections<GV>() TODO
+        "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
     c.def(
         "append",
         [](T& self,
@@ -78,8 +78,8 @@ public:
            const IntersectionFilter<GV>& intersection_filter,
            const ElementFilter<GV>& element_filter) { self.append(functor, intersection_filter, element_filter); },
         "element_and_intersection_functor"_a,
-        "intersection_filter"_a , // = ApplyOn::AllIntersections<GV>()
-        "element_filter"_a ); // = ApplyOn::AllElements<GV>()
+        "intersection_filter"_a = ApplyOn::AllIntersections<GV>(),
+        "element_filter"_a = ApplyOn::AllElements<GV>());
     c.def(
         "walk",
         [](T& self, const bool thread_parallel = false, const bool clear_functors_after_walk = true) {

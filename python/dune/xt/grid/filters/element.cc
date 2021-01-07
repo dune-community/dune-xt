@@ -69,7 +69,15 @@ PYBIND11_MODULE(_grid_filters_element, m)
   py::module::import("dune.xt.grid._grid_filters_base");
 
 #define BIND_(NAME) InitlessElementFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-//#define BIND_(NAME) InitlessElementFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
+
+  BIND_(AllElements);
+  BIND_(NoElements);
+  BIND_(BoundaryElements);
+  //  BIND_(GenericFilteredElements); <- not initless
+  //  BIND_(PartitionSetElements); <- requires partitionset template parameter
+
+#undef BIND_
+#define BIND_(NAME) InitlessElementFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
 
   BIND_(AllElements);
   BIND_(NoElements);

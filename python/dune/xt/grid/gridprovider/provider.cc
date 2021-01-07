@@ -27,7 +27,7 @@ struct InitlessIntersectionFilter_for_all_grids
 
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind(m, class_id);
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind(m, class_id, "leaf");
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, GV>::bind_leaf_factory(m, class_id);
     InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
@@ -49,7 +49,7 @@ struct InitlessIntersectionFilter_for_all_coupling_grids
 
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id);
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id, "coupling");
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
     InitlessIntersectionFilter_for_all_coupling_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
@@ -137,7 +137,6 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_filters_base");
 
 #define BIND_(NAME) InitlessIntersectionFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
-//#define BIND_(NAME) InitlessIntersectionFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
 
   BIND_(AllIntersections);
   BIND_(AllIntersectionsOnce);
@@ -154,6 +153,21 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   BIND_(ProcessIntersections);
 
 #undef BIND_
+#define BIND_(NAME) InitlessIntersectionFilter_for_all_coupling_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)
+
+  BIND_(AllIntersections);
+  BIND_(AllIntersectionsOnce);
+  BIND_(NoIntersections);
+  BIND_(InnerIntersections);
+  BIND_(InnerIntersectionsOnce);
+  //  BIND_(PartitionSetInnerIntersectionsOnce); <- requires partition set as template argument
+  BIND_(BoundaryIntersections);
+  BIND_(NonPeriodicBoundaryIntersections);
+  BIND_(PeriodicBoundaryIntersections);
+  BIND_(PeriodicBoundaryIntersectionsOnce);
+  //  BIND_(GenericFilteredIntersections); <- requires lambda in init
+  //  BIND_(CustomBoundaryAndProcessIntersections); <- requires boundary type and info in init
+  BIND_(ProcessIntersections);
 
   CustomBoundaryIntersectionFilter_for_all_grids<>::bind(m);
   CustomBoundaryIntersectionFilter_for_all_coupling_grids<>::bind(m);

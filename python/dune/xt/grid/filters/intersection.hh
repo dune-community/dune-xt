@@ -44,8 +44,10 @@ public:
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
-    if (!layer_id.empty())
+    if (!layer_id.empty()) {
       ClassName += "_" + layer_id;
+      ClassId += "_" + layer_id;
+    }
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
@@ -115,7 +117,6 @@ public:
                                 const std::string& class_id = "apply_on_custom_boundary_intersections")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](const GridProvider<G>&,
@@ -134,7 +135,6 @@ public:
                                     const std::string& class_id = "apply_on_custom_boundary_intersections")
   {
       using namespace pybind11::literals;
-      // factories
       m.def(
           Common::to_camel_case(class_id).c_str(),
           [](const CouplingGridProvider<GV>&,
