@@ -581,5 +581,4 @@ GTEST_TEST(empty, main) {
         }
     }
 
-
 }

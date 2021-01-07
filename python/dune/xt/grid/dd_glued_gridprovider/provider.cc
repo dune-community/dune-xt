@@ -36,7 +36,7 @@
 
 #include <dune/xt/grid/view/coupling.hh>
 
-namespace Dune::XT::Grid{
+namespace Dune::XT::Grid {
 
 template <class MacroGV, class MicroGV>
 class MacroGridBasedBoundaryInfo : public Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MicroGV>>
@@ -111,7 +111,7 @@ template <class MG, class G>
 class GluedGridProvider
 {
 public:
-//  using type = GluedGridProvider<MG, G>;
+  //  using type = GluedGridProvider<MG, G>;
   using type = Grid::DD::Glued<MG, G, XT::Grid::Layers::leaf>;
   using bound_type = pybind11::class_<type>;
 
@@ -134,80 +134,84 @@ public:
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
     c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
-//    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
-//    c.def("local_grid", (typename type::LocalGridProviderType& (type::*)(size_t)) & type::local_grid);
+    //    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
+    //    c.def("local_grid", (typename type::LocalGridProviderType& (type::*)(size_t)) & type::local_grid);
     c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
     c.def_property_readonly("boundary_subdomains", [](type& self) {
-        std::vector<size_t> boundary_subdomains;
-        for (auto&& macro_element : elements(self.macro_grid_view()))
-          if (self.boundary(macro_element))
-            boundary_subdomains.push_back(self.subdomain(macro_element));
-          return boundary_subdomains;
-      });
-    c.def("neighbors", [](type& self, const size_t ss) {
-        DUNE_THROW_IF(ss >= self.num_subdomains(),
+      std::vector<size_t> boundary_subdomains;
+      for (auto&& macro_element : elements(self.macro_grid_view()))
+        if (self.boundary(macro_element))
+          boundary_subdomains.push_back(self.subdomain(macro_element));
+      return boundary_subdomains;
+    });
+    c.def(
+        "neighbors",
+        [](type& self, const size_t ss) {
+          DUNE_THROW_IF(ss >= self.num_subdomains(),
                         XT::Common::Exceptions::index_out_of_range,
                         "ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
-         std::vector<size_t> neighboring_subdomains;
-         for (auto&& macro_element : elements(self.macro_grid_view())) {
-           if (self.subdomain(macro_element) == ss) {
-             for (auto&& macro_intersection : intersections(self.macro_grid_view(), macro_element))
-               if (macro_intersection.neighbor())
-                 neighboring_subdomains.push_back(self.subdomain(macro_intersection.outside()));
-             break;
-           }
-         }
-         return neighboring_subdomains;
-    },
-    "ss"_a);
-    c.def("coupling_grid", [](type& self, const size_t ss, const size_t nn){
-        for (auto&& inside_macro_element : elements(self.macro_grid_view())) {
-          if (self.subdomain(inside_macro_element) == ss) {
-            // this is the subdomain we are interested in
-            bool found_correct_macro_intersection = false;
-            for (auto&& macro_intersection :
-                 intersections(self.macro_grid_view(), inside_macro_element)) {
-              if (macro_intersection.neighbor()) {
-                const auto outside_macro_element = macro_intersection.outside();
-                if (self.subdomain(outside_macro_element) == nn) {
-                  found_correct_macro_intersection = true;
-                  // these are the subdomains we are interested in
-                  auto cgv = Dune::XT::Grid::make_coupling_grid_view<type, ElementType, IntersectionType>(
-                              inside_macro_element, outside_macro_element, self, macro_intersection);
-                  Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
-                  return coupling_provider;
+          std::vector<size_t> neighboring_subdomains;
+          for (auto&& macro_element : elements(self.macro_grid_view())) {
+            if (self.subdomain(macro_element) == ss) {
+              for (auto&& macro_intersection : intersections(self.macro_grid_view(), macro_element))
+                if (macro_intersection.neighbor())
+                  neighboring_subdomains.push_back(self.subdomain(macro_intersection.outside()));
+              break;
+            }
+          }
+          return neighboring_subdomains;
+        },
+        "ss"_a);
+    c.def(
+        "coupling_grid",
+        [](type& self, const size_t ss, const size_t nn) {
+          for (auto&& inside_macro_element : elements(self.macro_grid_view())) {
+            if (self.subdomain(inside_macro_element) == ss) {
+              // this is the subdomain we are interested in
+              bool found_correct_macro_intersection = false;
+              for (auto&& macro_intersection : intersections(self.macro_grid_view(), inside_macro_element)) {
+                if (macro_intersection.neighbor()) {
+                  const auto outside_macro_element = macro_intersection.outside();
+                  if (self.subdomain(outside_macro_element) == nn) {
+                    found_correct_macro_intersection = true;
+                    // these are the subdomains we are interested in
+                    auto cgv = Dune::XT::Grid::make_coupling_grid_view<type, ElementType, IntersectionType>(
+                        inside_macro_element, outside_macro_element, self, macro_intersection);
+                    Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
+                    return coupling_provider;
+                  }
                 }
               }
+              DUNE_THROW_IF(!found_correct_macro_intersection,
+                            XT::Common::Exceptions::index_out_of_range,
+                            "ss = " << ss << "\n   nn = " << nn);
             }
-            DUNE_THROW_IF(!found_correct_macro_intersection,
-                          XT::Common::Exceptions::index_out_of_range,
-                          "ss = " << ss << "\n   nn = " << nn);
           }
-        }
-    },
-    "ss"_a,
-    "nn"_a);
-    c.def("macro_based_boundary_info", [](type& self, const size_t ss) {
-        DUNE_THROW_IF(ss >= self.num_subdomains(),
-                      XT::Common::Exceptions::index_out_of_range,
-                      "ss = " << ss << "\n   self.num_subdomains() = "
-                              << self.num_subdomains());
-        using MGV = typename type::MacroGridViewType;
-        const XT::Grid::AllDirichletBoundaryInfo<XT::Grid::extract_intersection_t<MGV>> macro_boundary_info;
-//        std::unique_ptr<M> subdomain_matrix;
-        for (auto&& macro_element : elements(self.macro_grid_view())) {
-          if (self.subdomain(macro_element) == ss) {
-            // this is the subdomain we are interested in, create space
-//            auto subdomain_grid_view = self.local_grid(macro_element).leaf_view();
-//            using I = typename GV::Intersection;
-//            auto subdomain_space = make_subdomain_space(subdomain_grid_view, space_type);
-            const MacroGridBasedBoundaryInfo<MGV, GV> subdomain_boundary_info(
-                self.macro_grid_view(), macro_element, macro_boundary_info);
-            return subdomain_boundary_info;
+        },
+        "ss"_a,
+        "nn"_a);
+    c.def(
+        "macro_based_boundary_info",
+        [](type& self, const size_t ss) {
+          DUNE_THROW_IF(ss >= self.num_subdomains(),
+                        XT::Common::Exceptions::index_out_of_range,
+                        "ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
+          using MGV = typename type::MacroGridViewType;
+          const XT::Grid::AllDirichletBoundaryInfo<XT::Grid::extract_intersection_t<MGV>> macro_boundary_info;
+          //        std::unique_ptr<M> subdomain_matrix;
+          for (auto&& macro_element : elements(self.macro_grid_view())) {
+            if (self.subdomain(macro_element) == ss) {
+              // this is the subdomain we are interested in, create space
+              //            auto subdomain_grid_view = self.local_grid(macro_element).leaf_view();
+              //            using I = typename GV::Intersection;
+              //            auto subdomain_space = make_subdomain_space(subdomain_grid_view, space_type);
+              const MacroGridBasedBoundaryInfo<MGV, GV> subdomain_boundary_info(
+                  self.macro_grid_view(), macro_element, macro_boundary_info);
+              return subdomain_boundary_info;
+            }
           }
-        }
-    },
-    "ss"_a);
+        },
+        "ss"_a);
     c.def("write_global_visualization", &type::write_global_visualization);
     return c;
   } // ... bind(...)
@@ -230,7 +234,7 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
-    c.def("alive", [](type& self){std::cout << "I am alive" << std::endl;});
+    c.def("alive", [](type& self) { std::cout << "I am alive" << std::endl; });
     return c;
   } // ... bind(...)
 }; // class CouplingGridProvider
@@ -245,8 +249,8 @@ struct MacroGridBasedBoundaryInfo
   using bound_type = pybind11::class_<type>;
 
   static bound_type bind(pybind11::module& m,
-                   const std::string& grid_id = grid_name<G>::value(),
-                   const std::string& class_id = "macro_grid_based_boundary_info")
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& class_id = "macro_grid_based_boundary_info")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -254,11 +258,7 @@ struct MacroGridBasedBoundaryInfo
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
     c.def(
-        "type",
-        [](type& self,
-           const I& intersection)
-            { self.type(intersection); },
-        "intersection"_a);
+        "type", [](type& self, const I& intersection) { self.type(intersection); }, "intersection"_a);
     return c;
   } // ... bind(...)
 }; // struct MacroGridBasedBoundaryInfo
@@ -268,12 +268,13 @@ struct MacroGridBasedBoundaryInfo
 
 #include <dune/xt/grid/grids.hh>
 
-template <class GridTypes = Dune::XT::Grid::Available2dGridTypes>  // grid-glue only working 2d
+template <class GridTypes = Dune::XT::Grid::Available2dGridTypes> // grid-glue only working 2d
 struct GluedGridProvider_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::GluedGridProvider<Dune::XT::Common::tuple_head_t<GridTypes>,Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    Dune::XT::Grid::bindings::GluedGridProvider<Dune::XT::Common::tuple_head_t<GridTypes>,
+                                                Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
     GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -286,15 +287,18 @@ struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 
 // COUPLINGGRIDPROVIDER
 
-using GridGlue2dYaspYasp = Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
-using GridGlue2dAluSCAluSC = Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
+using GridGlue2dYaspYasp =
+    Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
+using GridGlue2dAluSCAluSC =
+    Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
 using GridGlue2dAluCAluC = Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
 
 using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
 using CouplingGridView2dAluSCAluSC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluSCAluSC>;
-using CouplingGridView2dAluCAluC= Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
+using CouplingGridView2dAluCAluC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
 
-using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp,CouplingGridView2dAluSCAluSC,CouplingGridView2dAluCAluC>;
+using AvailableCouplingGridViewTypes =
+    std::tuple<CouplingGridView2dYaspYasp, CouplingGridView2dAluSCAluSC, CouplingGridView2dAluCAluC>;
 
 template <class CouplingGridViewTypes = AvailableCouplingGridViewTypes>
 struct CouplingGridProvider_for_all_grids
@@ -341,7 +345,7 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
   py::module::import("dune.xt.grid._grid_filters_base");
 
-//#undef BIND_
+  //#undef BIND_
   GluedGridProvider_for_all_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
   CouplingGridProvider_for_all_grids<>::bind(m);
