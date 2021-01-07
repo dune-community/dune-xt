@@ -84,7 +84,7 @@ public:
         "grid_provider"_a,
         "volume"_a,
         py::keep_alive<0, 1>());
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m,
                                     const std::string& class_id = "maximum_element_volume_refine_functor")

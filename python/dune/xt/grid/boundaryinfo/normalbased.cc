@@ -87,7 +87,7 @@ public:
         "default_boundary_type"_a,
         "tolerance"_a = 1e-10,
         "logging_prefix"_a = "");
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "normal_based_boundary_info")
   {
@@ -104,8 +104,8 @@ public:
         "default_boundary_type"_a,
         "tolerance"_a = 1e-10,
         "logging_prefix"_a = "");
-  }
-};
+  } // ... bind_coupling_factory(...)
+}; // NormalBasedBoundaryInfo
 
 } // namespace Dune::XT::Grid::bindings
 

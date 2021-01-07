@@ -58,12 +58,12 @@ public:
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id)
   {
     m.def(Common::to_camel_case(class_id).c_str(), [](const GridProvider<G>&) { return new type(); });
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id)
   {
     m.def(Common::to_camel_case(class_id).c_str(), [](const CouplingGridProvider<GV>&) { return new type(); });
-  }
+  } // ... bind_coupling_factory(...)
 }; // class InitlessIntersectionFilter
 
 
@@ -120,7 +120,7 @@ public:
         "boundary_info"_a,
         "boundary_type"_a,
         "logging_prefix"_a = "");
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m,
                                     const std::string& class_id = "apply_on_custom_boundary_intersections")
@@ -136,7 +136,8 @@ public:
         "boundary_info"_a,
         "boundary_type"_a,
         "logging_prefix"_a = "");
-  }
+  } // ... bind_coupling_factory(...)
+
 }; // class CustomBoundaryIntersectionsFilter
 
 

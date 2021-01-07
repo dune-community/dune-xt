@@ -59,7 +59,7 @@ public:
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id)
   {
     m.def(Common::to_camel_case(class_id).c_str(), [](const GridProvider<G>&) { return new type(); });
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {

@@ -94,7 +94,7 @@ public:
         "boundary_type"_a,
         "logging_prefix"_a = "",
         py::keep_alive<0, 2>());
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "boundary_detector_functor")
   {
@@ -113,8 +113,7 @@ public:
         "boundary_type"_a,
         "logging_prefix"_a = "",
         py::keep_alive<0, 2>());
-  }
-
+  } // ... bind_coupling_factory(...)
 }; // class BoundaryDetectorFunctor
 
 

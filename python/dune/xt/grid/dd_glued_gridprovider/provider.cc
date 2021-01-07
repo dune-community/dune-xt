@@ -85,7 +85,7 @@ public:
   const XT::Grid::NoBoundary no_boundary_;
 }; // class MacroGridBasedBoundaryInfo
 
-// Since CouplingIntersectionWithCorrectNormal is not derived from Dune::Intersection, we need this copy here :/
+// Since CouplingIntersectionWithCorrectNormal is not derived from Dune::Intersection, we need this copy here
 template <class C, class I>
 double diameter(const internal::CouplingIntersectionWithCorrectNormal<C, I>& intersection)
 {
@@ -271,10 +271,11 @@ struct MacroGridBasedBoundaryInfo
 template <class GridTypes = Dune::XT::Grid::Available2dGridTypes> // grid-glue only working 2d
 struct GluedGridProvider_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::GluedGridProvider<Dune::XT::Common::tuple_head_t<GridTypes>,
-                                                Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    Dune::XT::Grid::bindings::GluedGridProvider<G, G>::bind(m);
     GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -285,7 +286,6 @@ struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
   static void bind(pybind11::module& /*m*/) {}
 };
 
-// COUPLINGGRIDPROVIDER
 
 using GridGlue2dYaspYasp =
     Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
@@ -303,9 +303,11 @@ using AvailableCouplingGridViewTypes =
 template <class CouplingGridViewTypes = AvailableCouplingGridViewTypes>
 struct CouplingGridProvider_for_all_grids
 {
+  using CGV = Dune::XT::Common::tuple_head_t<CouplingGridViewTypes>;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::CouplingGridProvider<Dune::XT::Common::tuple_head_t<CouplingGridViewTypes>>::bind(m);
+    Dune::XT::Grid::bindings::CouplingGridProvider<CGV>::bind(m);
     CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<CouplingGridViewTypes>>::bind(m);
   }
 };
@@ -320,9 +322,11 @@ struct CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
 struct MacroGridBasedBoundaryInfo_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::MacroGridBasedBoundaryInfo<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    Dune::XT::Grid::bindings::MacroGridBasedBoundaryInfo<G>::bind(m);
     MacroGridBasedBoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
@@ -345,7 +349,6 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
   py::module::import("dune.xt.grid._grid_filters_base");
 
-  //#undef BIND_
   GluedGridProvider_for_all_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
   CouplingGridProvider_for_all_grids<>::bind(m);

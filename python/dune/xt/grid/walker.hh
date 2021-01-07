@@ -119,7 +119,7 @@ public:
         Common::to_camel_case(class_id).c_str(),
         [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
         "grid_provider"_a);
-  }
+  } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
@@ -130,8 +130,7 @@ public:
           return new type(coupling_grid_provider.coupling_view());
         },
         "coupling_grid_provider"_a);
-  }
-
+  } // ... bind_coupling_factory(...)
 }; // class Walker
 
 
