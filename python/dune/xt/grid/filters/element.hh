@@ -48,7 +48,7 @@ public:
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     if (!layer_id.empty())
       ClassName += "_" + layer_id;
-      ClassId += "_" + layer_id;
+    ClassId += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
@@ -56,21 +56,14 @@ public:
     return c;
   } // ... bind(...)
 
-  static void bind_leaf_factory(pybind11::module& m,
-                                const std::string& class_id)
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id)
   {
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](const GridProvider<G>&) { return new type(); });
+    m.def(Common::to_camel_case(class_id).c_str(), [](const GridProvider<G>&) { return new type(); });
   }
 
-  static void bind_coupling_factory(pybind11::module& m,
-                                    const std::string& class_id = "Walker")
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](const CouplingGridProvider<GV>&) {
-                return new type(); });
+    m.def(Common::to_camel_case(class_id).c_str(), [](const CouplingGridProvider<GV>&) { return new type(); });
   }
 
 }; // class InitlessElementFilter

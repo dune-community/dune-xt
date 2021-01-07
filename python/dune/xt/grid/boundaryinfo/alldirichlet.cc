@@ -29,57 +29,52 @@ using namespace Dune::XT::Grid::bindings;
 
 namespace Dune::XT::Grid::bindings {
 
-template<class GV>
+template <class GV>
 class AllDirichletBoundaryInfo
 {
-    using G = Dune::XT::Grid::extract_grid_t<GV>;
-    using I = Dune::XT::Grid::extract_intersection_t<GV>;
+  using G = Dune::XT::Grid::extract_grid_t<GV>;
+  using I = Dune::XT::Grid::extract_intersection_t<GV>;
 
-  public:
-    using type = Dune::XT::Grid::AllDirichletBoundaryInfo<I>;
-    using bound_type = pybind11::class_<type>;
+public:
+  using type = Dune::XT::Grid::AllDirichletBoundaryInfo<I>;
+  using bound_type = pybind11::class_<type>;
 
-    static bound_type bind(pybind11::module& m,
-                           const std::string& grid_id = grid_name<G>::value(),
-                           const std::string& layer_id = "",
-                           const std::string& class_id = "all_dirichlet_boundary_info")
-    {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
+  static bound_type bind(pybind11::module& m,
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "all_dirichlet_boundary_info")
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
 
-      std::string class_name = class_id;
-      class_name += "_" + grid_id;
-      if (!layer_id.empty())
-        class_name += "_" + layer_id;
-      const auto ClassName = XT::Common::to_camel_case(class_name);
-      bound_type c(m, ClassName.c_str(), ClassName.c_str());
-      c.def(py::init([]() { return std::make_unique<type>(); }));
-      return c;
-    }
+    std::string class_name = class_id;
+    class_name += "_" + grid_id;
+    if (!layer_id.empty())
+      class_name += "_" + layer_id;
+    const auto ClassName = XT::Common::to_camel_case(class_name);
+    bound_type c(m, ClassName.c_str(), ClassName.c_str());
+    c.def(py::init([]() { return std::make_unique<type>(); }));
+    return c;
+  }
 
-    static void bind_leaf_factory(pybind11::module& m,
-                                  const std::string& class_id = "all_dirichlet_boundary_info")
-    {
-        using namespace pybind11::literals;
-        m.def(
-            Common::to_camel_case(class_id).c_str(),
-            [](GridProvider<G>&) { return new type(); },
-            "grid_provider"_a);
-    }
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "all_dirichlet_boundary_info")
+  {
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(), [](GridProvider<G>&) { return new type(); }, "grid_provider"_a);
+  }
 
-    static void bind_coupling_factory(pybind11::module& m,
-                                      const std::string& class_id = "all_dirichlet_boundary_info")
-    {
-        using namespace pybind11::literals;
-        m.def(
-            Common::to_camel_case(class_id).c_str(),
-            [](CouplingGridProvider<GV>&) {
-                  return new type(); },
-            "coupling_grid_provider"_a);
-    }
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "all_dirichlet_boundary_info")
+  {
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](CouplingGridProvider<GV>&) { return new type(); },
+        "coupling_grid_provider"_a);
+  }
 };
 
-}  // namespace bindings
+} // namespace Dune::XT::Grid::bindings
 
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct AllDirichletBoundaryInfo_for_all_grids

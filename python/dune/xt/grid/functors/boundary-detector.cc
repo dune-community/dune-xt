@@ -77,44 +77,42 @@ public:
     return c;
   } // ... bind(...)
 
-  static void bind_leaf_factory(pybind11::module& m,
-                                const std::string& class_id = "boundary_detector_functor")
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "boundary_detector_functor")
   {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](const GridProvider<G>&,
-             const BoundaryInfo<I>& boundary_info,
-             const BoundaryType& boundary_type,
-             const std::string& logging_prefix) {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const GridProvider<G>&,
+           const BoundaryInfo<I>& boundary_info,
+           const BoundaryType& boundary_type,
+           const std::string& logging_prefix) {
           return std::make_unique<type>(boundary_info, boundary_type.copy(), logging_prefix);
         },
-          "grid_provider"_a,
-          "boundary_info"_a,
-          "boundary_type"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+        "grid_provider"_a,
+        "boundary_info"_a,
+        "boundary_type"_a,
+        "logging_prefix"_a = "",
+        py::keep_alive<0, 2>());
   }
 
-  static void bind_coupling_factory(pybind11::module& m,
-                                    const std::string& class_id = "boundary_detector_functor")
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "boundary_detector_functor")
   {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](const CouplingGridProvider<GV>&,
-             const BoundaryInfo<I>& boundary_info,
-             const BoundaryType& boundary_type,
-             const std::string& logging_prefix) {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const CouplingGridProvider<GV>&,
+           const BoundaryInfo<I>& boundary_info,
+           const BoundaryType& boundary_type,
+           const std::string& logging_prefix) {
           return std::make_unique<type>(boundary_info, boundary_type.copy(), logging_prefix);
         },
-          "coupling_grid_provider"_a,
-          "boundary_info"_a,
-          "boundary_type"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+        "coupling_grid_provider"_a,
+        "boundary_info"_a,
+        "boundary_type"_a,
+        "logging_prefix"_a = "",
+        py::keep_alive<0, 2>());
   }
 
 }; // class BoundaryDetectorFunctor

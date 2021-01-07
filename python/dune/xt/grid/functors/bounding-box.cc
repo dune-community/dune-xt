@@ -37,8 +37,7 @@ public:
   static bound_type bind(pybind11::module& m,
                          const std::string& grid_id = grid_name<G>::value(),
                          const std::string& layer_id = "",
-                         const std::string& class_id = "bounding_box_functor",
-                         )
+                         const std::string& class_id = "bounding_box_functor", )
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -55,22 +54,20 @@ public:
     return c;
   } // ... bind(...)
 
-  static void bind_leaf_factory(pybind11::module& m,
-                                const std::string& class_id = "bounding_box_functor")
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "bounding_box_functor")
   {
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](GridProvider<G>&) { return new type(); }, "grid_provider"_a);
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(), [](GridProvider<G>&) { return new type(); }, "grid_provider"_a);
   }
 
-  static void bind_coupling_factory(pybind11::module& m,
-                                    const std::string& class_id = "bounding_box_functor")
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "bounding_box_functor")
   {
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](CouplingGridProvider<GV>&) { return new type(); }, "coupling_grid_provider"_a);
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](CouplingGridProvider<GV>&) { return new type(); },
+        "coupling_grid_provider"_a);
   }
 
 }; // class MinMaxCoordinateFunctor

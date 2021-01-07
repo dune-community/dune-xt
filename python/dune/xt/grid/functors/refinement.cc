@@ -74,31 +74,31 @@ public:
   static void bind_leaf_factory(pybind11::module& m,
                                 const std::string& class_id = "maximum_element_volume_refine_functor")
   {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](GridProvider<G>& grid_provider, const double& volume) {
-            return std::make_unique<type>(grid_provider.grid(), volume, 1.);
-          },
-          "grid_provider"_a,
-          "volume"_a,
-          py::keep_alive<0, 1>());
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](GridProvider<G>& grid_provider, const double& volume) {
+          return std::make_unique<type>(grid_provider.grid(), volume, 1.);
+        },
+        "grid_provider"_a,
+        "volume"_a,
+        py::keep_alive<0, 1>());
   }
 
   static void bind_coupling_factory(pybind11::module& m,
                                     const std::string& class_id = "maximum_element_volume_refine_functor")
   {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
-      m.def(
-          Common::to_camel_case(class_id).c_str(),
-          [](CouplingGridProvider<G>& coupling_grid_provider, const double& volume) {
-            return std::make_unique<type>(coupling_grid_provider.grid(), volume, 1.);
-          },
-          "coupling_grid_provider"_a,
-          "volume"_a,
-          py::keep_alive<0, 1>());
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](CouplingGridProvider<G>& coupling_grid_provider, const double& volume) {
+          return std::make_unique<type>(coupling_grid_provider.grid(), volume, 1.);
+        },
+        "coupling_grid_provider"_a,
+        "volume"_a,
+        py::keep_alive<0, 1>());
   }
 }; // class MaximumEntityVolumeRefineFunctor
 
