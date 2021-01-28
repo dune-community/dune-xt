@@ -8,18 +8,16 @@
 # Authors:
 #   Felix Schindler (2013 - 2014, 2016 - 2017, 2019)
 #   René Fritze     (2009, 2015, 2019)
+#   Tobias Leibner  (2020)
 ```
 
-[![Build Status](https://travis-ci.org/dune-community/dune-xt-common.svg?branch=master)](https://travis-ci.org/dune-community/dune-xt-common)
-
-dune-xt-common is an eXTensions module for DUNE (http://www.dune-project.org),
-which is often used together with [dune-xt-grid](https://github.com/dune-community/dune-xt),
-[dune-xt-functions](https://github.com/dune-community/dune-xt) and
-[dune-xt-la](https://github.com/dune-community/dune-xt) in the context of
+dune-xt is an eXTensions module for [DUNE](https://www.dune-project.org),
+which is often used in the context of
 the discretization module [dune-gdt](https://github.com/dune-community/dune-gdt).
 
-There is a paper describing some of the concepts behind these extensions. While
-already dated, most ideas still apply:
+There is a paper describing some of the concepts behind this extension. While
+already dated (in particular, the four modules dune-xt-common, dune-xt-grid, dune-xt-la and dune-xt-functions have been merged into the single dune-xt module),
+most ideas still apply:
 
 ```
 T. Leibner and R. Milk and F. Schindler: "Extending DUNE: The dune-xt modules"
@@ -28,10 +26,11 @@ https://www.doi.org/10.11588/ans.2017.1.27720
 ```
 
 New users may best try out this module by using the git supermodule
-[dune-xt-super](https://github.com/dune-community/dune-xt-super), experienced
+[dune-xt-super](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt-super), experienced
 DUNE users may go ahead.
 
-Please see our [github page](https://github.com/dune-community/dune-xt)
+Please see our [gitlab page](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt)
 for issue tracking and further information. If you want to start hacking, go
-ahead and fork us on github and have a look at the
+ahead and fork us on gitlab (or fork the [github mirror](https://github.com/dune-community/dune-xt)) and
+have a look at the
 [CONTRIBUTING.md](https://github.com/dune-community/dune-xt/blob/master/CONTRIBUTING.md).
