@@ -14,6 +14,7 @@
 #include <string>
 
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune::XT::Grid {
 
