@@ -24,10 +24,11 @@ namespace Dune::XT::Common {
 
 
 DefaultLogger::DefaultLogger(const std::string& prfx,
-                             bool start_disabled,
+                             const std::array<bool, 3>& initial_state,
                              const std::array<std::string, 3>& colors,
                              bool global_timer)
   : prefix(prfx)
+  , state(initial_state)
   , copy_count(0)
   , colors_(colors)
   , global_timer_(global_timer)
@@ -40,13 +41,11 @@ DefaultLogger::DefaultLogger(const std::string& prfx,
   , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                    build_prefix(prfx.empty() ? "warn" : prfx, copy_count, colors_[2]),
                                                    std::cerr))
-  , info_enabled(!start_disabled)
-  , debug_enabled(!start_disabled)
-  , warn_enabled(true)
 {}
 
 DefaultLogger::DefaultLogger(const DefaultLogger& other)
   : prefix(other.prefix)
+  , state(other.state)
   , copy_count(other.copy_count + 1)
   , colors_(other.colors_)
   , global_timer_(other.global_timer_)
@@ -62,15 +61,13 @@ DefaultLogger::DefaultLogger(const DefaultLogger& other)
         std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                  build_prefix(prefix.empty() ? "warn" : prefix, copy_count, colors_[2]),
                                                  std::cerr))
-  , info_enabled(other.info_enabled)
-  , debug_enabled(other.debug_enabled)
-  , warn_enabled(other.warn_enabled)
 {}
 
 DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
 {
   if (&other != this) {
     prefix = other.prefix;
+    state = other.state;
     copy_count = other.copy_count;
     timer_ = other.timer_;
     colors_ = other.colors_;
@@ -87,18 +84,13 @@ DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
         std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                  build_prefix(prefix.empty() ? "warn" : prefix, copy_count, colors_[2]),
                                                  std::cerr);
-    info_enabled = other.info_enabled;
-    debug_enabled = other.debug_enabled;
-    warn_enabled = other.warn_enabled;
   }
   return *this;
 } // ... operator=(...)
 
 void DefaultLogger::enable(const std::string& prfx)
 {
-  info_enabled = true;
-  debug_enabled = true;
-  warn_enabled = true;
+  state = default_logger_state();
   if (!prfx.empty()) {
     prefix = prfx;
     copy_count = 0;
@@ -111,30 +103,64 @@ void DefaultLogger::enable(const std::string& prfx)
   }
 } // ... enable(...)
 
+
+void DefaultLogger::enable_like(const DefaultLogger& other)
+{
+  this->state[0] = other.state[0];
+  this->state[1] = other.state[1];
+  this->state[2] = other.state[2];
+}
+
+std::array<bool, 3> DefaultLogger::get_state_or(const std::array<bool, 3>& other_state) const
+{
+  std::array<bool, 3> ret;
+  ret[0] = this->state[0] || other_state[0];
+  ret[1] = this->state[1] || other_state[1];
+  ret[2] = this->state[2] || other_state[2];
+  return ret;
+}
+
+std::array<bool, 3> DefaultLogger::get_state_and(const std::array<bool, 3>& other_state) const
+{
+  std::array<bool, 3> ret;
+  ret[0] = this->state[0] && other_state[0];
+  ret[1] = this->state[1] && other_state[1];
+  ret[2] = this->state[2] && other_state[2];
+  return ret;
+}
+
+void DefaultLogger::state_or(const std::array<bool, 3>& other_state)
+{
+  state = get_state_or(other_state);
+}
+
+void DefaultLogger::state_and(const std::array<bool, 3>& other_state)
+{
+  state = get_state_and(other_state);
+}
+
 void DefaultLogger::disable()
 {
-  info_enabled = false;
-  debug_enabled = false;
-  warn_enabled = false;
+  state = {{false, false, false}};
 }
 
 std::ostream& DefaultLogger::info()
 {
-  if (info_enabled)
+  if (state[0])
     return *info_;
   return dev_null;
 }
 
 std::ostream& DefaultLogger::debug()
 {
-  if (debug_enabled)
+  if (state[1])
     return *debug_;
   return dev_null;
 }
 
 std::ostream& DefaultLogger::warn()
 {
-  if (warn_enabled)
+  if (state[2])
     return *warn_;
   return dev_null;
 }

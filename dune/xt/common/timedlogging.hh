@@ -47,6 +47,13 @@ DUNE_EXPORT inline const Timer& SecondsSinceStartup()
 }
 
 
+DUNE_EXPORT inline std::array<bool, 3>& default_logger_state()
+{
+  static std::array<bool, 3> state_{{false, false, true}};
+  return state_;
+}
+
+
 /**
  * \brief A logging manager that provides info, debug and warning streams
  */
@@ -69,11 +76,12 @@ class DefaultLogger
 
 public:
   std::string prefix;
+  std::array<bool, 3> state;
   size_t copy_count;
 
   DefaultLogger(const std::string& prfx = "",
-                bool start_disabled = false,
-                const std::array<std::string, 3>& colors = {"blue", "darkgray", "red"},
+                const std::array<bool, 3>& initial_state = default_logger_state(),
+                const std::array<std::string, 3>& colors = {{"blue", "darkgray", "red"}},
                 bool global_timer = true);
 
   DefaultLogger(const DefaultLogger&);
@@ -89,18 +97,32 @@ private:
   std::shared_ptr<std::ostream> warn_;
 
 public:
-  bool info_enabled;
-  bool debug_enabled;
-  bool warn_enabled;
+  bool info_enabled()
+  {
+    return state[0];
+  }
+
+  bool debug_enabled()
+  {
+    return state[1];
+  }
+
+  bool warn_enabled()
+  {
+    return state[2];
+  }
 
   void enable(const std::string& prfx = "");
 
-  void enable_like(const DefaultLogger& other)
-  {
-    this->info_enabled = this->info_enabled || other.info_enabled;
-    this->debug_enabled = this->debug_enabled || other.debug_enabled;
-    this->warn_enabled = this->warn_enabled || other.warn_enabled;
-  }
+  void enable_like(const DefaultLogger& other);
+
+  std::array<bool, 3> get_state_or(const std::array<bool, 3>& other_state) const;
+
+  std::array<bool, 3> get_state_and(const std::array<bool, 3>& other_state) const;
+
+  void state_or(const std::array<bool, 3>& other_state);
+
+  void state_and(const std::array<bool, 3>& other_state);
 
   void disable();
 
@@ -112,19 +134,30 @@ public:
 }; // class DefaultLogger
 
 
+/// \brief Convenience macro for enrivonments with a logger variable
+#ifdef LOG
+#  error Macro LOG already defined, open an issue at https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues !
+#else
+#  define LOG(type)                                                                                                    \
+    if (logger.type##_enabled())                                                                                       \
+    logger.type()
+#endif
+
+/// \brief Convenience macro for classes with a logger member
 #ifdef LOG_
 #  error Macro LOG_ already defined, open an issue at https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues !
 #else
 #  define LOG_(type)                                                                                                   \
-    if (this->logger.type##_enabled)                                                                                   \
+    if (this->logger.type##_enabled())                                                                                 \
     this->logger.type()
 #endif
 
+/// \brief Convenience macro for classes with a logger member (allows to specify BaseType for diamond inheritance)
 #ifdef LOG__
 #  error Macro LOG_ already defined, open an issue at https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues !
 #else
 #  define LOG__(base, type)                                                                                            \
-    if (base ::logger.type##_enabled)                                                                                  \
+    if (base ::logger.type##_enabled())                                                                                \
     base ::logger.type()
 #endif
 
@@ -137,18 +170,8 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-  [[deprecated("Use this.logger.prefix instead (12.08.2020)!")]] static const std::string logging_id;
-
-  [[deprecated("Use WithLogger(id, start_enabled) instead (12.08.2020)!")]] WithLogger(const std::string& /*prefix*/,
-                                                                                       const std::string& id,
-                                                                                       const bool start_enabled = false)
-    : logger(id, start_enabled)
-  {
-    LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
-  }
-
-  WithLogger(const std::string& id, const bool start_enabled = false)
-    : logger(id, start_enabled)
+  WithLogger(const std::string& id, const std::array<bool, 3>& initial_state = {{true, true, true}})
+    : logger(id, initial_state)
   {
     LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
   }
@@ -179,16 +202,8 @@ public:
   {
     LOG_(debug) << "WithLogger.operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
-
-  [[deprecated("Use this.logger.enable_like(other.logger) instead (12.08.2020)!")]] void
-  enable_logging_like(const ThisType& other)
-  {
-    this->logger.enable_like(other.logger);
-  }
 }; // class WithLogger
 
-template <class T>
-const std::string WithLogger<T>::logging_id = "Use this.logger.prefix instead";
 
 /**
  * \brief A logging manager that provides info, debug and warning streams

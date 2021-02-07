@@ -28,26 +28,23 @@ namespace Dune::XT::Functions {
 /**
  * \brief A function given by a lambda expression or std::function which is evaluated locally on each element.
  *
- *        To model the function f(x, u) = x^p * u with a variable exponent p, use as
+ *        To model the function f(x, u) = x[0]^p * u with a variable exponent p, use as
  * \code
-GenericFluxFunction<...> f(
-                           [](const typename F::ElementType& element,
-                              const typename F::DomainType& point_in_local_coordinates,
-                              const typename F::StateType& u,
-                              const XT::Common::Parameter&  param) {
-                             typename F::RangeType ret(std::pow(point_in_local_coordinates[0],
-param.get("power").at(0)));
-                             return ret * u;
-                           },
-                           integration_order,
-                           XT::Common::ParameterType("power", 1),
-                           "x_power_p");
+GenericFluxFunction<...> f([](const auto& param){ return param.get("power").at(0)}, // order
+                           [](const auto& grid_element){ // do nothing }            // post_bind
+                           [](const auto& x, const auto& u, const auto& param)      // evaluate
+                             {
+                               const auto p = param.get("power").at(0);
+                               return u * std::pow(x[0], p);
+                             }
+                           XT::Common::ParameterType("power", 1),                   // parameter_type
+                           "x_power_p");                                            // name
 \endcode
  *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter param which is
  *        passed on to the generic function is of correct type.
  * \note  The Localfunction does not implement derivative.
  */
-template <class E, size_t s, size_t r, size_t rC = 1, class R = double>
+template <class E, size_t s = 1, size_t r = 1, size_t rC = 1, class R = double>
 class GenericFluxFunction : public FluxFunctionInterface<E, s, r, rC, R>
 {
   using BaseType = FluxFunctionInterface<E, s, r, rC, R>;

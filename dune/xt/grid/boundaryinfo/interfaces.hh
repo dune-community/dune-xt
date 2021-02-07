@@ -74,8 +74,9 @@ public:
   using DomainType = Common::FieldVector<DomainFieldType, dimDomain>;
   using WorldType = Common::FieldVector<DomainFieldType, dimWorld>;
 
-  BoundaryInfo(const std::string& log_prefix = "", const bool logging_disabled = true)
-    : Logger(log_prefix.empty() ? "BoundaryInfo" : log_prefix, logging_disabled)
+  BoundaryInfo(const std::string& logging_prefix = "",
+               const std::array<bool, 3>& logging_state = Common::default_logger_state())
+    : Logger(logging_prefix.empty() ? "BoundaryInfo" : logging_prefix, logging_state)
   {}
 
   BoundaryInfo(const ThisType&) = default;
