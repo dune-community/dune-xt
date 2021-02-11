@@ -53,13 +53,9 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_cube, m)
   py::module::import("dune.xt.grid._grid_dd_glued_gridprovider_provider");
   py::module::import("dune.xt.grid._grid_traits");
 
-  //  make_cube_dd_grid<ONED_1D, void>::bind(m);  // so far only 2d grid
   make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, Cube>::bind(m);
-//  make_cube_dd_grid<YASP_3D_EQUIDISTANT_OFFSET, Cube>::bind(m);
 #if HAVE_DUNE_ALUGRID
   make_cube_dd_grid<ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
   make_cube_dd_grid<ALU_2D_CUBE, Cube>::bind(m);
-//  make_cube_dd_grid<ALU_3D_SIMPLEX_CONFORMING, Simplex>::bind(m);
-//  make_cube_dd_grid<ALU_3D_CUBE, Cube>::bind(m);
 #endif
 }

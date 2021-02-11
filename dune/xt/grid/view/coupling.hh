@@ -32,6 +32,10 @@
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+
+namespace Dune::XT::Grid {
+namespace internal {
+
 template <class type>
 struct CompareType
 {
@@ -40,9 +44,6 @@ struct CompareType
     return (std::addressof(one) < std::addressof(other));
   }
 };
-
-namespace Dune::XT::Grid {
-namespace internal {
 
 /**
  * Inherits all types and methods from the coupling intersection, but uses the macro intersection to provide a correctly
@@ -334,13 +335,11 @@ public:
     DUNE_THROW(NotImplemented, "");
   }
 
-  // define IntersectionIterator type
   IntersectionIterator ibegin(const LocalElementType& inside_element) const
   {
     return coupling_intersections_[local_to_inside_index(inside_element)].begin();
   };
 
-  // define IntersectionIterator type
   IntersectionIterator iend(const LocalElementType& inside_element) const
   {
     return coupling_intersections_[local_to_inside_index(inside_element)].end();
@@ -430,14 +429,6 @@ public:
   }
 }; // class CouplingGridView
 
-
-// template <bool codim_iters_provided, class GL>
-// CouplingGridView<GL, codim_iters_provided>
-// make_periodic_grid_view(const GL& base_grid_view,
-//                        const std::bitset<GL::dimension> periodic_directions = std::bitset<GL::dimension>{}.set())
-//{
-//  return CouplingGridView<GL, codim_iters_provided>(base_grid_view, periodic_directions);
-//}
 
 template <class GT, class E, class IT>
 CouplingGridView<GT> make_coupling_grid_view(const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
