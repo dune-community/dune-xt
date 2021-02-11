@@ -270,7 +270,7 @@ public:
          coupling_intersection_it != coupling.template iend<0>();
          ++coupling_intersection_it) {
       auto inside = coupling_intersection_it->inside();
-      inside_elements_ids_.push_back(local_inside_grid_->leaf_view().indexSet().index(inside));
+      inside_elements_ids_.push_back(local_inside_grid_.leaf_view().indexSet().index(inside));
     }
     // some coupling intersection may have the same inside element, remove duplicates
     std::sort(inside_elements_ids_.begin(), inside_elements_ids_.end());
@@ -278,10 +278,10 @@ public:
     inside_elements_ids_.erase(last, inside_elements_ids_.end());
 
     for (auto id = inside_elements_ids_.begin(); id != inside_elements_ids_.end(); ++id) {
-      for (auto el = local_inside_grid_->leaf_view().template begin<0>();
-           el != local_inside_grid_->leaf_view().template end<0>();
+      for (auto el = local_inside_grid_.leaf_view().template begin<0>();
+           el != local_inside_grid_.leaf_view().template end<0>();
            ++el) {
-        if (local_inside_grid_->leaf_view().indexSet().index(*el) == *id) {
+        if (local_inside_grid_.leaf_view().indexSet().index(*el) == *id) {
           // This is the inside element we are searching for.. add it to the vector
           inside_elements_.push_back(*el);
           std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>
@@ -291,7 +291,7 @@ public:
                coupling_intersection_it != coupling.template iend<0>();
                ++coupling_intersection_it) {
             auto inside = coupling_intersection_it->inside();
-            auto inside_id = local_inside_grid_->leaf_view().indexSet().index(inside);
+            auto inside_id = local_inside_grid_.leaf_view().indexSet().index(inside);
             if (inside_id == *id) {
               CorrectedCouplingIntersectionType coupling_intersection(*coupling_intersection_it, macro_intersection_);
               coupling_intersection_set.insert(coupling_intersection);
@@ -303,10 +303,10 @@ public:
     }
     // introduce a local to global map
     for (auto id = inside_elements_ids_.begin(); id != inside_elements_ids_.end(); ++id) {
-      for (auto el = local_inside_grid_->leaf_view().template begin<0>();
-           el != local_inside_grid_->leaf_view().template end<0>();
+      for (auto el = local_inside_grid_.leaf_view().template begin<0>();
+           el != local_inside_grid_.leaf_view().template end<0>();
            ++el) {
-        if (local_inside_grid_->leaf_view().indexSet().index(*el) == *id) {
+        if (local_inside_grid_.leaf_view().indexSet().index(*el) == *id) {
           // This is the inside element we are searching for..
           local_to_inside_indices_.push_back({*id, local_to_inside_indices_.size()});
         }
@@ -316,7 +316,7 @@ public:
 
   size_t local_to_inside_index(const LocalElementType& local_element) const
   {
-    auto id = local_inside_grid_->leaf_view().indexSet().index(local_element);
+    auto id = local_inside_grid_.leaf_view().indexSet().index(local_element);
     for (auto index_pair = local_to_inside_indices_.begin(); index_pair != local_to_inside_indices_.end();
          ++index_pair) {
       if (id == index_pair->first) {
@@ -380,7 +380,7 @@ private:
   GridGlueType& dd_grid_;
   const MacroIntersectionType& macro_intersection_;
   const MacroGridViewType& macro_grid_view_;
-  const std::shared_ptr<LocalGridProviderType> local_inside_grid_;
+  const LocalGridProviderType& local_inside_grid_;
   std::vector<LocalElementType> inside_elements_;
   std::vector<int> inside_elements_ids_;
   std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>
