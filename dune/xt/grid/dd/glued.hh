@@ -721,17 +721,17 @@ public:
     GluedVTKWriter<MacroGridType, LocalGridType, layer> vtk_writer(*this);
     XT::Functions::ConstantFunction<dimDomain> zero_function(0.);
     for (size_t subdomain = 0; subdomain < macro_leaf_view_size_; ++subdomain) {
-        if (std::find(subdomains.begin(), subdomains.end(), subdomain) != subdomains.end()) {
-            auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
-                func.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), func.name());
-            vtk_writer.addVertexData(subdomain, visualization_adapter);
-    } else
-        {
-            // for now: fill the rest with zero. TODO: how can we remove this?
-            auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
-                zero_function.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), zero_function.name());
-            vtk_writer.addVertexData(subdomain, visualization_adapter);
-    }
+      if (std::find(subdomains.begin(), subdomains.end(), subdomain) != subdomains.end()) {
+        auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
+            func.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), func.name());
+        vtk_writer.addVertexData(subdomain, visualization_adapter);
+      } else {
+        // for now: fill the rest with zero. TODO: how can we remove this?
+        auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
+            zero_function.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(),
+            zero_function.name());
+        vtk_writer.addVertexData(subdomain, visualization_adapter);
+      }
     }
     vtk_writer.write(filename_prefix, VTK::appendedraw);
     vtk_writer.clear();

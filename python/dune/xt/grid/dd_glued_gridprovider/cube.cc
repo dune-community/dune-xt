@@ -55,9 +55,9 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_cube, m)
 
 #if HAVE_DUNE_GRID_GLUE
   make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, Cube>::bind(m);
-#if HAVE_DUNE_ALUGRID
+#  if HAVE_DUNE_ALUGRID
   make_cube_dd_grid<ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
   make_cube_dd_grid<ALU_2D_CUBE, Cube>::bind(m);
-#endif
+#  endif
 #endif
 }
