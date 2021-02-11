@@ -360,7 +360,9 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
   py::module::import("dune.xt.grid._grid_filters_base");
 
+#if HAVE_DUNE_GRID_GLUE
   GluedGridProvider_for_all_available_grids<>::bind(m);
   CouplingGridProvider_for_all_available_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
+#endif
 }
