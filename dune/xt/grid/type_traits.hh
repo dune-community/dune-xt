@@ -42,7 +42,6 @@
 #include <dune/grid/onedgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 
-
 namespace Dune {
 namespace GridGlue {
 

@@ -27,14 +27,15 @@
 #include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/mapper.hh>
+#include <dune/xt/grid/view/coupling.hh>
 #include <dune/xt/functions/generic/grid-function.hh>
 
 #include <python/dune/xt/common/configuration.hh>
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-#include <dune/xt/grid/view/coupling.hh>
 
 namespace Dune::XT::Grid {
 
@@ -134,8 +135,6 @@ public:
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
     c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
-    //    c.def("local_grid", py::overload_cast<size_t>(&type::local_grid, py::const_));
-    //    c.def("local_grid", (typename type::LocalGridProviderType& (type::*)(size_t)) & type::local_grid);
     c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
     c.def_property_readonly("boundary_subdomains", [](type& self) {
       std::vector<size_t> boundary_subdomains;
@@ -198,13 +197,9 @@ public:
                         "ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
           using MGV = typename type::MacroGridViewType;
           const XT::Grid::AllDirichletBoundaryInfo<XT::Grid::extract_intersection_t<MGV>> macro_boundary_info;
-          //        std::unique_ptr<M> subdomain_matrix;
           for (auto&& macro_element : elements(self.macro_grid_view())) {
             if (self.subdomain(macro_element) == ss) {
               // this is the subdomain we are interested in, create space
-              //            auto subdomain_grid_view = self.local_grid(macro_element).leaf_view();
-              //            using I = typename GV::Intersection;
-              //            auto subdomain_space = make_subdomain_space(subdomain_grid_view, space_type);
               const MacroGridBasedBoundaryInfo<MGV, GV> subdomain_boundary_info(
                   self.macro_grid_view(), macro_element, macro_boundary_info);
               return subdomain_boundary_info;
@@ -215,7 +210,7 @@ public:
     c.def("write_global_visualization", &type::write_global_visualization);
     return c;
   } // ... bind(...)
-}; // class GridProvider
+}; // class GluedGridProvider
 
 template <class CGV>
 class CouplingGridProvider
@@ -265,58 +260,71 @@ struct MacroGridBasedBoundaryInfo
 
 } // namespace Dune::XT::Grid::bindings
 
+/**
+ * \note Available grid types for DD::Glued. So far, we only use Alugrid and Yasp
+ */
 
-#include <dune/xt/grid/grids.hh>
+using AvailableGridGlueGridTypes = std::tuple<YASP_2D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                              ,
+                                              ALU_2D_SIMPLEX_CONFORMING,
+                                              ALU_2D_CUBE
+#endif
+                                              >;
 
-// fill this with your grid
-using GridGlue2dGridTypes = std::tuple<YASP_2D_EQUIDISTANT_OFFSET, ALU_2D_SIMPLEX_CONFORMING, ALU_2D_CUBE>;
+using GridGlue2dYaspYasp =
+    Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
+using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
+#if HAVE_DUNE_ALUGRID
+using GridGlue2dAluSCAluSC =
+    Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
+using GridGlue2dAluCAluC = Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
+using CouplingGridView2dAluSCAluSC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluSCAluSC>;
+using CouplingGridView2dAluCAluC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
+#endif
 
-template <class GridTypes = GridGlue2dGridTypes> // grid-glue only working 2d
-struct GluedGridProvider_for_all_grids
+using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp
+#if HAVE_DUNE_ALUGRID
+                                                  ,
+                                                  CouplingGridView2dAluSCAluSC,
+                                                  CouplingGridView2dAluCAluC
+#endif
+                                                  >;
+
+
+template <class GridTypes = AvailableGridGlueGridTypes>
+struct GluedGridProvider_for_all_available_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
 
   static void bind(pybind11::module& m)
   {
     Dune::XT::Grid::bindings::GluedGridProvider<G, G>::bind(m);
-    GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+    GluedGridProvider_for_all_available_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
 
 template <>
-struct GluedGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
+struct GluedGridProvider_for_all_available_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
 
 
-using GridGlue2dYaspYasp =
-    Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
-using GridGlue2dAluSCAluSC =
-    Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
-using GridGlue2dAluCAluC = Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
-
-using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
-using CouplingGridView2dAluSCAluSC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluSCAluSC>;
-using CouplingGridView2dAluCAluC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
-
-using AvailableCouplingGridViewTypes =
-    std::tuple<CouplingGridView2dYaspYasp, CouplingGridView2dAluSCAluSC, CouplingGridView2dAluCAluC>;
-
 template <class CouplingGridViewTypes = AvailableCouplingGridViewTypes>
-struct CouplingGridProvider_for_all_grids
+struct CouplingGridProvider_for_all_available_grids
 {
   using CGV = Dune::XT::Common::tuple_head_t<CouplingGridViewTypes>;
 
   static void bind(pybind11::module& m)
   {
     Dune::XT::Grid::bindings::CouplingGridProvider<CGV>::bind(m);
-    CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_tail_t<CouplingGridViewTypes>>::bind(m);
+    CouplingGridProvider_for_all_available_grids<Dune::XT::Common::tuple_tail_t<CouplingGridViewTypes>>::bind(m);
   }
 };
 
 template <>
-struct CouplingGridProvider_for_all_grids<Dune::XT::Common::tuple_null_type>
+struct CouplingGridProvider_for_all_available_grids<Dune::XT::Common::tuple_null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -352,7 +360,7 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_provider, m)
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
   py::module::import("dune.xt.grid._grid_filters_base");
 
-  GluedGridProvider_for_all_grids<>::bind(m);
+  GluedGridProvider_for_all_available_grids<>::bind(m);
+  CouplingGridProvider_for_all_available_grids<>::bind(m);
   MacroGridBasedBoundaryInfo_for_all_grids<>::bind(m);
-  CouplingGridProvider_for_all_grids<>::bind(m);
 }
