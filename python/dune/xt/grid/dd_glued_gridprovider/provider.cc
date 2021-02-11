@@ -268,7 +268,10 @@ struct MacroGridBasedBoundaryInfo
 
 #include <dune/xt/grid/grids.hh>
 
-template <class GridTypes = Dune::XT::Grid::Available2dGridTypes> // grid-glue only working 2d
+// fill this with your grid
+using GridGlue2dGridTypes = std::tuple<YASP_2D_EQUIDISTANT_OFFSET, ALU_2D_SIMPLEX_CONFORMING, ALU_2D_CUBE>;
+
+template <class GridTypes = GridGlue2dGridTypes> // grid-glue only working 2d
 struct GluedGridProvider_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
