@@ -5,8 +5,9 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2016 - 2019)
-//   René Fritze     (2016 - 2019)
+//   Felix Schindler (2016 - 2020)
+//   René Fritze     (2016 - 2020)
+//   Tim Keil        (2021)
 //   Tobias Leibner  (2016 - 2020)
 
 #ifndef DUNE_XT_GRID_TYPE_TRAITS_HH

@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
-//   René Fritze     (2018 - 2019)
+//   René Fritze     (2018 - 2020)
 //   Tobias Leibner  (2020)
 
 #ifndef DUNE_XT_GRID_LAYERS_BINDINGS_HH

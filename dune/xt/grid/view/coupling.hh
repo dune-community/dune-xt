@@ -5,9 +5,7 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2015 - 2018)
-//   René Fritze     (2015 - 2019)
-//   Tobias Leibner  (2015 - 2018, 2020)
+//   Tim Keil (2020 - 2021)
 
 #ifndef DUNE_XT_GRID_VIEW_NEW_COUPLING_HH
 #define DUNE_XT_GRID_VIEW_NEW_COUPLING_HH
