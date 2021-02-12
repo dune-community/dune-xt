@@ -8,7 +8,7 @@
 # Authors:
 #   Felix Schindler (2017, 2019 - 2020)
 #   René Fritze     (2018 - 2019)
-#   Tim Keil        (2018)
+#   Tim Keil        (2018, 2020)
 #   Tobias Leibner  (2019 - 2020)
 # ~~~
 
