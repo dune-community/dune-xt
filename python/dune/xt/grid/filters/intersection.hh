@@ -57,7 +57,7 @@ public:
 
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id)
   {
-    m.def(Common::to_camel_case(class_id).c_str(), [](const GridProvider<G>&) { return new type(); });
+    m.def(Common::to_camel_case(class_id).c_str(), [](const Grid::GridProvider<G>&) { return new type(); });
   } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id)
@@ -112,7 +112,7 @@ public:
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
-        [](const GridProvider<G>&,
+        [](const Grid::GridProvider<G>&,
            const BoundaryInfo<I>& boundary_info,
            const BoundaryType& boundary_type,
            const std::string& logging_prefix) { return new type(boundary_info, boundary_type.copy(), logging_prefix); },

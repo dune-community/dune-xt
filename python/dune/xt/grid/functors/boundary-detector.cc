@@ -62,7 +62,7 @@ public:
 
     m.def(
         ClassId.c_str(),
-        [](const GridProvider<G>&,
+        [](const Grid::GridProvider<G>&,
            const BoundaryInfo<I>& boundary_info,
            const BoundaryType& boundary_type,
            const std::string& logging_prefix) {
@@ -83,7 +83,7 @@ public:
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
-        [](const GridProvider<G>&,
+        [](const Grid::GridProvider<G>&,
            const BoundaryInfo<I>& boundary_info,
            const BoundaryType& boundary_type,
            const std::string& logging_prefix) {

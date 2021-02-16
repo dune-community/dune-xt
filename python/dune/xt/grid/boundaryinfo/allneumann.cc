@@ -62,7 +62,7 @@ public:
   {
     using namespace pybind11::literals;
     m.def(
-        Common::to_camel_case(class_id).c_str(), [](GridProvider<G>&) { return new type(); }, "grid_provider"_a);
+        Common::to_camel_case(class_id).c_str(), [](Grid::GridProvider<G>&) { return new type(); }, "grid_provider"_a);
   } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "all_neumann_boundary_info")
