@@ -37,7 +37,8 @@ class AllReflectingBoundaryInfo
 
 public:
   using type = Dune::XT::Grid::AllReflectingBoundaryInfo<I>;
-  using bound_type = pybind11::class_<type>;
+  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
+  using bound_type = pybind11::class_<type, base_type>;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& grid_id = grid_name<G>::value(),

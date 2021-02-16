@@ -38,7 +38,8 @@ class NormalBasedBoundaryInfo
 
 public:
   using type = Dune::XT::Grid::NormalBasedBoundaryInfo<I>;
-  using bound_type = pybind11::class_<type>;
+  using base_type = Dune::XT::Grid::BoundaryInfo<I>;
+  using bound_type = pybind11::class_<type, base_type>;
   using D = typename type::DomainFieldType;
 
   static bound_type bind(pybind11::module& m,
