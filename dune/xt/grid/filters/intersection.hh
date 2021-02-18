@@ -195,7 +195,9 @@ public:
     if (intersection.neighbor() && !intersection.boundary()) {
       const auto inside_element = intersection.inside();
       const auto outside_element = intersection.outside();
-      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
+      const auto inside_index = grid_layer.indexSet().index(inside_element);
+      const auto outside_index = grid_layer.indexSet().index(outside_element);
+      return inside_index < outside_index;
     } else
       return false;
   }
