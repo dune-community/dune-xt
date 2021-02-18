@@ -230,7 +230,6 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
-    c.def("alive", [](type& self) { std::cout << "I am alive" << std::endl; });
     return c;
   } // ... bind(...)
 }; // class CouplingGridProvider
