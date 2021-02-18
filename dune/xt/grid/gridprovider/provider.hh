@@ -129,6 +129,12 @@ public:
     return Layer<GridType, Layers::leaf, Backends::view>::create(*grid_ptr_);
   }
 
+  const LeafGridViewType& leaf_view_ref() const
+  {
+    static LeafGridViewType view{Layer<GridType, Layers::leaf, Backends::view>::create(*grid_ptr_)};
+    return view;
+  }
+
   void visualize(const std::string& filename = static_id(),
                  const Common::Configuration& boundary_info_cfg = Common::Configuration()) const
   {

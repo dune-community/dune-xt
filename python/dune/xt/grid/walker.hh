@@ -114,11 +114,13 @@ public:
 
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
+    namespace py = pybind11;
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
         [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
-        "grid_provider"_a);
+        "grid_provider"_a,
+        py::keep_alive<0, 1>());
   } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
