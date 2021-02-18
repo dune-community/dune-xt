@@ -30,11 +30,13 @@ struct BoundaryInfo_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::BoundaryInfo<LGV>::bind(m, grid_name<G>::value(), "leaf");
+#if HAVE_DUNE_GRID_GLUE
     if constexpr (d == 2) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::BoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
     }
+#endif
     BoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };
