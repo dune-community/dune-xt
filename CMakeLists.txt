@@ -13,15 +13,14 @@
 #   Tobias Leibner  (2016, 2018 - 2020)
 # ~~~
 
+cmake_minimum_required(VERSION 3.8)
+
 project("dune-xt" CXX)
 
 # local environment
 set(ENV{PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/bin:$ENV{PATH}")
 set(ENV{LD_LIBRARY_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib:$ENV{LD_LIBRARY_PATH}")
 set(ENV{PKG_CONFIG_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
-
-# cmake specific
-cmake_minimum_required(VERSION 3.8)
 
 set(CMAKE_COLOR_MAKEFILE ON)
 
