@@ -95,7 +95,7 @@ public:
   {}
 
 private: // one newline above this group of members
-  double number_; // all provate members with
+  double number_; // all private members with
   bool member_;   // trailing underscore
 }; // two newlines below this class
 
