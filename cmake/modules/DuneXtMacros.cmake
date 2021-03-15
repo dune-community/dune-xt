@@ -17,7 +17,7 @@ cmake_policy(SET CMP0057 NEW)
 
 # For some reason, the minimum required version is set to 2.8.3 by the find_package(Vc ...) call
 # in DuneCommonMacros.cmake in dune-common. This causes some warnings, so we reset it here.
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 
 include(XtCompilerSupport)
 include(XtTooling)
