@@ -18,7 +18,6 @@
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/filesystem.hh>
-#include <dune/xt/common/parameter.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/vector.hh>
@@ -298,76 +297,6 @@ public:
         }
         out << "}";
       }
-    }
-  } // ... str(...)
-}; // class Printer
-
-
-template <bool use_repr, typename anything>
-class Printer<ParameterType, use_repr, anything> : public internal::DefaultPrinter<ParameterType, use_repr>
-{
-public:
-  Printer(const ParameterType& val, const Configuration& param = {})
-    : internal::DefaultPrinter<ParameterType, use_repr>(val, param)
-  {}
-
-  void repr(std::ostream& out) const override
-  {
-    out << "ParameterType(";
-    this->str(out);
-    out << ")";
-  }
-
-  void str(std::ostream& out) const override
-  {
-    const auto sz = this->value.size();
-    if (sz == 0)
-      out << "{}";
-    else {
-      out << "{";
-      size_t counter = 0;
-      for (const auto& key : this->value.keys()) {
-        out << key << ": " << this->value.get(key);
-        if (counter < sz - 1)
-          out << ", ";
-        ++counter;
-      }
-      out << "}";
-    }
-  } // ... str(...)
-}; // class Printer
-
-
-template <bool use_repr, typename anything>
-class Printer<Parameter, use_repr, anything> : public internal::DefaultPrinter<Parameter, use_repr>
-{
-public:
-  Printer(const Parameter& val, const Configuration& param = {})
-    : internal::DefaultPrinter<Parameter, use_repr>(val, param)
-  {}
-
-  void repr(std::ostream& out) const override
-  {
-    out << "Parameter(";
-    this->str(out);
-    out << ")";
-  }
-
-  void str(std::ostream& out) const override
-  {
-    const auto sz = this->value.size();
-    if (sz == 0)
-      out << "{}";
-    else {
-      out << "{";
-      size_t counter = 0;
-      for (const auto& key : this->value.keys()) {
-        out << key << ": " << print(this->value.get(key));
-        if (counter < sz - 1)
-          out << ", ";
-        ++counter;
-      }
-      out << "}";
     }
   } // ... str(...)
 }; // class Printer

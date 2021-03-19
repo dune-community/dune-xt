@@ -212,12 +212,13 @@ public:
 
   Functions::DifferenceFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
-    return Functions::DifferenceFunction<ThisType, ThisType>(*this, other, this->name() + " - " + other.name());
+    return Functions::DifferenceFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " - " + other.name() + ")");
   }
 
   Functions::SumFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
-    return Functions::SumFunction<ThisType, ThisType>(*this, other, this->name() + " + " + other.name());
+    return Functions::SumFunction<ThisType, ThisType>(*this, other, "(" + this->name() + " + " + other.name() + ")");
   }
 
   template <class OtherType>
@@ -227,7 +228,7 @@ public:
   operator*(const OtherType& other) const
   {
     return Functions::ProductFunction<ThisType, as_function_interface_t<OtherType>>(
-        *this, other, "(" + this->name() + ")*(" + other.name() + ")");
+        *this, other, "(" + this->name() + "*" + other.name() + ")");
   }
 
   template <class OtherType>
@@ -237,7 +238,7 @@ public:
   operator/(const OtherType& other) const
   {
     return Functions::FractionFunction<ThisType, as_function_interface_t<OtherType>>(
-        *this, other, "(" + this->name() + ")/(" + other.name() + ")");
+        *this, other, "(" + this->name() + "/" + other.name() + ")");
   }
 
   /**

@@ -159,9 +159,9 @@ public:
    */
   NormalBasedBoundaryInfo(const DomainFieldType tol = 1e-10,
                           BoundaryType*&& default_boundary_type = new NoBoundary(),
-                          const std::string& logging_prefix = "",
-                          const std::array<bool, 3>& logging_state = Common::default_logger_state())
-    : BaseType(logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix, logging_state)
+                          const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
     , tol_(tol)
     , default_boundary_type_(default_boundary_type)
   {

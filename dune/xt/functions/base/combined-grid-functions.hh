@@ -86,12 +86,11 @@ public:
   CombinedGridFunction(const LeftType& left,
                        const RightType& right,
                        const std::string nm = "",
-                       const std::string& logging_prefix = "",
-                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
+                       const std::string& logging_prefix = "")
     : BaseType(left.parameter_type() + right.parameter_type(),
                logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
-               logging_state)
+               logging_prefix.empty())
     , left_(left.copy_as_grid_function())
     , right_(right.copy_as_grid_function())
     , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
@@ -103,12 +102,11 @@ public:
   CombinedGridFunction(LeftType*&& left,
                        RightType*&& right,
                        const std::string nm = "",
-                       const std::string& logging_prefix = "",
-                       const std::array<bool, 3>& logging_state = Common::default_logger_state())
+                       const std::string& logging_prefix = "")
     : BaseType(left->parameter_type() + right->parameter_type(),
                logging_prefix.empty() ? Common::to_camel_case(get_combination_name(comb{}) + "GridFunction")
                                       : logging_prefix,
-               logging_state)
+               logging_prefix.empty())
     , left_(std::move(left))
     , right_(std::move(right))
     , name_(nm.empty() ? "(" + left_->name() + GetCombination<comb>::symbol() + right_->name() + ")" : nm)
@@ -128,7 +126,8 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    LOG_(debug) << "local_function()" << std::endl;
+    LOG_(debug) << Common::to_camel_case(get_combination_name(comb{}) + "GridFunction") + "::local_function()"
+                << std::endl;
     using LeftLF = typename LeftType::LocalFunctionType;
     using RightLF = typename RightType::LocalFunctionType;
     return std::make_unique<CombinedElementFunction<LeftLF, RightLF, comb>>(std::move(left_->local_function()),

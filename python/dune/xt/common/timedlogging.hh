@@ -34,9 +34,9 @@ public:
 
     auto ClassName = Common::to_camel_case(class_id);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
-    c.def("info_enabled", &type::info_enabled);
-    c.def("debug_enabled", &type::debug_enabled);
-    c.def("warn_enabled", &type::warn_enabled);
+    c.def_readwrite("info_enabled", &type::info_enabled);
+    c.def_readwrite("debug_enabled", &type::debug_enabled);
+    c.def_readwrite("warn_enabled", &type::warn_enabled);
     c.def(
         "enable", [](type& self, const std::string& prefix) { self.enable(prefix); }, ""_a = "");
     c.def("disable", [](type& self) { self.disable(); });

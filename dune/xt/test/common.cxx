@@ -37,17 +37,10 @@ void busywait(const size_t ms)
 } // ... busywait(...)
 
 
-bool DXTC_TEST_CONFIG_HAS_SUB(const std::string& sub_key)
-{
-  const auto key = Dune::XT::Common::Test::get_unique_test_name() + "." + sub_key;
-  return DXTC_CONFIG.has_sub(key);
-}
-
-
 Dune::XT::Common::Configuration DXTC_TEST_CONFIG_SUB(const std::string& sub_key)
 {
   const auto key = Dune::XT::Common::Test::get_unique_test_name() + "." + sub_key;
-  EXPECT_TRUE(DXTC_CONFIG.has_sub(key)) << "check with DXTC_TEST_CONFIG_HAS_SUB first!";
+  EXPECT_TRUE(DXTC_CONFIG.has_sub(key));
   return DXTC_CONFIG.sub(key);
 }
 
