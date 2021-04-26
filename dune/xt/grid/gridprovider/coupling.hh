@@ -28,14 +28,14 @@ class CouplingGridProvider
 public:
   using ThisType = CouplingGridProvider<CouplingGridViewImp>;
 
-  using CoulingGridViewType = CouplingGridViewImp;
+  using CouplingGridViewType = CouplingGridViewImp;
 
   static const std::string static_id()
   {
     return "xt.grid.couplinggridprovider";
   }
 
-  CouplingGridProvider(const CoulingGridViewType& view)
+  CouplingGridProvider(const CouplingGridViewType& view)
     : view_(view)
   {}
 
@@ -45,13 +45,13 @@ public:
 
   CouplingGridProvider(const ThisType& other) = default;
 
-  const CoulingGridViewType& coupling_view()
+  const CouplingGridViewType& coupling_view() const
   {
     return view_.access();
   }
 
 private:
-  Dune::XT::Common::ConstStorageProvider<CoulingGridViewType> view_;
+  Dune::XT::Common::ConstStorageProvider<CouplingGridViewType> view_;
 }; // class CouplingGridProvider
 
 
