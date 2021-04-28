@@ -35,23 +35,19 @@ public:
     return "xt.grid.couplinggridprovider";
   }
 
-  CouplingGridProvider(const CouplingGridViewType& view)
+  CouplingGridProvider(const CouplingGridViewType view)
     : view_(view)
   {}
-
-//  CouplingGridProvider(CoulingGridViewType view)
-//    : view_(view)
-//  {}
 
   CouplingGridProvider(const ThisType& other) = default;
 
   const CouplingGridViewType& coupling_view() const
   {
-    return view_.access();
+    return view_;
   }
 
 private:
-  Dune::XT::Common::ConstStorageProvider<CouplingGridViewType> view_;
+  const CouplingGridViewType view_;
 }; // class CouplingGridProvider
 
 
