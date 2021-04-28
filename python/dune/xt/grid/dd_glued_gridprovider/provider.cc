@@ -177,8 +177,7 @@ public:
                     // these are the subdomains we are interested in
                     auto cgv = Dune::XT::Grid::make_coupling_grid_view<type, ElementType, IntersectionType>(
                         inside_macro_element, outside_macro_element, self, macro_intersection);
-                    Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
-                    return coupling_provider;
+                    return Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType>(cgv);
                   }
                 }
               }
@@ -230,6 +229,7 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    c.def_property_readonly("static_id", [](type& self) { return self.static_id(); });
     return c;
   } // ... bind(...)
 }; // class CouplingGridProvider
