@@ -90,10 +90,10 @@ public:
         py::call_guard<py::gil_scoped_release>());
   } // ... addbind_methods(...)
 
-  static bound_type bind(pybind11::module& m,
-                         const std::string& grid_id = grid_name<G>::value(),
-                         const std::string& layer_id = "",
-                         const std::string& class_id = "Walker")
+  static bound_type bind_leaf(pybind11::module& m,
+                              const std::string& grid_id = grid_name<G>::value(),
+                              const std::string& layer_id = "",
+                              const std::string& class_id = "Walker")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -103,14 +103,35 @@ public:
       ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
-    //  // for CGV, we need to call coupling_view()
-    //    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
-    //          "grid_provider"_a);
+    c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
+          "grid_provider"_a);
 
     addbind_methods(c);
 
     return c;
-  } // ... bind(...)
+  } // ... bind_leaf(...)
+
+  static bound_type bind_coupling(pybind11::module& m,
+                                  const std::string& grid_id = grid_name<G>::value(),
+                                  const std::string& layer_id = "",
+                                  const std::string& class_id = "Walker")
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+
+    auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
+    bound_type c(m, ClassName.c_str(), ClassName.c_str());
+
+    c.def(py::init([](CouplingGridProvider<GV>& grid_provider) { return new type(grid_provider.coupling_view()); }),
+          "grid_provider"_a);
+
+    addbind_methods(c);
+
+    return c;
+  } // ... bind_coupling(...)
+
 
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "Walker")
   {
