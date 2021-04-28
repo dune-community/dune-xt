@@ -670,9 +670,9 @@ GTEST_TEST(empty, main)
       auto cgv = Dune::XT::Grid::make_coupling_grid_view<GridGlueType, ElementType, IntersectionType>(
           inside_element, outside_element, *dd_grid, macro_intersection);
       for (auto&& inside_element : Dune::elements(cgv)) {
-        std::cout << "I arrived at an element with center: " << inside_element.geometry().center() << std::endl;
+//        std::cout << "I arrived at an element with center: " << inside_element.geometry().center() << std::endl;
         for (auto&& intersection : Dune::intersections(cgv, inside_element)) {
-          std::cout << "I arrived at an intersection with center: " << intersection.geometry().center() << std::endl;
+//          std::cout << "I arrived at an intersection with center: " << intersection.geometry().center() << std::endl;
         }
       }
       //            auto functor = Dune::XT::Grid::GenericElementFunctor<CouplingGridViewType>([] {},
@@ -690,8 +690,8 @@ GTEST_TEST(empty, main)
 
       // these lines are not required !!! but they test the CouplingGridProvider
       Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
-      auto cgv_c = coupling_provider.coupling_view();
-
+      const auto cgv_c = coupling_provider.coupling_view(); // with & would be reference, without is copy
+      CouplingGridViewType cgv_c2(cgv_c);  // <-- calls copy constructor
       auto walker = Dune::XT::Grid::Walker<CouplingGridViewType>(cgv_c); // or cgv itself
       walker.append(functor);
       walker.walk();
