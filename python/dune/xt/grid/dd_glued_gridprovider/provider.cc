@@ -134,9 +134,10 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    // dim cannot be binded directly because it is static const
     c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
-    c.def_property_readonly("num_subdomains", [](type& self) { return self.num_subdomains(); });
+    c.def_property_readonly("num_subdomains", &type::num_subdomains);
     c.def_property_readonly("boundary_subdomains", [](type& self) {
       std::vector<size_t> boundary_subdomains;
       for (auto&& macro_element : elements(self.macro_grid_view()))
@@ -200,9 +201,7 @@ public:
           for (auto&& macro_element : elements(self.macro_grid_view())) {
             if (self.subdomain(macro_element) == ss) {
               // this is the subdomain we are interested in, create space
-              const MacroGridBasedBoundaryInfo<MGV, GV> subdomain_boundary_info(
-                  self.macro_grid_view(), macro_element, macro_boundary_info);
-              return subdomain_boundary_info;
+              return MacroGridBasedBoundaryInfo<MGV, GV>(self.macro_grid_view(), macro_element, macro_boundary_info);
             }
           }
         },
@@ -276,18 +275,21 @@ using GridGlue2dYaspYasp =
     Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
 using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
 #if HAVE_DUNE_ALUGRID
-using GridGlue2dAluSCAluSC =
+using GridGlue2dAluSimplexConformingAluSimplexConforming =
     Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
-using GridGlue2dAluCAluC = Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
-using CouplingGridView2dAluSCAluSC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluSCAluSC>;
-using CouplingGridView2dAluCAluC = Dune::XT::Grid::CouplingGridView<GridGlue2dAluCAluC>;
+using GridGlue2dAluConformingAluConforming =
+    Dune::XT::Grid::DD::Glued<ALU_2D_CUBE, ALU_2D_CUBE, Dune::XT::Grid::Layers::leaf>;
+using CouplingGridView2dAluSimplexConformingAluSimplexConforming =
+    Dune::XT::Grid::CouplingGridView<GridGlue2dAluSimplexConformingAluSimplexConforming>;
+using CouplingGridView2dAluConformingAluConforming =
+    Dune::XT::Grid::CouplingGridView<GridGlue2dAluConformingAluConforming>;
 #endif
 
 using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp
 #if HAVE_DUNE_ALUGRID
                                                   ,
-                                                  CouplingGridView2dAluSCAluSC,
-                                                  CouplingGridView2dAluCAluC
+                                                  CouplingGridView2dAluSimplexConformingAluSimplexConforming,
+                                                  CouplingGridView2dAluConformingAluConforming
 #endif
                                                   >;
 

@@ -60,8 +60,7 @@ def visualize_function(function, grid, subsampling=False):
 def visualize_function_on_dd_grid(function, dd_grid, subdomains=None):
     assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
     assert function.dim_range == 1, f'Not implemented yet for {function.dim_domain}-dimensional functions!'
-    if not subdomains:
-        subdomains = list(range(dd_grid.num_subdomains))
+    subdomains = subdomains or list(range(dd_grid.num_subdomains))
     assert isinstance(subdomains, list), 'Please provide a list of subdomains'
     assert all(sd < dd_grid.num_subdomains for sd in subdomains)
     assert all(isinstance(sd, int) for sd in subdomains)
