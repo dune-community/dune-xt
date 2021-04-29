@@ -40,6 +40,9 @@
 
 namespace Dune::XT::Grid {
 
+/**
+ * TODO: MOVE THIS ELSEWHERE !
+ */
 template <class MacroGV, class MicroGV>
 class MacroGridBasedBoundaryInfo : public Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MicroGV>>
 {
@@ -50,8 +53,8 @@ public:
   using MacroBoundaryInfoType = Dune::XT::Grid::BoundaryInfo<Dune::XT::Grid::extract_intersection_t<MacroGV>>;
   using MacroElementType = Dune::XT::Grid::extract_entity_t<MacroGV>;
 
-  MacroGridBasedBoundaryInfo(const MacroGV& macro_grid_view,
-                             const MacroElementType& macro_element,
+  MacroGridBasedBoundaryInfo(const MacroGV macro_grid_view,
+                             const MacroElementType macro_element,
                              const MacroBoundaryInfoType& macro_boundary_info)
     : macro_grid_view_(macro_grid_view)
     , macro_element_(macro_element)
@@ -81,8 +84,8 @@ public:
     return no_boundary_;
   } // ... type(...)
 
-  const MacroGV& macro_grid_view_;
-  const MacroElementType& macro_element_;
+  const MacroGV macro_grid_view_;
+  const MacroElementType macro_element_;
   const MacroBoundaryInfoType& macro_boundary_info_;
   const XT::Grid::NoBoundary no_boundary_;
 }; // class MacroGridBasedBoundaryInfo
@@ -113,7 +116,6 @@ template <class MG, class G>
 class GluedGridProvider
 {
 public:
-  //  using type = GluedGridProvider<MG, G>;
   using type = Grid::DD::Glued<MG, G, XT::Grid::Layers::leaf>;
   using bound_type = pybind11::class_<type>;
 
@@ -192,20 +194,19 @@ public:
         "nn"_a);
     c.def(
         "macro_based_boundary_info",
-        [](type& self, const size_t ss) {
+        [](type& self, const size_t ss, const XT::Grid::BoundaryInfo<IntersectionType>& macro_boundary_info) {
           DUNE_THROW_IF(ss >= self.num_subdomains(),
                         XT::Common::Exceptions::index_out_of_range,
                         "ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
-          using MGV = typename type::MacroGridViewType;
-          const XT::Grid::AllDirichletBoundaryInfo<XT::Grid::extract_intersection_t<MGV>> macro_boundary_info;
           for (auto&& macro_element : elements(self.macro_grid_view())) {
             if (self.subdomain(macro_element) == ss) {
               // this is the subdomain we are interested in, create space
-              return MacroGridBasedBoundaryInfo<MGV, GV>(self.macro_grid_view(), macro_element, macro_boundary_info);
+              return MacroGridBasedBoundaryInfo<MacroGV, GV>(self.macro_grid_view(), macro_element, macro_boundary_info);
             }
           }
         },
-        "ss"_a);
+        "ss"_a,
+        "macro_boundary_info"_a);
     c.def("write_global_visualization", &type::write_global_visualization);
     return c;
   } // ... bind(...)
@@ -238,7 +239,8 @@ struct MacroGridBasedBoundaryInfo
 {
   using GV = typename G::LeafGridView;
   using I = Dune::XT::Grid::extract_intersection_t<GV>;
-  using type = Dune::XT::Grid::MacroGridBasedBoundaryInfo<GV, GV>;
+  using E = Dune::XT::Grid::extract_entity_t<GV>;
+  using type = Dune::XT::Grid::MacroGridBasedBoundaryInfo<GV, GV>; // assumes to have the same GV in micro und macro
   using base_type = Dune::XT::Grid::BoundaryInfo<I>;
   using bound_type = pybind11::class_<type>;
 
@@ -251,10 +253,11 @@ struct MacroGridBasedBoundaryInfo
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
-    c.def(
-        "type", [](type& self, const I& intersection) { self.type(intersection); }, "intersection"_a);
     return c;
   } // ... bind(...)
+
+  // no factory needed: will only be called from GluedGridProvider
+
 }; // struct MacroGridBasedBoundaryInfo
 
 } // namespace Dune::XT::Grid::bindings
