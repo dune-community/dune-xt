@@ -273,9 +273,9 @@ public:
     auto last = std::unique(inside_elements_ids_.begin(), inside_elements_ids_.end());
     inside_elements_ids_.erase(last, inside_elements_ids_.end());
 
-    for (auto id = inside_elements_ids_.begin(); id != inside_elements_ids_.end(); ++id) {
+    for (auto&& id : inside_elements_ids_) {
       for (auto&& el : elements(local_inside_grid_.leaf_view())) {
-        if (local_inside_grid_.leaf_view().indexSet().index(el) == *id) {
+        if (local_inside_grid_.leaf_view().indexSet().index(el) == id) {
           // This is the inside element we are searching for... add it to the vector
           inside_elements_.push_back(el);
           std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>
@@ -286,7 +286,7 @@ public:
                ++coupling_intersection_it) {
             auto inside = coupling_intersection_it->inside();
             auto inside_id = local_inside_grid_.leaf_view().indexSet().index(inside);
-            if (inside_id == *id) {
+            if (inside_id == id) {
               CorrectedCouplingIntersectionType coupling_intersection(*coupling_intersection_it, macro_intersection_);
               coupling_intersection_set.insert(coupling_intersection);
             }
