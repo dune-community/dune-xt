@@ -34,6 +34,10 @@
 namespace Dune::XT::Grid {
 namespace internal {
 
+/**
+ * Used for comparing Intersections in sets. Adress uniquely defines interesections,
+ * other properties were not successful for comparison.
+ */
 template <class type>
 struct CompareType
 {
@@ -56,18 +60,10 @@ class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
 
 public:
   using Entity = typename MacroIntersectionType::Entity;
-  enum
-  {
-    dimensionworld = MacroIntersectionType::dimensionworld
-  };
-
+  static constexpr auto dimensionworld = MacroIntersectionType::dimensionworld;
+  static constexpr auto dimension = MacroIntersectionType::dimension;
   using typename BaseType::GlobalCoordinate;
   using typename BaseType::LocalCoordinate;
-
-  enum
-  {
-    dimension = MacroIntersectionType::dimension
-  };
 
   CouplingIntersectionWithCorrectNormal(const CouplingIntersectionType& coupling_intersection,
                                         const MacroIntersectionType& macro_intersection)
@@ -75,14 +71,14 @@ public:
     , macro_intersection_(macro_intersection)
   {}
 
-  GlobalCoordinate outerNormal(const LocalCoordinate& local) const
+  GlobalCoordinate outerNormal(const LocalCoordinate& local)
   {
     global_ = this->geometry().global(local);
     local_ = macro_intersection_.geometry().local(global_);
     return macro_intersection_.outerNormal(local_);
   }
 
-  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local) const
+  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local)
   {
     auto normal = this->unitOuterNormal(local);
     const auto integration_element = BaseType::integrationOuterNormal(local).two_norm();
@@ -90,7 +86,7 @@ public:
     return normal;
   }
 
-  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
+  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local)
   {
     global_ = this->geometry().global(local);
     local_ = macro_intersection_.geometry().local(global_);
@@ -264,6 +260,8 @@ public:
   void update()
   {
     auto& coupling = dd_grid_.coupling(inside_element_, -1, outside_element_, -1, true);
+    // Note: This iterator iterates over all interesctions in the coupling grid. Not only over all intersections w.r.t.
+    //       a single element
     for (auto coupling_intersection_it = coupling.template ibegin<0>();
          coupling_intersection_it != coupling.template iend<0>();
          ++coupling_intersection_it) {
@@ -276,12 +274,10 @@ public:
     inside_elements_ids_.erase(last, inside_elements_ids_.end());
 
     for (auto id = inside_elements_ids_.begin(); id != inside_elements_ids_.end(); ++id) {
-      for (auto el = local_inside_grid_.leaf_view().template begin<0>();
-           el != local_inside_grid_.leaf_view().template end<0>();
-           ++el) {
-        if (local_inside_grid_.leaf_view().indexSet().index(*el) == *id) {
-          // This is the inside element we are searching for.. add it to the vector
-          inside_elements_.push_back(*el);
+      for (auto&& el : elements(local_inside_grid_.leaf_view())) {
+        if (local_inside_grid_.leaf_view().indexSet().index(el) == *id) {
+          // This is the inside element we are searching for... add it to the vector
+          inside_elements_.push_back(el);
           std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>
               coupling_intersection_set;
           // now iteratate over all intersections to find all coupling intersections
@@ -300,13 +296,11 @@ public:
       }
     }
     // introduce a local to global map
-    for (auto id = inside_elements_ids_.begin(); id != inside_elements_ids_.end(); ++id) {
-      for (auto el = local_inside_grid_.leaf_view().template begin<0>();
-           el != local_inside_grid_.leaf_view().template end<0>();
-           ++el) {
-        if (local_inside_grid_.leaf_view().indexSet().index(*el) == *id) {
+    for (auto&& id : inside_elements_ids_) {
+      for (auto&& el : elements(local_inside_grid_.leaf_view())) {
+        if (local_inside_grid_.leaf_view().indexSet().index(el) == id) {
           // This is the inside element we are searching for..
-          local_to_inside_indices_.push_back({*id, local_to_inside_indices_.size()});
+          local_to_inside_indices_.push_back({id, local_to_inside_indices_.size()});
         }
       }
     }
@@ -315,10 +309,9 @@ public:
   size_t local_to_inside_index(const LocalElementType& local_element) const
   {
     auto id = local_inside_grid_.leaf_view().indexSet().index(local_element);
-    for (auto index_pair = local_to_inside_indices_.begin(); index_pair != local_to_inside_indices_.end();
-         ++index_pair) {
-      if (id == index_pair->first) {
-        return index_pair->second;
+    for (auto&& index_pair : local_to_inside_indices_) {
+      if (id == index_pair.first) {
+        return index_pair.second;
       }
     }
   }
