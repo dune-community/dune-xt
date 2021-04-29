@@ -31,7 +31,7 @@ struct InitlessElementFilter_for_all_grids
     Dune::XT::Grid::bindings::InitlessElementFilter<Filter, LGV>::bind(m, class_id, "leaf");
     Dune::XT::Grid::bindings::InitlessElementFilter<Filter, LGV>::bind_leaf_factory(m, class_id);
 #if HAVE_DUNE_GRID_GLUE
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::InitlessElementFilter<Filter, CGV>::bind(m, class_id, "coupling");

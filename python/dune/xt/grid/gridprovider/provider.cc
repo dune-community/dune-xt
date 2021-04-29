@@ -31,7 +31,7 @@ struct InitlessIntersectionFilter_for_all_grids
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind(m, class_id, "leaf");
     Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind_leaf_factory(m, class_id);
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id, "coupling");
@@ -61,7 +61,7 @@ struct CustomBoundaryIntersectionFilter_for_all_grids
     Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind(m, grid_name<G>::value(), "leaf");
     Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind_leaf_factory(m);
 #if HAVE_DUNE_GRID_GLUE
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind(m, grid_name<G>::value(), "coupling");

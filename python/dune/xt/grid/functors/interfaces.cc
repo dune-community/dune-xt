@@ -30,7 +30,7 @@ struct ElementFunctor_for_all_grids
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::ElementFunctor<LGV>::bind(m, grid_name<G>::value(), "leaf");
 #if HAVE_DUNE_GRID_GLUE
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::ElementFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
@@ -58,7 +58,7 @@ struct IntersectionFunctor_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::IntersectionFunctor<LGV>::bind(m, grid_name<G>::value(), "leaf");
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::IntersectionFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
@@ -85,7 +85,7 @@ struct ElementAndIntersectionFunctor_for_all_grids
   {
     using Dune::XT::Grid::bindings::grid_name;
     Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<LGV>::bind(m, grid_name<G>::value(), "leaf");
-    if constexpr (d == 2) {
+    if constexpr (d < 3) {
       using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
       using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
       Dune::XT::Grid::bindings::ElementAndIntersectionFunctor<CGV>::bind(m, grid_name<G>::value(), "coupling");
