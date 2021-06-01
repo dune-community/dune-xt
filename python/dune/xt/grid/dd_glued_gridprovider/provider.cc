@@ -127,15 +127,19 @@ public:
 
   static bound_type bind(pybind11::module& m,
                          const std::string& class_id = "glued_grid_provider",
-                         const std::string& grid_id = grid_name<MG>::value())
+                         const std::string& macro_grid_id = grid_name<MG>::value(),
+                         const std::string& micro_grid_id = grid_name<G>::value())
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
     constexpr const int dim = type::dimDomain;
 
-    const std::string class_name = class_id + "_" + grid_id;
+    const std::string class_name = class_id + "_" + macro_grid_id + "_" + micro_grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
-    bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    bound_type c(
+        m,
+        ClassName.c_str(),
+        (XT::Common::to_camel_case(class_id) + " (" + macro_grid_id + "_" = micro_grid_id + " variant)").c_str());
     // dim cannot be binded directly because it is static const
     c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def("local_grid", py::overload_cast<size_t>(&type::local_grid));
@@ -201,7 +205,8 @@ public:
           for (auto&& macro_element : elements(self.macro_grid_view())) {
             if (self.subdomain(macro_element) == ss) {
               // this is the subdomain we are interested in, create space
-              return MacroGridBasedBoundaryInfo<MacroGV, GV>(self.macro_grid_view(), macro_element, macro_boundary_info);
+              return MacroGridBasedBoundaryInfo<MacroGV, GV>(
+                  self.macro_grid_view(), macro_element, macro_boundary_info);
             }
           }
         },

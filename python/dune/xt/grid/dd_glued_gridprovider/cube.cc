@@ -22,7 +22,7 @@
 using namespace Dune;
 using namespace Dune::XT::Grid::bindings;
 
-
+//TODO: different macro and micro grids
 template <class G, class element_type>
 struct make_cube_dd_grid
 {
