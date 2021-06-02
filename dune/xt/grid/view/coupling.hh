@@ -71,14 +71,14 @@ public:
     , macro_intersection_(macro_intersection)
   {}
 
-  GlobalCoordinate outerNormal(const LocalCoordinate& local)
+  GlobalCoordinate outerNormal(const LocalCoordinate& local) const
   {
     global_ = this->geometry().global(local);
     local_ = macro_intersection_.geometry().local(global_);
     return macro_intersection_.outerNormal(local_);
   }
 
-  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local)
+  GlobalCoordinate integrationOuterNormal(const LocalCoordinate& local) const
   {
     auto normal = this->unitOuterNormal(local);
     const auto integration_element = BaseType::integrationOuterNormal(local).two_norm();
@@ -86,7 +86,7 @@ public:
     return normal;
   }
 
-  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local)
+  GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
   {
     global_ = this->geometry().global(local);
     local_ = macro_intersection_.geometry().local(global_);
