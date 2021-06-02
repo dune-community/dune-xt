@@ -90,22 +90,6 @@ public:
   const XT::Grid::NoBoundary no_boundary_;
 }; // class MacroGridBasedBoundaryInfo
 
-// Since CouplingIntersectionWithCorrectNormal is not derived from Dune::Intersection, we need this copy here
-template <class C, class I>
-double diameter(const internal::CouplingIntersectionWithCorrectNormal<C, I>& intersection)
-{
-  auto max_dist = std::numeric_limits<typename I::ctype>::min();
-  const auto& geometry = intersection.geometry();
-  for (auto i : Common::value_range(geometry.corners())) {
-    const auto xi = geometry.corner(i);
-    for (auto j : Common::value_range(i + 1, geometry.corners())) {
-      auto xj = geometry.corner(j);
-      xj -= xi;
-      max_dist = std::max(max_dist, xj.two_norm());
-    }
-  }
-  return max_dist;
-} // diameter
 
 } // namespace Dune::XT::Grid
 
