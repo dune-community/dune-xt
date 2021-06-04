@@ -66,7 +66,7 @@ public:
   using typename BaseType::LocalCoordinate;
 
   CouplingIntersectionWithCorrectNormal(const CouplingIntersectionType& coupling_intersection,
-                                        const MacroIntersectionType& macro_intersection)
+                                        const MacroIntersectionType macro_intersection)
     : BaseType(coupling_intersection)
     , macro_intersection_(macro_intersection)
   {}
@@ -123,7 +123,7 @@ public:
   }
 
 private:
-  const MacroIntersectionType& macro_intersection_;
+  const MacroIntersectionType macro_intersection_;
   mutable GlobalCoordinate global_;
   mutable LocalCoordinate local_;
 }; // class CouplingIntersectionWithCorrectNormal
@@ -234,7 +234,7 @@ public:
   CouplingGridViewWrapper(const MacroElementType& ss,
                           const MacroElementType& nn,
                           GridGlueType& dd_grid,
-                          const MacroIntersectionType& macro_intersection)
+                          const MacroIntersectionType macro_intersection)
     : BaseType(dd_grid.macro_grid_view())
     , inside_element_(ss)
     , outside_element_(nn)
@@ -369,7 +369,7 @@ private:
   const MacroElementType& inside_element_;
   const MacroElementType& outside_element_;
   GridGlueType& dd_grid_;
-  const MacroIntersectionType& macro_intersection_;
+  const MacroIntersectionType macro_intersection_;
   const MacroGridViewType& macro_grid_view_;
   const LocalGridProviderType& local_inside_grid_;
   std::vector<LocalElementType> inside_elements_;
@@ -404,7 +404,7 @@ public:
   CouplingGridView(const MacroElementType& ss,
                    const MacroElementType& nn,
                    GridGlueType& dd_grid,
-                   const MacroIntersectionType& macro_intersection)
+                   const MacroIntersectionType macro_intersection)
     : ImplementationStorage(new Implementation(ss, nn, dd_grid, macro_intersection))
     , BaseType(ImplementationStorage::access())
   {}
