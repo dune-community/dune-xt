@@ -168,7 +168,7 @@ public:
                     // these are the subdomains we are interested in
                     auto cgv = Dune::XT::Grid::make_coupling_grid_view<type, ElementType, IntersectionType>(
                         inside_macro_element, outside_macro_element, self, macro_intersection);
-                    return Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType>(cgv);
+                    return std::make_unique<Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType>>(cgv);
                   }
                 }
               }

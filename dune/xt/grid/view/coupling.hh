@@ -422,7 +422,7 @@ public:
 
 
 template <class GT, class E, class IT>
-CouplingGridView<GT> make_coupling_grid_view(const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
+static CouplingGridView<GT> make_coupling_grid_view(const E& ss, const E& nn, GT& dd_grid, const IT& macro_intersection)
 {
   return CouplingGridView<GT>(ss, nn, dd_grid, macro_intersection);
 }
