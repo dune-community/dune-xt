@@ -11,5 +11,6 @@
 #   Tobias Leibner  (2020)
 # ~~~
 
+dune_pybindxi_add_module(_test_grid_element grid_element.cc)
 dune_pybindxi_add_module(_test_grid_intersection grid_intersection.cc)
 dune_pybindxi_add_module(_test_grid_types grid_types.cc)
