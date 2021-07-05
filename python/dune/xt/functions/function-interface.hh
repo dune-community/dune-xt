@@ -13,10 +13,15 @@
 #define PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_INTERFACE_HH
 
 #include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/numpy.h>
 #include <dune/pybindxi/operators.h>
 
 #include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/parameter.hh>
+#include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/la/container/common.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
@@ -185,6 +190,41 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
     c.def_property_readonly("dim_range", [](const C& /*self*/) { return std::make_pair(size_t(r), size_t(rC)); });
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
+
+  c.def(
+      "evaluate",
+      [](const C& self, const typename C::DomainType& x, const XT::Common::Parameter& mu) {
+        return self.evaluate(x, mu);
+      },
+      "x"_a,
+      "mu"_a = XT::Common::Parameter());
+  if constexpr (rC == 1) {
+    c.def(
+        "evaluate",
+        [](const C& self, py::array_t<double> list_of_points, const XT::Common::Parameter& mu) {
+          DUNE_THROW_IF(list_of_points.ndim() != 2,
+                        XT::Common::Exceptions::shapes_do_not_match,
+                        "list_of_points.ndim() = " << list_of_points.ndim() << " (has to be 2)!");
+          DUNE_THROW_IF(list_of_points.shape(1) != d,
+                        XT::Common::Exceptions::shapes_do_not_match,
+                        "list_of_points.shape(1) = " << list_of_points.shape(1) << " (has to be " << size_t(d) << ")!");
+          const auto& access_to_list_of_points = list_of_points.unchecked<2>();
+          const size_t num_points = access_to_list_of_points.shape(0);
+          py::array_t<double> values(/*shape=*/{num_points, r});
+          auto access_to_values = values.mutable_unchecked<2>();
+          typename C::DomainType point;
+          for (size_t ii = 0; ii < num_points; ++ii) {
+            for (size_t dd = 0; dd < d; ++dd)
+              point[dd] = access_to_list_of_points(ii, dd);
+            const auto value = self.evaluate(point, mu);
+            for (size_t rr = 0; rr < r; ++rr)
+              access_to_values(rr, ii) = value[rr];
+          }
+          return values;
+        },
+        "x"_a,
+        "mu"_a = XT::Common::Parameter());
+  } // vectorized evaluate for scalars and vectors
 
   // internal::Divergence<G>::addbind(m, c);
 
