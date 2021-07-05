@@ -25,6 +25,7 @@ for mod_name in (
         '_grid_boundaryinfo_interfaces',
         '_grid_boundaryinfo_normalbased',
         '_grid_boundaryinfo_types',
+        '_grid_element',
         '_grid_filters_base',
         '_grid_filters_element',
         '_grid_functors_boundary_detector',
