@@ -39,9 +39,11 @@ PYBIND11_MODULE(_grid_walker, m)
 {
   namespace py = pybind11;
 
-  py::module::import("dune.xt.grid._grid_gridprovider_provider");
+  py::module::import("dune.xt.grid._grid_element");
   py::module::import("dune.xt.grid._grid_filters_base");
   py::module::import("dune.xt.grid._grid_functors_interfaces");
+  py::module::import("dune.xt.grid._grid_gridprovider_provider");
+  py::module::import("dune.xt.grid._grid_intersection");
 
   Walker_for_all_grids<>::bind(m);
 }
