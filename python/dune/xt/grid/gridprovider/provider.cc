@@ -78,6 +78,7 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid._grid_boundaryinfo_interfaces");
   py::module::import("dune.xt.grid._grid_boundaryinfo_types");
+  py::module::import("dune.xt.grid._grid_element");
   py::module::import("dune.xt.grid._grid_filters_base");
 
 #define BIND_(NAME) InitlessIntersectionFilter_for_all_grids<ApplyOn::NAME>::bind(m, std::string("ApplyOn") + #NAME)

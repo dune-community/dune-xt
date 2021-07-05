@@ -21,6 +21,7 @@
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
+#include <dune/pybindxi/functional.h>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
 #include <dune/xt/common/ranges.hh>
@@ -232,10 +233,27 @@ public:
         py::call_guard<py::gil_scoped_release>());
     c.def(
         "global_refine",
-        [](type& self, const int count) { self.global_refine(count); },
-        "count"_a = 1,
-        py::call_guard<py::gil_scoped_release>());
-    c.def("refine_steps_for_half", [](type& /*self*/) { return DGFGridInfo<G>::refineStepsForHalf(); });
+        [](type &self, const int count) { self.global_refine(count); },
+        "count"_a = 1, py::call_guard<py::gil_scoped_release>());
+    c.def("refine_steps_for_half",
+          [](type & /*self*/) { return DGFGridInfo<G>::refineStepsForHalf(); });
+    c.def("apply_on_each_element",
+          [](type &self,
+             std::function<void(const XT::Grid::extract_entity_t<GV> &)>
+                 generic_function) {
+            for (auto &&element : elements(self.leaf_view()))
+              generic_function(element);
+          });
+    c.def("apply_on_each_intersection",
+          [](type &self,
+             std::function<void(const XT::Grid::extract_intersection_t<GV> &)>
+                 generic_function) {
+            auto gv = self.leaf_view();
+            for (auto &&element : elements(gv))
+              for (auto &&intersection : intersections(gv, element))
+                generic_function(intersection);
+          });
+
     return c;
   } // ... bind(...)
 }; // class GridProvider
