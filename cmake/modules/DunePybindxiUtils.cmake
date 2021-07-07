@@ -197,6 +197,17 @@ function(dune_pybindxi_add_module target_name)
     _dune_pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
   endif()
 
+  if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
+    # Strip unnecessary sections of the binary on Linux/Mac OS
+    if(CMAKE_STRIP)
+      if(APPLE)
+        add_custom_command(TARGET ${target_name} POST_BUILD COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:${target_name}>)
+      else()
+        add_custom_command(TARGET ${target_name} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${target_name}>)
+      endif()
+    endif()
+  endif()
+
   if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is needed for bigger binding
     # projects due to the limit to 64k addressable sections
