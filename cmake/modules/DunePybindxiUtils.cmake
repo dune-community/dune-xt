@@ -103,6 +103,17 @@ function(dune_pybindxi_add_module target_name)
     pybind11_strip(${target_name})
   endif()
 
+  if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
+    # Strip unnecessary sections of the binary on Linux/Mac OS
+    if(CMAKE_STRIP)
+      if(APPLE)
+        add_custom_command(TARGET ${target_name} POST_BUILD COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:${target_name}>)
+      else()
+        add_custom_command(TARGET ${target_name} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${target_name}>)
+      endif()
+    endif()
+  endif()
+
   if(MSVC)
     target_link_libraries(${target_name} PRIVATE pybind11::windows_extras)
   endif()
