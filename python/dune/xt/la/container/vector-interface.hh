@@ -27,6 +27,25 @@
 #include <dune/xt/la/container/vector-interface.hh>
 #include <python/dune/xt/la/container/container-interface.hh>
 
+namespace py = pybind11;
+
+template <class Vec>
+Vec* create_from_buffer(py::buffer /* buffer */, const size_t /* ptr_offset */, const size_t /* vec_size */)
+{
+  DUNE_THROW(Dune::NotImplemented, "");
+  return nullptr;
+}
+
+template <>
+Dune::XT::LA::CommonDenseVector<double>*
+create_from_buffer(py::buffer buffer, const size_t ptr_offset, const size_t vec_size)
+{
+  using Vec = Dune::XT::LA::CommonDenseVector<double>;
+  using ScalarType = typename Vec::ScalarType;
+  py::buffer_info info = buffer.request();
+  ScalarType* ptr = static_cast<ScalarType*>(info.ptr);
+  return new Vec(vec_size, ptr + ptr_offset, 0, true);
+}
 
 namespace Dune {
 namespace XT {
@@ -37,7 +56,6 @@ template <class C>
 auto bind_Vector(pybind11::module& m)
 {
   static_assert(is_vector<C>::value);
-  namespace py = pybind11;
   using namespace pybind11::literals;
 
   using S = typename C::ScalarType;
@@ -57,7 +75,10 @@ auto bind_Vector(pybind11::module& m)
           return new C(tmp);
         }),
         "Assigns the elements of the iterable to the vector.");
-
+  c.def(py::init([](py::buffer buffer, const size_t ptr_offset, const size_t vec_size) {
+          return create_from_buffer<C>(buffer, ptr_offset, vec_size);
+        }),
+        "Uses existing buffer as storage.");
   c.def(
       "__repr__",
       [ClassName](const C& self) {
