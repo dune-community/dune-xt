@@ -76,7 +76,9 @@ else(MKL_FOUND)
   find_package(LAPACKE)
 endif(MKL_FOUND)
 find_package(BZip2)
-dune_register_package_flags(LIBRARIES ${BZIP2_LIBRARIES})
+if(BZIP2_FOUND)
+  dune_register_package_flags(LIBRARIES ${BZIP2_LIBRARIES})
+endif(BZIP2_FOUND)
 
 find_package(Spe10Data)
 
