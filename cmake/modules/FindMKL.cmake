@@ -13,18 +13,13 @@
 include(Hints)
 
 set(mkl_hints $ENV{MKLROOT} ${MKLROOT} ${root_hints})
-set(mkl_lib_hints "")
-set(mkl_include_hints "")
-list(APPEND mkl_hints
-            "/opt/intel/mkl/"
-            "$ENV{HOME}/intel/mkl/"
-            "/opt/intel/oneapi/mkl/latest/")
+set(mkl_lib_hints "${MKL_LIBRARY_DIR}")
+set(mkl_include_hints "${MKL_INCLUDE_DIR}")
+list(APPEND mkl_hints "/opt/intel/mkl/" "$ENV{HOME}/intel/mkl/" "/opt/intel/oneapi/mkl/latest/")
 append_to_each("${mkl_hints}" "/lib/" mkl_lib_hints)
 append_to_each("${mkl_hints}" "/lib/intel64/" mkl_lib_hints_intel)
-list(PREPEND mkl_lib_hints "${MKL_LIBRARY_DIR}")
 list(APPEND mkl_lib_hints ${mkl_lib_hints_intel} "/usr/lib/x86_64-linux-gnu")
 append_to_each("${mkl_hints}" "/include/" mkl_include_hints)
-list(PREPEND mkl_include_hints "${MKL_INCLUDE_DIR}")
 list(APPEND mkl_include_hints "/usr/include/mkl/")
 
 find_library(MKL_LP64_LIBRARY mkl_intel_lp64 HINTS ${mkl_lib_hints})
