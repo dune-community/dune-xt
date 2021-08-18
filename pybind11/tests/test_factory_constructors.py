@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
 import pytest
 import re
+
+import env     # noqa: F401
 
 from pybind11_tests import factory_constructors as m
 from pybind11_tests.factory_constructors import tag
@@ -38,9 +41,10 @@ def test_init_factory_basic():
     z3 = m.TestFactory3("bye")
     assert z3.value == "bye"
 
-    with pytest.raises(TypeError) as excinfo:
-        m.TestFactory3(tag.null_ptr)
-    assert str(excinfo.value) == "pybind11::init(): factory function returned nullptr"
+    for null_ptr_kind in [tag.null_ptr, tag.null_unique_ptr, tag.null_shared_ptr]:
+        with pytest.raises(TypeError) as excinfo:
+            m.TestFactory3(null_ptr_kind)
+        assert (str(excinfo.value) == "pybind11::init(): factory function returned nullptr")
 
     assert [i.alive() for i in cstats] == [3, 3, 3]
     assert ConstructorStats.detail_reg_inst() == n_inst + 9
@@ -52,14 +56,18 @@ def test_init_factory_basic():
     assert [i.alive() for i in cstats] == [0, 0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [["3", "hi!"], ["7", "hi again"], ["42", "bye"]]
+    assert [i.values() for i in cstats] == [
+        ["3", "hi!"],
+        ["7", "hi again"],
+        ["42", "bye"],
+    ]
     assert [i.default_constructions for i in cstats] == [1, 1, 1]
 
 
 def test_init_factory_signature(msg):
     with pytest.raises(TypeError) as excinfo:
         m.TestFactory1("invalid", "constructor", "arguments")
-    assert msg(excinfo.value) == """
+    assert (msg(excinfo.value) == """
         __init__(): incompatible constructor arguments. The following argument types are supported:
             1. m.factory_constructors.TestFactory1(arg0: m.factory_constructors.tag.unique_ptr_tag, arg1: int)
             2. m.factory_constructors.TestFactory1(arg0: str)
@@ -67,9 +75,12 @@ def test_init_factory_signature(msg):
             4. m.factory_constructors.TestFactory1(arg0: handle, arg1: int, arg2: handle)
 
         Invoked with: 'invalid', 'constructor', 'arguments'
-    """  # noqa: E501 line too long
+    """
 
-    assert msg(m.TestFactory1.__init__.__doc__) == """
+     # noqa: E501 line too long
+           )
+
+    assert (msg(m.TestFactory1.__init__.__doc__) == """
         __init__(*args, **kwargs)
         Overloaded function.
 
@@ -80,7 +91,10 @@ def test_init_factory_signature(msg):
         3. __init__(self: m.factory_constructors.TestFactory1, arg0: m.factory_constructors.tag.pointer_tag) -> None
 
         4. __init__(self: m.factory_constructors.TestFactory1, arg0: handle, arg1: int, arg2: handle) -> None
-    """  # noqa: E501 line too long
+    """
+
+     # noqa: E501 line too long
+           )
 
 
 def test_init_factory_casting():
@@ -121,7 +135,11 @@ def test_init_factory_casting():
     assert [i.alive() for i in cstats] == [0, 0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [["4", "5", "6", "7", "8"], ["4", "5", "8"], ["6", "7"]]
+    assert [i.values() for i in cstats] == [
+        ["4", "5", "6", "7", "8"],
+        ["4", "5", "8"],
+        ["6", "7"],
+    ]
 
 
 def test_init_factory_alias():
@@ -189,8 +207,10 @@ def test_init_factory_alias():
     assert [i.alive() for i in cstats] == [0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [["1", "8", "3", "4", "5", "6", "123", "10", "47"],
-                                            ["hi there", "3", "4", "6", "move", "123", "why hello!", "move", "47"]]
+    assert [i.values() for i in cstats] == [
+        ["1", "8", "3", "4", "5", "6", "123", "10", "47"],
+        ["hi there", "3", "4", "6", "move", "123", "why hello!", "move", "47"],
+    ]
 
 
 def test_init_factory_dual():
@@ -267,9 +287,10 @@ def test_init_factory_dual():
     assert [i.alive() for i in cstats] == [0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [[
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "100", "11", "12", "13", "14"
-    ], ["2", "4", "6", "8", "9", "100", "12"]]
+    assert [i.values() for i in cstats] == [
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "100", "11", "12", "13", "14"],
+        ["2", "4", "6", "8", "9", "100", "12"],
+    ]
 
 
 def test_no_placement_new(capture):
@@ -278,7 +299,7 @@ def test_no_placement_new(capture):
     with capture:
         a = m.NoPlacementNew(123)
 
-    found = re.search(r'^operator new called, returning (\d+)\n$', str(capture))
+    found = re.search(r"^operator new called, returning (\d+)\n$", str(capture))
     assert found
     assert a.i == 123
     with capture:
@@ -289,7 +310,7 @@ def test_no_placement_new(capture):
     with capture:
         b = m.NoPlacementNew()
 
-    found = re.search(r'^operator new called, returning (\d+)\n$', str(capture))
+    found = re.search(r"^operator new called, returning (\d+)\n$", str(capture))
     assert found
     assert b.i == 100
     with capture:
@@ -319,26 +340,29 @@ def create_and_destroy(*args):
 
 
 def strip_comments(s):
-    return re.sub(r'\s+#.*', '', s)
+    return re.sub(r"\s+#.*", "", s)
 
 
-def test_reallocations(capture, msg):
+def test_reallocation_a(capture, msg):
     """When the constructor is overloaded, previous overloads can require a preallocated value.
     This test makes sure that such preallocated values only happen when they might be necessary,
-    and that they are deallocated properly"""
+    and that they are deallocated properly."""
 
     pytest.gc_collect()
 
     with capture:
         create_and_destroy(1)
-    assert msg(capture) == """
+    assert (msg(capture) == """
         noisy new
         noisy placement new
         NoisyAlloc(int 1)
         ---
         ~NoisyAlloc()
         noisy delete
-    """
+    """)
+
+
+def test_reallocation_b(capture, msg):
     with capture:
         create_and_destroy(1.5)
     assert msg(capture) == strip_comments("""
@@ -351,6 +375,8 @@ def test_reallocations(capture, msg):
         noisy delete   # operator delete
     """)
 
+
+def test_reallocation_c(capture, msg):
     with capture:
         create_and_destroy(2, 3)
     assert msg(capture) == strip_comments("""
@@ -361,6 +387,8 @@ def test_reallocations(capture, msg):
         noisy delete   # operator delete
     """)
 
+
+def test_reallocation_d(capture, msg):
     with capture:
         create_and_destroy(2.5, 3)
     assert msg(capture) == strip_comments("""
@@ -372,6 +400,8 @@ def test_reallocations(capture, msg):
         noisy delete   # operator delete
     """)
 
+
+def test_reallocation_e(capture, msg):
     with capture:
         create_and_destroy(3.5, 4.5)
     assert msg(capture) == strip_comments("""
@@ -383,6 +413,8 @@ def test_reallocations(capture, msg):
         noisy delete   # operator delete
     """)
 
+
+def test_reallocation_f(capture, msg):
     with capture:
         create_and_destroy(4, 0.5)
     assert msg(capture) == strip_comments("""
@@ -395,6 +427,8 @@ def test_reallocations(capture, msg):
         noisy delete   # operator delete
     """)
 
+
+def test_reallocation_g(capture, msg):
     with capture:
         create_and_destroy(5, "hi")
     assert msg(capture) == strip_comments("""
@@ -409,7 +443,7 @@ def test_reallocations(capture, msg):
     """)
 
 
-@pytest.unsupported_on_py2
+@pytest.mark.skipif("env.PY2")
 def test_invalid_self():
     """Tests invocation of the pybind-registered base class with an invalid `self` argument.  You
     can only actually do this on Python 3: Python 2 raises an exception itself if you try."""
@@ -432,7 +466,9 @@ def test_invalid_self():
     class BrokenTF6(m.TestFactory6):
 
         def __init__(self, bad):
-            if bad == 1:
+            if bad == 0:
+                m.TestFactory6.__init__()
+            elif bad == 1:
                 a = m.TestFactory2(tag.pointer, 1)
                 m.TestFactory6.__init__(a, tag.base, 1)
             elif bad == 2:
@@ -446,9 +482,9 @@ def test_invalid_self():
     for arg in (1, 2):
         with pytest.raises(TypeError) as excinfo:
             BrokenTF1(arg)
-        assert str(excinfo.value) == "__init__(self, ...) called with invalid `self` argument"
+        assert (str(excinfo.value) == "__init__(self, ...) called with invalid or missing `self` argument")
 
-    for arg in (1, 2, 3, 4):
+    for arg in (0, 1, 2, 3, 4):
         with pytest.raises(TypeError) as excinfo:
             BrokenTF6(arg)
-        assert str(excinfo.value) == "__init__(self, ...) called with invalid `self` argument"
+        assert (str(excinfo.value) == "__init__(self, ...) called with invalid or missing `self` argument")

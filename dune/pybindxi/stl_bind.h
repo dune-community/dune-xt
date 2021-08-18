@@ -16,8 +16,8 @@
 #include <algorithm>
 #include <sstream>
 
-NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 /* SFINAE helper class used by 'is_comparable */
 template <typename T>
@@ -36,10 +36,11 @@ struct container_traits
   template <typename T2>
   static std::false_type test_pair(...);
 
-  static constexpr bool is_comparable = std::is_same<std::true_type, decltype(test_comparable<T>(nullptr))>::value;
-  static constexpr bool is_pair = std::is_same<std::true_type, decltype(test_pair<T>(nullptr, nullptr))>::value;
-  static constexpr bool is_vector = std::is_same<std::true_type, decltype(test_value<T>(nullptr))>::value;
-  static constexpr bool is_element = !is_pair && !is_vector;
+  static constexpr const bool is_comparable =
+      std::is_same<std::true_type, decltype(test_comparable<T>(nullptr))>::value;
+  static constexpr const bool is_pair = std::is_same<std::true_type, decltype(test_pair<T>(nullptr, nullptr))>::value;
+  static constexpr const bool is_vector = std::is_same<std::true_type, decltype(test_value<T>(nullptr))>::value;
+  static constexpr const bool is_element = !is_pair && !is_vector;
 };
 
 /* Default: is_comparable -> std::false_type */
@@ -57,14 +58,14 @@ struct is_comparable<T, enable_if_t<container_traits<T>::is_element && container
 template <typename T>
 struct is_comparable<T, enable_if_t<container_traits<T>::is_vector>>
 {
-  static constexpr bool value = is_comparable<typename T::value_type>::value;
+  static constexpr const bool value = is_comparable<typename T::value_type>::value;
 };
 
 /* For pairs, recursively check the two data types */
 template <typename T>
 struct is_comparable<T, enable_if_t<container_traits<T>::is_pair>>
 {
-  static constexpr bool value =
+  static constexpr const bool value =
       is_comparable<typename T::first_type>::value && is_comparable<typename T::second_type>::value;
 };
 
@@ -143,7 +144,7 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
   cl.def(
       "append", [](Vector& v, const T& value) { v.push_back(value); }, arg("x"), "Add an item to the end of the list");
 
-  cl.def(init([](iterable it) {
+  cl.def(init([](const iterable& it) {
     auto v = std::unique_ptr<Vector>(new Vector());
     v->reserve(len_hint(it));
     for (handle h : it)
@@ -162,7 +163,7 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
 
   cl.def(
       "extend",
-      [](Vector& v, iterable it) {
+      [](Vector& v, const iterable& it) {
         const size_t old_size = v.size();
         v.reserve(old_size + len_hint(it));
         try {
@@ -201,7 +202,7 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
       [](Vector& v) {
         if (v.empty())
           throw index_error();
-        T t = v.back();
+        T t = std::move(v.back());
         v.pop_back();
         return t;
       },
@@ -211,8 +212,8 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
       "pop",
       [wrap_i](Vector& v, DiffType i) {
         i = wrap_i(i, v.size());
-        T t = v[(SizeType)i];
-        v.erase(v.begin() + i);
+        T t = std::move(v[(SizeType)i]);
+        v.erase(std::next(v.begin(), i));
         return t;
       },
       arg("i"),
@@ -227,12 +228,12 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
   cl.def(
       "__getitem__",
       [](const Vector& v, slice slice) -> Vector* {
-        size_t start, stop, step, slicelength;
+        size_t start = 0, stop = 0, step = 0, slicelength = 0;
 
         if (!slice.compute(v.size(), &start, &stop, &step, &slicelength))
           throw error_already_set();
 
-        Vector* seq = new Vector();
+        auto* seq = new Vector();
         seq->reserve((size_t)slicelength);
 
         for (size_t i = 0; i < slicelength; ++i) {
@@ -247,7 +248,7 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
   cl.def(
       "__setitem__",
       [](Vector& v, slice slice, const Vector& value) {
-        size_t start, stop, step, slicelength;
+        size_t start = 0, stop = 0, step = 0, slicelength = 0;
         if (!slice.compute(v.size(), &start, &stop, &step, &slicelength))
           throw error_already_set();
 
@@ -272,7 +273,7 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
   cl.def(
       "__delitem__",
       [](Vector& v, slice slice) {
-        size_t start, stop, step, slicelength;
+        size_t start = 0, stop = 0, step = 0, slicelength = 0;
 
         if (!slice.compute(v.size(), &start, &stop, &step, &slicelength))
           throw error_already_set();
@@ -389,9 +390,21 @@ struct vector_has_data_and_format<
                      typename Vector::value_type*>::value>> : std::true_type
 {};
 
+// [workaround(intel)] Separate function required here
+// Workaround as the Intel compiler does not compile the enable_if_t part below
+// (tested with icc (ICC) 2021.1 Beta 20200827)
+template <typename... Args>
+constexpr bool args_any_are_buffer()
+{
+  return detail::any_of<std::is_same<Args, buffer_protocol>...>::value;
+}
+
+// [workaround(intel)] Separate function required here
+// [workaround(msvc)] Can't use constexpr bool in return type
+
 // Add the buffer interface to a vector
 template <typename Vector, typename Class_, typename... Args>
-enable_if_t<detail::any_of<std::is_same<Args, buffer_protocol>...>::value> vector_buffer(Class_& cl)
+void vector_buffer_impl(Class_& cl, std::true_type)
 {
   using T = typename Vector::value_type;
 
@@ -407,31 +420,40 @@ enable_if_t<detail::any_of<std::is_same<Args, buffer_protocol>...>::value> vecto
         v.data(), static_cast<ssize_t>(sizeof(T)), format_descriptor<T>::format(), 1, {v.size()}, {sizeof(T)});
   });
 
-  cl.def(init([](buffer buf) {
+  cl.def(init([](const buffer& buf) {
     auto info = buf.request();
     if (info.ndim != 1 || info.strides[0] % static_cast<ssize_t>(sizeof(T)))
       throw type_error("Only valid 1D buffers can be copied to a vector");
     if (!detail::compare_buffer_info<T>::compare(info) || (ssize_t)sizeof(T) != info.itemsize)
       throw type_error("Format mismatch (Python: " + info.format + " C++: " + format_descriptor<T>::format() + ")");
 
-    auto vec = std::unique_ptr<Vector>(new Vector());
-    vec->reserve((size_t)info.shape[0]);
     T* p = static_cast<T*>(info.ptr);
     ssize_t step = info.strides[0] / static_cast<ssize_t>(sizeof(T));
     T* end = p + info.shape[0] * step;
+    if (step == 1) {
+      return Vector(p, end);
+    }
+    Vector vec;
+    vec.reserve((size_t)info.shape[0]);
     for (; p != end; p += step)
-      vec->push_back(*p);
-    return vec.release();
+      vec.push_back(*p);
+    return vec;
   }));
 
   return;
 }
 
 template <typename Vector, typename Class_, typename... Args>
-enable_if_t<!detail::any_of<std::is_same<Args, buffer_protocol>...>::value> vector_buffer(Class_&)
+void vector_buffer_impl(Class_&, std::false_type)
 {}
 
-NAMESPACE_END(detail)
+template <typename Vector, typename Class_, typename... Args>
+void vector_buffer(Class_& cl)
+{
+  vector_buffer_impl<Vector, Class_, Args...>(cl, detail::any_of<std::is_same<Args, buffer_protocol>...>{});
+}
+
+PYBIND11_NAMESPACE_END(detail)
 
 //
 // std::vector
@@ -523,7 +545,7 @@ class_<Vector, holder_type> bind_vector(handle scope, std::string const& name, A
 // std::map, std::unordered_map
 //
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 /* Fallback functions */
 template <typename, typename, typename... Args>
@@ -596,7 +618,7 @@ auto map_if_insertion_operator(Class_& cl, std::string const& name)
 }
 
 
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 template <typename Map, typename holder_type = std::unique_ptr<Map>, typename... Args>
 class_<Map, holder_type> bind_map(handle scope, const std::string& name, Args&&... args)
@@ -670,4 +692,4 @@ class_<Map, holder_type> bind_map(handle scope, const std::string& name, Args&&.
   return cl;
 }
 
-NAMESPACE_END(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_END(PYBIND11_NAMESPACE)

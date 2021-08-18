@@ -18,13 +18,13 @@
 #  undef I
 #endif
 
-NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 
 template <typename T>
 struct format_descriptor<std::complex<T>, detail::enable_if_t<std::is_floating_point<T>::value>>
 {
-  static constexpr char c = format_descriptor<T>::c;
-  static constexpr char value[3] = {'Z', c, '\0'};
+  static constexpr const char c = format_descriptor<T>::c;
+  static constexpr const char value[3] = {'Z', c, '\0'};
   static std::string format()
   {
     return std::string(value);
@@ -34,11 +34,12 @@ struct format_descriptor<std::complex<T>, detail::enable_if_t<std::is_floating_p
 #ifndef PYBIND11_CPP17
 
 template <typename T>
-constexpr char format_descriptor<std::complex<T>, detail::enable_if_t<std::is_floating_point<T>::value>>::value[3];
+constexpr const char
+    format_descriptor<std::complex<T>, detail::enable_if_t<std::is_floating_point<T>::value>>::value[3];
 
 #endif
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 template <typename T>
 struct is_fmt_numeric<std::complex<T>, detail::enable_if_t<std::is_floating_point<T>::value>>
@@ -73,5 +74,5 @@ public:
 
   PYBIND11_TYPE_CASTER(std::complex<T>, _("complex"));
 };
-NAMESPACE_END(detail)
-NAMESPACE_END(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(PYBIND11_NAMESPACE)

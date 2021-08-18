@@ -12,8 +12,8 @@
 
 #include "class.h"
 
-NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 template <>
 class type_caster<value_and_holder>
@@ -37,7 +37,7 @@ private:
   value_and_holder* value = nullptr;
 };
 
-NAMESPACE_BEGIN(initimpl)
+PYBIND11_NAMESPACE_BEGIN(initimpl)
 
 inline void no_nullptr(void* ptr)
 {
@@ -159,6 +159,7 @@ template <typename Class>
 void construct(value_and_holder& v_h, Holder<Class> holder, bool need_alias)
 {
   auto* ptr = holder_helper<Holder<Class>>::get(holder);
+  no_nullptr(ptr);
   // If we need an alias, check that the held pointer is actually an alias instance
   if (Class::has_alias && need_alias && !is_alias<Class>(ptr))
     throw type_error("pybind11::init(): construction failed: returned holder-wrapped instance "
@@ -367,7 +368,13 @@ template <typename Class, typename T, typename O, enable_if_t<std::is_convertibl
 void setstate(value_and_holder& v_h, std::pair<T, O>&& result, bool need_alias)
 {
   construct<Class>(v_h, std::move(result.first), need_alias);
-  setattr((PyObject*)v_h.inst, "__dict__", result.second);
+  auto d = handle(result.second);
+  if (PyDict_Check(d.ptr()) && PyDict_Size(d.ptr()) == 0) {
+    // Skipping setattr below, to not force use of py::dynamic_attr() for Class unnecessarily.
+    // See PR #2972 for details.
+    return;
+  }
+  setattr((PyObject*)v_h.inst, "__dict__", d);
 }
 
 /// Implementation for py::pickle(GetState, SetState)
@@ -412,6 +419,6 @@ struct pickle_factory<Get, Set, RetState(Self), NewInstance(ArgState)>
   }
 };
 
-NAMESPACE_END(initimpl)
-NAMESPACE_END(detail)
-NAMESPACE_END(pybind11)
+PYBIND11_NAMESPACE_END(initimpl)
+PYBIND11_NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(pybind11)

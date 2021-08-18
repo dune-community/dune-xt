@@ -1,15 +1,14 @@
 #pragma once
+#include <utility>
+
 #include "pybind11_tests.h"
 
 /// Simple class used to test py::local:
 template <int>
-class LocalBase
-{
+class LocalBase {
 public:
-  LocalBase(int i)
-    : i(i)
-  {}
-  int i = -1;
+    LocalBase(int i) : i(i) {}
+    int i = -1;
 };
 
 /// Registered with py::module_local in both main and secondary modules:
@@ -45,41 +44,29 @@ PYBIND11_MAKE_OPAQUE(NonLocalVec);
 PYBIND11_MAKE_OPAQUE(NonLocalMap);
 PYBIND11_MAKE_OPAQUE(NonLocalMap2);
 
-
 // Simple bindings (used with the above):
 template <typename T, int Adjust = 0, typename... Args>
-py::class_<T> bind_local(Args&&... args)
-{
-  return py::class_<T>(std::forward<Args>(args)...).def(py::init<int>()).def("get", [](T& i) { return i.i + Adjust; });
+py::class_<T> bind_local(Args &&... args) {
+    return py::class_<T>(std::forward<Args>(args)...).def(py::init<int>()).def("get", [](T &i) {
+        return i.i + Adjust;
+    });
 };
 
 // Simulate a foreign library base class (to match the example in the docs):
 namespace pets {
-class Pet
-{
+class Pet {
 public:
-  Pet(std::string name)
-    : name_(name)
-  {}
-  std::string name_;
-  const std::string& name()
-  {
-    return name_;
-  }
+    Pet(std::string name) : name_(std::move(name)) {}
+    std::string name_;
+    const std::string &name() const { return name_; }
 };
 } // namespace pets
 
-struct MixGL
-{
-  int i;
-  MixGL(int i)
-    : i{i}
-  {}
+struct MixGL {
+    int i;
+    MixGL(int i) : i{i} {}
 };
-struct MixGL2
-{
-  int i;
-  MixGL2(int i)
-    : i{i}
-  {}
+struct MixGL2 {
+    int i;
+    MixGL2(int i) : i{i} {}
 };

@@ -49,8 +49,8 @@
 #  define PYBIND11_HAS_VARIANT 1
 #endif
 
-NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 /// Extracts an const lvalue reference or rvalue reference for U based on the type of T (e.g. for
 /// forwarding a container element).  Typically used indirect via forwarded_type(), below.
@@ -156,7 +156,7 @@ struct list_caster
 
   bool load(handle src, bool convert)
   {
-    if (!isinstance<sequence>(src) || isinstance<str>(src))
+    if (!isinstance<sequence>(src) || isinstance<bytes>(src) || isinstance<str>(src))
       return false;
     auto s = reinterpret_borrow<sequence>(src);
     value.clear();
@@ -172,11 +172,11 @@ struct list_caster
 
 private:
   template <typename T = Type, enable_if_t<std::is_same<decltype(std::declval<T>().reserve(0)), void>::value, int> = 0>
-  void reserve_maybe(sequence s, Type*)
+  void reserve_maybe(const sequence& s, Type*)
   {
     value.reserve(s.size());
   }
-  void reserve_maybe(sequence, void*) {}
+  void reserve_maybe(const sequence&, void*) {}
 
 public:
   template <typename T>
@@ -302,7 +302,9 @@ struct optional_caster
   {
     if (!src)
       return none().inc_ref();
-    policy = return_value_policy_override<typename T::value_type>::policy(policy);
+    if (!std::is_lvalue_reference<T>::value) {
+      policy = return_value_policy_override<T>::policy(policy);
+    }
     return value_conv::cast(*std::forward<T_>(src), policy, parent);
   }
 
@@ -310,7 +312,8 @@ struct optional_caster
   {
     if (!src) {
       return false;
-    } else if (src.is_none()) {
+    }
+    if (src.is_none()) {
       return true; // default-constructed value is already empty
     }
     value_conv inner_caster;
@@ -324,7 +327,7 @@ struct optional_caster
   PYBIND11_TYPE_CASTER(T, _("Optional[") + value_conv::name + _("]"));
 };
 
-#if PYBIND11_HAS_OPTIONAL
+#if defined(PYBIND11_HAS_OPTIONAL)
 template <typename T>
 struct type_caster<std::optional<T>> : public optional_caster<std::optional<T>>
 {};
@@ -334,7 +337,7 @@ struct type_caster<std::nullopt_t> : public void_caster<std::nullopt_t>
 {};
 #endif
 
-#if PYBIND11_HAS_EXP_OPTIONAL
+#if defined(PYBIND11_HAS_EXP_OPTIONAL)
 template <typename T>
 struct type_caster<std::experimental::optional<T>> : public optional_caster<std::experimental::optional<T>>
 {};
@@ -419,21 +422,25 @@ struct variant_caster<V<Ts...>>
   PYBIND11_TYPE_CASTER(Type, _("Union[") + detail::concat(make_caster<Ts>::name...) + _("]"));
 };
 
-#if PYBIND11_HAS_VARIANT
+#if defined(PYBIND11_HAS_VARIANT)
 template <typename... Ts>
 struct type_caster<std::variant<Ts...>> : variant_caster<std::variant<Ts...>>
 {};
 #endif
 
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 inline std::ostream& operator<<(std::ostream& os, const handle& obj)
 {
+#ifdef PYBIND11_HAS_STRING_VIEW
+  os << str(obj).cast<std::string_view>();
+#else
   os << (std::string)str(obj);
+#endif
   return os;
 }
 
-NAMESPACE_END(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_END(PYBIND11_NAMESPACE)
 
 #if defined(_MSC_VER)
 #  pragma warning(pop)

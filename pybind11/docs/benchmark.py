@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import random
 import os
 import time
@@ -13,7 +14,7 @@ def generate_dummy_code_pybind11(nclasses=10):
 
     for cl in range(nclasses):
         decl += "class cl%03i;\n" % cl
-    decl += '\n'
+    decl += "\n"
 
     for cl in range(nclasses):
         decl += "class cl%03i {\n" % cl
@@ -25,14 +26,13 @@ def generate_dummy_code_pybind11(nclasses=10):
             decl += "    cl%03i *fn_%03i(" % (ret, fn)
             decl += ", ".join("cl%03i *" % p for p in params)
             decl += ");\n"
-            bindings += '        .def("fn_%03i", &cl%03i::fn_%03i)\n' % \
-                (fn, cl, fn)
+            bindings += '        .def("fn_%03i", &cl%03i::fn_%03i)\n' % (fn, cl, fn)
         decl += "};\n\n"
-        bindings += '        ;\n'
+        bindings += "        ;\n"
 
     result = "#include <pybind11/pybind11.h>\n\n"
     result += "namespace py = pybind11;\n\n"
-    result += decl + '\n'
+    result += decl + "\n"
     result += "PYBIND11_MODULE(example, m) {\n"
     result += bindings
     result += "}"
@@ -45,7 +45,7 @@ def generate_dummy_code_boost(nclasses=10):
 
     for cl in range(nclasses):
         decl += "class cl%03i;\n" % cl
-    decl += '\n'
+    decl += "\n"
 
     for cl in range(nclasses):
         decl += "class cl%03i {\n" % cl
@@ -57,14 +57,15 @@ def generate_dummy_code_boost(nclasses=10):
             decl += "    cl%03i *fn_%03i(" % (ret, fn)
             decl += ", ".join("cl%03i *" % p for p in params)
             decl += ");\n"
-            bindings += '        .def("fn_%03i", &cl%03i::fn_%03i, py::return_value_policy<py::manage_new_object>())\n' % \
-                (fn, cl, fn)
+            bindings += (
+                '        .def("fn_%03i", &cl%03i::fn_%03i, py::return_value_policy<py::manage_new_object>())\n' %
+                (fn, cl, fn))
         decl += "};\n\n"
-        bindings += '        ;\n'
+        bindings += "        ;\n"
 
     result = "#include <boost/python.hpp>\n\n"
     result += "namespace py = boost::python;\n\n"
-    result += decl + '\n'
+    result += decl + "\n"
     result += "BOOST_PYTHON_MODULE(example) {\n"
     result += bindings
     result += "}"
@@ -83,6 +84,6 @@ for codegen in [generate_dummy_code_pybind11, generate_dummy_code_boost]:
                   "-I /System/Library/Frameworks/Python.framework/Headers -o test.so")
         n2 = dt.datetime.now()
         elapsed = (n2 - n1).total_seconds()
-        size = os.stat('test.so').st_size
+        size = os.stat("test.so").st_size
         print("   {%i, %f, %i}," % (nclasses * nfns, elapsed, size))
     print("}")

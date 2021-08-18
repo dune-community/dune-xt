@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
 import pytest
+
+import env     # noqa: F401
+
 from pybind11_tests import ConstructorStats
 from pybind11_tests import multiple_inheritance as m
 
@@ -10,6 +14,8 @@ def test_multiple_inheritance_cpp():
     assert mt.bar() == 4
 
 
+@pytest.mark.skipif("env.PYPY and env.PY2")
+@pytest.mark.xfail("env.PYPY and not env.PY2")
 def test_multiple_inheritance_mix1():
 
     class Base1:
@@ -54,6 +60,8 @@ def test_multiple_inheritance_mix2():
     assert mt.bar() == 4
 
 
+@pytest.mark.skipif("env.PYPY and env.PY2")
+@pytest.mark.xfail("env.PYPY and not env.PY2")
 def test_multiple_inheritance_python():
 
     class MI1(m.Base1, m.Base2):
@@ -191,7 +199,16 @@ def test_multiple_inheritance_python_many_bases():
             m.BaseN7.__init__(self, 7)
             m.BaseN8.__init__(self, 8)
 
-    class MIMany916(m.BaseN9, m.BaseN10, m.BaseN11, m.BaseN12, m.BaseN13, m.BaseN14, m.BaseN15, m.BaseN16):
+    class MIMany916(
+            m.BaseN9,
+            m.BaseN10,
+            m.BaseN11,
+            m.BaseN12,
+            m.BaseN13,
+            m.BaseN14,
+            m.BaseN15,
+            m.BaseN16,
+    ):
 
         def __init__(self):
             m.BaseN9.__init__(self, 9)
@@ -254,7 +271,7 @@ def test_multiple_inheritance_virtbase():
 
 def test_mi_static_properties():
     """Mixing bases with and without static properties should be possible
-     and the result should be independent of base definition order"""
+    and the result should be independent of base definition order"""
 
     for d in (m.VanillaStaticMix1(), m.VanillaStaticMix2()):
         assert d.vanilla() == "Vanilla"
@@ -276,7 +293,7 @@ def test_mi_static_properties():
         assert d.static_value == 0
 
 
-@pytest.unsupported_on_pypy
+# Requires PyPy 6+
 def test_mi_dynamic_attributes():
     """Mixing bases with and without dynamic attribute support"""
 
