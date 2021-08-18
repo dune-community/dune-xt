@@ -50,7 +50,7 @@ function(dune_pybindxi_add_module target_name)
   dune_target_link_libraries(${target_name} "${DUNE_LIB_ADD_LIBS}")
   add_dune_all_flags(${target_name})
 
-  target_link_libraries(${target_name} PRIVATE dunepybindxi)
+  target_link_libraries(${target_name} dunepybindxi)
   target_include_directories(${target_name} PRIVATE ${PYBIND11_INCLUDE_DIR} ${PYTHON_INCLUDE_DIRS})
   # dune-pybindxi END
 
