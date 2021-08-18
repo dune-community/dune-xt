@@ -392,32 +392,28 @@ public:
   {
     if (periodic_neighbor_)
       return true;
-    else
-      return BaseType::neighbor();
+    return BaseType::neighbor();
   } // bool neighbor() const
 
   ElementType outside() const
   {
     if (periodic_neighbor_)
       return *periodic_neighbor_;
-    else
-      return ElementType(BaseType::outside());
+    return ElementType(BaseType::outside());
   } // ... outside() const
 
   LocalGeometry geometryInOutside() const
   {
     if (periodic_neighbor_)
       return intersection_in_outside_->geometryInInside();
-    else
-      return BaseType::geometryInOutside();
+    return BaseType::geometryInOutside();
   } // ... geometryInOutside() const
 
   int indexInOutside() const
   {
     if (periodic_neighbor_)
       return intersection_in_outside_->indexInInside();
-    else
-      return BaseType::indexInOutside();
+    return BaseType::indexInOutside();
   } // int indexInOutside() const
 
 private:
@@ -907,6 +903,13 @@ public:
     : ImplementationStorage(new Implementation(other.access()))
     , BaseType(ImplementationStorage::access())
   {}
+
+  PeriodicGridView& operator=(const PeriodicGridView& other)
+  {
+    ImplementationStorage::access() = other.access();
+    BaseType::operator=(ImplementationStorage::access());
+    return *this;
+  }
 
   const BaseGridViewType& as_base_grid_view() const
   {

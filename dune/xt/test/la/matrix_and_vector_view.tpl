@@ -27,7 +27,7 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
 {
   using MatrixImp = {{M_TYPE}};
   using VectorImp = {{V_TYPE}};
-  using PatternType = typename Dune::XT::LA::SparsityPatternDefault;
+  using PatternType = Dune::XT::LA::SparsityPatternDefault;
 
   void produces_correct_results() const
   {
