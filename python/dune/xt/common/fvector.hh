@@ -18,8 +18,8 @@
 
 #include <dune/xt/common/fvector.hh>
 
-NAMESPACE_BEGIN(pybind11)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(pybind11)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 
 template <class FieldVectorImp,
@@ -125,7 +125,7 @@ struct type_caster<Dune::XT::Common::FieldVector<K, SIZE>>
 {};
 
 
-NAMESPACE_END(detail)
-NAMESPACE_END(pybind11)
+PYBIND11_NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(pybind11)
 
 #endif // DUNE_XT_COMMON_FVECTOR_PBH

@@ -20,9 +20,7 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/common/bindings.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
 
 #include <python/dune/xt/la/container/container-interface.hh>
 #include <python/dune/xt/la/container/vector-interface.hh>

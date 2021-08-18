@@ -54,11 +54,11 @@ def visualize_grid(grid):
 
         centers = np.array(grid.centers(1), copy=False)[:, 0]
 
-        points = np.zeros(2*grid.size(0))
+        points = np.zeros(2 * grid.size(0))
         points[1::2] = centers[1:]
         points[2::2] = centers[1:(len(centers) - 1)]
 
-        indices = np.zeros(2*grid.size(0))
+        indices = np.zeros(2 * grid.size(0))
         indices[::2] = np.arange(grid.size(0))
         indices[1::2] = np.arange(grid.size(0))
 

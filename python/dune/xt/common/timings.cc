@@ -21,7 +21,6 @@
 #include <python/dune/xt/common/bindings.hh>
 #include <dune/xt/common/python.hh>
 #include <dune/xt/common/timings.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
 

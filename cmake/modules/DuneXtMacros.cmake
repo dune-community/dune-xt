@@ -15,8 +15,8 @@
 # enables "IN_LIST operator
 cmake_policy(SET CMP0057 NEW)
 
-# For some reason, the minimum required version is set to 2.8.3 by the find_package(Vc ...) call
-# in DuneCommonMacros.cmake in dune-common. This causes some warnings, so we reset it here.
+# For some reason, the minimum required version is set to 2.8.3 by the find_package(Vc ...) call in
+# DuneCommonMacros.cmake in dune-common. This causes some warnings, so we reset it here.
 cmake_minimum_required(VERSION 3.8)
 
 include(XtCompilerSupport)
@@ -125,4 +125,4 @@ set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
 
-include(DunePybindxiMacros)
+include(DunePybindxiUtils)

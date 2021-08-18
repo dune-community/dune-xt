@@ -27,7 +27,6 @@
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/common/parameter.hh>
 #include <python/dune/xt/grid/traits.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
 
 namespace Dune::XT::Functions::bindings {
 

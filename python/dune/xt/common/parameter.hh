@@ -16,8 +16,8 @@
 #include <dune/xt/common/parameter.hh>
 
 
-NAMESPACE_BEGIN(pybind11)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(pybind11)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 
 template <typename Type, typename Value>
@@ -76,7 +76,7 @@ struct type_caster<Dune::XT::Common::Parameter>
 {};
 
 
-NAMESPACE_END(detail)
-NAMESPACE_END(pybind11)
+PYBIND11_NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(pybind11)
 
 #endif // PYTHON_DUNE_XT_COMMON_PARAMETER_HH
