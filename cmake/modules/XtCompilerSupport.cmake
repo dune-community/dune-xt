@@ -45,6 +45,6 @@ check_cxx_source_compiles("
 " HAVE_MAP_EMPLACE)
 
 check_cxx_source_compiles("
-    void foo([[maybe_unused]] arg) {}
+    void foo([[maybe_unused]] bool arg) {}
     int main(void){};
 " HAS_WORKING_UNUSED_ATTRIBUTE)
