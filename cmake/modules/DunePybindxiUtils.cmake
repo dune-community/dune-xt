@@ -48,7 +48,7 @@ function(dune_pybindxi_add_module target_name)
   add_library(${target_name} ${lib_type} ${exclude_from_all} ${ARG_UNPARSED_ARGUMENTS})
   # dune-pybindxi START
   dune_target_link_libraries(${target_name} "${DUNE_LIB_ADD_LIBS}")
-  add_dune_all_flags(${target_name})
+  dune_target_enable_all_packages(${target_name})
 
   target_link_libraries(${target_name} dunepybindxi)
   target_include_directories(${target_name} PRIVATE ${PYBIND11_INCLUDE_DIR} ${PYTHON_INCLUDE_DIRS})
