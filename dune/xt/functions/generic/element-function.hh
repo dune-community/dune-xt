@@ -47,15 +47,14 @@ public:
       const std::array<size_t, d>&, const DomainType&, std::vector<DerivativeRangeType>&, const Common::Parameter&)>;
   using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
 
-  GenericElementFunctionSet(
-      GenericSizeFunctionType size_func,
-      GenericSizeFunctionType max_size_func,
-      GenericOrderFunctionType order_func,
-      GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-      const Common::ParameterType& param_type = {},
-      GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
-      GenericDerivativeFunctionType derivative_func = default_derivative_function(),
-      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunctionSet(GenericSizeFunctionType size_func,
+                            GenericSizeFunctionType max_size_func,
+                            GenericOrderFunctionType order_func,
+                            GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
+                            const Common::ParameterType& param_type = {},
+                            GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+                            GenericDerivativeFunctionType derivative_func = default_derivative_function(),
+                            GenericPostBindFunctionType post_bind_func = default_post_bind_function())
     : BaseType(param_type)
     , size_(std::move(size_func))
     , max_size_(std::move(max_size_func))
@@ -66,14 +65,13 @@ public:
     , post_bind_(post_bind_func)
   {}
 
-  GenericElementFunctionSet(
-      const size_t fixed_size,
-      const int ord,
-      GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
-      const Common::ParameterType& param_type = {},
-      GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
-      GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
-      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunctionSet(const size_t fixed_size,
+                            const int ord,
+                            GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
+                            const Common::ParameterType& param_type = {},
+                            GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
+                            GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
+                            GenericPostBindFunctionType post_bind_func = default_post_bind_function())
     : BaseType(param_type)
     , size_([=](const auto& /*param*/) { return fixed_size; })
     , max_size_([=](const auto& /*param*/) { return fixed_size; })
@@ -90,7 +88,7 @@ public:
    */
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     post_bind_(element);
   }
@@ -102,24 +100,24 @@ public:
    * \{
    */
 
-  size_t size(const Common::Parameter& param = {}) const override final
+  size_t size(const Common::Parameter& param = {}) const final
   {
     return size_(this->parse_parameter(param));
   }
 
-  size_t max_size(const Common::Parameter& param = {}) const override final
+  size_t max_size(const Common::Parameter& param = {}) const final
   {
     return max_size_(this->parse_parameter(param));
   }
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   void evaluate(const DomainType& point_in_reference_element,
                 std::vector<RangeType>& result,
-                const Common::Parameter& param = {}) const override final
+                const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -129,7 +127,7 @@ public:
 
   void jacobians(const DomainType& point_in_reference_element,
                  std::vector<DerivativeRangeType>& result,
-                 const Common::Parameter& param = {}) const override final
+                 const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -140,7 +138,7 @@ public:
   void derivatives(const std::array<size_t, d>& alpha,
                    const DomainType& point_in_reference_element,
                    std::vector<DerivativeRangeType>& result,
-                   const Common::Parameter& param = {}) const override final
+                   const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -186,6 +184,11 @@ public:
                  "This GenericElementFunctionSet does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
     };
+  }
+
+  static GenericPostBindFunctionType default_post_bind_function()
+  {
+    return [](const ElementType&) {};
   }
 
   /**
@@ -261,7 +264,7 @@ public:
    */
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     post_bind_(element);
   }
@@ -273,26 +276,26 @@ public:
    * \{
    */
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return evaluate_(point_in_reference_element, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return jacobian_(point_in_reference_element, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_reference_element,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
   {
     return derivative_(alpha, point_in_reference_element, this->parse_parameter(param));
   }
