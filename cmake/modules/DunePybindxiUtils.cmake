@@ -93,9 +93,9 @@ function(dune_pybindxi_add_module target_name)
 
   if(NOT DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
     if(ARG_THIN_LTO)
-      target_link_libraries(${target_name} PRIVATE pybind11::thin_lto)
+      target_link_libraries(${target_name} pybind11::thin_lto)
     else()
-      target_link_libraries(${target_name} PRIVATE pybind11::lto)
+      target_link_libraries(${target_name} pybind11::lto)
     endif()
   endif()
 
@@ -104,11 +104,11 @@ function(dune_pybindxi_add_module target_name)
   endif()
 
   if(MSVC)
-    target_link_libraries(${target_name} PRIVATE pybind11::windows_extras)
+    target_link_libraries(${target_name} pybind11::windows_extras)
   endif()
 
   if(ARG_OPT_SIZE)
-    target_link_libraries(${target_name} PRIVATE pybind11::opt_size)
+    target_link_libraries(${target_name} pybind11::opt_size)
   endif()
 endfunction()
 
