@@ -45,7 +45,7 @@ dune_project()
 # dune-xt cmake includes
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(Python3)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 add_subdirectory(pybind11)
 dune_enable_all_packages(INCLUDE_DIRS
                          ${dune-xt_SOURCE_DIR}/dune
@@ -56,7 +56,8 @@ dune_enable_all_packages(INCLUDE_DIRS
                          dunext)
 
 target_link_libraries(dunepybindxi PRIVATE pybind11::module)
-target_link_libraries(dunepybindxi ${Python3_LIBRARIES})
+target_link_libraries(dunepybindxi PRIVATE ${Python3_LIBRARIES})
+target_link_libraries(dunext INTERFACE ${Python3_LIBRARIES})
 target_include_directories(dunepybindxi PRIVATE pybind11::module)
 
 # ----------------------------------------------------------------------------------------------------
