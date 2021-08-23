@@ -21,8 +21,6 @@
 #  include <dune/pybindxi/stl.h>
 #endif
 
-#include <dune/xt/common/parallel/communicator.hh>
-
 namespace Dune::XT::Common {
 
 //! this class is needed because pybind11 cannot directly use the real mpi_comm type

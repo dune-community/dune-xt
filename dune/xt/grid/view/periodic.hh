@@ -52,8 +52,8 @@ public:
                   const DomainType& upper_right,
                   const std::bitset<dimDomain>& periodic_directions,
                   const BaseGridViewType& base_grid_view,
-                  std::array<IndexType, dimDomain + 1>& entity_counts,
-                  std::array<IndexType, num_geometries>& type_counts,
+                  std::array<size_t, dimDomain + 1>& entity_counts,
+                  std::array<size_t, num_geometries>& type_counts,
                   std::array<std::unordered_set<IndexType>, num_geometries>& entities_to_skip,
                   std::array<std::vector<IndexType>, num_geometries>& new_indices,
                   std::array<std::unordered_map<IndexType, ElementPtrVectorType>, num_geometries>&
@@ -215,8 +215,8 @@ private:
   const std::bitset<dimDomain>& periodic_directions_;
   const BaseGridViewType& base_grid_view_;
   const extract_index_set_t<BaseGridViewType>& base_index_set_;
-  std::array<IndexType, dimDomain + 1>& entity_counts_;
-  std::array<IndexType, num_geometries>& type_counts_;
+  std::array<size_t, dimDomain + 1>& entity_counts_;
+  std::array<size_t, num_geometries>& type_counts_;
   std::array<std::unordered_set<IndexType>, num_geometries>& entities_to_skip_;
   std::array<std::vector<IndexType>, num_geometries>& new_indices_;
   std::vector<DomainType> periodic_coords_;
@@ -259,8 +259,8 @@ public:
   static constexpr size_t num_geometries = GlobalGeometryTypeIndex::size(dimension);
 
   PeriodicIndexSet(const BaseIndexSetType& base_index_set,
-                   const std::array<IndexType, dimension + 1>& entity_counts,
-                   const std::array<IndexType, num_geometries>& type_counts,
+                   const std::array<size_t, dimension + 1>& entity_counts,
+                   const std::array<size_t, num_geometries>& type_counts,
                    const std::array<std::vector<IndexType>, num_geometries>& new_indices)
     : BaseType()
     , base_index_set_(base_index_set)
@@ -302,11 +302,9 @@ public:
     IndexType base_sub_index = base_index_set_.template subIndex<cd>(entity, i, codim);
     if (codim == 0)
       return base_sub_index;
-    else {
-      const auto& ref_element = reference_element(entity);
-      const auto type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
-      return new_indices_[type_index][base_sub_index];
-    }
+    const auto& ref_element = reference_element(entity);
+    const auto type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
+    return new_indices_[type_index][base_sub_index];
   }
 
   template <class EntityType>
@@ -326,7 +324,7 @@ public:
     return type_counts_[type_index];
   }
 
-  IndexType size(int codim) const
+  size_t size(int codim) const
   {
     assert(codim <= dimension);
     return entity_counts_[codim];
@@ -340,8 +338,8 @@ public:
 
 private:
   const BaseIndexSetType& base_index_set_;
-  const std::array<IndexType, dimension + 1>& entity_counts_;
-  const std::array<IndexType, num_geometries>& type_counts_;
+  const std::array<size_t, dimension + 1>& entity_counts_;
+  const std::array<size_t, num_geometries>& type_counts_;
   const std::array<std::vector<IndexType>, num_geometries>& new_indices_;
 }; // class PeriodicIndexSet<...>
 
@@ -729,8 +727,8 @@ public:
     // initialize variables
     boundary_entity_to_periodic_neighbors_maps_ =
         std::make_shared<std::array<std::unordered_map<IndexType, ElementPtrVectorType>, num_geometries>>();
-    entity_counts_ = std::make_shared<std::array<IndexType, dimDomain + 1>>();
-    type_counts_ = std::make_shared<std::array<IndexType, num_geometries>>();
+    entity_counts_ = std::make_shared<std::array<size_t, dimDomain + 1>>();
+    type_counts_ = std::make_shared<std::array<size_t, num_geometries>>();
     entities_to_skip_ = std::make_shared<std::array<std::unordered_set<IndexType>, num_geometries>>();
     new_indices_ = std::make_shared<std::array<std::vector<IndexType>, num_geometries>>();
 
@@ -750,12 +748,12 @@ public:
     index_set_ = std::make_shared<IndexSet>(BaseType::indexSet(), *entity_counts_, *type_counts_, *new_indices_);
   }
 
-  int size(int codim) const
+  size_t size(int codim) const
   {
     return index_set_->size(codim);
   }
 
-  int size(const Dune::GeometryType& type) const
+  size_t size(const Dune::GeometryType& type) const
   {
     return index_set_->size(type);
   }
@@ -833,9 +831,9 @@ private:
       boundary_entity_to_periodic_neighbors_maps_;
   std::bitset<dimDomain> periodic_directions_;
   // number of entities for each codimension
-  std::shared_ptr<std::array<IndexType, dimDomain + 1>> entity_counts_;
+  std::shared_ptr<std::array<size_t, dimDomain + 1>> entity_counts_;
   // number of entities for each geometry type
-  std::shared_ptr<std::array<IndexType, num_geometries>> type_counts_;
+  std::shared_ptr<std::array<size_t, num_geometries>> type_counts_;
   // indices of entities that are not part of the periodic grid view as they are identified with their periodic
   // equivalent
   std::shared_ptr<std::array<std::unordered_set<IndexType>, num_geometries>> entities_to_skip_;

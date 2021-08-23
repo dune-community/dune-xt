@@ -22,7 +22,6 @@ install(
         FindEigen3.cmake
         FindFASP.cmake
         FindLIKWID.cmake
-        FindTBB.cmake
         GridUtils.cmake
         XtCompilerSupport.cmake
         XtTooling.cmake
