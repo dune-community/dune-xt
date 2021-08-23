@@ -33,31 +33,7 @@ macro(INCLUDE_SYS_DIR)
   endforeach(ARG)
 endmacro(INCLUDE_SYS_DIR)
 
-include(CheckIncludeFileCXX)
-include(TestCXXAcceptsFlag)
-check_include_file_cxx("tr1/array" HAVE_TR1_ARRAY)
-check_include_file_cxx("malloc.h" HAVE_MALLOC_H)
-
-check_cxx_source_compiles("
-   int main(void)
-   {
-     auto f = [&] (){ return 0; };
-     return 0;
-   };
-" HAS_LAMBDA_FUNCTIONS)
-
-check_cxx_source_compiles("
-    #include <vector>
-    #include <iterator>
-    int main(void)
-    {
-      std::vector<int> a;
-      std::vector<int>::const_iterator b = std::begin(a);
-      std::vector<int>::const_iterator e = std::end(a);
-      return 0;
-    };
-" HAS_STD_BEGIN_END)
-
+include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("
     #include <map>
     int main(void)
@@ -69,6 +45,6 @@ check_cxx_source_compiles("
 " HAVE_MAP_EMPLACE)
 
 check_cxx_source_compiles("
-    void foo([[maybe_unused]] arg) {}
+    void foo([[maybe_unused]] bool arg) {}
     int main(void){};
 " HAS_WORKING_UNUSED_ATTRIBUTE)

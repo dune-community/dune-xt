@@ -19,7 +19,6 @@
 #include <dune/pybindxi/stl.h>
 
 #include <python/dune/xt/common/bindings.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
 
 #include <dune/pybindxi/pybind11.h>
 

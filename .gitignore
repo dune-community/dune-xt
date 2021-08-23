@@ -51,3 +51,5 @@ cmake/modules/petsc
 *.pyc
 tags
 .vscode
+compile_commands.json
+.cache

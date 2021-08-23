@@ -15,8 +15,8 @@
 # enables "IN_LIST operator
 cmake_policy(SET CMP0057 NEW)
 
-# For some reason, the minimum required version is set to 2.8.3 by the find_package(Vc ...) call
-# in DuneCommonMacros.cmake in dune-common. This causes some warnings, so we reset it here.
+# For some reason, the minimum required version is set to 2.8.3 by the find_package(Vc ...) call in
+# DuneCommonMacros.cmake in dune-common. This causes some warnings, so we reset it here.
 cmake_minimum_required(VERSION 3.8)
 
 include(XtCompilerSupport)
@@ -53,10 +53,11 @@ endif(TARGET Boost::headers)
 foreach(_boost_lib ${DS_REQUIRED_BOOST_LIBS})
   set(_BOOST_LIB "")
   string(TOUPPER "${_boost_lib}" _BOOST_LIB)
-  dune_register_package_flags(LIBRARIES ${Boost_${_BOOST_LIB}_LIBRARY})
   if(TARGET Boost::${_boost_lib})
     dune_register_package_flags(LIBRARIES Boost::${_boost_lib})
-  endif()
+  else(TARGET Boost::${_boost_lib})
+    dune_register_package_flags(LIBRARIES ${Boost_${_BOOST_LIB}_LIBRARY})
+  endif(TARGET Boost::${_boost_lib})
 endforeach(_boost_lib ${DS_REQUIRED_BOOST_LIBS})
 
 find_package(Eigen3 3.2.0)
@@ -125,4 +126,4 @@ set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
 
-include(DunePybindxiMacros)
+include(DunePybindxiUtils)

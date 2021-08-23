@@ -115,12 +115,12 @@ auto bind_Vector(pybind11::module& m)
   c.def(
       "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
   c.def("__iadd__", // function ptr signature required for the right return type
-        (C & (C::*)(const C&)) & C::operator+=,
+        static_cast<C& (C::*)(const C&)>(&C::operator+=),
         py::is_operator());
   c.def(
       "__sub__", [](const C& self, const C& other) { return std::make_unique<C>(self - other); }, py::is_operator());
   c.def("__isub__", // function ptr signature required for the right return type
-        (C & (C::*)(const C&)) & C::operator-=,
+        static_cast<C& (C::*)(const C&)>(&C::operator-=),
         py::is_operator());
   c.def(
       "__mul__",
@@ -138,9 +138,9 @@ auto bind_Vector(pybind11::module& m)
         return ret;
       },
       py::is_operator());
-  c.def("__imul__", // function ptr signature required for the right return type
-        (C & (C::*)(const C&)) & C::operator*=,
-        py::is_operator());
+  // c.def("__imul__", // function ptr signature required for the right return type
+  //       py::overload_cast<const C&>(&C::operator*=),
+  //       py::is_operator());
   c.def(
       "__truediv__",
       [](const C& self, const R& alpha) {
@@ -149,9 +149,9 @@ auto bind_Vector(pybind11::module& m)
         return ret;
       },
       py::is_operator());
-  c.def("__itruediv__", // function ptr signature required for the right return type
-        (C & (C::*)(const C&)) & C::operator/=,
-        py::is_operator());
+  // c.def("__itruediv__", // function ptr signature required for the right return type
+  //       py::overload_cast<const C&>(&C::operator/=),
+  //       py::is_operator());
   c.def(
       "neg",
       [](const C& self) {

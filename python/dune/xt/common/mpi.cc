@@ -24,7 +24,6 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/common/fmatrix.hh>
 #include <python/dune/xt/common/configuration.hh>

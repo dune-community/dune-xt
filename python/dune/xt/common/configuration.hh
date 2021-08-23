@@ -17,8 +17,8 @@
 
 #include <dune/xt/common/configuration.hh>
 
-NAMESPACE_BEGIN(pybind11)
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(pybind11)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 
 template <>
@@ -62,7 +62,7 @@ struct type_caster<Dune::XT::Common::Configuration>
 }; // struct type_caster<Dune::XT::Common::Configuration>
 
 
-NAMESPACE_END(detail)
-NAMESPACE_END(pybind11)
+PYBIND11_NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(pybind11)
 
 #endif // DUNE_XT_COMMON_CONFIGURATION_PBH

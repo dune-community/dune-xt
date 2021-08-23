@@ -79,9 +79,9 @@
 #define LIKWID_PERFMON 1
 #endif
 
-#ifndef HAVE_MAP_EMPLACE
-#cmakedefine HAVE_MAP_EMPLACE 1
-#endif
+#cmakedefine01 HAVE_MAP_EMPLACE
+
+#cmakedefine01 HAS_WORKING_UNUSED_ATTRIBUTE
 
 #ifndef DS_MAX_MIC_THREADS
 #define DS_MAX_MIC_THREADS ${DS_MAX_MIC_THREADS}
@@ -181,10 +181,6 @@
 
 #ifndef DUNE_FEM_COMPATIBILITY
 #define DUNE_FEM_COMPATIBILITY 0
-#endif
-
-#ifndef HAVE_MAP_EMPLACE
-#define HAVE_MAP_EMPLACE 0
 #endif
 
 /*** End: Silence implicitly False evaluation of undefined macro warnings ****/

@@ -45,8 +45,8 @@ class ReinterpretLocalizableFunction
   using BaseType = GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>;
 
 public:
-  using BaseType::r;
-  using BaseType::rC;
+  static constexpr size_t r = BaseType::r;
+  static constexpr size_t rC = BaseType::rC;
   using typename BaseType::LocalFunctionType;
   using typename BaseType::R;
 

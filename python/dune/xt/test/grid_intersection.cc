@@ -15,7 +15,6 @@
 #include <dune/pybindxi/functional.h>
 
 #include <python/dune/xt/common/bindings.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 

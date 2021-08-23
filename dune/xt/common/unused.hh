@@ -26,7 +26,7 @@
 #  define DXTC_MPI_ONLY
 #else
 #  if HAS_WORKING_UNUSED_ATTRIBUTE
-#    define DXTC_DEBUG_ONLY [[maybe_unused]]
+#    define DXTC_MPI_ONLY [[maybe_unused]]
 #  else
 #    define DXTC_MPI_ONLY __attribute__((unused))
 #  endif

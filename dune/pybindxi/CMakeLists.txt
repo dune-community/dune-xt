@@ -22,6 +22,7 @@ install(FILES attr.h
               embed.h
               eval.h
               functional.h
+              gil.h
               interpreter.hh
               iostream.h
               numpy.h
@@ -31,4 +32,12 @@ install(FILES attr.h
               pytypes.h
               stl.h
               stl_bind.h
+              stl/filesystem.h
+              detail/class.h
+              detail/common.h
+              detail/descr.h
+              detail/init.h
+              detail/internals.h
+              detail/type_caster_base.h
+              detail/typeid.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/pybindxi)
