@@ -71,7 +71,7 @@ public:
           DUNE_THROW_IF(codim != dim && codim != 0 && !G::LeafGridView::conforming,
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids and codim " << codim << "!");
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [codim](GeometryType gt, int dimgrid) {
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(self.leaf_view(), [codim](GeometryType gt, int dimgrid) {
             return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
           });
           return mapper.size();
@@ -86,7 +86,7 @@ public:
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids and codim " << codim << "!");
           auto grid_view = self.leaf_view();
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [codim](GeometryType gt, int dimgrid) {
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(self.leaf_view(), [codim](GeometryType gt, int dimgrid) {
             return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
           });
           auto centers =
@@ -110,7 +110,7 @@ public:
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids!");
           auto grid_view = self.leaf_view();
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), mcmgLayout(Codim<1>()));
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(self.leaf_view(), mcmgLayout(Codim<1>()));
           std::set<size_t> global_indices;
           Grid::ApplyOn::InnerIntersections<GV> filter;
           for (auto&& element : elements(grid_view)) {
@@ -137,8 +137,8 @@ public:
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids!");
           auto grid_view = self.leaf_view();
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> element_mapper(self.grid(), mcmgElementLayout());
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> intersection_mapper(self.grid(), mcmgLayout(Codim<1>()));
+          const MultipleCodimMultipleGeomTypeMapper<GV> element_mapper(self.leaf_view(), mcmgElementLayout());
+          const MultipleCodimMultipleGeomTypeMapper<GV> intersection_mapper(self.leaf_view(), mcmgLayout(Codim<1>()));
           LA::CommonDenseVector<size_t> element_indices(intersection_mapper.size(), std::numeric_limits<size_t>::max());
           Grid::ApplyOn::AllIntersectionsOnce<GV> filter;
           for (auto&& element : elements(grid_view)) {
@@ -162,8 +162,8 @@ public:
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids!");
           auto grid_view = self.leaf_view();
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> element_mapper(self.grid(), mcmgElementLayout());
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> intersection_mapper(self.grid(), mcmgLayout(Codim<1>()));
+          const MultipleCodimMultipleGeomTypeMapper<GV> element_mapper(self.leaf_view(), mcmgElementLayout());
+          const MultipleCodimMultipleGeomTypeMapper<GV> intersection_mapper(self.leaf_view(), mcmgLayout(Codim<1>()));
           LA::CommonDenseVector<size_t> element_indices(intersection_mapper.size(), std::numeric_limits<size_t>::max());
           Grid::ApplyOn::InnerIntersectionsOnce<GV> filter;
           for (auto&& element : elements(grid_view)) {
@@ -188,7 +188,7 @@ public:
                         XT::Common::Exceptions::requirements_not_met,
                         "This is not yet implemented for non-conforming grids!");
           auto grid_view = self.leaf_view();
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), mcmgLayout(Codim<1>()));
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(self.leaf_view(), mcmgLayout(Codim<1>()));
           std::set<size_t> global_indices;
           for (auto&& element : elements(grid_view)) {
             for (auto&& intersection : intersections(grid_view, element)) {
@@ -211,7 +211,7 @@ public:
     c.def(
         "visualize",
         [](type& self, const std::string& filename) {
-          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [](GeometryType gt, int dimgrid) {
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(self.leaf_view(), [](GeometryType gt, int dimgrid) {
             return dimgrid - Common::numeric_cast<int>(gt.dim()) == 0;
           });
           double element_index = 0; // not thread safe!
