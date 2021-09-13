@@ -216,13 +216,13 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
               point[dd] = access_to_list_of_points(ii, dd);
             const auto value = self.evaluate(point, mu);
             for (size_t rr = 0; rr < r; ++rr)
-              access_to_values(rr, ii) = value[rr];
+              access_to_values(ii, rr) = value[rr];
           }
           return values;
         },
         "x"_a,
         "mu"_a = XT::Common::Parameter());
-  } // vectorized evaluate for scalars and vectors
+  }
 
   // internal::Divergence<G>::addbind(m, c);
 
