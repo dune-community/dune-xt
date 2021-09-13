@@ -207,7 +207,31 @@ auto bind_Matrix(pybind11::module& m)
       "min_rows"_a = -1,
       "min_cols"_a = -1,
       "mode"_a = "ascii");
-
+  c.def(
+      "to_csr",
+      [](const C& self, const bool prune, const S& eps) {
+        const auto pattern = self.pattern(prune, eps);
+        size_t nnz = 0;
+        for (const auto& row : pattern)
+          nnz += row.size();
+        std::vector<S> data;
+        std::vector<size_t> row_indices;
+        std::vector<size_t> col_indices;
+        data.reserve(nnz);
+        row_indices.reserve(nnz);
+        col_indices.reserve(nnz);
+        for (size_t row_index = 0; row_index < self.rows(); ++row_index) {
+          for (const auto& col_index : pattern.inner(row_index)) {
+            data.push_back(self.get_entry(row_index, col_index));
+            row_indices.push_back(row_index);
+            col_indices.push_back(col_index);
+          }
+        }
+        return std::make_tuple(std::move(data), std::move(row_indices), std::move(col_indices));
+      },
+      py::call_guard<py::gil_scoped_release>(),
+      "prune"_a = false,
+      "eps"_a = 1e-15);
   c.def(
       "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
   c.def("__iadd__", // function ptr signature required for the right return type
