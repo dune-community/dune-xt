@@ -18,7 +18,7 @@
 
 PYBIND11_MODULE(_version, m)
 {
-  m.attr("version") = pybind11::str(TOSTRING(DUNE_XT_VERSION));
+  m.attr("__version__") = pybind11::str(TOSTRING(DUNE_XT_VERSION));
 }
 
 
