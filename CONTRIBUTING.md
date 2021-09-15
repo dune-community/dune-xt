@@ -13,8 +13,7 @@
 # Help
 
 If you are experiencing problems or would like to get help, open up a new
-[issue](https://github.com/dune-community/dune-xt/issues/new) and tag it accordingly
-or ask for help on the [mailinglist](https://listserv.uni-muenster.de/mailman/listinfo/dune-xt-dev).
+[issue](https://github.com/dune-community/dune-xt/issues/new) and tag it accordingly.
 Please note that dune-xt is not one of the core DUNE modules. Thus, you will not get
 any support from the official channels (such as the DUNE mailinglist, the DUNE bugtracker,
 etc...).
@@ -31,11 +30,9 @@ There are several ways to contribute to this project:
 
 Fork the repository and open up a pull request, explaining your changes and why they should be included.
 
-## Mailinglist and issues
+## Issues
 
-Join the [mailinglist](https://listserv.uni-muenster.de/mailman/listinfo/dune-xt-dev) and take a look at the
-[issues](https://github.com/dune-community/dune-xt/issues) to help shape the future of this project.
-
+Take a look at the [issues](https://github.com/dune-community/dune-xt/issues) to help shape the future of this project.
 
 # Coding style
 
