@@ -45,5 +45,5 @@ def guarded_import(globs, base_name, mod_name):
     # and import
     globs.update({k: getattr(mod, k) for k in names})
 
-for mod_name in ('_version',):
-    guarded_import(globals(), 'dune.xt', mod_name)
+
+from ._version import __version__
