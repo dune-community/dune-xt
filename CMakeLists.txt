@@ -13,7 +13,7 @@
 #   Tobias Leibner  (2016, 2018 - 2021)
 # ~~~
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.13)
 
 project("dune-xt" CXX)
 
