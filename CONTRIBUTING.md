@@ -1,13 +1,14 @@
 ```
 # This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2013 - 2014, 2016 - 2017, 2019)
 #   René Fritze     (2009, 2015, 2016, 2019)
+#   Tobias Leibner  (2021)
 ```
 
 # Help
@@ -18,7 +19,6 @@ any support from the official channels (such as the DUNE mailinglist, the DUNE b
 etc...).
 When submitting bugs, please read these
 [general guidelines](https://www.dune-project.org/doc/guides/bug_reporting/) beforehand.
-
 
 # Contributing
 
