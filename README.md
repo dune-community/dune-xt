@@ -13,7 +13,7 @@
 
 dune-xt is an eXTensions module for [DUNE](https://www.dune-project.org),
 which is often used in the context of
-the discretization module [dune-gdt](https://github.com/dune-community/dune-gdt).
+the discretization module [dune-gdt](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-gdt).
 
 There is a paper describing some of the concepts behind this extension. While
 already dated (in particular, the four modules dune-xt-common, dune-xt-grid, dune-xt-la and dune-xt-functions have been merged into the single dune-xt module),
