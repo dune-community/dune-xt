@@ -13,6 +13,6 @@
 
 Module: dune-xt
 Version: 18.11-dev
-Maintainer: felix.schindler@wwu.de
+Maintainer: dune-xt@dune-community.ovh
 Depends: dune-common (>= 2.6) dune-geometry (>= 2.6) dune-grid (>= 2.6) dune-istl (>= 2.6)
 Suggests: dune-testtools (>= 2.6) dune-alugrid (>= 2.6) dune-grid-glue (>= 2.6) dune-uggrid (>= 2.6)
