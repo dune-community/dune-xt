@@ -76,6 +76,8 @@ else(MKL_FOUND)
   find_package(LAPACKE)
 endif(MKL_FOUND)
 
+find_package(Spe10Data)
+
 # intel mic and likwid don't mix
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "k1om")
   include(FindLIKWID)

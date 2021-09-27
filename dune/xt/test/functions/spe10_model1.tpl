@@ -50,24 +50,24 @@ struct Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
-#if HAVE_DUNE_XT_DATA
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+#if HAVE_SPE10_DATA
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType function(
       filename,
       {0, 0},
       {Dune::XT::Functions::Spe10::internal::model_1_length_x, Dune::XT::Functions::Spe10::internal::model_1_length_z});
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
 {
-#if HAVE_DUNE_XT_DATA
+#if HAVE_SPE10_DATA
   auto cfg = FunctionType::defaults();
   EXPECT_EQ(cfg.get<std::string>("name"), FunctionType::static_id());
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
@@ -86,8 +86,8 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
-#if HAVE_DUNE_XT_DATA
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+#if HAVE_SPE10_DATA
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType default_function(
       filename,
       {0, 0},
@@ -95,14 +95,14 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
   const auto leaf_view = grid_.leaf_view();
   visualize(default_function, leaf_view, "test__Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-#if HAVE_DUNE_XT_DATA
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+#if HAVE_SPE10_DATA
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType default_function(
       filename,
       {0, 0},
@@ -113,14 +113,14 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
     local_f->bind(element);
   }
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
-#if HAVE_DUNE_XT_DATA
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+#if HAVE_SPE10_DATA
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType default_function(
       filename,
       {0, 0},
@@ -134,16 +134,16 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
     EXPECT_EQ(expected_order, actual_order);
   }
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
-#if HAVE_DUNE_XT_DATA
+#if HAVE_SPE10_DATA
   const auto leaf_view = grid_.leaf_view();
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType default_function(
       filename,
       {0, 0},
@@ -162,17 +162,17 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
     }
   }
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
-#if HAVE_DUNE_XT_DATA
+#if HAVE_SPE10_DATA
   const auto leaf_view = grid_.leaf_view();
   const DerivativeRangeType expected_jacobian = DerivativeRangeType();
-  auto filename = Dune::XT::Data::spe10_model1_filename();
+  auto filename = SPE10_MODEL1_FILENAME;
   FunctionType default_function(
       filename,
       {0, 0},
@@ -187,7 +187,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
     }
   }
 #else
-  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+  std::cout << "Test disabled, missing spe10 data files!" << std::endl;
 #endif
 }
 

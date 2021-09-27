@@ -15,9 +15,6 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/configuration.hh>
-#if HAVE_DUNE_XT_DATA
-#  include <dune/xt/data/paths.hh>
-#endif
 
 #include "../checkerboard.hh"
 
@@ -118,8 +115,8 @@ public:
     Common::Configuration config;
     config["type"] = static_id();
     config["filename"] =
-#if HAVE_DUNE_XT_DATA
-        Data::spe10_model2_filename();
+#if HAVE_SPE10_DATA
+        SPE10_MODEL2_FILENAME;
 #else
         "spe_perm.dat";
 #endif

@@ -91,6 +91,10 @@
 #define HAVE_DUNE_FEM_PARAMETER_REPLACE 0
 #endif
 
+#cmakedefine01 HAVE_SPE10_DATA
+#define SPE10_MODEL1_FILENAME "${SPE10_MODEL1_FILENAME}"
+#define SPE10_MODEL2_FILENAME "${SPE10_MODEL2_FILENAME}"
+
 /* needed in dune/xt/common/profiler.hh */
 #ifndef DUNE_XT_DO_TIMING
 #define DUNE_XT_DO_TIMING 0

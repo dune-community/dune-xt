@@ -5,7 +5,12 @@ import json
 import pandas as pd
 
 categories = ['Source', 'InstantiateClass', 'InstantiateFunction', 'ParseClass', 'ParseTemplate']
-categories = ['Source', 'InstantiateClass', 'InstantiateFunction',]
+categories = [
+    'Source',
+    'InstantiateClass',
+    'InstantiateFunction',
+]
+
 
 def read_files(filenames):
     df = None
@@ -20,9 +25,10 @@ def read_files(filenames):
     df['reldur'] = df[['dur']] / df[['dur']].max()
     return df
 
+
 def _process_sources(df, strip_dir, detail_name):
     sources = df[df['name'] == detail_name]
-    sources['detail'] = [f['detail'].replace(strip_dir,'PROJ_ROOT/') for f in sources['args']]
+    sources['detail'] = [f['detail'].replace(strip_dir, 'PROJ_ROOT/') for f in sources['args']]
     sources = sources.drop('args', axis=1)
     sources = sources.sort_values(by=['dur'], ascending=False)
     total_time = sources['dur'].sum()
@@ -35,6 +41,7 @@ def _process_sources(df, strip_dir, detail_name):
     sl = sl.rename(columns={'detail': detail_name, 'dur': 'cum. time (s)', 'count': 'event count'})
     return sl
 
+
 def report(trace_files, out_fn_base='time_trace_results', strip_dir=''):
     df = read_files(trace_files)
     df.to_pickle(f'{out_fn_base}.dataframe.pickle.xz')
@@ -46,6 +53,7 @@ def report(trace_files, out_fn_base='time_trace_results', strip_dir=''):
     with open(f'{out_fn_base}.totals.md', 'wt') as out:
         out.write('Totals:\n')
         out.write(totals.groupby(['name'])[['dur']].sum().rename(columns={'dur': 'cum. time (s)'}).to_markdown())
+
 
 if __name__ == '__main__':
     strip_dir = '/home/r_milk01/master_xt/'
