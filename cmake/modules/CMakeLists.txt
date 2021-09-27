@@ -11,8 +11,7 @@
 #   Tobias Leibner  (2020)
 # ~~~
 
-install(FILES AddALUGridCompileFlags.cmake
-              DuneTBB.cmake
+install(FILES DuneTBB.cmake
               DuneUtils.cmake
               DuneXtMacros.cmake
               DunePybindxiMacros.cmake
