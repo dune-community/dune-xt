@@ -18,7 +18,6 @@ install(
         DuneXtVersionHelper.cmake
         DunePybindxiMacros.cmake
         DunePybindxiUtils.cmake
-        FindPythonLibsNew.cmake
         FindEigen3.cmake
         FindFASP.cmake
         FindLIKWID.cmake
