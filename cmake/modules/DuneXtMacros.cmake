@@ -69,8 +69,6 @@ else(EIGEN3_FOUND)
   set(HAVE_EIGEN 0)
 endif(EIGEN3_FOUND)
 
-find_package(Clp)
-find_package(Qhull)
 find_package(MKL)
 if(MKL_FOUND)
   set(HAVE_LAPACKE 0)
