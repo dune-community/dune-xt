@@ -27,4 +27,3 @@ install(
         XtCompilerSupport.cmake
         XtTooling.cmake
   DESTINATION ${DUNE_INSTALL_MODULEDIR})
-
