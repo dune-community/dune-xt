@@ -1,19 +1,19 @@
 ```
 # This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2013 - 2014, 2016 - 2017, 2019)
 #   René Fritze     (2009, 2015, 2019)
-#   Tobias Leibner  (2020)
+#   Tobias Leibner  (2020 - 2021)
 ```
 
 dune-xt is an eXTensions module for [DUNE](https://www.dune-project.org),
 which is often used in the context of
-the discretization module [dune-gdt](https://github.com/dune-community/dune-gdt).
+the discretization module [dune-gdt](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-gdt).
 
 There is a paper describing some of the concepts behind this extension. While
 already dated (in particular, the four modules dune-xt-common, dune-xt-grid, dune-xt-la and dune-xt-functions have been merged into the single dune-xt module),

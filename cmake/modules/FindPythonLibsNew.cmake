@@ -1,3 +1,14 @@
+# ~~~
+# This file is part of the dune-xt project:
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   Felix Schindler (2016)
+#   Tobias Leibner  (2020)
+#
 # * Find python libraries This module finds the libraries corresponding to the Python interpreter FindPythonInterp
 #   provides. This code sets the following variables:
 #
@@ -8,6 +19,7 @@
 # - whether the Python interpreter is a debug build
 #
 # Thanks to talljimbo for the patch adding the 'LDVERSION' config variable usage.
+# ~~~
 
 # =============================================================================
 # Copyright 2001-2009 Kitware, Inc. Copyright 2012 Continuum Analytics, Inc.

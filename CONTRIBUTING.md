@@ -1,25 +1,24 @@
 ```
 # This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2013 - 2014, 2016 - 2017, 2019)
 #   René Fritze     (2009, 2015, 2016, 2019)
+#   Tobias Leibner  (2021)
 ```
 
 # Help
 
-If you are experiencing problems or would like to get help, open up a new
-[issue](https://github.com/dune-community/dune-xt/issues/new) and tag it accordingly.
+If you are experiencing problems or would like to get help, just send us an [email](dune-xt@dune-community.ovh).
 Please note that dune-xt is not one of the core DUNE modules. Thus, you will not get
 any support from the official channels (such as the DUNE mailinglist, the DUNE bugtracker,
 etc...).
 When submitting bugs, please read these
 [general guidelines](https://www.dune-project.org/doc/guides/bug_reporting/) beforehand.
-
 
 # Contributing
 
@@ -32,7 +31,8 @@ Fork the repository and open up a pull request, explaining your changes and why 
 
 ## Issues
 
-Take a look at the [issues](https://github.com/dune-community/dune-xt/issues) to help shape the future of this project.
+Take a look at the [issues](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/issues)
+to help shape the future of this project.
 
 # Coding style
 
@@ -56,7 +56,8 @@ dimensions, such as `static const size_t dim = 2;`).
 typos.
 * Include guards follow a pattern: file location `dune/xt/common/fvector.hh` turns into `DUNE_XT_COMMON_FVECTOR_HH`
 * Be careful to handle integers corretly, bad integer conversion is bad! Whenever possible, use `size_t` (even for
-`template<class Foo, size_t bar>`) and convert to the correct type using our `numeric_cast` from [dune/xt/common/numeric_cast.hh](https://github.com/dune-community/dune-xt/blob/master/dune/xt/common/numeric_cast.hh):
+`template<class Foo, size_t bar>`) and convert to the correct type using our `numeric_cast` from
+[dune/xt/common/numeric_cast.hh](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/blob/master/dune/xt/common/numeric_cast.hh):
 ```c++
 #include <dune/xt/common/numeric_cast.hh>
 
@@ -68,8 +69,8 @@ Dune::function_that_requires_an_int_because_ints_are_cool(Dune::XT::Common::nume
 Within functions and methods, only very rarely place an empty line!
 If you feel you need a visual break, placing a comment is often a better idea.
 Within a struct or class, place one newline before each method and before the block of members.
-Between classes, free functions and the like in a header, always place two newlines to visually seperate them.
-If you have several tempalte specializations of the same class or function, one newline does suffice.
+Between classes, free functions and the like in a header, always place two newlines to visually separate them.
+If you have several template specializations of the same class or function, one newline does suffice.
 For example:
 ```c++
 #include "header.hh"

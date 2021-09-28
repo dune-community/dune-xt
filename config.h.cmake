@@ -1,13 +1,13 @@
 // This file is part of the dune-xt project:
-//   https://github.com/dune-community/dune-xt
-// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+//   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+// Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2013 - 2018)
-//   René Fritze     (2013 - 2019)
-//   Tobias Leibner  (2014, 2016 - 2020)
+//   Felix Schindler (2013 - 2018, 2020)
+//   René Fritze     (2013 - 2020)
+//   Tobias Leibner  (2014, 2016 - 2021)
 
 /* begin dune-xt */
 // NEVER delete/alter above comment, dune's cmake relies on it
@@ -90,6 +90,10 @@
 #ifndef HAVE_DUNE_FEM_PARAMETER_REPLACE
 #define HAVE_DUNE_FEM_PARAMETER_REPLACE 0
 #endif
+
+#cmakedefine01 HAVE_SPE10_DATA
+#define SPE10_MODEL1_FILENAME "${SPE10_MODEL1_FILENAME}"
+#define SPE10_MODEL2_FILENAME "${SPE10_MODEL2_FILENAME}"
 
 /* needed in dune/xt/common/profiler.hh */
 #ifndef DUNE_XT_DO_TIMING

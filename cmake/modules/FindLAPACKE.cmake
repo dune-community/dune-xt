@@ -1,7 +1,7 @@
 # ~~~
 # This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -13,11 +13,6 @@
 
 include(Hints)
 
-find_package(BLAS)
-if(BLAS_FOUND)
-  list(APPEND LAPACKE_LIBRARIES ${BLAS_LIBRARIES})
-  list(APPEND LAPACKE_LIBRARIES gfortran)
-endif()
 message("-- checking for lapacke library")
 find_library(LAPACKE_LIBRARY lapacke HINTS ${lib_hints})
 if("${LAPACKE_LIBRARY}" MATCHES "LAPACKE_LIBRARY-NOTFOUND")
@@ -36,14 +31,26 @@ else("${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
   include_sys_dir("${LAPACKE_INCLUDE_DIRS}")
 endif("${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
 
+find_package(BLAS)
+if(BLAS_FOUND)
+  list(APPEND LAPACKE_LIBRARIES ${BLAS_LIBRARIES})
+  list(APPEND LAPACKE_LIBRARIES gfortran)
+endif()
+find_package(LAPACK)
+if(LAPACK_FOUND)
+  list(APPEND LAPACKE_LIBRARIES ${LAPACK_LIBRARIES})
+endif()
+
 if(NOT DEFINED LAPACKE_FOUND)
   set(LAPACKE_FOUND 0)
 endif(NOT DEFINED LAPACKE_FOUND)
-if(NOT "${LAPACKE_LIBRARY}" MATCHES "LAPACKE_LIBRARY-NOTFOUND")
-  if(NOT "${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
-    set(LAPACKE_FOUND 1)
-  endif(NOT "${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
-endif(NOT "${LAPACKE_LIBRARY}" MATCHES "LAPACKE_LIBRARY-NOTFOUND")
+if(LAPACK_FOUND)
+  if(NOT "${LAPACKE_LIBRARY}" MATCHES "LAPACKE_LIBRARY-NOTFOUND")
+    if(NOT "${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
+      set(LAPACKE_FOUND 1)
+    endif(NOT "${LAPACKE_INCLUDE_DIRS}" MATCHES "LAPACKE_INCLUDE_DIRS-NOTFOUND")
+  endif(NOT "${LAPACKE_LIBRARY}" MATCHES "LAPACKE_LIBRARY-NOTFOUND")
+endif(LAPACK_FOUND)
 
 set(HAVE_LAPACKE ${LAPACKE_FOUND})
 

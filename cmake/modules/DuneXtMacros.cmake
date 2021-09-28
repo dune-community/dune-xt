@@ -1,15 +1,15 @@
 # ~~~
 # This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   Felix Schindler (2013 - 2014, 2016 - 2017)
-#   René Fritze     (2013 - 2016, 2018 - 2019)
+#   Felix Schindler (2013 - 2014, 2016 - 2017, 2020)
+#   René Fritze     (2013 - 2016, 2018 - 2020)
 #   Sven Kaulmann   (2014)
-#   Tobias Leibner  (2016, 2018 - 2020)
+#   Tobias Leibner  (2016, 2018 - 2021)
 # ~~~
 
 # enables "IN_LIST operator
@@ -69,14 +69,14 @@ else(EIGEN3_FOUND)
   set(HAVE_EIGEN 0)
 endif(EIGEN3_FOUND)
 
-find_package(Clp)
-find_package(Qhull)
 find_package(MKL)
 if(MKL_FOUND)
   set(HAVE_LAPACKE 0)
 else(MKL_FOUND)
   find_package(LAPACKE)
 endif(MKL_FOUND)
+
+find_package(Spe10Data)
 
 # intel mic and likwid don't mix
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "k1om")
