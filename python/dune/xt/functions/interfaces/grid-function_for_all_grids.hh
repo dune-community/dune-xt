@@ -38,28 +38,51 @@ struct GridFunctionInterface_for_all_grids
   {
     static constexpr size_t rC = Dune::XT::Common::tuple_head_t<Dims>::value;
 
-    template <bool vector = (r != 1 && rC == 1), bool matrix = (rC != 1), bool anything = false>
-    struct product_helper // <true, false, ...>
+    template <bool scalar = (r == 1 && rC == 1),
+              bool vector = (r != 1 && rC == 1),
+              bool matrix = (rC != 1),
+              bool anything = false>
+    struct product_helper;
+
+    template <bool anything>
+    struct product_helper<true, false, false, anything>
     {
       static void addbind(pybind11::module& m)
       {
         using Dune::XT::Functions::bindings::ProductGridFunction;
         using Dune::XT::Grid::bindings::grid_name;
 
-        // special case: vector * vector
+        ProductGridFunction<G, E, 1, 1, 1, 1>::bind(m, grid_name<G>::value());
+      }
+    };
+
+    template <bool anything>
+    struct product_helper<false, true, false, anything>
+    {
+      static void addbind(pybind11::module& m)
+      {
+        using Dune::XT::Functions::bindings::ProductGridFunction;
+        using Dune::XT::Grid::bindings::grid_name;
+
+        // vector * scalar
+        ProductGridFunction<G, E, r, 1, 1, 1>::bind(m, grid_name<G>::value());
+        // vector * vector
         ProductGridFunction<G, E, r, 1, r, 1>::bind(m, grid_name<G>::value());
       }
     };
 
     template <bool anything>
-    struct product_helper<false, true, anything>
+    struct product_helper<false, false, true, anything>
     {
       static void addbind(pybind11::module& m)
       {
         using Dune::XT::Functions::bindings::ProductGridFunction;
         using Dune::XT::Grid::bindings::grid_name;
 
-        // general case: matrix * matrix or vector
+        // matrix * scalar
+        if (r * rC != 1)
+          ProductGridFunction<G, E, r, rC, 1, 1>::bind(m, grid_name<G>::value());
+        // matrix * matrix or vector
         ProductGridFunction<G, E, r, rC, rC, 1>::bind(m, grid_name<G>::value());
         ProductGridFunction<G, E, r, rC, rC, 2>::bind(m, grid_name<G>::value());
         ProductGridFunction<G, E, r, rC, rC, 3>::bind(m, grid_name<G>::value());
