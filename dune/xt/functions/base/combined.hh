@@ -39,34 +39,37 @@ struct CombinedDim
   }
 };
 
-// general case: non-scalar matrix * non-scalar {matrix or vector}
 template <size_t L_r, size_t L_rC, size_t R_r, size_t R_rC>
 struct CombinedDim<CombinationType::product, L_r, L_rC, R_r, R_rC>
 {
   static constexpr size_t r()
   {
-    if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
-      return 1;
-    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+    if constexpr (L_rC == R_r) { // matrix*matrix case, all scalar case
+      return L_r;
+    } else if constexpr (R_r == 1 && R_rC == 1) { // any left, scalar right case
+      return L_r;
+    } else if constexpr (L_r == 1 && L_rC == 1) { // scalar left, any right case
       return R_r;
-    } else if constexpr (R_r == 1 && R_rC == 1) {
-      return L_r;
-    } else if constexpr (L_rC * R_rC != 1) {
-      return L_r;
+    } else if constexpr (L_r == R_r && L_rC == 1 && R_rC == 1) { // all vectors case
+      return 1;
+    } else if constexpr (L_rC == R_rC && L_r == 1 && R_r == 1) { // all transposed vectors case
+      return 1;
     }
     return 0;
   }
 
   static constexpr size_t rC()
   {
-    if constexpr (R_rC == 1 && L_rC == 1 && L_r != 1) {
-      return 1;
-    } else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
+    if constexpr (L_rC == R_r) { // matrix*matrix case, all scalar case
       return R_rC;
-    } else if constexpr (R_r == 1 && R_rC == 1) {
+    } else if constexpr (R_r == 1 && R_rC == 1) { // any left, scalar right case
       return L_rC;
-    } else if constexpr (L_rC * R_rC != 1) {
+    } else if constexpr (L_r == 1 && L_rC == 1) { // scalar left, any right case
       return R_rC;
+    } else if constexpr (L_r == R_r && L_rC == 1 && R_rC == 1) { // all vectors case
+      return 1;
+    } else if constexpr (L_rC == R_rC && L_r == 1 && R_r == 1) { // all transposed vectors case
+      return 1;
     }
     return 0;
   }
@@ -162,7 +165,6 @@ struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
       } else
         return left.evaluate(point, param) * right.evaluate(point, param);
     }
-
     // special case: non-scalar elementwise multiplication by scalar from the left
     else if constexpr (L_r == 1 && L_rC == 1 && R_r * R_rC != 1) {
       const auto left_value = left.evaluate(point, param)[0];
@@ -170,19 +172,23 @@ struct CombinedEval<CombinationType::product, L_R, R_R, L_r, L_rC, R_r, R_rC>
       right_value *= left_value;
       return right_value;
     }
-    // special case: elementwise multiplication by scalar from the right AND all scalar case
-    else if constexpr (std::is_convertible<decltype(left.evaluate(point, param)), RangeReturnType>::value && R_r == 1
-                       && R_rC == 1) {
+    // special case: non-scalar elementwise multiplication by scalar from the right
+    else if constexpr (R_r == 1 && R_rC == 1 && L_r * L_rC != 1) {
       RangeReturnType left_value = left.evaluate(point, param);
-      const auto right_value = right.evaluate(point, param)[0];
-      left_value *= right_value;
+      left_value *= right.evaluate(point, param)[0];
       return left_value;
+    }
+    // special case: all scalar case
+    else if constexpr (L_r == 1 && L_rC == 1 && R_r == 1 && R_rC == 1) {
+      return left.evaluate(point, param)[0] * right.evaluate(point, param)[0];
     }
     // special case: non-scalar vectors
     else if constexpr (L_r == R_r && R_rC == 1 && L_rC == 1 && L_r != 1) {
       return left.evaluate(point, param) * right.evaluate(point, param);
     }
-    DUNE_THROW(NotImplemented, "no product compute combination available");
+    DUNE_THROW(NotImplemented,
+               "no product compute combination available for L_r=" << L_r << ", L_rC=" << L_rC << ", R_r=" << R_r
+                                                                   << ", R_rC=" << R_rC << "!");
   }
 };
 
