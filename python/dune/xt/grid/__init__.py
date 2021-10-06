@@ -23,6 +23,7 @@ for mod_name in (
         '_grid_boundaryinfo_allneumann',
         '_grid_boundaryinfo_allreflecting',
         '_grid_boundaryinfo_interfaces',
+        '_grid_boundaryinfo_functionbased',
         '_grid_boundaryinfo_normalbased',
         '_grid_boundaryinfo_types',
         '_grid_element',
