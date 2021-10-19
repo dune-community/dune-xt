@@ -1,7 +1,7 @@
 macro(dune_xt_module_version_from_git)
 
     execute_process(COMMAND
-        ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}
+        ${PYTHON_EXECUTABLE}
             ${PROJECT_SOURCE_DIR}/cmake/modules/versioneer.py
             ${PROJECT_SOURCE_DIR}
                     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
