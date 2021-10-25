@@ -38,13 +38,15 @@ list(APPEND CMAKE_MODULE_PATH ${dune-common_MODULE_PATH} ${PROJECT_SOURCE_DIR}/c
 
 # include the dune macros
 include(DuneMacros)
+include(DuneUtils)
 
 # start a dune project with information from dune.module
 dune_project()
 
 # (re-)set version info from git if available
 include(DuneXtVersionHelper)
-dune_xt_module_version_from_git(DUNE_XT)
+dune_xt_module_version_from_git(dune-xt)
+
 # dune-xt cmake includes
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 

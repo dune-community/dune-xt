@@ -41,7 +41,7 @@ class InstallPlatlib(install):
 
 
 setup(name='dune-xt',
-      version='${DUNE_XT_VERSION}',
+      version='${dune-xt_VERSION}',
       namespace_packages=['dune'],
       setup_requires=['wheel'],
       description='Python for Dune-Xt',
