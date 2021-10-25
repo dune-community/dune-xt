@@ -1,8 +1,13 @@
 macro(dune_xt_module_version_from_git TARGET_MODULE)
 
+    if (dune-xt_MODULE_PATH)
+      set(VERSIONEER_DIR ${dune-xt_MODULE_PATH})
+    else()
+      set(VERSIONEER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+    endif()
     execute_process(COMMAND
         ${PYTHON_EXECUTABLE}
-            ${PROJECT_SOURCE_DIR}/cmake/modules/versioneer.py
+            ${VERSIONEER_DIR}/versioneer.py
             ${PROJECT_SOURCE_DIR}
                     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                     OUTPUT_VARIABLE GIT_DESCRIBE_VERSION
@@ -21,10 +26,21 @@ macro(dune_xt_module_version_from_git TARGET_MODULE)
     set(${TARGET_MODULE}_VERSION_MINOR    "${DUNE_VERSION_MINOR}")
     set(${TARGET_MODULE}_VERSION_REVISION "${DUNE_VERSION_REVISION}")
 
-    # configure CPack
     set(CPACK_PACKAGE_NAME "${DUNE_MOD_NAME}")
     set(CPACK_PACKAGE_VERSION "${DUNE_VERSION_MAJOR}.${DUNE_VERSION_MINOR}.${DUNE_VERSION_REVISION}")
     set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
     set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}" "\\\\.svn" "\\\\.git" ".*/*\\\\.gitignore")
+
+    # reset variables from dune-common/cmake/modules/DuneMacros.cmake:dune_project
+    set(ProjectVersion         "${GIT_DESCRIBE_VERSION}")
+    set(ProjectVersionString   "${DUNE_VERSION_MAJOR}.${DUNE_VERSION_MINOR}.${DUNE_VERSION_REVISION}")
+    set(ProjectVersionMajor    "${DUNE_VERSION_MAJOR}")
+    set(ProjectVersionMinor    "${DUNE_VERSION_MINOR}")
+    set(ProjectVersionRevision "${DUNE_VERSION_REVISION}")
+
+    # need to re-run template insertion
+    configure_file(
+      ${CONFIG_VERSION_FILE}
+      ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake @ONLY)
 
 endmacro(dune_xt_module_version_from_git)
