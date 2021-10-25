@@ -68,12 +68,14 @@ def get_root():
 def get_config_from_root(root):
     """Read the project setup.cfg file to determine Versioneer config."""
 
-    CONFIG = """
+    mode = "pep440-pre" if os.environ.get("CI", 0) else "pep440"
+
+    CONFIG = f"""
     # Hardcoded config for all our modules
 
     [versioneer]
     VCS = git
-    style = pep440
+    style = {mode}
     versionfile_source =
     versionfile_build =
     tag_prefix =
