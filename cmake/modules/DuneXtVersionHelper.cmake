@@ -39,6 +39,22 @@ macro(dune_xt_module_version_from_git TARGET_MODULE)
     set(ProjectVersionRevision "${DUNE_VERSION_REVISION}")
 
     # need to re-run template insertion
+    if(NOT EXISTS ${PROJECT_SOURCE_DIR}/${ProjectName}-config-version.cmake.in)
+      file(WRITE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config-version.cmake.in
+  "set(PACKAGE_VERSION \"${ProjectVersionString}\")
+
+  if(\"\${PACKAGE_FIND_VERSION_MAJOR}\" EQUAL \"${ProjectVersionMajor}\" AND
+       \"\${PACKAGE_FIND_VERSION_MINOR}\" EQUAL \"${ProjectVersionMinor}\")
+    set (PACKAGE_VERSION_COMPATIBLE 1) # compatible with newer
+    if (\"\${PACKAGE_FIND_VERSION}\" VERSION_EQUAL \"${ProjectVersionString}\")
+      set(PACKAGE_VERSION_EXACT 1) #exact match for this version
+    endif()
+  endif()
+  ")
+      set(CONFIG_VERSION_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config-version.cmake.in)
+    else()
+      set(CONFIG_VERSION_FILE ${PROJECT_SOURCE_DIR}/${ProjectName}-config-version.cmake.in)
+    endif()
     configure_file(
       ${CONFIG_VERSION_FILE}
       ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake @ONLY)

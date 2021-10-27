@@ -19,6 +19,12 @@ include(XtCompilerSupport)
 include(XtTooling)
 include(Hints)
 
+# (re-)set version info from git if available
+include(DuneXtVersionHelper)
+dune_xt_module_version_from_git(DUNE_XT)
+
+set(DXT_DONT_LINK_PYTHON_LIB ${DXT_DONT_LINK_PYTHON_LIB} CACHE STRING "wheelbuilders want to set this to 1")
+
 # library checks  #########################################################################
 find_package(PkgConfig)
 
