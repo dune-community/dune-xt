@@ -17,13 +17,18 @@ from setuptools import setup, find_packages
 from setuptools.dist import Distribution
 from setuptools.command.install import install
 
-requires=['jinja2', 'docopt', 'pylicense3>=0.4.1',
-                        'ipython', 'pytest', 'pytest-cov', 'cmake_format==0.4.1',
-                        'codecov', 'yapf==0.25', 'loguru', 'numpy', 'scipy', 'matplotlib',
-                        'k3d', 'vtk', 'ipywidgets', 'lxml', 'xmljson']
-extras_require = []
+requires=['ipython','numpy', 'scipy']
+
+extras_require = {
+  'visualisation': ( 'k3d', 'vtk', 'ipywidgets', 'lxml', 'xmljson',
+                     'matplotlib',),
+  'infrastructure': ('pylicense3>=0.4.1', 'pytest', 'pytest-cov',
+                     'cmake_format==0.4.1', 'codecov', 'yapf==0.25',
+                     'jinja2', ),
+}
+
 if '${HAVE_MPI}' == 'TRUE':
-    extras_require.append('mpi4py')
+    extras_require['parallel'] = ('mpi4py',)
 
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name"""
@@ -55,7 +60,7 @@ setup(name='dune-xt',
       },
       distclass=BinaryDistribution,
       install_requires=requires,
-      extras_require={'parallel': extras_require},
+      extras_require=extras_require,
       scripts=['./scripts/generate_compare_functions.py',
                './scripts/distribute_testing.py',
                './scripts/dxt_code_generation.py',
