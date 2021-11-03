@@ -18,4 +18,4 @@ add_subdirectory(grid)
 add_subdirectory(la)
 add_subdirectory(test)
 
-dune_pybindxi_add_module(_version EXCLUDE_FROM_ALL version.cc)
+configure_file(_version.py.in _version.py)
