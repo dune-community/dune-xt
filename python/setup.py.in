@@ -31,6 +31,8 @@ extras_require = {
 if '${HAVE_MPI}' == 'TRUE':
     extras_require['parallel'] = ('mpi4py',)
 
+extras_require['all'] = [p for plist in extras_require.values() for p in plist]
+
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name"""
     def is_pure(self):
