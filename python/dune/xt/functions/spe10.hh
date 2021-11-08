@@ -185,7 +185,7 @@ auto bind_Spe10Model2Function(pybind11::module& m, const std::string& grid_id)
         "upper_right"_a);
 #if HAVE_SPE10_DATA
   c.def(py::init([](const Common::FieldVector<D, d>& ll, const Common::FieldVector<D, d>& up) {
-          return std::make_unique<C>(XT::Data::spe10_model2_filename(), ll, up);
+          return std::make_unique<C>(SPE10_MODEL2_FILENAME, ll, up);
         }),
         "lower_left"_a,
         "upper_right"_a);
@@ -222,7 +222,7 @@ auto bind_Spe10Model2Function(pybind11::module& m, const std::string& grid_id)
          const Common::FieldVector<D, d>& lower_left,
          const Common::FieldVector<D, d>& upper_right,
          const std::string& name) {
-        return C(XT::Data::spe10_model2_filename(),
+        return C(SPE10_MODEL2_FILENAME,
                  lower_left,
                  upper_right,
                  {Spe10::internal::model2_x_elements,
