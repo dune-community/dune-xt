@@ -6,16 +6,10 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   Felix Schindler (2019)
-#   René Fritze     (2018 - 2019)
-#   Tim Keil        (2018)
+#   Felix Schindler (2014, 2016 - 2017, 2019)
+#   René Fritze     (2012, 2015 - 2016, 2018 - 2019)
+#   Tim Keil        (2019)
 #   Tobias Leibner  (2019 - 2020)
 # ~~~
 
-add_subdirectory(common)
-add_subdirectory(functions)
-add_subdirectory(grid)
-add_subdirectory(la)
-add_subdirectory(test)
-
-configure_file(_version.py.in _version.py)
+__version__ = "${dune-xt_VERSION}"

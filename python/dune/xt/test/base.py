@@ -14,7 +14,6 @@ from pkg_resources import resource_filename, resource_stream
 import pkgutil
 import logging
 import pprint
-from loguru import logger
 
 
 def load_all_submodule(module):
