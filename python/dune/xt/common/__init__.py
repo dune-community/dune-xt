@@ -16,6 +16,7 @@ from dune.xt import guarded_import
 for mod_name in (
         '_common_exceptions',
         '_common_mpi',
+        '_common_parameter',
         '_common_traits',
 ):
     guarded_import(globals(), 'dune.xt.common', mod_name)

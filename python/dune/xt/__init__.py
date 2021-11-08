@@ -44,3 +44,6 @@ def guarded_import(globs, base_name, mod_name):
             raise ImportError(f'{base_name}: name \'{nm}\' already exists (when importing from \'{mod_name}\'!)')
     # and import
     globs.update({k: getattr(mod, k) for k in names})
+
+
+from ._version import __version__

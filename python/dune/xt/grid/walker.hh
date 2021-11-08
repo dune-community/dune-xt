@@ -12,6 +12,7 @@
 #define PYTHON_DUNE_XT_GRID_WALKER_HH
 
 #include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/functional.h>
 
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/walker.hh>
@@ -30,6 +31,11 @@ public:
   using base_type = Grid::ElementAndIntersectionFunctor<GV>;
   using bound_type = pybind11::class_<type, base_type>;
 
+private:
+  using E = typename type::ElementType;
+  using I = typename type::IntersectionType;
+
+public:
   template <class T, typename... options>
   static void addbind_methods(pybind11::class_<T, options...>& c)
   {
@@ -43,10 +49,26 @@ public:
         "element_filter"_a = ApplyOn::AllElements<GV>());
     c.def(
         "append",
+        [](T& self, std::function<void(const E&)> generic_element_function, const ElementFilter<GV>& filter) {
+          self.append(/*prepare=*/[]() {}, /*apply_local=*/generic_element_function, /*finalize=*/[]() {}, filter);
+        },
+        "generic_element_function"_a,
+        "element_filter"_a = ApplyOn::AllElements<GV>());
+    c.def(
+        "append",
         [](T& self, IntersectionFunctor<GV>& functor, const IntersectionFilter<GV>& filter) {
           self.append(functor, filter);
         },
         "intersection_functor"_a,
+        "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
+    c.def(
+        "append",
+        [](T& self,
+           std::function<void(const I&, const E&, const E&)> generic_intersection_function,
+           const IntersectionFilter<GV>& filter) {
+          self.append(/*prepare=*/[]() {}, /*apply_local=*/generic_intersection_function, /*finalize=*/[]() {}, filter);
+        },
+        "generic_intersection_function"_a,
         "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
     c.def(
         "append",

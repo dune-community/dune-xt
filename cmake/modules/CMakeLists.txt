@@ -14,6 +14,7 @@
 install(FILES DuneTBB.cmake
               DuneUtils.cmake
               DuneXtMacros.cmake
+              DuneXtVersionHelper.cmake
               DunePybindxiMacros.cmake
               DunePybindxiUtils.cmake
               FindPythonLibsNew.cmake

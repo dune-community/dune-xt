@@ -14,66 +14,32 @@
 
 #include <vector>
 
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parameter.hh>
 #include <dune/xt/la/exceptions.hh>
-
-//#include "interface.hh"
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
 
 
-// forward, needed for the Traits
 template <class Vector>
-class ListVectorArray;
-
-
-#if 0
-namespace internal {
-
-
-template <class Vector>
-class ListVectorArrayTraits
+class ListVectorArray
 {
   static_assert(is_vector<Vector>::value, "");
 
 public:
-  using derived_type = ListVectorArray<Vector>;
-  using VectorType = Vector;
-  using const_iterator = typename std::vector<Vector>::const_iterator;
-  using iterator = typename std::vector<Vector>::iterator;
-}; // class ListVectorArrayTraits
-
-
-} // namespace internal
-#endif // 0
-
-
-/**
- * \brief Implementation of VectorArrayInterface as an array of vectors
- */
-template <class Vector>
-class ListVectorArray /*: public VectorArrayInterface<internal::ListVectorArrayTraits<Vector>>*/
-{
-  //  using BaseType = VectorArrayInterface<internal::ListVectorArrayTraits<Vector>>;
   using ThisType = ListVectorArray;
 
-public:
-  //  using Traits = typename BaseType::Traits;
-  //  using derived_type = typename BaseType::derived_type;
-
-  //  using typename BaseType::VectorType;
-  //  using typename BaseType::const_iterator;
-  //  using typename BaseType::iterator;
-
   using VectorType = Vector;
+  using VectorArrayType = std::vector<Common::StorageProvider<VectorType>>;
 
 private:
   class AnnotatedVector
   {
   public:
-    AnnotatedVector(std::vector<Vector>& vectors, std::vector<Common::Parameter>& notes, const size_t ii)
+    AnnotatedVector(VectorArrayType& vectors, std::vector<Common::Parameter>& notes, const size_t ii)
       : vectors_(vectors)
       , notes_(notes)
       , ii_(ii)
@@ -84,7 +50,7 @@ private:
       DUNE_THROW_IF(ii_ >= vectors_.size(),
                     InvalidStateException,
                     "This should not happen: ii_ = " << ii_ << "\n   vectors_.size() = " << vectors_.size());
-      return vectors_[ii_];
+      return vectors_[ii_].access();
     }
 
     VectorType& vector()
@@ -92,7 +58,7 @@ private:
       DUNE_THROW_IF(ii_ >= vectors_.size(),
                     InvalidStateException,
                     "This should not happen: ii_ = " << ii_ << "\n   vectors_.size() = " << vectors_.size());
-      return vectors_[ii_];
+      return vectors_[ii_].access();
     }
 
     const Common::Parameter& note() const
@@ -112,18 +78,20 @@ private:
     }
 
   private:
-    std::vector<Vector>& vectors_;
+    VectorArrayType& vectors_;
     std::vector<Common::Parameter>& notes_;
     const size_t ii_;
   }; // class AnnotatedVector
 
+  using AnnotatedVectorArrayType = std::vector<AnnotatedVector>;
+
 public:
-  using iterator = typename std::vector<AnnotatedVector>::iterator;
-  using const_iterator = typename std::vector<AnnotatedVector>::const_iterator;
-  using reverse_iterator = typename std::vector<AnnotatedVector>::reverse_iterator;
-  using const_reverse_iterator = typename std::vector<AnnotatedVector>::const_reverse_iterator;
-  using reference = typename std::vector<AnnotatedVector>::reference;
-  using const_reference = typename std::vector<AnnotatedVector>::const_reference;
+  using iterator = typename AnnotatedVectorArrayType::iterator;
+  using const_iterator = typename AnnotatedVectorArrayType::const_iterator;
+  using reverse_iterator = typename AnnotatedVectorArrayType::reverse_iterator;
+  using const_reverse_iterator = typename AnnotatedVectorArrayType::const_reverse_iterator;
+  using reference = typename AnnotatedVectorArrayType::reference;
+  using const_reference = typename AnnotatedVectorArrayType::const_reference;
 
   ListVectorArray(const size_t dm, const size_t lngth = 0, const size_t resrv = 0)
     : dim_(dm)
@@ -135,7 +103,7 @@ public:
     notes_.reserve(resrv);
     pairs_.reserve(resrv);
     for (size_t ii = 0; ii < len_; ++ii) {
-      vectors_.emplace_back(dim_, 0);
+      vectors_.emplace_back(new VectorType(dim_, 0.));
       notes_.emplace_back();
       pairs_.emplace_back(vectors_, notes_, ii);
     }
@@ -175,7 +143,7 @@ public:
     return len_;
   }
 
-  const std::vector<VectorType>& vectors() const
+  const VectorArrayType& vectors() const
   {
     return vectors_;
   }
@@ -192,7 +160,16 @@ public:
     pairs_.reserve(len);
   }
 
+  // careful, makes a copy
   void append(const VectorType& vec, const Common::Parameter& note = {})
+  {
+    vectors_.emplace_back(new VectorType(vec));
+    notes_.emplace_back(note);
+    pairs_.emplace_back(vectors_, notes_, len_);
+    ++len_;
+  }
+
+  void append(VectorType& vec, const Common::Parameter& note = {})
   {
     vectors_.emplace_back(vec);
     notes_.emplace_back(note);
@@ -303,9 +280,9 @@ public:
 private:
   const size_t dim_;
   size_t len_;
-  std::vector<Vector> vectors_;
+  VectorArrayType vectors_;
   std::vector<Common::Parameter> notes_;
-  std::vector<AnnotatedVector> pairs_;
+  AnnotatedVectorArrayType pairs_;
 }; // class ListVectorArray
 
 

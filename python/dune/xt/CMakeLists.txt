@@ -17,3 +17,5 @@ add_subdirectory(functions)
 add_subdirectory(grid)
 add_subdirectory(la)
 add_subdirectory(test)
+
+configure_file(_version.py.in _version.py)

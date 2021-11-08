@@ -26,29 +26,48 @@
 
 
 template <class G>
-void addbind_for_Grid(pybind11::module& m)
+void bind_model1_for_grid(pybind11::module& m)
 {
   using namespace Dune::XT::Functions;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
   const auto g_dim = G::dimension;
 
-  bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
-  bind_Spe10Model1Function<G, g_dim, g_dim, g_dim>(m, grid_id);
-} // ... addbind_for_Grid(...)
+  bind_Spe10Model1Function<G, g_dim>(m, grid_id);
+} // ... bind_model1_for_grid(...)
 
 
-template <class Tuple = Dune::XT::Grid::bindings::AvailableGridTypes>
-void all_grids(pybind11::module& m)
+template <class Tuple = Dune::XT::Grid::bindings::Available2dGridTypes>
+void bind_model1_for_all_grids(pybind11::module& m)
 {
   Dune::XT::Common::bindings::guarded_bind([&]() { //  different grids but same entity
-    addbind_for_Grid<typename Dune::XT::Common::list_content<Tuple>::head>(m);
+    bind_model1_for_grid<typename Dune::XT::Common::list_content<Tuple>::head>(m);
   });
-  all_grids<typename Dune::XT::Common::list_content<Tuple>::tail>(m);
+  bind_model1_for_all_grids<typename Dune::XT::Common::list_content<Tuple>::tail>(m);
+}
+
+template <>
+void bind_model1_for_all_grids<Dune::XT::Common::tuple_null_type>(pybind11::module&)
+{}
+
+
+template <class G>
+void bind_model2_for_grid(pybind11::module& m)
+{
+  Dune::XT::Functions::bind_Spe10Model2Function<G>(m, Dune::XT::Grid::bindings::grid_name<G>::value());
 }
 
 
+template <class Tuple = Dune::XT::Grid::bindings::Available3dGridTypes>
+void bind_model2_for_all_grids(pybind11::module& m)
+{
+  Dune::XT::Common::bindings::guarded_bind([&]() { //  different grids but same entity
+    bind_model2_for_grid<typename Dune::XT::Common::list_content<Tuple>::head>(m);
+  });
+  bind_model2_for_all_grids<typename Dune::XT::Common::list_content<Tuple>::tail>(m);
+}
+
 template <>
-void all_grids<Dune::XT::Common::tuple_null_type>(pybind11::module&)
+void bind_model2_for_all_grids<Dune::XT::Common::tuple_null_type>(pybind11::module&)
 {}
 
 
@@ -63,5 +82,6 @@ PYBIND11_MODULE(_functions_spe10, m)
   py::module::import("dune.xt.functions._functions_interfaces_grid_function_2d");
   py::module::import("dune.xt.functions._functions_interfaces_grid_function_3d");
 
-  all_grids(m);
+  bind_model1_for_all_grids(m);
+  bind_model2_for_all_grids(m);
 }
