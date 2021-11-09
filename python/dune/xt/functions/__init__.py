@@ -11,11 +11,8 @@
 #   Tim Keil        (2018)
 #   Tobias Leibner  (2019 - 2020)
 # ~~~
-
-from tempfile import NamedTemporaryFile
-
 from dune.xt import guarded_import
-from dune.xt.common.vtk.plot import plot
+from dune.xt.common.config import config
 
 for mod_name in (
         '_functions_checkerboard',
@@ -43,15 +40,18 @@ for mod_name in (
 ):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
 
-from dune.xt.functions._functions_gridfunction import GridFunction
 
+if config.HAVE_K3D:
+    from tempfile import NamedTemporaryFile
+    from dune.xt.common.vtk.plot import plot
+    from dune.xt.functions._functions_gridfunction import GridFunction
 
-def visualize_function(function, grid, subsampling=False):
-    assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
-    assert function.dim_range == 1, f'Not implemented yet for {function.dim_range}-dimensional functions!'
-    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-    try:
-        function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-    except AttributeError:
-        GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-    return plot(tmpfile, color_attribute_name=function.name)
+    def visualize_function(function, grid, subsampling=False):
+        assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
+        assert function.dim_range == 1, f'Not implemented yet for {function.dim_range}-dimensional functions!'
+        tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+        try:
+            function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+        except AttributeError:
+            GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+        return plot(tmpfile, color_attribute_name=function.name)
