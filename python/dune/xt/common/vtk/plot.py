@@ -57,7 +57,11 @@ def _transform_to_k3d(timestep, poly_data, color_attribute_name):
 
 class VTKPlot(k3dPlot):
 
-    def __init__(self, vtk_data, color_attribute_name='Data', color_map=k3d.basic_color_maps.CoolWarm, *args,
+    def __init__(self,
+                 vtk_data,
+                 color_attribute_name='Data',
+                 color_map=k3d.basic_color_maps.CoolWarm,
+                 *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -68,8 +72,9 @@ class VTKPlot(k3dPlot):
 
         self.vtk_data = np.stack([_transform_to_k3d(v[0], v[1], color_attribute_name) for v in vtk_data])
         self.value_minmax = (np.nanmin(self.vtk_data[:, 2]), np.nanmax(self.vtk_data[:, 3]))
-        self.mesh = k3d.vtk_poly_data(
-            vtk_data[0][1], color_attribute=(color_attribute_name, *self.value_minmax), color_map=color_map)
+        self.mesh = k3d.vtk_poly_data(vtk_data[0][1],
+                                      color_attribute=(color_attribute_name, *self.value_minmax),
+                                      color_map=color_map)
         self.timestep = vtk_data[0][0]
         self += self.mesh
         self.camera_no_pan = True
@@ -116,13 +121,12 @@ def plot(vtkfile_path, color_attribute_name, color_map=get_cmap('viridis')):
         np.max(all_bounds[:, 5])
     ])
 
-    vtkplot = VTKPlot(
-        data,
-        color_attribute_name=color_attribute_name,
-        grid_auto_fit=False,
-        camera_auto_fit=False,
-        color_map=color_map,
-        grid=combined_bounds)
+    vtkplot = VTKPlot(data,
+                      color_attribute_name=color_attribute_name,
+                      grid_auto_fit=False,
+                      camera_auto_fit=False,
+                      color_map=color_map,
+                      grid=combined_bounds)
     # display needs to have been called before changing camera/grid_visible
     vtkplot.display()
     # could be replaced with testing if the widget is'ready'

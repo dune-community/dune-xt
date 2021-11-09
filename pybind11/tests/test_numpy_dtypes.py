@@ -79,8 +79,8 @@ def test_format_descriptors():
     ldbl_fmt = ("4x" if ld.alignment > 4 else "") + ld.char
     ss_fmt = "^T{?:bool_:3xI:uint_:f:float_:" + ldbl_fmt + ":ldbl_:}"
     dbl = np.dtype("double")
-    partial_fmt = ("^T{?:bool_:3xI:uint_:f:float_:" +
-                   str(4 * (dbl.alignment > 4) + dbl.itemsize + 8 * (ld.alignment > 8)) + "xg:ldbl_:}")
+    partial_fmt = ("^T{?:bool_:3xI:uint_:f:float_:" + str(4 * (dbl.alignment > 4) + dbl.itemsize + 8 *
+                                                          (ld.alignment > 8)) + "xg:ldbl_:}")
     nested_extra = str(max(8, ld.alignment))
     assert m.print_format_descriptors() == [
         ss_fmt,
@@ -251,9 +251,9 @@ def test_array_array():
     e = "<" if byteorder == "little" else ">"
 
     arr = m.create_array_array(3)
-    assert str(arr.dtype) == (
-        "{{'names':['a','b','c','d'], " + "'formats':[('S4', (3,)),('" + e +
-        "i4', (2,)),('u1', (3,)),('{e}f4', (4, 2))], " + "'offsets':[0,12,20,24], 'itemsize':56}}").format(e=e)
+    assert str(arr.dtype) == ("{{'names':['a','b','c','d'], " + "'formats':[('S4', (3,)),('" + e +
+                              "i4', (2,)),('u1', (3,)),('{e}f4', (4, 2))], " +
+                              "'offsets':[0,12,20,24], 'itemsize':56}}").format(e=e)
     assert m.print_array_array(arr) == [
         "a={{A,B,C,D},{K,L,M,N},{U,V,W,X}},b={0,1}," + "c={0,1,2},d={{0,1},{10,11},{20,21},{30,31}}",
         "a={{W,X,Y,Z},{G,H,I,J},{Q,R,S,T}},b={1000,1001}," +

@@ -73,5 +73,5 @@ def visualize_grid(grid):
     else:
         tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
         grid.visualize(tmpfile[:-4])
-        return plot(
-            tmpfile, color_attribute_name='Element index')     # see visualize in python/dune/xt/grid/gridprovider.hh
+        return plot(tmpfile,
+                    color_attribute_name='Element index')     # see visualize in python/dune/xt/grid/gridprovider.hh

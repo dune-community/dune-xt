@@ -20,8 +20,8 @@ import pprint
 def load_all_submodule(module):
     ignore_playground = True
     fails = []
-    for _, module_name, _ in pkgutil.walk_packages(module.__path__, module.__name__ + '.',
-                                                   lambda n: fails.append((n, ''))):
+    for _, module_name, _ in pkgutil.walk_packages(module.__path__, module.__name__ + '.', lambda n: fails.append(
+        (n, ''))):
         if ignore_playground and 'playground' in module_name:
             continue
         try:

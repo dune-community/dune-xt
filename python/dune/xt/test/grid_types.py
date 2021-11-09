@@ -49,7 +49,7 @@ def all_args(dims):
     two_and_three = [f for f in dims if 1 < f < 4]
     return {
         'alu': [arguments['alu'](d, 'simplex', e) for e in ('nonconforming', 'conforming') for d in two_and_three] +
-        [arguments['alu'](d, 'cube', 'nonconforming') for d in two_and_three],
+               [arguments['alu'](d, 'cube', 'nonconforming') for d in two_and_three],
         'yasp': [arguments['yasp'](d) for d in dims if d > 0],
         'ug': [arguments['ug'](d) for d in two_and_three],
         'alberta': [arguments['alberta'](d) for d in two_and_three]

@@ -1,5 +1,4 @@
 # Version: 0.19
-
 """The Versioneer - like a rocketeer, but for versions.
 
 The Versioneer
@@ -48,7 +47,9 @@ import ast
 class VersioneerConfig:
     """Container for Versioneer configuration parameters."""
 
+
 PROJECT_ROOT = None
+
 
 def get_root():
     """Get the project root directory.
@@ -59,9 +60,7 @@ def get_root():
     root = os.path.realpath(os.path.abspath(PROJECT_ROOT))
 
     if not (os.path.exists(root) or os.path.isdir(root)):
-        err = (
-            "Versioneer was unable to run the project root directory. "
-        )
+        err = ("Versioneer was unable to run the project root directory. ")
         raise VersioneerBadRootError(err)
     return root
 
@@ -89,7 +88,7 @@ def get_config_from_root(root):
     # the top of versioneer.py for instructions on writing your setup.cfg .
     parser = configparser.ConfigParser()
     parser.read_string(CONFIG)
-    VCS = parser.get("versioneer", "VCS")  # mandatory
+    VCS = parser.get("versioneer", "VCS")     # mandatory
 
     def get(parser, name):
         if parser.has_option("versioneer", name):
@@ -118,7 +117,7 @@ LONG_VERSION_PY = {}
 HANDLERS = {}
 
 
-def register_vcs_handler(vcs, method):  # decorator
+def register_vcs_handler(vcs, method):     # decorator
     """Create decorator to mark a method as the handler of a VCS."""
 
     def decorate(f):
@@ -139,9 +138,11 @@ def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False, env=
         try:
             dispcmd = str([c] + args)
             # remember shell=False, so use git.cmd on windows, not just git
-            p = subprocess.Popen(
-                [c] + args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=(subprocess.PIPE if hide_stderr else None)
-            )
+            p = subprocess.Popen([c] + args,
+                                 cwd=cwd,
+                                 env=env,
+                                 stdout=subprocess.PIPE,
+                                 stderr=(subprocess.PIPE if hide_stderr else None))
             break
         except EnvironmentError:
             e = sys.exc_info()[1]
@@ -162,7 +163,6 @@ def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False, env=
             print("stdout was %s" % stdout)
         return None, p.returncode
     return stdout, p.returncode
-
 
 
 @register_vcs_handler("git", "get_keywords")
@@ -281,8 +281,8 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
     # if there is a tag matching tag_prefix, this yields TAG-NUM-gHEX[-dirty]
     # if there isn't one, this yields HEX[-dirty] (no NUM)
     describe_out, rc = run_command(
-        GITS, ["describe", "--tags", "--dirty", "--always", "--long", "--match", "%s*" % tag_prefix], cwd=root
-    )
+        GITS, ["describe", "--tags", "--dirty", "--always", "--long", "--match",
+               "%s*" % tag_prefix], cwd=root)
     # --long was added in git-1.5.5
     if describe_out is None:
         raise NotThisMethod("'git describe' failed")
@@ -294,7 +294,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
 
     pieces = {}
     pieces["long"] = full_out
-    pieces["short"] = full_out[:7]  # maybe improved later
+    pieces["short"] = full_out[:7]     # maybe improved later
     pieces["error"] = None
 
     # parse describe_out. It will be like TAG-NUM-gHEX[-dirty] or HEX[-dirty]
@@ -305,7 +305,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
     dirty = git_describe.endswith("-dirty")
     pieces["dirty"] = dirty
     if dirty:
-        git_describe = git_describe[: git_describe.rindex("-dirty")]
+        git_describe = git_describe[:git_describe.rindex("-dirty")]
 
     # now we have TAG-NUM-gHEX or HEX
 
@@ -337,7 +337,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
         # HEX: no tags
         pieces["closest-tag"] = None
         count_out, rc = run_command(GITS, ["rev-list", "HEAD", "--count"], cwd=root)
-        pieces["distance"] = int(count_out)  # total number of commits
+        pieces["distance"] = int(count_out)     # total number of commits
 
     # commit date: see ISO-8601 comment in git_versions_from_keywords()
     date = run_command(GITS, ["show", "-s", "--format=%ci", "HEAD"], cwd=root)[0].strip()
@@ -375,7 +375,7 @@ def versions_from_parentdir(parentdir_prefix, root, verbose):
             }
         else:
             rootdirs.append(root)
-            root = os.path.dirname(root)  # up a level
+            root = os.path.dirname(root)     # up a level
 
     if verbose:
         print("Tried directories %s but none started with prefix %s" % (str(rootdirs), parentdir_prefix))
@@ -574,7 +574,7 @@ def render(pieces, style):
         }
 
     if not style or style == "default":
-        style = "pep440"  # the default
+        style = "pep440"     # the default
 
     if style == "pep440":
         rendered = render_pep440(pieces)
@@ -686,6 +686,7 @@ def get_versions(verbose=False):
 def get_version():
     """Get the short version string for this project."""
     return get_versions()["version"]
+
 
 if __name__ == "__main__":
     PROJECT_ROOT = sys.argv[1]

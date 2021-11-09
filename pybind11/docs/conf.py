@@ -250,9 +250,9 @@ latex_elements = {
      # Additional stuff for the LaTeX preamble.
      # remove blank pages (between the title page and the TOC, etc.)
     "classoptions":
-    ",openany,oneside",
+        ",openany,oneside",
     "preamble":
-    r"""
+        r"""
 \usepackage{fontawesome}
 \usepackage{textgreek}
 \DeclareUnicodeCharacter{00A0}{}

@@ -146,6 +146,7 @@ import os
 import jinja2
 import sys
 from itertools import product
+
 tpl = jinja2.Template(tpl)
 images = ['debian-unstable_gcc_full', 'debian_gcc_full', 'debian_clang_full']
 subdirs = ['common', 'grid', 'functions', 'la']
