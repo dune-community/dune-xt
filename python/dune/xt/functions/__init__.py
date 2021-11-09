@@ -16,7 +16,7 @@ from tempfile import NamedTemporaryFile
 import numpy as np
 
 from dune.xt import guarded_import
-from dune.xt.common.vtk.plot import plot
+from dune.xt.common.config import config
 
 for mod_name in (
         '_functions_checkerboard',
@@ -44,38 +44,40 @@ for mod_name in (
 ):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
 
-from dune.xt.functions._functions_gridfunction import GridFunction
+if config.HAVE_K3D:
+    from tempfile import NamedTemporaryFile
+    from dune.xt.common.vtk.plot import plot
+    from dune.xt.functions._functions_gridfunction import GridFunction
 
+    def visualize_function(function, grid, subsampling=False):
+        assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
+        assert function.dim_range == 1, f'Not implemented yet for {function.dim_range}-dimensional functions!'
+        tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+        try:
+            function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+        except AttributeError:
+            GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+        return plot(tmpfile, color_attribute_name=function.name)
 
-def visualize_function(function, grid, subsampling=False):
-    assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
-    assert function.dim_range == 1, f'Not implemented yet for {function.dim_range}-dimensional functions!'
-    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-    try:
-        function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-    except AttributeError:
-        GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-    return plot(tmpfile, color_attribute_name=function.name)
-
-def visualize_function_on_dd_grid(function, dd_grid, subdomains=None):
-    assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
-    assert function.dim_range == 1, f'Not implemented yet for {function.dim_domain}-dimensional functions!'
-    subdomains = subdomains or list(range(dd_grid.num_subdomains))
-    assert isinstance(subdomains, list), 'Please provide a list of subdomains'
-    assert all(sd < dd_grid.num_subdomains for sd in subdomains)
-    assert all(isinstance(sd, int) for sd in subdomains)
-    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-    dd_grid.write_global_visualization(tmpfile[5:-4], function, subdomains)
-    prestring = f's{dd_grid.num_subdomains:04d}-'
-    if len(subdomains) == 1:
-        prestring += f'p{subdomains[0]:04d}-'
-        return plot(prestring + tmpfile[5:], color_attribute_name=function.name)
-    try:
-        plot(prestring + tmpfile[5:-4] + '.pvtu', color_attribute_name=function.name)
-    except AttributeError:
-        if 1 < len(subdomains) < dd_grid.num_subdomains:
-            # TODO: fix this error
-            print("For 1 < len(subdomains) < num_subdomains, the generated .pvtu file is known "
-                   + "to be broken. The result for each subdomain can be viewed via paraview")
-        else:
-            print("Unexpected error")
+    def visualize_function_on_dd_grid(function, dd_grid, subdomains=None):
+        assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
+        assert function.dim_range == 1, f'Not implemented yet for {function.dim_domain}-dimensional functions!'
+        subdomains = subdomains or list(range(dd_grid.num_subdomains))
+        assert isinstance(subdomains, list), 'Please provide a list of subdomains'
+        assert all(sd < dd_grid.num_subdomains for sd in subdomains)
+        assert all(isinstance(sd, int) for sd in subdomains)
+        tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+        dd_grid.write_global_visualization(tmpfile[5:-4], function, subdomains)
+        prestring = f's{dd_grid.num_subdomains:04d}-'
+        if len(subdomains) == 1:
+            prestring += f'p{subdomains[0]:04d}-'
+            return plot(prestring + tmpfile[5:], color_attribute_name=function.name)
+        try:
+            plot(prestring + tmpfile[5:-4] + '.pvtu', color_attribute_name=function.name)
+        except AttributeError:
+            if 1 < len(subdomains) < dd_grid.num_subdomains:
+                # TODO: fix this error
+                print("For 1 < len(subdomains) < num_subdomains, the generated .pvtu file is known "
+                       + "to be broken. The result for each subdomain can be viewed via paraview")
+            else:
+                print("Unexpected error")
