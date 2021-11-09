@@ -10,7 +10,9 @@
 #   René Fritze     (2019)
 # ~~~
 
-try:
+from dune.xt.common.config import config
+
+if config.HAVE_K3D:
     import time
     import warnings
     import IPython
@@ -153,5 +155,3 @@ try:
             IPython.display.display(hbox)
 
         return vtkplot
-except ImportError:
-    pass
