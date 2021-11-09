@@ -10,13 +10,12 @@
 #   René Fritze     (2018 - 2019)
 #   Tobias Leibner  (2019 - 2021)
 # ~~~
-
 import numpy as np
 from numbers import Number
-from tempfile import NamedTemporaryFile
 
 from dune.xt import guarded_import
-from dune.xt.common.vtk.plot import plot
+from dune.xt.common.config import config
+
 
 for mod_name in (
         '_grid_boundaryinfo_alldirichlet',
@@ -70,7 +69,10 @@ def visualize_grid(grid):
 
         return plt.gca()
 
-    else:
+    elif config.HAVE_K3D:
+        from tempfile import NamedTemporaryFile
+        from dune.xt.common.vtk.plot import plot
+
         tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
         grid.visualize(tmpfile[:-4])
         return plot(
