@@ -17,6 +17,7 @@ macro(append_to_each INPUTLIST POSTFIX OUTPUTLIST)
 endmacro()
 
 set(root_hints
+    "/usr/"
     "${CMAKE_SOURCE_DIR}/../local/"
     "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
     "${CMAKE_SOURCE_DIR}/../environments/debian-full/local/"
