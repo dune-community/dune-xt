@@ -17,7 +17,7 @@ macro(APPEND_TO_EACH inputlist postfix outputlist)
   endforeach(entry ${inputlist})
 endmacro()
 
-set(_root_hints "${CMAKE_SOURCE_DIR}/../local/" "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
+set(_root_hints "/usr/" "${CMAKE_SOURCE_DIR}/../local/" "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
                 "${CMAKE_SOURCE_DIR}/../environments/debian-full/local/" "$ENV{HOME}/" "$ENV{HOME}/Software/")
 
 set(BIN_HINTS "")
