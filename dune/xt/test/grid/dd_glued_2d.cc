@@ -139,6 +139,13 @@ TYPED_TEST(GluedDdGridTest, couplings_are_of_correct_size)
 {
   this->couplings_are_of_correct_size();
 }
-
+TYPED_TEST(GluedDdGridTest, local_grids_are_constructable)
+{
+  this->local_grids_are_constructable();
+}
+TYPED_TEST(GluedDdGridTest, walk_coupling_views)
+{
+  this->walk_coupling_views();
+}
 
 #endif // HAVE_DUNE_GRID_GLUE
