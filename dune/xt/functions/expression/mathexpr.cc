@@ -1552,7 +1552,7 @@ ROperation ROperation::Diff(const RVar& var) const
         ppop1 = new ROperation*[j];
         for (i = 0; i < j; i++)
           ppop1[i] = new ROperation(NthMember(i + 1).Diff(var));
-        op2 = ApplyOperator(pfunc->nvars, ppop1, &operator,);
+        op2 = ApplyOperator(pfunc->nvars, ppop1, &operator, );
         for (i = 0; i < pfunc->nvars; i++)
           delete ppop1[i];
         delete[] ppop1;

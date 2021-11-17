@@ -983,9 +983,11 @@ struct is_fmt_numeric<T, enable_if_t<std::is_arithmetic<T>::value>>
       std::is_same<T, bool>::value
           ? 0
           : 1
-                + (std::is_integral<T>::value
-                       ? detail::log2(sizeof(T)) * 2 + std::is_unsigned<T>::value
-                       : 8 + (std::is_same<T, double>::value ? 1 : std::is_same<T, long double>::value ? 2 : 0));
+                + (std::is_integral<T>::value ? detail::log2(sizeof(T)) * 2 + std::is_unsigned<T>::value
+                                              : 8
+                                                    + (std::is_same<T, double>::value        ? 1
+                                                       : std::is_same<T, long double>::value ? 2
+                                                                                             : 0));
 };
 PYBIND11_NAMESPACE_END(detail)
 
@@ -1121,7 +1123,7 @@ public:
   {}
 
   // Moves the vector out of an rvalue any_container
-  operator std::vector<T> &&() &&
+  operator std::vector<T>&&() &&
   {
     return std::move(v);
   }

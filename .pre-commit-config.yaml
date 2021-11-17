@@ -15,7 +15,7 @@ repos:
         exclude: "^pybind11"
         args: ["--config=./python/setup.cfg"]
 -   repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: 'v8.0.1'
+    rev: 'v13.0.0'
     hooks:
     -   id: clang-format
         exclude: "^(dune/xt/test/gtest/|pybind11)"

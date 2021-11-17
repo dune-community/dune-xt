@@ -162,7 +162,9 @@ struct EigenProps
   using if_zero = std::integral_constant<EigenIndex, i == 0 ? ifzero : i>;
   static constexpr EigenIndex inner_stride = if_zero<StrideType::InnerStrideAtCompileTime, 1>::value,
                               outer_stride = if_zero < StrideType::OuterStrideAtCompileTime,
-                              vector ? size : row_major ? cols : rows > ::value;
+                              vector      ? size
+                              : row_major ? cols
+                                          : rows > ::value;
   static constexpr bool dynamic_stride = inner_stride == Eigen::Dynamic && outer_stride == Eigen::Dynamic;
   static constexpr bool requires_row_major =
       !dynamic_stride && !vector && (row_major ? inner_stride : outer_stride) == 1;
@@ -388,7 +390,7 @@ public:
   {
     return value;
   }
-  operator Type &&() &&
+  operator Type&&() &&
   {
     return std::move(value);
   }
@@ -458,12 +460,11 @@ private:
   using props = EigenProps<Type>;
   using Scalar = typename props::Scalar;
   using MapType = Eigen::Map<PlainObjectType, 0, StrideType>;
-  using Array =
-      array_t<Scalar,
-              array::forcecast
-                  | ((props::row_major ? props::inner_stride : props::outer_stride) == 1
-                         ? array::c_style
-                         : (props::row_major ? props::outer_stride : props::inner_stride) == 1 ? array::f_style : 0)>;
+  using Array = array_t<Scalar,
+                        array::forcecast
+                            | ((props::row_major ? props::inner_stride : props::outer_stride) == 1   ? array::c_style
+                               : (props::row_major ? props::outer_stride : props::inner_stride) == 1 ? array::f_style
+                                                                                                     : 0)>;
   static constexpr bool need_writeable = is_eigen_mutable_map<Type>::value;
   // Delay construction (these have no default constructor)
   std::unique_ptr<MapType> map;
