@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2016 - 2017, 2019 - 2020)
 //   René Fritze     (2018 - 2020)
-//   Tim Keil        (2018)
-//   Tobias Leibner  (2018 - 2020)
+//   Tim Keil        (2018, 2021)
+//   Tobias Leibner  (2018 - 2021)
 
 #include "config.h"
 

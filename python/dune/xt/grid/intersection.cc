@@ -7,7 +7,8 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
-//   Tobias Leibner  (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2020 - 2021)
 //
 // This file is part of the dune-gdt project:
 

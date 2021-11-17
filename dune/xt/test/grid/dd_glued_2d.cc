@@ -7,7 +7,8 @@
 // Authors:
 //   Felix Schindler (2017 - 2018)
 //   René Fritze     (2018 - 2020)
-//   Tobias Leibner  (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2020 - 2021)
 
 #include <dune/xt/test/main.hxx> // <- this one has to come first (includes the config.h)!
 

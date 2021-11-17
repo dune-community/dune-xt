@@ -7,6 +7,8 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #include "config.h"
 
