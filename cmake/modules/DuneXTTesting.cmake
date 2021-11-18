@@ -255,13 +255,18 @@ macro(dxt_exclude_from_headercheck)
 endmacro(dxt_exclude_from_headercheck)
 
 macro(dxt_add_python_tests)
-  add_custom_target(
-    xt_test_python
-    "${CMAKE_BINARY_DIR}/run-in-dune-env" "py.test" "${CMAKE_BINARY_DIR}/python" "--cov" "${CMAKE_CURRENT_SOURCE_DIR}/"
-    "--junitxml=pytest_results.xml"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python"
-    DEPENDS bindings
-    VERBATIM USES_TERMINAL)
+  add_custom_target(xt_test_python
+                    "${CMAKE_BINARY_DIR}/run-in-dune-env"
+                    "py.test"
+                    "-W"
+                    "error::RuntimeWarning"
+                    "${CMAKE_BINARY_DIR}/python"
+                    "--cov"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/"
+                    "--junitxml=pytest_results.xml"
+                    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python"
+                    DEPENDS bindings
+                    VERBATIM USES_TERMINAL)
   if(NOT TARGET test_python)
     add_custom_target(test_python)
   endif(TARGET test_python)
