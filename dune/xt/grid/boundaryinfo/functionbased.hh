@@ -51,9 +51,9 @@ public:
 
   FunctionBasedBoundaryInfo(const BoundaryType& default_boundary_type = NoBoundary(),
                             const double tol = 1e-10,
-                            const std::string& logging_prefix = "")
-    : BaseType(logging_prefix.empty() ? "FunctionBasedBoundaryInfo" : logging_prefix,
-               /*logging_disabled=*/logging_prefix.empty())
+                            const std::string& logging_prefix = "",
+                            const std::array<bool, 3>& logging_state = Common::default_logger_state())
+    : BaseType(logging_prefix.empty() ? "FunctionBasedBoundaryInfo" : logging_prefix, logging_state)
     , tol_(tol)
     , default_boundary_type_(default_boundary_type.copy())
   {
