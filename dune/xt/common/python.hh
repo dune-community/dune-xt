@@ -32,6 +32,18 @@ add_initialization(pybind11::module& /*m*/, const std::string& /*logger_name*/, 
 try_register(pybind11::module& m, const std::function<void(pybind11::module&)>& registrar);
 
 
+/** Use the python C-API to raise a warning
+ * Be careful not to call this from bounded methods that release the GIL!
+ * for the call sig see https://docs.python.org/3/c-api/exceptions.html#issuing-warnings
+ * for possible categories see https://docs.python.org/3/c-api/exceptions.html#standard-warning-categories
+ * example: Common::bindings::warning(PyExc_RuntimeWarning, "some Message");
+ */
+void warning(PyObject* category, const char* warning, Py_ssize_t stack = 1)
+{
+  if (PyErr_WarnEx(category, warning, stack) == -1)
+    throw new pybind11::error_already_set;
+}
+
 } // namespace Dune::XT::Common::bindings
 
 #endif // DUNE_XT_COMMON_PYTHON_HH
