@@ -28,6 +28,9 @@ There are several ways to contribute to this project:
 ## Contribute code and/or documentation
 
 Fork the repository and open up a pull request, explaining your changes and why they should be included.
+Before you start making changes, please make sure you have [pre-commit](https://pre-commit.com/)
+installed and run `pre-commit install` in the module root directory. This installs git hooks
+to automatically check coding style and some linters.
 
 ## Issues
 
@@ -149,21 +152,3 @@ Rather use a subdirectory and several headers than overly large headers.
 Tests can be found in `dune/xt/test`, where the name of a test source correspond to the full path of the
 corresponding header, e.g. `dune/xt/test/common/foo_bar.cc` contains tests for `dune/xt/common/foo/bar.hh`.
 
-
-# clang-format
-
-You need to have clang-format in the correct version installed (use `clang-format --version` to check).
-To apply clang-format to all files in this project, call `make format` in your build directory.
-_Note that clang-format changes the files inplace, so save your work in your editor beforehand!_
-
-A pre-commit hook to test for compliance is automatically installed by ```dunecontrol {vcsetup,all}```.
-If you have several versions of clang-format installed you can manually specify the name of the
-executble by setting:
-```
-git config hooks.clangformat my-custom-clang-format-version
-```
-
-If you do not have clang-format in the correct version available or forgot to apply it, the code you publish will fail the
-corresponding travis check.
-Upon failure you are provided with more information on the github pull request page on how to proceed.
-In particular you are provided with the required changes which you may download and incorporate into your code.
