@@ -19,6 +19,8 @@
 #include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/walker.hh>
+#include <xt/common/python.hh>
+
 
 namespace Dune::XT::Grid::bindings {
 
@@ -85,6 +87,9 @@ public:
     c.def(
         "walk",
         [](T& self, const bool thread_parallel = false, const bool clear_functors_after_walk = true) {
+          if (!HAVE_TBB && thread_parallel) {
+            Common::bindings::warning(PyExc_RuntimeWarning, "Requested thread parallel walk without TBB support");
+          }
           self.walk(thread_parallel, clear_functors_after_walk);
         },
         "thread_parallel"_a = false,
