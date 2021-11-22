@@ -4,4 +4,4 @@ testtype = double, float, int, unsigned int, unsigned long, long long, char, Dun
 suf_testtype = double, float, int, unsigned_int, unsigned_long, long_long, char, field_vector_double_3 | expand field
 
 [__static]
-FIELD_TYPE = {testtype} 
+FIELD_TYPE = {testtype}
