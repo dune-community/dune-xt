@@ -23,8 +23,10 @@ for mod_name in (
         '_grid_boundaryinfo_allneumann',
         '_grid_boundaryinfo_allreflecting',
         '_grid_boundaryinfo_interfaces',
+        '_grid_boundaryinfo_functionbased',
         '_grid_boundaryinfo_normalbased',
         '_grid_boundaryinfo_types',
+        '_grid_element',
         '_grid_filters_base',
         '_grid_filters_element',
         '_grid_functors_boundary_detector',
@@ -71,5 +73,5 @@ def visualize_grid(grid):
     else:
         tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
         grid.visualize(tmpfile[:-4])
-        return plot(
-            tmpfile, color_attribute_name='Element index')     # see visualize in python/dune/xt/grid/gridprovider.hh
+        return plot(tmpfile,
+                    color_attribute_name='Element index')     # see visualize in python/dune/xt/grid/gridprovider.hh

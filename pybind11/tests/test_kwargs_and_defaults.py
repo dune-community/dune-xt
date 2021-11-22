@@ -86,38 +86,35 @@ def test_mixed_args_and_kwargs(msg):
      # noqa: E501 line too long
            )
 
-    assert mpk(
-        -2, 3.5, pi=3.14159, e=2.71828) == (
-            -2,
-            3.5,
-            {
-                "e": 2.71828,
-                "pi": 3.14159
-            },
-        )
-    assert mpak(
-        7, 7.7, 7.77, 7.777, 7.7777, minusseven=-7) == (
-            7,
-            7.7,
-            (7.77, 7.777, 7.7777),
-            {
-                "minusseven": -7
-            },
-        )
+    assert mpk(-2, 3.5, pi=3.14159, e=2.71828) == (
+        -2,
+        3.5,
+        {
+            "e": 2.71828,
+            "pi": 3.14159
+        },
+    )
+    assert mpak(7, 7.7, 7.77, 7.777, 7.7777, minusseven=-7) == (
+        7,
+        7.7,
+        (7.77, 7.777, 7.7777),
+        {
+            "minusseven": -7
+        },
+    )
     assert mpakd() == (1, 3.14159, (), {})
     assert mpakd(3) == (3, 3.14159, (), {})
     assert mpakd(j=2.71828) == (1, 2.71828, (), {})
     assert mpakd(k=42) == (1, 3.14159, (), {"k": 42})
-    assert mpakd(
-        1, 1, 2, 3, 5, 8, then=13, followedby=21) == (
-            1,
-            1,
-            (2, 3, 5, 8),
-            {
-                "then": 13,
-                "followedby": 21
-            },
-        )
+    assert mpakd(1, 1, 2, 3, 5, 8, then=13, followedby=21) == (
+        1,
+        1,
+        (2, 3, 5, 8),
+        {
+            "then": 13,
+            "followedby": 21
+        },
+    )
     # Arguments specified both positionally and via kwargs should fail:
     with pytest.raises(TypeError) as excinfo:
         assert mpakd(1, i=1)
@@ -251,25 +248,23 @@ def test_args_refcount():
     assert m.args_function(-1, myval) == (-1, myval)
     assert refcount(myval) == expected
 
-    assert m.mixed_plus_args_kwargs(
-        5, 6.0, myval, a=myval) == (
-            5,
-            6.0,
-            (myval,),
-            {
-                "a": myval
-            },
-        )
+    assert m.mixed_plus_args_kwargs(5, 6.0, myval, a=myval) == (
+        5,
+        6.0,
+        (myval,),
+        {
+            "a": myval
+        },
+    )
     assert refcount(myval) == expected
 
-    assert m.args_kwargs_function(
-        7, 8, myval, a=1, b=myval) == (
-            (7, 8, myval),
-            {
-                "a": 1,
-                "b": myval
-            },
-        )
+    assert m.args_kwargs_function(7, 8, myval, a=1, b=myval) == (
+        (7, 8, myval),
+        {
+            "a": 1,
+            "b": myval
+        },
+    )
     assert refcount(myval) == expected
 
     exp3 = refcount(myval, myval, myval)

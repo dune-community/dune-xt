@@ -23,6 +23,8 @@ include(XtCompilerSupport)
 include(XtTooling)
 include(Hints)
 
+set(DXT_DONT_LINK_PYTHON_LIB ${DXT_DONT_LINK_PYTHON_LIB} CACHE STRING "wheelbuilders want to set this to 1")
+
 # library checks  #########################################################################
 find_package(PkgConfig)
 

@@ -60,7 +60,9 @@ def test_normalbased_boundary_inf():
     from grid_provider_cube import init_args as grid_init_args
     for args in grid_init_args:
         grid = make_cube_grid(*args)
-        NormalBasedBoundaryInfo(
-            grid_provider=grid, default_boundary_type=NoBoundary(), tolerance=1e-10, logging_prefix='')
+        NormalBasedBoundaryInfo(grid_provider=grid,
+                                default_boundary_type=NoBoundary(),
+                                tolerance=1e-10,
+                                logging_prefix='')
         NormalBasedBoundaryInfo(grid_provider=grid, default_boundary_type=NoBoundary(), tolerance=1e-10)
         NormalBasedBoundaryInfo(grid_provider=grid, default_boundary_type=NoBoundary())
