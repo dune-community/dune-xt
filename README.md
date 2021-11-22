@@ -10,6 +10,8 @@
 #   René Fritze     (2009, 2015, 2019)
 #   Tobias Leibner  (2020 - 2021)
 ```
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![pipeline status](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/badges/master/pipeline.svg)](https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt/-/commits/master)
 
 dune-xt is an eXTensions module for [DUNE](https://www.dune-project.org),
 which is often used in the context of
