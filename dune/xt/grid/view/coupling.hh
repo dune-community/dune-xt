@@ -62,6 +62,7 @@ public:
   using Entity = typename MacroIntersectionType::Entity;
   static constexpr auto dimensionworld = MacroIntersectionType::dimensionworld;
   static constexpr auto dimension = MacroIntersectionType::dimension;
+  static constexpr auto mydimension = MacroIntersectionType::mydimension;
   using typename BaseType::GlobalCoordinate;
   using typename BaseType::LocalCoordinate;
 
