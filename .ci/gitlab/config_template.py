@@ -144,6 +144,9 @@ lint:
     stage: {{kind}}
     needs: ["{{image}}"]
     script:
+    {%- if 'cpp' in kind and 'functions' in subdir  %}
+          - ccache --max-size 10G
+    {%- endif %}
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_{{kind}}.bash
 {% endfor %}
 

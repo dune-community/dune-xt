@@ -189,6 +189,7 @@ functions unstable_gcc_full cpp:
     stage: cpp
     needs: ["debian-unstable_gcc_full"]
     script:
+          - ccache --max-size 10G
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions unstable_gcc_full headercheck:
@@ -285,6 +286,7 @@ functions gcc_full cpp:
     stage: cpp
     needs: ["debian_gcc_full"]
     script:
+          - ccache --max-size 10G
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions gcc_full headercheck:
@@ -371,6 +373,7 @@ functions clang_full cpp:
     stage: cpp
     needs: ["debian_clang_full"]
     script:
+          - ccache --max-size 10G
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions clang_full headercheck:
