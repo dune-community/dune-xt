@@ -27,8 +27,8 @@ struct CouplingIntersection_for_all_grids
   {
 #if HAVE_DUNE_GRID_GLUE
     if constexpr (d < 3) {
-       using Dune::XT::Grid::bindings::grid_name;
-       Dune::XT::Grid::bindings::CouplingIntersectionBinder<G, G>::bind(m, grid_name<G>::value());
+      using Dune::XT::Grid::bindings::grid_name;
+      Dune::XT::Grid::bindings::CouplingIntersectionBinder<G, G>::bind(m, grid_name<G>::value());
     }
 #endif
     CouplingIntersection_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);

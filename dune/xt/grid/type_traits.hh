@@ -97,8 +97,9 @@ struct is_intersection<Dune::GridGlue::Intersection<P0, P1, I, O>> : public std:
 };
 
 template <class G, class I, typename P0, typename P1, int It, int O>
-struct is_intersection<Dune::XT::Grid::internal::CouplingIntersectionWithCorrectNormal<
-        Dune::GridGlue::Intersection<P0, P1, It, O>,Dune::Intersection<G, I>>> : public std::true_type
+struct is_intersection<
+    Dune::XT::Grid::internal::CouplingIntersectionWithCorrectNormal<Dune::GridGlue::Intersection<P0, P1, It, O>,
+                                                                    Dune::Intersection<G, I>>> : public std::true_type
 {
   using GridType = typename Dune::GridGlue::Intersection<P0, P1, It, O>::InsideGridView::Grid;
   using InsideElementType = typename Dune::GridGlue::Intersection<P0, P1, It, O>::InsideEntity;
