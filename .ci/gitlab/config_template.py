@@ -152,10 +152,8 @@ lint:
     extends: .subdir-test
     variables:
         CI_IMAGE: {{ image }}
-    {%- if 'gcc' in image %}
     tags:
         - dustin
-    {%- endif %}
     stage: python
     needs: ["{{image}}"]
     script:
