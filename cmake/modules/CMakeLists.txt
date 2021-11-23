@@ -18,8 +18,6 @@ install(FILES DuneTBB.cmake
               DunePybindxiMacros.cmake
               DunePybindxiUtils.cmake
               FindPythonLibsNew.cmake
-              FindClangFormat.cmake
-              FindClangTidy.cmake
               FindEigen3.cmake
               FindFASP.cmake
               FindLIKWID.cmake
