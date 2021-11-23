@@ -34,63 +34,9 @@ macro(add_analyze)
   endif(EXISTS ${ANALYZER})
 endmacro(add_analyze)
 
-find_package(ClangFormat 8 EXACT)
-macro(add_format glob_dir)
-  if(NOT TARGET format)
-    if(NOT ClangFormat_FOUND)
-      message(WARNING "clang-format not found, not adding format target")
-    else()
-      add_custom_target(format)
-    endif()
-  else()
-    if(NOT ClangFormat_FOUND)
-      message(FATAL "clang-format not found but format target already exists")
-    endif()
-  endif(NOT TARGET format)
-  string(REPLACE "/"
-                 "_"
-                 fn
-                 ${glob_dir})
-  message(STATUS "adding format target")
-  if(ClangFormat_FOUND)
-    file(GLOB_RECURSE _files
-                      "${glob_dir}/*.hh"
-                      "${glob_dir}/*.cc"
-                      "${glob_dir}/*.cxx"
-                      "${glob_dir}/*.hxx"
-                      "${glob_dir}/*.cpp"
-                      "${glob_dir}/*.hpp"
-                      "${glob_dir}/*.h"
-                      "${glob_dir}/*.c"
-                      "${glob_dir}/*.pbh")
-    # Formatting gtest.h causes extremely high memory usage and takes a long time
-    list(FILTER _files EXCLUDE REGEX ".*gtest.h$")
-    add_custom_target("format_${fn}" ${ClangFormat_EXECUTABLE} -i -style=file -fallback-style=none ${_files})
-    add_dependencies(format "format_${fn}")
-    file(GLOB_RECURSE _pyfiles "${glob_dir}/*.py")
-    add_custom_target("pyformat_${fn}"
-                      ${CMAKE_CURRENT_BINARY_DIR}/run-in-dune-env
-                      yapf
-                      -i
-                      --style=${CMAKE_CURRENT_SOURCE_DIR}/python/.style.yapf
-                      ${_pyfiles})
-    add_dependencies(format "pyformat_${fn}")
-    file(GLOB_RECURSE _files "${glob_dir}/*.cmake" "${glob_dir}/CMakeLists.txt")
-    file(GLOB_RECURSE _exclude_files "${glob_dir}/*builder_definitions.cmake")
-    list(REMOVE_ITEM _files "${glob_dir}/config.h.cmake")
-    list(REMOVE_ITEM _files "${_exclude_files}")
-    add_custom_target("format_${fn}_cmake"
-                      ${CMAKE_BINARY_DIR}/run-in-dune-env
-                      cmake-format
-                      -i
-                      -c
-                      ${glob_dir}/.cmake_format.py
-                      ${_files})
-    add_dependencies(format "format_${fn}_cmake")
-  else()
-    message(WARNING "not adding format target because clang-format is missing or "
-                    "wrong version: ${ClangFormat_EXECUTABLE} ${ClangFormat_VERSION}")
-  endif(ClangFormat_FOUND)
+macro(add_format)
+  message(NOTICE clang-format support was moved to a `pre-commit` hook. See dune-xt/.pre-commit-config.yaml)
+  add_custom_target("format" echo 'clang-format is now a pre-commit hook' && false)
 endmacro(add_format)
 
 find_package(ClangTidy 8)
