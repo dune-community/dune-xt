@@ -11,12 +11,12 @@ variables:
     GIT_SUBMODULE_STRATEGY: recursive
     TRAVIS_BRANCH: ${CI_COMMIT_REF_NAME}
     TRAVIS_COMMIT: ${CI_COMMIT_SHA}
-    MY_MODULE: dune-xt
     CCACHE_BASEDIR: ${CI_PROJECT_DIR}
     CCACHE_DIR: "${CI_PROJECT_DIR}/.ccache"
     CCACHE_COMPILERCHECK: content
     CCACHE_COMPRESS: "true"
     PYTEST_ADDOPTS: "-s"
+    MY_MODULE: dune-xt
     BASE_PROJECT: zivgitlab.wwu.io/ag-ohlberger/dune-community/dune-xt-super
 
 .image_builder:
