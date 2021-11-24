@@ -137,10 +137,8 @@ lint:
     variables:
         CI_IMAGE: {{ image }}
         TESTS_MODULE_SUBDIR: {{ subdir }}
-    {%- if 'gcc' in image %}
     tags:
         - dustin
-    {%- endif %}
     stage: {{kind}}
     needs: ["{{image}}"]
     script:
