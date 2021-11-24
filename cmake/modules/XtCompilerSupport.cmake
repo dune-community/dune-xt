@@ -34,7 +34,8 @@ macro(INCLUDE_SYS_DIR)
 endmacro(INCLUDE_SYS_DIR)
 
 include(CheckCXXSourceCompiles)
-check_cxx_source_compiles("
+check_cxx_source_compiles(
+  "
     #include <map>
     int main(void)
     {
@@ -42,9 +43,12 @@ check_cxx_source_compiles("
       a.emplace(2, 2);
       return 0;
     };
-" HAVE_MAP_EMPLACE)
+"
+  HAVE_MAP_EMPLACE)
 
-check_cxx_source_compiles("
+check_cxx_source_compiles(
+  "
     void foo([[maybe_unused]] bool arg) {}
     int main(void){};
-" HAS_WORKING_UNUSED_ATTRIBUTE)
+"
+  HAS_WORKING_UNUSED_ATTRIBUTE)

@@ -15,8 +15,8 @@
 # ~~~
 
 # Build a Python extension module: dune_pybindxi_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL] [NO_EXTRAS]
-# [THIN_LTO] source1 [source2 ...])
-# Renamed copy of pybind11_add_module, added code blocks are marked with dune-pybindxi START/END
+# [THIN_LTO] source1 [source2 ...]) Renamed copy of pybind11_add_module, added code blocks are marked with dune-pybindxi
+# START/END
 function(dune_pybindxi_add_module target_name)
   set(options "MODULE;SHARED;EXCLUDE_FROM_ALL;NO_EXTRAS;SYSTEM;THIN_LTO;OPT_SIZE")
   # the next two lines were added/modified compared to the original function
@@ -61,9 +61,9 @@ function(dune_pybindxi_add_module target_name)
   pybind11_extension(${target_name})
 
   # -fvisibility=hidden is required to allow multiple modules compiled against different pybind versions to work
-  # properly, and for some features (e.g. py::module_local).  We force it on everything inside the `pybind11`
-  # namespace; also turning it on for a pybind module compilation here avoids potential warnings or issues from having
-  # mixed hidden/non-hidden types.
+  # properly, and for some features (e.g. py::module_local).  We force it on everything inside the `pybind11` namespace;
+  # also turning it on for a pybind module compilation here avoids potential warnings or issues from having mixed
+  # hidden/non-hidden types.
   if(NOT DEFINED CMAKE_CXX_VISIBILITY_PRESET)
     set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
   endif()
@@ -121,11 +121,7 @@ macro(dxt_add_make_dependent_bindings)
     dune_module_path(MODULE ${_mod} RESULT ${_mod}_binary_dir BUILD_DIR)
     set(tdir ${${_mod}_binary_dir})
     if(IS_DIRECTORY ${tdir})
-      add_custom_target(${_mod}_bindings
-                        COMMAND ${CMAKE_COMMAND}
-                                --build ${tdir}
-                                --target bindings_no_ext
-                                -- -j1)
+      add_custom_target(${_mod}_bindings COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings_no_ext -- -j1)
       add_dependencies(dependent_bindings ${_mod}_bindings)
     endif()
   endforeach()

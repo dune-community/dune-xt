@@ -26,8 +26,7 @@ macro(get_headercheck_targets subdir)
 
   if(ENABLE_HEADERCHECK)
     file(GLOB_RECURSE headerlist "${CMAKE_SOURCE_DIR}/dune/xt/${subdir}/*.hh"
-         "${CMAKE_SOURCE_DIR}/dune/xt/test/${subdir}/*.hh"
-         "${CMAKE_SOURCE_DIR}/python/dune/xt/${subdir}/*.hh")
+         "${CMAKE_SOURCE_DIR}/dune/xt/test/${subdir}/*.hh" "${CMAKE_SOURCE_DIR}/python/dune/xt/${subdir}/*.hh")
     add_custom_target(${subdir}_headercheck)
     foreach(header ${headerlist})
       list(FIND dxt_ignore_header "${header}" _index)
@@ -71,8 +70,7 @@ macro(add_subdir_tests subdir)
           dune_xt_execute.py
           ${DEBUG_MACRO_TESTS})
         foreach(target ${targetlist_${testbase}})
-          target_link_libraries(${target} ${link_xt_libs} ${COMMON_LIBS}
-                                ${GRID_LIBS} gtest_dune_xt)
+          target_link_libraries(${target} ${link_xt_libs} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt)
           list(APPEND ${subdir}_dxt_test_binaries ${target})
           set(dxt_test_names_${target} ${testlist_${testbase}_${target}})
           foreach(test_name ${dxt_test_names_${target}})
@@ -109,8 +107,7 @@ macro(add_subdir_tests subdir)
       set_tests_properties(${target} PROPERTIES LABELS ${subdir})
     endif(EXISTS ${minifile})
   endforeach(source)
-  file(GLOB_RECURSE test_templates
-       "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.tpl")
+  file(GLOB_RECURSE test_templates "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.tpl")
   foreach(template ${test_templates})
     set(ranks "1")
     if(template MATCHES "mpi")
@@ -119,10 +116,8 @@ macro(add_subdir_tests subdir)
     get_filename_component(testbase ${template} NAME_WE)
     string(REPLACE ".tpl" ".py" config_fn "${template}")
     string(REPLACE ".tpl" ".tpl.cc" out_fn "${template}")
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
-                   out_fn "${out_fn}")
-    # get the last completed cache for the codegen execution during configure
-    # time
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" out_fn "${out_fn}")
+    # get the last completed cache for the codegen execution during configure time
     foreach(_mod ${ALL_DEPENDENCIES})
       dune_module_path(MODULE ${_mod} RESULT ${_mod}_binary_dir BUILD_DIR)
       if(IS_DIRECTORY ${${_mod}_binary_dir})
@@ -141,18 +136,15 @@ macro(add_subdir_tests subdir)
       "${last_dep_bindir}"
       OUTPUT_VARIABLE
       codegen_output)
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/codegen.${testbase}.log"
-         ${codegen_output})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/codegen.${testbase}.log" ${codegen_output})
     file(GLOB generated_sources "${out_fn}.*")
     if("" STREQUAL "${generated_sources}")
       set(generated_sources ${out_fn})
     endif()
     add_custom_command(
       OUTPUT "${generated_sources}"
-      COMMAND
-        ${CMAKE_BINARY_DIR}/run-in-dune-env dxt_code_generation.py
-        "${config_fn}" "${template}" "${CMAKE_BINARY_DIR}" "${out_fn}"
-        "${last_dep_bindir}"
+      COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env dxt_code_generation.py "${config_fn}" "${template}"
+              "${CMAKE_BINARY_DIR}" "${out_fn}" "${last_dep_bindir}"
       DEPENDS "${config_fn}" "${template}"
       VERBATIM USES_TERMINAL)
     foreach(gen_source ${generated_sources})
@@ -190,8 +182,7 @@ macro(add_subdir_tests subdir)
   endforeach(template ${test_templates})
   add_custom_target(${subdir}_test_templates SOURCES ${test_templates})
 
-  # this excludes meta-ini variation test cases because  there binary name !=
-  # test name
+  # this excludes meta-ini variation test cases because  there binary name != test name
   foreach(test ${${subdir}_xt_test_binaries})
     if(TARGET test)
       set_tests_properties(${test} PROPERTIES TIMEOUT ${DXT_TEST_TIMEOUT})
@@ -199,24 +190,20 @@ macro(add_subdir_tests subdir)
     endif(TARGET test)
   endforeach()
 
-  add_custom_target(
-    ${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}
-  )# add_dependencies(test test_binaries)
+  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test
+                                                                                    # test_binaries)
   add_custom_target(
     ${subdir}_check
-    COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j
-            ${DXT_TEST_PROCS}
+    COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j ${DXT_TEST_PROCS}
     DEPENDS ${subdir}_test_binaries
     USES_TERMINAL)
   add_custom_target(
     ${subdir}_recheck
-    COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} --rerun-failed
-            -j ${DXT_TEST_PROCS}
+    COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} --rerun-failed -j ${DXT_TEST_PROCS}
     DEPENDS ${subdir}_test_binaries
     USES_TERMINAL)
   foreach(target ${${subdir}_dxt_test_binaries})
-    set(all_sorted_testnames
-        "${all_sorted_testnames}/${dxt_test_names_${target}}")
+    set(all_sorted_testnames "${all_sorted_testnames}/${dxt_test_names_${target}}")
   endforeach()
   set(${subdir}_dxt_headercheck_targets "")
   get_headercheck_targets(${subdir})
@@ -258,8 +245,7 @@ macro(finalize_test_setup)
 endmacro()
 
 macro(dxt_exclude_from_headercheck)
-  exclude_from_headercheck(${ARGV0}) # make this robust to argument being passed
-                                     # with or without ""
+  exclude_from_headercheck(${ARGV0}) # make this robust to argument being passed with or without ""
   string(REGEX REPLACE "[\ \n]+([^\ ])" ";\\1" list ${ARGV0})
   set(list "${list};${ARGV}")
   foreach(item ${list})
@@ -271,8 +257,8 @@ endmacro(dxt_exclude_from_headercheck)
 macro(dxt_add_python_tests)
   add_custom_target(
     xt_test_python
-    "${CMAKE_BINARY_DIR}/run-in-dune-env" "py.test" "${CMAKE_BINARY_DIR}/python"
-    "--cov" "${CMAKE_CURRENT_SOURCE_DIR}/" "--junitxml=pytest_results.xml"
+    "${CMAKE_BINARY_DIR}/run-in-dune-env" "py.test" "${CMAKE_BINARY_DIR}/python" "--cov" "${CMAKE_CURRENT_SOURCE_DIR}/"
+    "--junitxml=pytest_results.xml"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python"
     DEPENDS bindings
     VERBATIM USES_TERMINAL)

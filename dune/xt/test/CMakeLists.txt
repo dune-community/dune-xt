@@ -18,18 +18,15 @@ dependencycheck(${xtcommon})
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/gtest)
 dune_library_add_sources(gtest_dune_xt SOURCES common.cxx gtest/gtest-all.cc)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gtest
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/
-        FILES_MATCHING
-        PATTERN "*")
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gtest
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/
+  FILES_MATCHING
+  PATTERN "*")
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.hxx DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/)
 
 # this should ideally move back into the grid subdir, along with the files
-dune_symlink_to_source_files(FILES
-                             gmsh_2d_simplices.msh
-                             dgf_1d_interval.dgf
-                             dgf_2d_interval.dgf
-                             dgf_3d_interval.dgf
+dune_symlink_to_source_files(FILES gmsh_2d_simplices.msh dgf_1d_interval.dgf dgf_2d_interval.dgf dgf_3d_interval.dgf
                              dgf_4d_interval.dgf)
 
 add_subdir_tests(common)

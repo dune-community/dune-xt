@@ -13,32 +13,33 @@
 
 dune_library_add_sources(dunepybindxi SOURCES interpreter.cc)
 
-install(FILES attr.h
-              buffer_info.h
-              cast.h
-              chrono.h
-              common.h
-              complex.h
-              eigen.h
-              embed.h
-              eval.h
-              functional.h
-              gil.h
-              interpreter.hh
-              iostream.h
-              numpy.h
-              operators.h
-              options.h
-              pybind11.h
-              pytypes.h
-              stl.h
-              stl_bind.h
-              stl/filesystem.h
-              detail/class.h
-              detail/common.h
-              detail/descr.h
-              detail/init.h
-              detail/internals.h
-              detail/type_caster_base.h
-              detail/typeid.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/pybindxi)
+install(
+  FILES attr.h
+        buffer_info.h
+        cast.h
+        chrono.h
+        common.h
+        complex.h
+        eigen.h
+        embed.h
+        eval.h
+        functional.h
+        gil.h
+        interpreter.hh
+        iostream.h
+        numpy.h
+        operators.h
+        options.h
+        pybind11.h
+        pytypes.h
+        stl.h
+        stl_bind.h
+        stl/filesystem.h
+        detail/class.h
+        detail/common.h
+        detail/descr.h
+        detail/init.h
+        detail/internals.h
+        detail/type_caster_base.h
+        detail/typeid.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/pybindxi)

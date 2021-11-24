@@ -25,11 +25,11 @@ set(ENV{PKG_CONFIG_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib/pkgconfig:$EN
 set(CMAKE_COLOR_MAKEFILE ON)
 
 # guess dune-common build dir
-if(NOT (dune-common_DIR OR dune-common_ROOT OR "${CMAKE_PREFIX_PATH}" MATCHES ".*dune-common.*"))
-  string(REPLACE ${CMAKE_PROJECT_NAME}
-                 dune-common
-                 dune-common_DIR
-                 ${PROJECT_BINARY_DIR})
+if(NOT
+   (dune-common_DIR
+    OR dune-common_ROOT
+    OR "${CMAKE_PREFIX_PATH}" MATCHES ".*dune-common.*"))
+  string(REPLACE ${CMAKE_PROJECT_NAME} dune-common dune-common_DIR ${PROJECT_BINARY_DIR})
 endif()
 
 # find dune-common and set the module path
@@ -52,13 +52,14 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 add_subdirectory(pybind11)
-dune_enable_all_packages(INCLUDE_DIRS
-                         ${dune-xt_SOURCE_DIR}/dune
-                         ${Python3_INCLUDE_DIRS}
-                         MODULE_LIBRARIES
-                         dunepybindxi
-                         gtest_dune_xt
-                         dunext)
+dune_enable_all_packages(
+  INCLUDE_DIRS
+  ${dune-xt_SOURCE_DIR}/dune
+  ${Python3_INCLUDE_DIRS}
+  MODULE_LIBRARIES
+  dunepybindxi
+  gtest_dune_xt
+  dunext)
 
 target_link_libraries(dunepybindxi PRIVATE pybind11::module)
 target_link_libraries(dunepybindxi PRIVATE ${Python3_LIBRARIES})
@@ -68,10 +69,11 @@ target_include_directories(dunepybindxi PRIVATE pybind11::module)
 # ----------------------------------------------------------------------------------------------------
 # General Settings
 # ----------------------------------------------------------------------------------------------------
-execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
-                OUTPUT_VARIABLE COMMIT
-                ERROR_VARIABLE shell_error
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(
+  COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
+  OUTPUT_VARIABLE COMMIT
+  ERROR_VARIABLE shell_error
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # silence most warnings we are not responsible for
 include(DuneUtils)
@@ -85,7 +87,6 @@ include_dependent_binary_python_dirs()
 
 # install jinja2 for code generation into the dune-python virtualenv
 execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install jinja2 pytest-cov ipywidgets)
-
 
 add_subdirectory(python)
 
@@ -102,6 +103,6 @@ add_pylicense()
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
 
 # patch config.h to remove warnings about unused HAVE_GRIDTYPE
-execute_process(COMMAND sed -i -e
-                        "s,^\\([ ]*\\)\#if HAVE_GRIDTYPE$,\\1\#if defined(HAVE_GRIDTYPE) \\&\\& HAVE_GRIDTYPE,g"
-                        ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+execute_process(
+  COMMAND sed -i -e "s,^\\([ ]*\\)\#if HAVE_GRIDTYPE$,\\1\#if defined(HAVE_GRIDTYPE) \\&\\& HAVE_GRIDTYPE,g"
+          ${CMAKE_CURRENT_BINARY_DIR}/config.h)

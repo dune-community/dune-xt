@@ -11,18 +11,19 @@
 #   Tobias Leibner  (2020)
 # ~~~
 
-install(FILES DuneTBB.cmake
-              DuneUtils.cmake
-              DuneXtMacros.cmake
-              DuneXtVersionHelper.cmake
-              DunePybindxiMacros.cmake
-              DunePybindxiUtils.cmake
-              FindPythonLibsNew.cmake
-              FindEigen3.cmake
-              FindFASP.cmake
-              FindLIKWID.cmake
-              FindTBB.cmake
-              GridUtils.cmake
-              XtCompilerSupport.cmake
-              XtTooling.cmake
-        DESTINATION ${DUNE_INSTALL_MODULEDIR})
+install(
+  FILES DuneTBB.cmake
+        DuneUtils.cmake
+        DuneXtMacros.cmake
+        DuneXtVersionHelper.cmake
+        DunePybindxiMacros.cmake
+        DunePybindxiUtils.cmake
+        FindPythonLibsNew.cmake
+        FindEigen3.cmake
+        FindFASP.cmake
+        FindLIKWID.cmake
+        FindTBB.cmake
+        GridUtils.cmake
+        XtCompilerSupport.cmake
+        XtTooling.cmake
+  DESTINATION ${DUNE_INSTALL_MODULEDIR})
