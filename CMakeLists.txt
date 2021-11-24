@@ -84,7 +84,7 @@ dune_pybindxi_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
 
 # install jinja2 for code generation into the dune-python virtualenv
-execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install jinja2)
+execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install jinja2 pytest-cov)
 
 
 add_subdirectory(python)
