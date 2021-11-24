@@ -137,8 +137,10 @@ lint:
     variables:
         CI_IMAGE: {{ image }}
         TESTS_MODULE_SUBDIR: {{ subdir }}
+    {%- if 'cpp' in kind %}
     tags:
         - dustin
+    {%- endif %}
     stage: {{kind}}
     needs: ["{{image}}"]
     script:
