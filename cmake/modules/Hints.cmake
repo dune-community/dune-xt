@@ -10,20 +10,21 @@
 #   Tobias Leibner (2018 - 2020)
 # ~~~
 
-macro(append_to_each INPUTLIST POSTFIX OUTPUTLIST)
-  foreach(ENTRY ${INPUTLIST})
-    list(APPEND ${OUTPUTLIST} ${ENTRY}${POSTFIX})
-  endforeach(ENTRY ${INPUTLIST})
+# Appends postfix to each element in inputlist
+macro(APPEND_TO_EACH inputlist postfix outputlist)
+  foreach(entry ${inputlist})
+    list(APPEND ${outputlist} ${entry}${postfix})
+  endforeach(entry ${inputlist})
 endmacro()
 
-set(root_hints "${CMAKE_SOURCE_DIR}/../local/" "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
-               "${CMAKE_SOURCE_DIR}/../environments/debian-full/local/" "$ENV{HOME}/" "$ENV{HOME}/Software/")
+set(_root_hints "${CMAKE_SOURCE_DIR}/../local/" "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
+                "${CMAKE_SOURCE_DIR}/../environments/debian-full/local/" "$ENV{HOME}/" "$ENV{HOME}/Software/")
 
-set(bin_hints "")
-append_to_each("${root_hints}" "bin/" bin_hints)
+set(BIN_HINTS "")
+append_to_each("${_root_hints}" "bin/" BIN_HINTS)
 
-set(lib_hint "")
-append_to_each("${root_hints}" "lib/" lib_hints)
+set(LIB_HINT "")
+append_to_each("${_root_hints}" "lib/" LIB_HINTS)
 
-set(include_hints "")
-append_to_each("${root_hints}" "include/" include_hints)
+set(INCLUDE_HINTS "")
+append_to_each("${_root_hints}" "include/" INCLUDE_HINTS)

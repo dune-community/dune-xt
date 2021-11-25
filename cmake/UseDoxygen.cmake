@@ -58,7 +58,11 @@
 # COPYING-CMAKE-SCRIPTS file.
 #
 
-macro(usedoxygen_set_default name value)
+# cmake-format: off
+# cmake-lint seems to be confused about the "${name}"
+# cmake-lint: disable=C0103
+# cmake-format: on
+macro(USEDOXYGEN_SET_DEFAULT name value)
   if(NOT DEFINED "${name}")
     set("${name}" "${value}")
   endif()

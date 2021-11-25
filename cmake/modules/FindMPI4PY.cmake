@@ -15,7 +15,7 @@
 
 # https://compacc.fnal.gov/projects/repositories/entry/synergia2/CMake/FindMPI4PY.cmake?rev=c147eafb60728606af4fe7b1b16
 # 1a660df142e9a
-macro(myfind_mpi4py)
+macro(MYFIND_MPI4PY)
   if(NOT MPI4PY_INCLUDE_DIR)
     execute_process(
       COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"

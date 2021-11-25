@@ -10,13 +10,17 @@
 #   René Fritze     (2018 - 2020)
 #   Tobias Leibner  (2020 - 2021)
 #
-# The dune_pybind11_add_module function is a renamed copy of pybind11_add_module from ../../pybind11/tools/pybind11Tools.cmake, see ../../pybind11/LICENSE for license
-# information.
+# The dune_pybind11_add_module function is a renamed copy of pybind11_add_module from
+# ../../pybind11/tools/pybind11Tools.cmake, see ../../pybind11/LICENSE for license information.
 # ~~~
 
-# Build a Python extension module: dune_pybindxi_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL] [NO_EXTRAS]
-# [THIN_LTO] source1 [source2 ...]) Renamed copy of pybind11_add_module, added code blocks are marked with dune-pybindxi
-# START/END
+# ~~~
+# Build a Python extension module:
+# dune_pybindxi_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL] [NO_EXTRAS] [THIN_LTO] source1 [source2 ...])
+# Renamed copy of pybind11_add_module, added code blocks are marked with dune-pybindxi START/END.
+# ~~~
+
+# cmake-lint: disable=R0912,R0915
 function(dune_pybindxi_add_module target_name)
   set(options "MODULE;SHARED;EXCLUDE_FROM_ALL;NO_EXTRAS;SYSTEM;THIN_LTO;OPT_SIZE")
   # the next two lines were added/modified compared to the original function
@@ -112,17 +116,17 @@ function(dune_pybindxi_add_module target_name)
   endif()
 endfunction()
 
-macro(dxt_add_make_dependent_bindings)
+macro(DXT_ADD_MAKE_DEPENDENT_BINDINGS)
   add_custom_target(dependent_bindings)
   if(TARGET bindings AND NOT DXT_NO_AUTO_BINDINGS_DEPENDS)
     add_dependencies(bindings dependent_bindings)
   endif()
-  foreach(_mod ${ARGN})
-    dune_module_path(MODULE ${_mod} RESULT ${_mod}_binary_dir BUILD_DIR)
-    set(tdir ${${_mod}_binary_dir})
+  foreach(mod ${ARGN})
+    dune_module_path(MODULE ${mod} RESULT ${mod}_binary_dir BUILD_DIR)
+    set(tdir ${${mod}_binary_dir})
     if(IS_DIRECTORY ${tdir})
-      add_custom_target(${_mod}_bindings COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings_no_ext -- -j1)
-      add_dependencies(dependent_bindings ${_mod}_bindings)
+      add_custom_target(${mod}_bindings COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings_no_ext -- -j1)
+      add_dependencies(dependent_bindings ${mod}_bindings)
     endif()
   endforeach()
 endmacro()

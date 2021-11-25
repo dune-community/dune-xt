@@ -9,6 +9,7 @@
 #   Tobias Leibner  (2021)
 # ~~~
 
+# cmake-lint: disable=C0103
 set(DXT_DATA_BASEDIR "${CMAKE_BINARY_DIR}/data")
 if(Spe10Data_FOUND)
   return()
