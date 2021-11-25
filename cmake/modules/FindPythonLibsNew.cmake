@@ -35,8 +35,8 @@
 # * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
 #   disclaimer in the documentation and/or other materials provided with the distribution.
 #
-# * Neither the names of Kitware, Inc., the Insight Software Consortium, nor the names of their contributors may be
-#   used to endorse or promote products derived from this software without specific prior written permission.
+# * Neither the names of Kitware, Inc., the Insight Software Consortium, nor the names of their contributors may be used
+#   to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 # INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR # A PARTICULAR PURPOSE ARE
@@ -68,9 +68,11 @@ endif()
 # According to http://stackoverflow.com/questions/646518/python-how-to-detect-debug-interpreter testing whether sys has
 # the gettotalrefcount function is a reliable, cross-platform way to detect a CPython debug interpreter.
 #
-# The library suffix is from the config var LDVERSION sometimes, otherwise VERSION. VERSION will typically be like
-# "2.7" on unix, and "27" on windows.
-execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "from distutils import sysconfig as s;import sys;import struct;
+# The library suffix is from the config var LDVERSION sometimes, otherwise VERSION. VERSION will typically be like "2.7"
+# on unix, and "27" on windows.
+execute_process(
+  COMMAND
+    "${PYTHON_EXECUTABLE}" "-c" "from distutils import sysconfig as s;import sys;import struct;
 print('.'.join(str(v) for v in sys.version_info));
 print(sys.prefix);
 print(s.get_python_inc(plat_specific=True));
@@ -81,7 +83,10 @@ print(struct.calcsize('@P'));
 print(s.get_config_var('LDVERSION') or s.get_config_var('VERSION'));
 print(s.get_config_var('LIBDIR') or '');
 print(s.get_config_var('MULTIARCH') or '');
-" RESULT_VARIABLE _PYTHON_SUCCESS OUTPUT_VARIABLE _PYTHON_VALUES ERROR_VARIABLE _PYTHON_ERROR_VALUE)
+"
+  RESULT_VARIABLE _PYTHON_SUCCESS
+  OUTPUT_VARIABLE _PYTHON_VALUES
+  ERROR_VARIABLE _PYTHON_ERROR_VALUE)
 
 if(NOT _PYTHON_SUCCESS MATCHES 0)
   if(PythonLibsNew_FIND_REQUIRED)
@@ -94,22 +99,10 @@ endif()
 
 # Convert the process output into a list
 if(WIN32)
-  string(REGEX
-         REPLACE "\\\\"
-                 "/"
-                 _PYTHON_VALUES
-                 ${_PYTHON_VALUES})
+  string(REGEX REPLACE "\\\\" "/" _PYTHON_VALUES ${_PYTHON_VALUES})
 endif()
-string(REGEX
-       REPLACE ";"
-               "\\\\;"
-               _PYTHON_VALUES
-               ${_PYTHON_VALUES})
-string(REGEX
-       REPLACE "\n"
-               ";"
-               _PYTHON_VALUES
-               ${_PYTHON_VALUES})
+string(REGEX REPLACE ";" "\\\\;" _PYTHON_VALUES ${_PYTHON_VALUES})
+string(REGEX REPLACE "\n" ";" _PYTHON_VALUES ${_PYTHON_VALUES})
 list(GET _PYTHON_VALUES 0 _PYTHON_VERSION_LIST)
 list(GET _PYTHON_VALUES 1 PYTHON_PREFIX)
 list(GET _PYTHON_VALUES 2 PYTHON_INCLUDE_DIR)
@@ -135,31 +128,15 @@ if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZE
 endif()
 
 # The built-in FindPython didn't always give the version numbers
-string(REGEX
-       REPLACE "\\."
-               ";"
-               _PYTHON_VERSION_LIST
-               ${_PYTHON_VERSION_LIST})
+string(REGEX REPLACE "\\." ";" _PYTHON_VERSION_LIST ${_PYTHON_VERSION_LIST})
 list(GET _PYTHON_VERSION_LIST 0 PYTHON_VERSION_MAJOR)
 list(GET _PYTHON_VERSION_LIST 1 PYTHON_VERSION_MINOR)
 list(GET _PYTHON_VERSION_LIST 2 PYTHON_VERSION_PATCH)
 
 # Make sure all directory separators are '/'
-string(REGEX
-       REPLACE "\\\\"
-               "/"
-               PYTHON_PREFIX
-               ${PYTHON_PREFIX})
-string(REGEX
-       REPLACE "\\\\"
-               "/"
-               PYTHON_INCLUDE_DIR
-               ${PYTHON_INCLUDE_DIR})
-string(REGEX
-       REPLACE "\\\\"
-               "/"
-               PYTHON_SITE_PACKAGES
-               ${PYTHON_SITE_PACKAGES})
+string(REGEX REPLACE "\\\\" "/" PYTHON_PREFIX ${PYTHON_PREFIX})
+string(REGEX REPLACE "\\\\" "/" PYTHON_INCLUDE_DIR ${PYTHON_INCLUDE_DIR})
+string(REGEX REPLACE "\\\\" "/" PYTHON_SITE_PACKAGES ${PYTHON_SITE_PACKAGES})
 
 if(CMAKE_HOST_WIN32)
   set(PYTHON_LIBRARY "${PYTHON_PREFIX}/libs/Python${PYTHON_LIBRARY_SUFFIX}.lib")
@@ -184,7 +161,11 @@ else()
   endif()
   # message(STATUS "Searching for Python libs in ${_PYTHON_LIBS_SEARCH}") Probably this needs to be more involved. It
   # would be nice if the config information the python interpreter itself gave us were more complete.
-  find_library(PYTHON_LIBRARY NAMES "python${PYTHON_LIBRARY_SUFFIX}" PATHS ${_PYTHON_LIBS_SEARCH} NO_DEFAULT_PATH)
+  find_library(
+    PYTHON_LIBRARY
+    NAMES "python${PYTHON_LIBRARY_SUFFIX}"
+    PATHS ${_PYTHON_LIBS_SEARCH}
+    NO_DEFAULT_PATH)
 
   # If all else fails, just set the name/version and let the linker figure out the path.
   if(NOT PYTHON_LIBRARY)

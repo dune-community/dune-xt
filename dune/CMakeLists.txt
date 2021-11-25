@@ -13,4 +13,8 @@
 
 add_subdirectory(xt)
 add_subdirectory(pybindxi)
-install(DIRECTORY xt DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/ FILES_MATCHING PATTERN "*.hh")
+install(
+  DIRECTORY xt
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/
+  FILES_MATCHING
+  PATTERN "*.hh")

@@ -23,17 +23,31 @@ include(XtCompilerSupport)
 include(XtTooling)
 include(Hints)
 
-set(DXT_DONT_LINK_PYTHON_LIB ${DXT_DONT_LINK_PYTHON_LIB} CACHE STRING "wheelbuilders want to set this to 1")
+set(DXT_DONT_LINK_PYTHON_LIB
+    ${DXT_DONT_LINK_PYTHON_LIB}
+    CACHE STRING "wheelbuilders want to set this to 1")
 
 # library checks  #########################################################################
 find_package(PkgConfig)
 
-set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem system thread timer)
+set(DS_REQUIRED_BOOST_LIBS
+    atomic
+    chrono
+    date_time
+    filesystem
+    system
+    thread
+    timer)
 set(BOOST_ROOT_HINTS "$ENV{BOOST_ROOT}" ${root_hints})
 # check if any hints are provided by user
-if(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR)
+if(DEFINED BOOST_ROOT
+   OR DEFINED BOOOST_INCLUDEDIR
+   OR DEFINED BOOST_LIBRARYDIR)
   find_package(Boost 1.48.0 REQUIRED COMPONENTS ${DS_REQUIRED_BOOST_LIBS})
-else(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR)
+else(
+  DEFINED BOOST_ROOT
+  OR DEFINED BOOOST_INCLUDEDIR
+  OR DEFINED BOOST_LIBRARYDIR)
   # FindBoost can only take a single hint directory from BOOST_ROOT, so we loop over all hints
   foreach(BOOST_ROOT_HINT ${BOOST_ROOT_HINTS})
     set(BOOST_ROOT ${BOOST_ROOT_HINT})
@@ -44,7 +58,10 @@ else(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR
   endforeach(BOOST_ROOT_HINT ${BOOST_ROOT_HINTS})
   # check for Boost again with REQUIRED keyword to make boost mandatory
   find_package(Boost 1.48.0 REQUIRED COMPONENTS ${DS_REQUIRED_BOOST_LIBS})
-endif(DEFINED BOOST_ROOT OR DEFINED BOOOST_INCLUDEDIR OR DEFINED BOOST_LIBRARYDIR)
+endif(
+  DEFINED BOOST_ROOT
+  OR DEFINED BOOOST_INCLUDEDIR
+  OR DEFINED BOOST_LIBRARYDIR)
 if(${Boost_INCLUDE_DIRS})
   dune_register_package_flags(INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 endif(${Boost_INCLUDE_DIRS})
@@ -98,9 +115,10 @@ if(HAVE_MPI)
   if(MPI4PY_FOUND)
 
   else()
-    execute_process(COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env pip install mpi4py
-                    ERROR_VARIABLE shell_error
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(
+      COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env pip install mpi4py
+      ERROR_VARIABLE shell_error
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
     myfind_mpi4py()
   endif()
   if(MPI4PY_FOUND)
@@ -119,12 +137,18 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(DS_MAX_MIC_THREADS CACHE INTEGER 120)
 set(DUNE_XT_COMMON_TEST_DIR ${dune-xt_SOURCE_DIR}/dune/xt/common/test)
-set(ENABLE_PERFMON 0 CACHE STRING "enable likwid performance monitoring API usage")
+set(ENABLE_PERFMON
+    0
+    CACHE STRING "enable likwid performance monitoring API usage")
 if(NOT DS_HEADERCHECK_DISABLE)
   set(ENABLE_HEADERCHECK 1)
 endif(NOT DS_HEADERCHECK_DISABLE)
-set(DXT_TEST_TIMEOUT 180 CACHE STRING "per-test timeout in seconds")
-set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
+set(DXT_TEST_TIMEOUT
+    180
+    CACHE STRING "per-test timeout in seconds")
+set(DXT_TEST_PROCS
+    1
+    CACHE STRING "run N tests in parallel")
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
 

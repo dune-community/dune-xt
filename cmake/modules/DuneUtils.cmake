@@ -22,7 +22,9 @@ function(TO_LIST_SPACES _LIST_NAME OUTPUT_VAR)
   foreach(ITEM ${${_LIST_NAME}})
     set(NEW_LIST_SPACE ${NEW_LIST_SPACE} ${ITEM})
   endforeach()
-  set(${OUTPUT_VAR} "${NEW_LIST_SPACE}" PARENT_SCOPE)
+  set(${OUTPUT_VAR}
+      "${NEW_LIST_SPACE}"
+      PARENT_SCOPE)
 endfunction()
 
 if(DEFINED dune-xt_DIR)
@@ -41,24 +43,28 @@ enable_testing()
 include(DuneXTTesting)
 
 macro(add_header_listing) # header
-  file(GLOB_RECURSE current_module_header
-                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.pbh"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hxx"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hh"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.pbh"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hxx")
+  file(
+    GLOB_RECURSE
+    current_module_header
+    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.pbh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.pbh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hxx")
   set(COMMON_HEADER ${current_module_header} ${DUNE_HEADERS})
 
   # add header of dependent modules for header listing
   foreach(_mod ${ALL_DEPENDENCIES})
-    file(GLOB_RECURSE HEADER_LIST
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hh"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.pbh"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hxx"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hh"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.pbh"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hxx")
+    file(
+      GLOB_RECURSE
+      HEADER_LIST
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.pbh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hxx"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.pbh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hxx")
     list(APPEND COMMON_HEADER ${HEADER_LIST})
   endforeach(_mod DEPENDENCIES)
   set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
@@ -78,48 +84,30 @@ endmacro(make_dependent_modules_sys_included)
 macro(add_pylicense)
   file(GLOB configs ${PROJECT_SOURCE_DIR}/.pylicense*.py)
   foreach(cfg ${configs})
-    string(REGEX
-           REPLACE ".*/([^/]*)"
-                   "\\1"
-                   cfg_target
-                   ${cfg})
-    string(REPLACE ${PROJECT_SOURCE_DIR}
-                   ""
-                   cfg_target
-                   ${cfg_target})
-    string(REGEX
-           REPLACE "(.*)/[^/]*"
-                   "\\1"
-                   cfg_target
-                   ${cfg_target})
-    string(REGEX
-           REPLACE "/"
-                   "_"
-                   cfg_target
-                   ${cfg_target})
+    string(REGEX REPLACE ".*/([^/]*)" "\\1" cfg_target ${cfg})
+    string(REPLACE ${PROJECT_SOURCE_DIR} "" cfg_target ${cfg_target})
+    string(REGEX REPLACE "(.*)/[^/]*" "\\1" cfg_target ${cfg_target})
+    string(REGEX REPLACE "/" "_" cfg_target ${cfg_target})
     list(APPEND cfg_targets ${cfg_target})
-    add_custom_target(${cfg_target}
-                      ${CMAKE_BINARY_DIR}/run-in-dune-env
-                      pylicense
-                      "--cfg=${cfg}"
-                      "${PROJECT_SOURCE_DIR}"
-                      VERBATIM
-                      USES_TERMINAL)
+    add_custom_target(
+      ${cfg_target}
+      ${CMAKE_BINARY_DIR}/run-in-dune-env pylicense "--cfg=${cfg}" "${PROJECT_SOURCE_DIR}"
+      VERBATIM USES_TERMINAL)
   endforeach(cfg ${configs})
   add_custom_target(license DEPENDS ${cfg_targets})
 endmacro(add_pylicense)
 
 function(dump_cmake_variables)
-    get_cmake_property(_variableNames VARIABLES)
-    list (SORT _variableNames)
-    foreach (_variableName ${_variableNames})
-        if (ARGV0)
-            unset(MATCHED)
-            string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
-            if (NOT MATCHED)
-                continue()
-            endif()
-        endif()
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
+  get_cmake_property(_variableNames VARIABLES)
+  list(SORT _variableNames)
+  foreach(_variableName ${_variableNames})
+    if(ARGV0)
+      unset(MATCHED)
+      string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
+      if(NOT MATCHED)
+        continue()
+      endif()
+    endif()
+    message(STATUS "${_variableName}=${${_variableName}}")
+  endforeach()
 endfunction()

@@ -20,8 +20,8 @@ else("${FASP_LIBRARY}" MATCHES "FASP_LIBRARY-NOTFOUND")
   set(FASPLIB "${FASP_LIBRARY}")
 endif("${FASP_LIBRARY}" MATCHES "FASP_LIBRARY-NOTFOUND")
 message("-- checking for 'fasp' header")
-find_path(FASP_INCLUDE_DIR fasp.h
-          HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../local/include/" "${CMAKE_CURRENT_SOURCE_DIR}/../local/include/fasp/")
+find_path(FASP_INCLUDE_DIR fasp.h HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../local/include/"
+                                        "${CMAKE_CURRENT_SOURCE_DIR}/../local/include/fasp/")
 if("${FASP_INCLUDE_DIR}" MATCHES "FASP_INCLUDE_DIR-NOTFOUND")
   message("--   'fasp' header not found")
 else("${FASP_INCLUDE_DIR}" MATCHES "FASP_INCLUDE_DIR-NOTFOUND")

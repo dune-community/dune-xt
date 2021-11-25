@@ -14,14 +14,16 @@
 set(lib_dune_xt_la_sources container/pattern.cc eigen-solver/internal/numpy.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
-  list(APPEND lib_dune_xt_la_sources
-              container/common.cc
-              container/eigen/dense.cc
-              container/eigen/sparse.cc
-              container/istl.cc
-              solver/common.cc
-              solver/eigen.cc
-              solver/istl.cc)
+  list(
+    APPEND
+    lib_dune_xt_la_sources
+    container/common.cc
+    container/eigen/dense.cc
+    container/eigen/sparse.cc
+    container/istl.cc
+    solver/common.cc
+    solver/eigen.cc
+    solver/istl.cc)
 endif()
 
 dune_library_add_sources(dunext SOURCES ${lib_dune_xt_la_sources})

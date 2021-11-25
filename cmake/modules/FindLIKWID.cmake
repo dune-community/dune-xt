@@ -11,8 +11,16 @@
 #   Tobias Leibner  (2020)
 # ~~~
 
-find_path(LIKWID_INCLUDE_DIR NAMES likwid.h PATHS ${LIKWID_ROOT} PATH_SUFFIXES include)
-find_library(LIKWID_LIBRARY NAMES likwid PATHS ${LIKWID_ROOT} PATH_SUFFIXES lib)
+find_path(
+  LIKWID_INCLUDE_DIR
+  NAMES likwid.h
+  PATHS ${LIKWID_ROOT}
+  PATH_SUFFIXES include)
+find_library(
+  LIKWID_LIBRARY
+  NAMES likwid
+  PATHS ${LIKWID_ROOT}
+  PATH_SUFFIXES lib)
 
 mark_as_advanced(LIKWID_LIBRARY LIKWID_INCLUDE_DIR)
 

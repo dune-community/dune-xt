@@ -11,9 +11,13 @@
 #   Tobias Leibner  (2020)
 # ~~~
 
-set(GRIDTYPE "YASPGRID" CACHE STRING "GRIDTYPE")
+set(GRIDTYPE
+    "YASPGRID"
+    CACHE STRING "GRIDTYPE")
 
-set(GRIDDIM "2" CACHE STRING "GRIDDIM")
+set(GRIDDIM
+    "2"
+    CACHE STRING "GRIDDIM")
 
 add_definitions("-DGRIDDIM=${GRIDDIM}")
 add_definitions("-DGRIDTYPE=${GRIDTYPE}")

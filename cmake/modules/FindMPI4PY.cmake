@@ -17,15 +17,17 @@
 # 1a660df142e9a
 macro(myfind_mpi4py)
   if(NOT MPI4PY_INCLUDE_DIR)
-    execute_process(COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
-                    OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
-                    RESULT_VARIABLE MPI4PY_COMMAND_RESULT
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(
+      COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
+      OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
+      RESULT_VARIABLE MPI4PY_COMMAND_RESULT
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(MPI4PY_COMMAND_RESULT)
-      execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
-                      OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
-                      RESULT_VARIABLE MPI4PY_COMMAND_RESULT
-                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+      execute_process(
+        COMMAND "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
+        OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
+        RESULT_VARIABLE MPI4PY_COMMAND_RESULT
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
     endif()
     if(MPI4PY_COMMAND_RESULT)
       message("jfa: mpi4py not found")
@@ -38,7 +40,9 @@ macro(myfind_mpi4py)
       else(MPI4PY_INCLUDE_DIR MATCHES "Traceback")
         # successful
         set(MPI4PY_FOUND TRUE)
-        set(MPI4PY_INCLUDE_DIR ${MPI4PY_INCLUDE_DIR} CACHE STRING "mpi4py include path")
+        set(MPI4PY_INCLUDE_DIR
+            ${MPI4PY_INCLUDE_DIR}
+            CACHE STRING "mpi4py include path")
       endif(MPI4PY_INCLUDE_DIR MATCHES "Traceback")
     endif(MPI4PY_COMMAND_RESULT)
   else(NOT MPI4PY_INCLUDE_DIR)
