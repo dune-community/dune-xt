@@ -230,6 +230,9 @@ struct GluedDdGridTest : public ::testing::Test
         // iterate over micro coupling
         auto cgv = make_coupling_grid_view<GridGlueType, MacroElementType, MacroIntersectionType>(
             inside_element, outside_element, *dd_grid_, macro_intersection);
+
+        std::cout << "My codim 0 and 1 sizes are: " << cgv.size(0) << " and " << cgv.size(1) << std::endl;
+
         // check coupling provider
         CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
         const auto cgv_c = coupling_provider.coupling_view();

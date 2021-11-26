@@ -7,8 +7,8 @@
 // Authors:
 //   Tim Keil (2020 - 2021)
 
-#ifndef DUNE_XT_GRID_VIEW_NEW_COUPLING_HH
-#define DUNE_XT_GRID_VIEW_NEW_COUPLING_HH
+#ifndef DUNE_XT_GRID_VIEW_COUPLING_HH
+#define DUNE_XT_GRID_VIEW_COUPLING_HH
 
 #include <bitset>
 #include <iterator>
@@ -74,8 +74,8 @@ public:
 
   GlobalCoordinate outerNormal(const LocalCoordinate& local) const
   {
-    global_ = this->geometry().global(local);
-    local_ = macro_intersection_.geometry().local(global_);
+    auto global_ = this->geometry().global(local);
+    auto local_ = macro_intersection_.geometry().local(global_);
     return macro_intersection_.outerNormal(local_);
   }
 
@@ -89,15 +89,15 @@ public:
 
   GlobalCoordinate unitOuterNormal(const LocalCoordinate& local) const
   {
-    global_ = this->geometry().global(local);
-    local_ = macro_intersection_.geometry().local(global_);
+    auto global_ = this->geometry().global(local);
+    auto local_ = macro_intersection_.geometry().local(global_);
     return macro_intersection_.unitOuterNormal(local_);
   }
 
   GlobalCoordinate centerUnitOuterNormal() const
   {
-    global_ = this->geometry().center();
-    local_ = macro_intersection_.geometry().local(global_);
+    auto global_ = this->geometry().center();
+    auto local_ = macro_intersection_.geometry().local(global_);
     return macro_intersection_.unitOuterNormal(local_);
   }
 
@@ -125,8 +125,6 @@ public:
 
 private:
   const MacroIntersectionType macro_intersection_;
-  mutable GlobalCoordinate global_;
-  mutable LocalCoordinate local_;
 }; // class CouplingIntersectionWithCorrectNormal
 
 
@@ -260,25 +258,33 @@ public:
   // shared_ptrs in this function to avoid changing state of a copied-from CouplingGridView.
   void update()
   {
+    // initialize variables
+    inside_elements_ = std::make_shared<std::vector<LocalElementType>>();
+    inside_elements_ids_ = std::make_shared<std::vector<int>>();
+    coupling_intersections_ = std::make_shared<
+        std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>();
+    local_to_inside_indices_ = std::make_shared<std::vector<std::pair<size_t, size_t>>>();
+
     auto& coupling = dd_grid_.coupling(inside_element_, -1, outside_element_, -1, true);
+    coupling_size_ = coupling.size();
     // Note: This iterator iterates over all interesctions in the coupling grid. Not only over all intersections w.r.t.
     //       a single element
     for (auto coupling_intersection_it = coupling.template ibegin<0>();
          coupling_intersection_it != coupling.template iend<0>();
          ++coupling_intersection_it) {
       auto inside = coupling_intersection_it->inside();
-      inside_elements_ids_.push_back(local_inside_grid_.leaf_view().indexSet().index(inside));
+      inside_elements_ids_->push_back(local_inside_grid_.leaf_view().indexSet().index(inside));
     }
     // some coupling intersection may have the same inside element, remove duplicates
-    std::sort(inside_elements_ids_.begin(), inside_elements_ids_.end());
-    auto last = std::unique(inside_elements_ids_.begin(), inside_elements_ids_.end());
-    inside_elements_ids_.erase(last, inside_elements_ids_.end());
+    std::sort(inside_elements_ids_->begin(), inside_elements_ids_->end());
+    auto last = std::unique(inside_elements_ids_->begin(), inside_elements_ids_->end());
+    inside_elements_ids_->erase(last, inside_elements_ids_->end());
 
-    for (auto&& id : inside_elements_ids_) {
+    for (auto&& id : *inside_elements_ids_) {
       for (auto&& el : elements(local_inside_grid_.leaf_view())) {
         if (local_inside_grid_.leaf_view().indexSet().index(el) == id) {
           // This is the inside element we are searching for... add it to the vector
-          inside_elements_.push_back(el);
+          inside_elements_->push_back(el);
           std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>
               coupling_intersection_set;
           // now iteratate over all intersections to find all coupling intersections
@@ -292,16 +298,16 @@ public:
               coupling_intersection_set.insert(coupling_intersection);
             }
           }
-          coupling_intersections_.push_back(coupling_intersection_set);
+          coupling_intersections_->push_back(coupling_intersection_set);
         }
       }
     }
     // introduce a local to global map
-    for (auto&& id : inside_elements_ids_) {
+    for (auto&& id : *inside_elements_ids_) {
       for (auto&& el : elements(local_inside_grid_.leaf_view())) {
         if (local_inside_grid_.leaf_view().indexSet().index(el) == id) {
           // This is the inside element we are searching for..
-          local_to_inside_indices_.push_back({id, local_to_inside_indices_.size()});
+          local_to_inside_indices_->push_back({id, local_to_inside_indices_->size()});
         }
       }
     }
@@ -310,7 +316,7 @@ public:
   size_t local_to_inside_index(const LocalElementType& local_element) const
   {
     auto id = local_inside_grid_.leaf_view().indexSet().index(local_element);
-    for (auto&& index_pair : local_to_inside_indices_) {
+    for (auto&& index_pair : *local_to_inside_indices_) {
       if (id == index_pair.first) {
         return index_pair.second;
       }
@@ -319,7 +325,12 @@ public:
 
   int size(int codim) const
   {
-    DUNE_THROW(NotImplemented, "");
+    if (codim == 0)
+      return inside_elements_->size();
+    else if (codim == 1)
+      return coupling_size_;
+    else
+      DUNE_THROW(NotImplemented, "");
   }
 
   int size(const Dune::GeometryType& type) const
@@ -329,36 +340,36 @@ public:
 
   IntersectionIterator ibegin(const LocalElementType& inside_element) const
   {
-    return coupling_intersections_[local_to_inside_index(inside_element)].begin();
+    return (*coupling_intersections_)[local_to_inside_index(inside_element)].begin();
   };
 
   IntersectionIterator iend(const LocalElementType& inside_element) const
   {
-    return coupling_intersections_[local_to_inside_index(inside_element)].end();
+    return (*coupling_intersections_)[local_to_inside_index(inside_element)].end();
   };
 
   template <int cd>
   typename Codim<cd>::Iterator begin() const
   {
-    return inside_elements_.begin();
+    return inside_elements_->begin();
   }
 
   template <int cd>
   typename Codim<cd>::Iterator end() const
   {
-    return inside_elements_.end();
+    return inside_elements_->end();
   }
 
   template <int cd, PartitionIteratorType pitype>
   typename Codim<cd>::template Partition<pitype>::Iterator begin() const
   {
-    return inside_elements_.begin();
+    return inside_elements_->begin();
   }
 
   template <int cd, PartitionIteratorType pitype>
   typename Codim<cd>::template Partition<pitype>::Iterator end() const
   {
-    return inside_elements_.end();
+    return inside_elements_->end();
   }
 
   const IndexSet& indexSet() const
@@ -373,11 +384,13 @@ private:
   const MacroIntersectionType macro_intersection_;
   const MacroGridViewType& macro_grid_view_;
   const LocalGridProviderType& local_inside_grid_;
-  std::vector<LocalElementType> inside_elements_;
-  std::vector<int> inside_elements_ids_;
-  std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>
+  int coupling_size_;
+  std::shared_ptr<std::vector<LocalElementType>> inside_elements_;
+  std::shared_ptr<std::vector<int>> inside_elements_ids_;
+  std::shared_ptr<
+      std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>
       coupling_intersections_;
-  std::vector<std::pair<size_t, size_t>> local_to_inside_indices_;
+  std::shared_ptr<std::vector<std::pair<size_t, size_t>>> local_to_inside_indices_;
 }; // ... class CouplingGridViewWrapper ...
 
 
@@ -430,4 +443,4 @@ static CouplingGridView<GT> make_coupling_grid_view(const E& ss, const E& nn, GT
 
 } // namespace Dune::XT::Grid
 
-#endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
+#endif // DUNE_XT_GRID_VIEW_COUPLING_HH
