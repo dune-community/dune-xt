@@ -31,6 +31,9 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/timedlogging.hh>
+#include <dune/xt/functions/base/visualization.hh>
+#include <dune/xt/functions/interfaces/function.hh>
+#include <dune/xt/functions/constant.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
@@ -710,6 +713,22 @@ public:
     vtk_writer.addCellData(outside_inside_coupling_visualization, "local coupling entities (outside/inside)");
     vtk_writer.write(filename, VTK::appendedraw);
   } // ... visualize(...)
+
+  void write_global_visualization(const std::string& filename_prefix,
+                                  const XT::Functions::FunctionInterface<dimDomain>& func,
+                                  const std::list<int>& subdomains)
+  {
+    GluedVTKWriter<MacroGridType, LocalGridType, layer> vtk_writer(*this);
+    for (size_t subdomain = 0; subdomain < macro_leaf_view_size_; ++subdomain) {
+      if (std::find(subdomains.begin(), subdomains.end(), subdomain) != subdomains.end()) {
+        auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
+            func.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), func.name());
+        vtk_writer.addVertexData(subdomain, visualization_adapter);
+      }
+    }
+    vtk_writer.write(filename_prefix, VTK::appendedraw);
+    vtk_writer.clear();
+  } // ... write_global_visualization(...)
 
 private:
   template <class MacroEntityType>

@@ -7,7 +7,8 @@
 // Authors:
 //   Felix Schindler (2017 - 2018)
 //   René Fritze     (2018 - 2020)
-//   Tobias Leibner  (2019 - 2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2019 - 2021)
 
 #ifndef DUNE_XT_GRID_TEST_DD_GLUED_HH
 #define DUNE_XT_GRID_TEST_DD_GLUED_HH
@@ -25,6 +26,9 @@
 #  include <dune/xt/grid/grids.hh>
 #  include <dune/xt/grid/gridprovider.hh>
 #  include <dune/xt/grid/dd/glued.hh>
+#  include <dune/xt/grid/walker.hh>
+#  include <dune/xt/grid/view/coupling.hh>
+#  include <dune/xt/grid/gridprovider/coupling.hh>
 
 
 template <class T>
@@ -99,7 +103,8 @@ struct GluedDdGridTest : public ::testing::Test
   template <class G, bool anything = true>
   struct get_local_layer
   {
-    static constexpr Layers type = Layers::level;
+    static constexpr Layers type = Layers::leaf;
+    // TODO: Layers:level does not work for walk_coupling_views()
   };
 
 #  if HAVE_ALBERTA
@@ -172,10 +177,75 @@ struct GluedDdGridTest : public ::testing::Test
     dd_grid_->visualize(Expectations::id());
   } // ... visualize_is_callable(...)
 
+  void local_grids_are_constructable()
+  {
+    setup();
+    ASSERT_NE(macro_grid_, nullptr) << "This should not happen!";
+    ASSERT_NE(dd_grid_, nullptr) << "This should not happen!";
+
+    for (int ss = 0; ss < dd_grid_->num_subdomains(); ss++) {
+      auto local_grid = dd_grid_->local_grid(ss);
+      EXPECT_EQ(macro_grid_->dimDomain, local_grid.dimDomain);
+    }
+  }
+
+  void walk_coupling_views()
+  {
+    setup();
+    ASSERT_NE(macro_grid_, nullptr) << "This should not happen!";
+    ASSERT_NE(dd_grid_, nullptr) << "This should not happen!";
+
+    using GridGlueType = DD::Glued<MacroGridType, LocalGridType, get_local_layer<LocalGridType>::type>;
+    using CouplingGridViewType = CouplingGridView<GridGlueType>;
+    using MacroElementType = typename MacroGridType::template Codim<0>::Entity;
+    using MacroGridProviderType = Dune::XT::Grid::GridProvider<MacroGridType>;
+    using MacroGridViewType = typename MacroGridProviderType::LeafGridViewType; //<-- adapt to local_layer
+    using MacroIntersectionType = typename MacroGridViewType::Intersection;
+
+    auto functor = Dune::XT::Grid::GenericElementAndIntersectionFunctor<CouplingGridViewType>(
+        [] {},
+        [](const auto& element) { std::cout << "WALKER: Element : " << element.geometry().center() << std::endl; },
+        [](const auto& intersection, const auto&, const auto&) {
+          std::cout << "WALKER:      Intersection : " << intersection.geometry().center() << std::endl;
+        },
+        [] {});
+
+    auto mgv = dd_grid_->macro_grid_view();
+
+    // use the gridview from view/coupling.hh
+    for (auto&& macro_element : Dune::elements(mgv)) {
+
+      for (auto& macro_intersection : Dune::intersections(mgv, macro_element)) {
+        printf("_______\n");
+        if (macro_intersection.boundary()) {
+          std::cout << "... skip this intersection, it belongs to the boundary of the domain" << std::endl;
+          continue;
+        }
+        auto inside_element = macro_intersection.inside();
+        auto outside_element = macro_intersection.outside();
+
+        std::cout << "My inside macro element has center : " << inside_element.geometry().center() << std::endl;
+        std::cout << "My outside macro element has center: " << outside_element.geometry().center() << std::endl;
+
+        // iterate over micro coupling
+        auto cgv = make_coupling_grid_view<GridGlueType, MacroElementType, MacroIntersectionType>(
+            inside_element, outside_element, *dd_grid_, macro_intersection);
+
+        std::cout << "My codim 0 and 1 sizes are: " << cgv.size(0) << " and " << cgv.size(1) << std::endl;
+
+        // check coupling provider
+        CouplingGridProvider<CouplingGridViewType> coupling_provider(cgv);
+        const auto cgv_c = coupling_provider.coupling_view();
+        auto walker = Dune::XT::Grid::Walker<CouplingGridViewType>(cgv_c); // or cgv itself
+        walker.append(functor);
+        walker.walk();
+      }
+    }
+  }
+
   std::unique_ptr<GridProvider<MacroGridType>> macro_grid_;
   std::unique_ptr<DD::Glued<MacroGridType, LocalGridType, local_layer>> dd_grid_;
 }; // struct GluedDdGridTest
-
 
 } // namespace Grid
 } // namespace XT

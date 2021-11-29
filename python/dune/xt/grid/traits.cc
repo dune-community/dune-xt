@@ -6,10 +6,40 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #include "config.h"
 
 #include "traits.hh"
+
+//#include <dune/xt/grid/type_traits.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
+
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
+struct CouplingIntersection_for_all_grids
+{
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
+
+  static void bind(pybind11::module& m)
+  {
+#if HAVE_DUNE_GRID_GLUE
+    if constexpr (d < 3) {
+      using Dune::XT::Grid::bindings::grid_name;
+      Dune::XT::Grid::bindings::CouplingIntersectionBinder<G, G>::bind(m, grid_name<G>::value());
+    }
+#endif
+    CouplingIntersection_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
+  }
+};
+
+template <>
+struct CouplingIntersection_for_all_grids<Dune::XT::Common::tuple_null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
 
 
 PYBIND11_MODULE(_grid_traits, m)
@@ -61,4 +91,10 @@ PYBIND11_MODULE(_grid_traits, m)
   pybind11::class_<Dimension<9>>(m, "Dimension9", "tag: Dimension9")
       .def(py::init())
       .def("__repr__", [](const Dimension<9>&) { return "Dim(9)"; });
+
+  pybind11::class_<LeafIntersection>(m, "LeafIntersection", "tag: LeafIntersection")
+      .def(py::init())
+      .def("__repr__", [](const LeafIntersection&) { return "LeafIntersection"; });
+
+  CouplingIntersection_for_all_grids<>::bind(m);
 }

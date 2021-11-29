@@ -7,10 +7,14 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #include "config.h"
 
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
 
@@ -20,9 +24,21 @@
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct BoundaryInfo_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::BoundaryInfo<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::BoundaryInfo<LGV>::bind(m, grid_name<G>::value(), "leaf");
+#if HAVE_DUNE_GRID_GLUE
+    if constexpr (d < 3) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::BoundaryInfo<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    }
+#endif
     BoundaryInfo_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

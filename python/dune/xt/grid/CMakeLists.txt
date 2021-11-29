@@ -8,7 +8,7 @@
 # Authors:
 #   Felix Schindler (2019 - 2020)
 #   René Fritze     (2018 - 2019)
-#   Tim Keil        (2018)
+#   Tim Keil        (2018, 2020)
 #   Tobias Leibner  (2019 - 2020)
 # ~~~
 
@@ -32,3 +32,5 @@ dune_pybindxi_add_module(_grid_intersection EXCLUDE_FROM_ALL intersection.cc)
 dune_pybindxi_add_module(_grid_gridprovider_provider EXCLUDE_FROM_ALL gridprovider/provider.cc)
 dune_pybindxi_add_module(_grid_traits EXCLUDE_FROM_ALL traits.cc)
 dune_pybindxi_add_module(_grid_walker EXCLUDE_FROM_ALL walker.cc)
+dune_pybindxi_add_module(_grid_dd_glued_gridprovider_cube EXCLUDE_FROM_ALL dd_glued_gridprovider/cube.cc)
+dune_pybindxi_add_module(_grid_dd_glued_gridprovider_provider EXCLUDE_FROM_ALL dd_glued_gridprovider/provider.cc)

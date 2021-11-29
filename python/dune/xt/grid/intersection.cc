@@ -7,7 +7,8 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
-//   Tobias Leibner  (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2020 - 2021)
 //
 // This file is part of the dune-gdt project:
 
@@ -19,10 +20,12 @@
 #include <dune/pybindxi/operators.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/print.hh>
+#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
@@ -47,9 +50,9 @@ public:
   using GlobalCoordinateType = FieldVector<D, d>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "intersection",
-                         const std::string& grid_id = XT::Grid::bindings::grid_name<G>::value(),
-                         const std::string& layer_id = "")
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "intersection")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -116,11 +119,20 @@ template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct Intersection_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
-  using GV = typename G::LeafGridView;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
 
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::Intersection<GV>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::Intersection<LGV>::bind(m, grid_name<G>::value(), "leaf");
+#if HAVE_DUNE_GRID_GLUE
+    if constexpr (d < 3) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::Intersection<CGV>::bind(m, grid_name<G>::value(), "coupling");
+    }
+#endif
     Intersection_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

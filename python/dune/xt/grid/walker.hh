@@ -7,6 +7,8 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #ifndef PYTHON_DUNE_XT_GRID_WALKER_HH
 #define PYTHON_DUNE_XT_GRID_WALKER_HH
@@ -14,17 +16,18 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/functional.h>
 
+#include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/walker.hh>
 
 namespace Dune::XT::Grid::bindings {
 
 
-template <class G>
+template <class GV>
 class Walker
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
 
 public:
   using type = Grid::Walker<GV>;
@@ -89,27 +92,70 @@ public:
         py::call_guard<py::gil_scoped_release>());
   } // ... addbind_methods(...)
 
-  static bound_type
-  bind(pybind11::module& m, const std::string& class_id = "walker", const std::string& grid_id = grid_name<G>::value())
+  static bound_type bind_leaf(pybind11::module& m,
+                              const std::string& grid_id = grid_name<G>::value(),
+                              const std::string& layer_id = "",
+                              const std::string& class_id = "Walker")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
+
     c.def(py::init([](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); }),
           "grid_provider"_a);
 
     addbind_methods(c);
 
-    // factories
+    return c;
+  } // ... bind_leaf(...)
+
+  static bound_type bind_coupling(pybind11::module& m,
+                                  const std::string& grid_id = grid_name<G>::value(),
+                                  const std::string& layer_id = "",
+                                  const std::string& class_id = "Walker")
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+
+    auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
+    bound_type c(m, ClassName.c_str(), ClassName.c_str());
+
+    c.def(py::init([](CouplingGridProvider<GV>& grid_provider) { return new type(grid_provider.coupling_view()); }),
+          "grid_provider"_a);
+
+    addbind_methods(c);
+
+    return c;
+  } // ... bind_coupling(...)
+
+
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "Walker")
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
         [](GridProvider<G>& grid_provider) { return new type(grid_provider.leaf_view()); },
-        "grid_provider"_a);
+        "grid_provider"_a,
+        py::keep_alive<0, 1>());
+  } // ... bind_leaf_factory(...)
 
-    return c;
-  } // ... bind(...)
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "Walker")
+  {
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](CouplingGridProvider<GV>& coupling_grid_provider) {
+          return new type(coupling_grid_provider.coupling_view());
+        },
+        "coupling_grid_provider"_a);
+  } // ... bind_coupling_factory(...)
 }; // class Walker
 
 

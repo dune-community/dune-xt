@@ -7,6 +7,8 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #ifndef PYTHON_DUNE_XT_GRID_FILTERS_INTERSECTION_HH
 #define PYTHON_DUNE_XT_GRID_FILTERS_INTERSECTION_HH
@@ -15,6 +17,7 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/filters/intersection.hh>
+#include <dune/xt/grid/gridprovider/coupling.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <python/dune/xt/common/timedlogging.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
@@ -22,41 +25,55 @@
 namespace Dune::XT::Grid::bindings {
 
 
-template <template <class> class Filter, class G>
+template <template <class> class Filter, class GV>
 class InitlessIntersectionFilter
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
 
 public:
   using type = Filter<GV>;
   using base_type = Grid::IntersectionFilter<GV>;
   using bound_type = pybind11::class_<type, base_type>;
 
-  static bound_type
-  bind(pybind11::module& m, const std::string& class_id, const std::string& grid_id = grid_name<G>::value())
+  static bound_type bind(pybind11::module& m,
+                         const std::string& class_id,
+                         const std::string& layer_id = "",
+                         const std::string& grid_id = grid_name<G>::value())
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty()) {
+      ClassName += "_" + layer_id;
+      ClassId += "_" + layer_id;
+    }
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
 
-    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return new type(); });
-
     return c;
   } // ... bind(...)
+
+  static void bind_leaf_factory(pybind11::module& m, const std::string& class_id)
+  {
+    m.def(Common::to_camel_case(class_id).c_str(), [](const Grid::GridProvider<G>&) { return new type(); });
+  } // ... bind_leaf_factory(...)
+
+  static void bind_coupling_factory(pybind11::module& m, const std::string& class_id)
+  {
+    m.def(Common::to_camel_case(class_id).c_str(), [](const CouplingGridProvider<GV>&) { return new type(); });
+  } // ... bind_coupling_factory(...)
 }; // class InitlessIntersectionFilter
 
 
-template <class G>
+template <class GV>
 class CustomBoundaryIntersectionsFilter
 {
+  using G = typename GV::Grid;
   static_assert(is_grid<G>::value);
-  using GV = typename G::LeafGridView;
   using I = Grid::extract_intersection_t<GV>;
 
 public:
@@ -65,14 +82,17 @@ public:
   using bound_type = pybind11::class_<type, base_type>;
 
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "apply_on_custom_boundary_intersections",
-                         const std::string& grid_id = grid_name<G>::value())
+                         const std::string& grid_id = grid_name<G>::value(),
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "apply_on_custom_boundary_intersections")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
+    if (!layer_id.empty())
+      ClassName += "_" + layer_id;
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
     c.def(py::init([](const BoundaryInfo<I>& boundary_info,
                       const BoundaryType& boundary_type,
@@ -85,8 +105,15 @@ public:
     c.def("__repr__", [ClassId](type&) { return ClassId + "(boundary_info=, boundary_type=, logging_prefix=)"; });
     c.def_readonly("logger", &type::logger);
 
+    return c;
+  } // ... bind(...)
+
+  static void bind_leaf_factory(pybind11::module& m,
+                                const std::string& class_id = "apply_on_custom_boundary_intersections")
+  {
+    using namespace pybind11::literals;
     m.def(
-        ClassId.c_str(),
+        Common::to_camel_case(class_id).c_str(),
         [](const Grid::GridProvider<G>&,
            const BoundaryInfo<I>& boundary_info,
            const BoundaryType& boundary_type,
@@ -95,9 +122,24 @@ public:
         "boundary_info"_a,
         "boundary_type"_a,
         "logging_prefix"_a = "");
+  } // ... bind_leaf_factory(...)
 
-    return c;
-  } // ... bind(...)
+  static void bind_coupling_factory(pybind11::module& m,
+                                    const std::string& class_id = "apply_on_custom_boundary_intersections")
+  {
+    using namespace pybind11::literals;
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const CouplingGridProvider<GV>&,
+           const BoundaryInfo<I>& boundary_info,
+           const BoundaryType& boundary_type,
+           const std::string& logging_prefix) { return new type(boundary_info, boundary_type.copy(), logging_prefix); },
+        "coupling_grid_provider"_a,
+        "boundary_info"_a,
+        "boundary_type"_a,
+        "logging_prefix"_a = "");
+  } // ... bind_coupling_factory(...)
+
 }; // class CustomBoundaryIntersectionsFilter
 
 

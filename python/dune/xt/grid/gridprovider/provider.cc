@@ -7,10 +7,14 @@
 // Authors:
 //   Felix Schindler (2020)
 //   René Fritze     (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2021)
 
 #include "config.h"
 
+#include <dune/xt/grid/dd/glued.hh>
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/view/coupling.hh>
 
 #include <python/dune/xt/grid/gridprovider.hh>
 #include <python/dune/xt/grid/filters/intersection.hh>
@@ -20,10 +24,21 @@
 template <template <class> class Filter, class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct InitlessIntersectionFilter_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
+
   static void bind(pybind11::module& m, const std::string& class_id)
   {
-    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, Dune::XT::Common::tuple_head_t<GridTypes>>::bind(
-        m, class_id);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind(m, class_id, "leaf");
+    Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, LGV>::bind_leaf_factory(m, class_id);
+    if constexpr (d < 3) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind(m, class_id, "coupling");
+      Dune::XT::Grid::bindings::InitlessIntersectionFilter<Filter, CGV>::bind_coupling_factory(m, class_id);
+    }
     InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m, class_id);
   }
 };
@@ -38,9 +53,23 @@ struct InitlessIntersectionFilter_for_all_grids<Filter, Dune::XT::Common::tuple_
 template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>
 struct CustomBoundaryIntersectionFilter_for_all_grids
 {
+  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using LGV = typename G::LeafGridView;
+  static const size_t d = G::dimension;
+
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<Dune::XT::Common::tuple_head_t<GridTypes>>::bind(m);
+    using Dune::XT::Grid::bindings::grid_name;
+    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind(m, grid_name<G>::value(), "leaf");
+    Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<LGV>::bind_leaf_factory(m);
+#if HAVE_DUNE_GRID_GLUE
+    if constexpr (d < 3) {
+      using GridGlueType = Dune::XT::Grid::DD::Glued<G, G, Dune::XT::Grid::Layers::leaf>;
+      using CGV = Dune::XT::Grid::CouplingGridView<GridGlueType>;
+      Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind(m, grid_name<G>::value(), "coupling");
+      Dune::XT::Grid::bindings::CustomBoundaryIntersectionsFilter<CGV>::bind_coupling_factory(m);
+    }
+#endif
     CustomBoundaryIntersectionFilter_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

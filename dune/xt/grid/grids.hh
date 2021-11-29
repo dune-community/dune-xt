@@ -36,7 +36,6 @@
 #include <dune/grid/yaspgrid.hh>
 #include <dune/xt/common/tuple.hh>
 
-
 // this is used by other headers
 using ONED_1D = Dune::OneDGrid;
 using YASP_1D_EQUIDISTANT_OFFSET = Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>;
@@ -115,7 +114,6 @@ using Available3dGridTypes = std::tuple<YASP_3D_EQUIDISTANT_OFFSET
  * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
  */
 using AvailableGridTypes = Common::tuple_cat_t<Available1dGridTypes, Available2dGridTypes, Available3dGridTypes>;
-
 
 } // namespace Dune::XT::Grid
 

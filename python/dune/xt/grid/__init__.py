@@ -36,6 +36,8 @@ for mod_name in (
         '_grid_gridprovider_cube',
         '_grid_gridprovider_gmsh',
         '_grid_gridprovider_provider',
+        '_grid_dd_glued_gridprovider_cube',
+        '_grid_dd_glued_gridprovider_provider',
         '_grid_intersection',
         '_grid_traits',
         '_grid_walker',

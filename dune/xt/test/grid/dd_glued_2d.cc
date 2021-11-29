@@ -7,7 +7,8 @@
 // Authors:
 //   Felix Schindler (2017 - 2018)
 //   René Fritze     (2018 - 2020)
-//   Tobias Leibner  (2020)
+//   Tim Keil        (2021)
+//   Tobias Leibner  (2020 - 2021)
 
 #include <dune/xt/test/main.hxx> // <- this one has to come first (includes the config.h)!
 
@@ -139,6 +140,13 @@ TYPED_TEST(GluedDdGridTest, couplings_are_of_correct_size)
 {
   this->couplings_are_of_correct_size();
 }
-
+TYPED_TEST(GluedDdGridTest, local_grids_are_constructable)
+{
+  this->local_grids_are_constructable();
+}
+TYPED_TEST(GluedDdGridTest, walk_coupling_views)
+{
+  this->walk_coupling_views();
+}
 
 #endif // HAVE_DUNE_GRID_GLUE
