@@ -64,13 +64,18 @@ def visualize_function_on_dd_grid(function, dd_grid, subdomains=None):
     assert isinstance(subdomains, list), 'Please provide a list of subdomains'
     assert all(sd < dd_grid.num_subdomains for sd in subdomains)
     assert all(isinstance(sd, int) for sd in subdomains)
-#    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-    dd_grid.write_global_visualization('something', function, subdomains)
+    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+    dd_grid.write_global_visualization(tmpfile[5:-4], function, subdomains)
     prestring = f's{dd_grid.num_subdomains:04d}-'
     if len(subdomains) == 1:
         prestring += f'p{subdomains[0]:04d}-'
-        return plot(prestring + 'something.vtu', color_attribute_name=function.name)
+        return plot(prestring + tmpfile[5:], color_attribute_name=function.name)
     try:
-        plot(prestring + 'something.pvtu', color_attribute_name=function.name)
+        plot(prestring + tmpfile[5:-4] + '.pvtu', color_attribute_name=function.name)
     except AttributeError:
-        print("no output generated (.pvtu file is broken). The results can be viewed via paraview")
+        if 1 < len(subdomains) < dd_grid.num_subdomains:
+            # TODO: fix this error
+            print("For 1 < len(subdomains) < num_subdomains, the generated .pvtu file is known "
+                   + "to be broken. The result for each subdomain can be viewed via paraview")
+        else:
+            print("Unexpected error")
