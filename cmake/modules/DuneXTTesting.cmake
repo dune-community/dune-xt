@@ -182,7 +182,7 @@ macro(add_subdir_tests subdir)
   endforeach(template ${test_templates})
   add_custom_target(${subdir}_test_templates SOURCES ${test_templates})
 
-  # this excludes meta-ini variation test cases because  there binary name != test name
+  # this excludes meta-ini variation test cases because there binary name != test name
   foreach(test ${${subdir}_xt_test_binaries})
     if(TARGET test)
       set_tests_properties(${test} PROPERTIES TIMEOUT ${DXT_TEST_TIMEOUT})
@@ -190,8 +190,18 @@ macro(add_subdir_tests subdir)
     endif(TARGET test)
   endforeach()
 
-  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test
-                                                                                    # test_binaries)
+  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries})
+  if("${subdir}" STREQUAL "functions")
+    # There are a lot of tests in the function subdir and these take a long time in CI. We thus create two additional
+    # targets here, each containing half of the tests.
+    list(LENGTH ${subdir}_dxt_test_binaries num_tests)
+    math(EXPR half_num_tests "${num_tests}/2")
+    list(SUBLIST ${subdir}_dxt_test_binaries 0 ${half_num_tests} functions1_dxt_test_binaries)
+    # If length is -1, all list elements starting from <begin> will be returned
+    list(SUBLIST ${subdir}_dxt_test_binaries ${half_num_tests} -1 functions2_dxt_test_binaries)
+    add_custom_target(${subdir}1_test_binaries DEPENDS ${${subdir}1_dxt_test_binaries})
+    add_custom_target(${subdir}2_test_binaries DEPENDS ${${subdir}2_dxt_test_binaries})
+  endif()
   add_custom_target(
     ${subdir}_check
     COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j ${DXT_TEST_PROCS}
