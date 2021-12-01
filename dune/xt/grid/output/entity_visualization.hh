@@ -40,7 +40,7 @@ struct ElementVisualization
   {
     // make a mapper for codim 0 entities in the leaf grid
     using Grid = extract_grid_t<View>;
-    Dune::LeafMultipleCodimMultipleGeomTypeMapper<Grid> mapper(view.grid(), mcmgElementLayout());
+    Dune::MultipleCodimMultipleGeomTypeMapper<View> mapper(view, mcmgElementLayout());
 
     std::vector<double> values(mapper.size());
     for (auto&& entity : elements(view)) {

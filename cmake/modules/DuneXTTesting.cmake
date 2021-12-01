@@ -12,15 +12,15 @@
 #   Tobias Leibner  (2015 - 2020)
 # ~~~
 
-macro(dxt_headercheck_target_name arg)
+macro(DXT_HEADERCHECK_TARGET_NAME arg)
   string(REGEX REPLACE ".*/([^/]*)" "\\1" simple ${arg})
   string(REPLACE ${PROJECT_SOURCE_DIR} "" rel ${arg})
   string(REGEX REPLACE "(.*)/[^/]*" "\\1" relpath ${rel})
   string(REGEX REPLACE "/" "_" targname ${rel})
   set(targname "headercheck_${targname}")
-endmacro(dxt_headercheck_target_name)
+endmacro(DXT_HEADERCHECK_TARGET_NAME)
 
-macro(get_headercheck_targets subdir)
+macro(GET_HEADERCHECK_TARGETS subdir)
   file(GLOB_RECURSE bindir_header "${CMAKE_BINARY_DIR}/*.hh")
   list(APPEND dxt_ignore_header ${bindir_header})
 
@@ -39,9 +39,10 @@ macro(get_headercheck_targets subdir)
       add_dependencies(${subdir}_headercheck ${targname})
     endforeach(header ${headerlist})
   endif(ENABLE_HEADERCHECK)
-endmacro(get_headercheck_targets)
+endmacro(GET_HEADERCHECK_TARGETS)
 
-macro(add_subdir_tests subdir)
+# cmake-lint: disable=R0915
+macro(ADD_SUBDIR_TESTS subdir)
   set(link_xt_libs dunext)
   list(APPEND dxt_test_dirs ${subdir})
   file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.cc")
@@ -118,12 +119,12 @@ macro(add_subdir_tests subdir)
     string(REPLACE ".tpl" ".tpl.cc" out_fn "${template}")
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" out_fn "${out_fn}")
     # get the last completed cache for the codegen execution during configure time
-    foreach(_mod ${ALL_DEPENDENCIES})
-      dune_module_path(MODULE ${_mod} RESULT ${_mod}_binary_dir BUILD_DIR)
-      if(IS_DIRECTORY ${${_mod}_binary_dir})
-        set(last_dep_bindir ${${_mod}_binary_dir})
+    foreach(mod ${ALL_DEPENDENCIES})
+      dune_module_path(MODULE ${mod} RESULT ${mod}_binary_dir BUILD_DIR)
+      if(IS_DIRECTORY ${${mod}_binary_dir})
+        set(last_dep_bindir ${${mod}_binary_dir})
       endif()
-    endforeach(_mod DEPENDENCIES)
+    endforeach(mod DEPENDENCIES)
 
     dune_execute_process(
       COMMAND
@@ -182,7 +183,7 @@ macro(add_subdir_tests subdir)
   endforeach(template ${test_templates})
   add_custom_target(${subdir}_test_templates SOURCES ${test_templates})
 
-  # this excludes meta-ini variation test cases because  there binary name != test name
+  # this excludes meta-ini variation test cases because there binary name != test name
   foreach(test ${${subdir}_xt_test_binaries})
     if(TARGET test)
       set_tests_properties(${test} PROPERTIES TIMEOUT ${DXT_TEST_TIMEOUT})
@@ -190,8 +191,23 @@ macro(add_subdir_tests subdir)
     endif(TARGET test)
   endforeach()
 
-  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test
-                                                                                    # test_binaries)
+  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries})
+  if("${subdir}" STREQUAL "functions")
+    # There are a lot of tests in the function subdir and these take a long time in CI. We thus create two additional
+    # targets here, each containing half of the tests.
+    list(LENGTH functions_dxt_test_binaries num_tests)
+    math(EXPR half_num_tests "${num_tests}/2")
+    list(SUBLIST functions_dxt_test_binaries 0 ${half_num_tests} functions1_dxt_test_binaries)
+    # If length is -1, all list elements starting from <begin> will be returned
+    list(SUBLIST functions_dxt_test_binaries ${half_num_tests} -1 functions2_dxt_test_binaries)
+    add_custom_target(functions1_test_binaries DEPENDS ${functions1_dxt_test_binaries})
+    add_custom_target(functions2_test_binaries DEPENDS ${functions2_dxt_test_binaries})
+    foreach(label functions1 functions2)
+      foreach(test ${${label}_dxt_test_binaries})
+        set_tests_properties(${test} PROPERTIES LABELS ${label})
+      endforeach()
+    endforeach()
+  endif()
   add_custom_target(
     ${subdir}_check
     COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j ${DXT_TEST_PROCS}
@@ -207,9 +223,9 @@ macro(add_subdir_tests subdir)
   endforeach()
   set(${subdir}_dxt_headercheck_targets "")
   get_headercheck_targets(${subdir})
-endmacro(add_subdir_tests)
+endmacro(ADD_SUBDIR_TESTS)
 
-macro(finalize_test_setup)
+macro(FINALIZE_TEST_SETUP)
   set(combine_targets test_templates test_binaries check recheck)
   foreach(target ${combine_targets})
     add_custom_target(${target})
@@ -244,7 +260,7 @@ macro(finalize_test_setup)
   endif()
 endmacro()
 
-macro(dxt_exclude_from_headercheck)
+macro(DXT_EXCLUDE_FROM_HEADERCHECK)
   exclude_from_headercheck(${ARGV0}) # make this robust to argument being passed with or without ""
   string(REGEX REPLACE "[\ \n]+([^\ ])" ";\\1" list ${ARGV0})
   set(list "${list};${ARGV}")
@@ -252,9 +268,9 @@ macro(dxt_exclude_from_headercheck)
     set(item ${CMAKE_CURRENT_SOURCE_DIR}/${item})
     list(APPEND dxt_ignore_header ${item})
   endforeach()
-endmacro(dxt_exclude_from_headercheck)
+endmacro(DXT_EXCLUDE_FROM_HEADERCHECK)
 
-macro(dxt_add_python_tests)
+macro(DXT_ADD_PYTHON_TESTS)
   add_custom_target(
     xt_test_python
     "${CMAKE_BINARY_DIR}/run-in-dune-env" "py.test" "${CMAKE_BINARY_DIR}/python" "--cov" "${CMAKE_CURRENT_SOURCE_DIR}/"
@@ -266,4 +282,4 @@ macro(dxt_add_python_tests)
     add_custom_target(test_python)
   endif(TARGET test_python)
   add_dependencies(test_python xt_test_python)
-endmacro(dxt_add_python_tests)
+endmacro(DXT_ADD_PYTHON_TESTS)

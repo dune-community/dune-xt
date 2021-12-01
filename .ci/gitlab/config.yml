@@ -185,18 +185,6 @@ grid unstable_gcc_full headercheck:
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
 
-functions unstable_gcc_full cpp:
-    extends: .subdir-test
-    variables:
-        CI_IMAGE: debian-unstable_gcc_full
-        TESTS_MODULE_SUBDIR: functions
-    tags:
-        - dustin
-    stage: cpp
-    needs: ["debian-unstable_gcc_full"]
-    script:
-          - ccache --max-size 10G
-          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions unstable_gcc_full headercheck:
     extends: .subdir-test
@@ -207,6 +195,32 @@ functions unstable_gcc_full headercheck:
     needs: ["debian-unstable_gcc_full"]
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
+
+functions1 unstable_gcc_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: functions1
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian-unstable_gcc_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
+
+functions2 unstable_gcc_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: functions2
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian-unstable_gcc_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
 
 la unstable_gcc_full cpp:
     extends: .subdir-test
@@ -274,18 +288,6 @@ grid gcc_full headercheck:
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
 
-functions gcc_full cpp:
-    extends: .subdir-test
-    variables:
-        CI_IMAGE: debian_gcc_full
-        TESTS_MODULE_SUBDIR: functions
-    tags:
-        - dustin
-    stage: cpp
-    needs: ["debian_gcc_full"]
-    script:
-          - ccache --max-size 10G
-          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions gcc_full headercheck:
     extends: .subdir-test
@@ -296,6 +298,32 @@ functions gcc_full headercheck:
     needs: ["debian_gcc_full"]
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
+
+functions1 gcc_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: functions1
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian_gcc_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
+
+functions2 gcc_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: functions2
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian_gcc_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
 
 la gcc_full cpp:
     extends: .subdir-test
@@ -363,18 +391,6 @@ grid clang_full headercheck:
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
 
-functions clang_full cpp:
-    extends: .subdir-test
-    variables:
-        CI_IMAGE: debian_clang_full
-        TESTS_MODULE_SUBDIR: functions
-    tags:
-        - dustin
-    stage: cpp
-    needs: ["debian_clang_full"]
-    script:
-          - ccache --max-size 10G
-          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
 functions clang_full headercheck:
     extends: .subdir-test
@@ -385,6 +401,32 @@ functions clang_full headercheck:
     needs: ["debian_clang_full"]
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
+
+functions1 clang_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: functions1
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian_clang_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
+
+functions2 clang_full cpp:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: functions2
+    tags:
+        - dustin
+    stage: cpp
+    needs: ["debian_clang_full"]
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
 
 la clang_full cpp:
     extends: .subdir-test

@@ -27,8 +27,9 @@ std::unique_ptr<VTKWriter<GridViewType>>
 create_vtkwriter(const GridViewType& grid_view, const bool subsampling = true, const int subsampling_level = 2)
 {
   static_assert(Grid::is_view<GridViewType>::value);
-  return subsampling ? std::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, subsampling_level)
-                     : std::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
+  return subsampling
+             ? std::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, refinementLevels(subsampling_level))
+             : std::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
 }
 
 

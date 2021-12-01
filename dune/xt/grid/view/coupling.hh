@@ -61,7 +61,7 @@ class CouplingIntersectionWithCorrectNormal : public CouplingIntersectionType
 public:
   using Entity = typename MacroIntersectionType::Entity;
   static constexpr auto dimensionworld = MacroIntersectionType::dimensionworld;
-  static constexpr auto dimension = MacroIntersectionType::dimension;
+  static constexpr auto dimension = MacroIntersectionType::Entity::dimension;
   static constexpr auto mydimension = MacroIntersectionType::mydimension;
   using typename BaseType::GlobalCoordinate;
   using typename BaseType::LocalCoordinate;
@@ -112,13 +112,13 @@ public:
   }
 
   //! Compares two intersections for equality. copied from dune/grid/common/intersection
-  bool operator==(const CouplingIntersectionWithCorrectNormal& other) const
+  bool operator==(const CouplingIntersectionWithCorrectNormal& /*other*/) const
   {
     DUNE_THROW(NotImplemented, "");
   }
 
   //! Compares two intersections for inequality. copied from dune/grid/common/intersection
-  bool operator!=(const CouplingIntersectionWithCorrectNormal& other) const
+  bool operator!=(const CouplingIntersectionWithCorrectNormal& /*other*/) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -327,13 +327,12 @@ public:
   {
     if (codim == 0)
       return inside_elements_->size();
-    else if (codim == 1)
+    if (codim == 1)
       return coupling_size_;
-    else
-      DUNE_THROW(NotImplemented, "");
+    DUNE_THROW(NotImplemented, "");
   }
 
-  int size(const Dune::GeometryType& type) const
+  int size(const Dune::GeometryType& /*type*/) const
   {
     DUNE_THROW(NotImplemented, "");
   }

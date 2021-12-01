@@ -82,7 +82,7 @@ struct PeriodicViewTest : public testing::Test
     // check interface
     [[maybe_unused]] const GridType& test_grid = periodic_grid_view.grid();
     const IndexSet& index_set = periodic_grid_view.indexSet();
-    const int codim0_size = periodic_grid_view.size(0);
+    const size_t codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube) {
       EXPECT_EQ(std::pow(elements_per_direction, dimDomain), codim0_size);
