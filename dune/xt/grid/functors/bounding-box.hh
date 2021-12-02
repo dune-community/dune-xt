@@ -72,13 +72,13 @@ public:
 
   MinMaxCoordinateFunctor(const MinMaxCoordinateFunctor& other) = default;
 
-  void prepare() override final
+  void prepare() final
   {
     bounding_box_ =
         std::make_pair(VectorType(std::numeric_limits<D>::max()), VectorType(std::numeric_limits<D>::min()));
   }
 
-  void apply_local(const typename BaseType::ElementType& element) override final
+  void apply_local(const typename BaseType::ElementType& element) final
   {
     const auto& geo = element.geometry();
     for (auto i : Common::value_range(geo.corners())) {
@@ -95,12 +95,12 @@ public:
     return bounding_box_;
   }
 
-  void finalize() override final
+  void finalize() final
   {
     Propagator::finalize_imp();
   }
 
-  BaseType* copy() override final
+  BaseType* copy() final
   {
     return Propagator::copy_imp();
   }

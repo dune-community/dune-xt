@@ -106,7 +106,7 @@ public:
   {}
 
 protected:
-  void compute() const override final
+  void compute() const final
   {
     const auto type = options_->template get<std::string>("type");
 #if HAVE_LAPACKE || HAVE_MKL

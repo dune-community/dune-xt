@@ -206,7 +206,7 @@ struct ConfigTest : public testing::Test
     , keys(boost::assign::list_of<std::string>().repeat_fun(values.size() - 1, key_gen))
   {}
 
-  virtual ~ConfigTest() {}
+  ~ConfigTest() override {}
 
   void get()
   {

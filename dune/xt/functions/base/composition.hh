@@ -69,12 +69,12 @@ struct GeneralElementFunctionChooser
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 2;
     }
 
-    RangeType evaluate(const DomainType& xx) const override final
+    RangeType evaluate(const DomainType& xx) const final
     {
       // evaluate inner function
       const auto inner_value = local_inner_function_->evaluate(xx);
@@ -90,7 +90,7 @@ struct GeneralElementFunctionChooser
       return local_outer_function_->evaluate(outer_element.geometry().local(inner_value));
     }
 
-    DerivativeRangeType jacobian(const DomainType& /*xx*/) const override final
+    DerivativeRangeType jacobian(const DomainType& /*xx*/) const final
     {
       DUNE_THROW(Dune::NotImplemented, "");
     }
@@ -140,18 +140,17 @@ struct ElementFunctionForGlobalChooser
 
     ElementFunction& operator=(const ElementFunction& /*other*/) = delete;
 
-    int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const final
     {
       return global_function_.order(param) * localizable_function_.local_function(element_)->order(param);
     }
 
-    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
+    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const final
     {
       return global_function_.evaluate(localizable_function_.local_function(element_)->evaluate(xx, param), param);
     }
 
-    DerivativeRangeType jacobian(const DomainType& /*xx*/,
-                                 const XT::Common::Parameter& /*param*/ = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const final
     {
       DUNE_THROW(Dune::NotImplemented, "");
     }
@@ -254,12 +253,12 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<ElementFunction>(inner_function_, outer_function_, element_search_);
   }

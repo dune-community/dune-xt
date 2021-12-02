@@ -170,7 +170,7 @@ struct ElementVisualization
                       << std::endl;
     }
 
-    double operator()(const Element&) const
+    double operator()(const Element&) const override
     {
       return -1;
     }
@@ -196,7 +196,7 @@ struct ElementVisualization
       , boundaryInfo_(boundaryInfo)
     {}
 
-    double operator()(const Element& entity) const
+    double operator()(const Element& entity) const override
     {
       static constexpr DirichletBoundary dirichlet_type{};
       static constexpr NeumannBoundary neumann_type{};
@@ -303,7 +303,7 @@ struct ElementVisualization
       , gridview_(view)
     {}
 
-    double operator()(const Element& entity) const
+    double operator()(const Element& entity) const override
     {
       return gridview_.indexSet().index(entity);
     }

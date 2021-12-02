@@ -480,7 +480,7 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -488,22 +488,22 @@ public:
     return backend() * other.backend();
   } // ... dot(...)
 
-  RealType l1_norm() const override final
+  RealType l1_norm() const final
   {
     return backend().l1_norm();
   }
 
-  RealType l2_norm() const override final
+  RealType l2_norm() const final
   {
     return backend().l2_norm();
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     return backend().sup_norm();
   }
 
-  void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -512,7 +512,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  void isub(const ThisType& other) override final
+  void isub(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,

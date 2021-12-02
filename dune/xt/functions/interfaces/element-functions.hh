@@ -495,7 +495,7 @@ public:
   ElementFunctionInterface(const ThisType& other) = default;
   ElementFunctionInterface(ThisType&& source) = default;
 
-  virtual ~ElementFunctionInterface() = default;
+  ~ElementFunctionInterface() override = default;
 
   ThisType& operator=(const ThisType& other) = default;
   ThisType& operator=(ThisType&& source) = default;

@@ -224,12 +224,12 @@ public:
     , combine_lambda_(std::move(combine_lambda))
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new CombinedIntersectionFilter<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     return combine_lambda_(left_->contains(grid_layer, intersection), right_->contains(grid_layer, intersection));
   }
@@ -274,12 +274,12 @@ public:
     , combine_lambda_(std::move(combine_lambda))
   {}
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new CombinedElementFilter<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
-  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const final
   {
     return combine_lambda_(left_->contains(grid_layer, element), right_->contains(grid_layer, element));
   }
@@ -308,12 +308,12 @@ public:
     : filter_(std::move(filter))
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new NegatedIntersectionFilter<GridViewType>(*filter_);
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     return !filter_->contains(grid_layer, intersection);
   }
@@ -340,12 +340,12 @@ public:
     : filter_(std::move(filter))
   {}
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new NegatedElementFilter<GridViewType>(*filter_);
   }
 
-  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const final
   {
     return !filter_->contains(grid_layer, element);
   }

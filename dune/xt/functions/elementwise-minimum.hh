@@ -123,7 +123,7 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       some_lf_->bind(element);
       min_ = internal::ElementwiseMinimumFunctionHelper<typename SomeFunction::LocalFunctionType>::compute(
@@ -131,12 +131,12 @@ private:
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return min_;
     }
@@ -183,12 +183,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>(*some_func_, search_quadrature_order_);
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

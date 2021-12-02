@@ -38,24 +38,24 @@ class ElementwiseDiameterFunction : public GridFunctionInterface<E>
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       diameter_ = Grid::diameter(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return diameter_;
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
-                                       const XT::Common::Parameter& /*param*/ = {}) const override final
+                                       const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return DerivativeRangeReturnType();
     }
@@ -91,12 +91,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

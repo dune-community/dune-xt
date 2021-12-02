@@ -140,7 +140,7 @@ public:
 
   FunctionInterface(ThisType&) = default;
 
-  virtual ~FunctionInterface() = default;
+  ~FunctionInterface() override = default;
 
   ThisType& operator=(const ThisType&) = delete;
 

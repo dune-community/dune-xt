@@ -248,12 +248,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -480,12 +480,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -681,13 +681,13 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     LOG_(info) << "GridFunction<1,1>::local_function()" << std::endl;
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

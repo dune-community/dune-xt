@@ -93,12 +93,12 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
@@ -106,7 +106,7 @@ public:
   /**
    * \brief "0.5 * pi * pi * cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
   {
     return (M_PI_2 * M_PI * cos(M_PI_2 * xx[0]) * cos(M_PI_2 * xx[1]));
   }
@@ -115,7 +115,7 @@ public:
    * \brief ["-0.25 * pi * pi * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.25 * pi * pi * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
   {
     DerivativeRangeReturnType ret(0.);
     const DomainFieldType pre = -0.25 * M_PI * M_PI * M_PI;
@@ -191,12 +191,12 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
@@ -204,7 +204,7 @@ public:
   /**
    * \brief "cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
   {
     return (cos(M_PI_2 * xx[0]) * cos(M_PI_2 * xx[1]));
   }
@@ -213,7 +213,7 @@ public:
    * \brief ["-0.5 * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.5 * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
   {
     DerivativeRangeReturnType ret(0.);
     const DomainFieldType pre = -0.5 * M_PI;
@@ -264,25 +264,24 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& ele) override final
+    void post_bind(const ElementType& ele) final
     {
       post_bind_helper<ElementType, d>::post_bind(ele, value_, local_diffusion_, poincare_constant_);
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(xx);
       return value_;
     }
 
-    DerivativeRangeReturnType jacobian(const DomainType& xx,
-                                       const Common::Parameter& /*param*/ = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(xx);
       return DerivativeRangeReturnType();
@@ -382,12 +381,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalCutoffFunction>(*diffusion_, poincare_constant_);
   }

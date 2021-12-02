@@ -127,38 +127,38 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return evaluate_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   void evaluate(const DomainType& point_in_global_coordinates,
                 DynamicRangeType& ret,
-                const Common::Parameter& param = {}) const override final
+                const Common::Parameter& param = {}) const final
   {
     dynamic_evaluate_(point_in_global_coordinates, ret, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return jacobian_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_global_coordinates,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
   {
     return derivative_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

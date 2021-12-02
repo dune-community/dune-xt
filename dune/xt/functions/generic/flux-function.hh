@@ -100,13 +100,13 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       post_bind_(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return order_(parsed_param);
@@ -114,7 +114,7 @@ private:
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
                              const StateType& u,
-                             const Common::Parameter& param = {}) const override final
+                             const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return evaluate_(point_in_local_coordinates, u, parsed_param);
@@ -122,7 +122,7 @@ private:
 
     JacobianRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
                                      const StateType& u,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return jacobian_(point_in_local_coordinates, u, parsed_param);
@@ -131,7 +131,7 @@ private:
     void evaluate(const DomainType& point_in_local_coordinates,
                   const StateType& u,
                   DynamicRangeType& ret,
-                  const Common::Parameter& param = {}) const override final
+                  const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       dynamic_evaluate_(point_in_local_coordinates, u, ret, parsed_param);
@@ -140,14 +140,14 @@ private:
     void jacobian(const DomainType& point_in_local_coordinates,
                   const StateType& u,
                   DynamicJacobianRangeType& ret,
-                  const Common::Parameter& param = {}) const override final
+                  const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return dynamic_jacobian_(point_in_local_coordinates, u, ret, parsed_param);
     }
 
 
-    const Common::ParameterType& parameter_type() const override final
+    const Common::ParameterType& parameter_type() const final
     {
       return param_type_;
     }
@@ -249,17 +249,17 @@ public:
     , dynamic_jacobian_(jacobian_func)
   {}
 
-  const Common::ParameterType& parameter_type() const override final
+  const Common::ParameterType& parameter_type() const final
   {
     return param_type_;
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalGenericFluxFunction>(
         order_, post_bind_, evaluate_, dynamic_evaluate_, param_type_, jacobian_, dynamic_jacobian_);

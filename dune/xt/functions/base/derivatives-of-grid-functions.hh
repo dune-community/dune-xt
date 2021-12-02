@@ -63,7 +63,7 @@ public:
     , name_(other.name_)
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<DerivativeElementFunction<typename GridFunctionType::LocalFunctionType, derivative>>(
         grid_function_->local_function());
@@ -82,7 +82,7 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

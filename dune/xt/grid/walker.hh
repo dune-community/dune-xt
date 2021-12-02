@@ -250,7 +250,7 @@ public:
 
   Walker(ThisType&& source) = default;
 
-  virtual ~Walker() = default;
+  ~Walker() override = default;
 
   const GridViewType& grid_view() const
   {
@@ -487,7 +487,7 @@ public:
    * \{
    */
 
-  virtual void prepare() override
+  void prepare() override
   {
     auto prep = [](auto& wrapper_list) {
       for (auto&& wrapper : wrapper_list)
@@ -561,7 +561,7 @@ public:
   } // ... apply_local(...)
 
   // finalize all threads
-  virtual void finalize() override
+  void finalize() override
   {
     auto fin = [](auto& per_thread_value) {
       for (auto&& list : per_thread_value) {

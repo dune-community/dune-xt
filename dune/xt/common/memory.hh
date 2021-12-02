@@ -56,12 +56,12 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByReference<T>(tt_);
   }
@@ -90,12 +90,12 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return *tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByPointer<T>(tt_);
   }
@@ -112,12 +112,12 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByValue<T>(T(tt_));
   }
@@ -151,17 +151,17 @@ public:
     : tt_(tt)
   {}
 
-  T& access() override final
+  T& access() final
   {
     return tt_;
   }
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  AccessInterface<T>* copy() override final
+  AccessInterface<T>* copy() final
   {
     return new AccessByReference<T>(tt_);
   }
@@ -190,17 +190,17 @@ public:
     : tt_(tt)
   {}
 
-  T& access() override final
+  T& access() final
   {
     return *tt_;
   }
 
-  const T& access() const override final
+  const T& access() const final
   {
     return *tt_;
   }
 
-  AccessInterface<T>* copy() override final
+  AccessInterface<T>* copy() final
   {
     return new AccessByPointer<T>(tt_);
   }
@@ -217,17 +217,17 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  T& access() override final
+  T& access() final
   {
     return tt_;
   }
 
-  AccessInterface<T>* copy() const override final
+  AccessInterface<T>* copy() const final
   {
     return new AccessByValue<T>(T(tt_));
   }

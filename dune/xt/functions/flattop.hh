@@ -98,7 +98,7 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -109,7 +109,7 @@ public:
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret = value_;
     for (size_t dd = 0; dd < domain_dim; ++dd) {

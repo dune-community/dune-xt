@@ -690,21 +690,21 @@ public:
 
   using InterfaceType::operator-;
 
-  ThisType operator-(const ThisType& other) const override final
+  ThisType operator-(const ThisType& other) const final
   {
     return ThisType(this->backend() - other.backend());
   }
 
   using InterfaceType::operator+;
 
-  ThisType operator+(const ThisType& other) const override final
+  ThisType operator+(const ThisType& other) const final
   {
     return ThisType(this->backend() + other.backend());
   }
 
   using InterfaceType::operator*;
 
-  ThisType operator*(const ThisType& other) const override final
+  ThisType operator*(const ThisType& other) const final
   {
     return ThisType(this->backend() * other.backend());
   }

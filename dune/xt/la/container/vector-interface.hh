@@ -82,7 +82,7 @@ public:
   friend iterator;
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
-  virtual ~VectorInterface() {}
+  ~VectorInterface() override {}
 
   template <class Vector>
   std::enable_if_t<Common::is_vector<Vector>::value, derived_type&> assign_from(const Vector& other)
@@ -548,7 +548,7 @@ public:
     return this->as_imp();
   }
 
-  virtual derived_type& operator/=(const ScalarType& scalar)
+  derived_type& operator/=(const ScalarType& scalar) override
   {
     for (auto& element : *this)
       element /= scalar;

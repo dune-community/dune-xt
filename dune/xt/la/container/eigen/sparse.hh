@@ -421,7 +421,7 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return backend_->nonZeros();
   }
@@ -451,7 +451,7 @@ public:
     return ret;
   } // ... pattern(...)
 
-  ThisType pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  ThisType pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return ThisType(*backend_, true, eps);
   }

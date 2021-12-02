@@ -68,7 +68,7 @@ public:
       compute();
   }
 
-  void compute() override final
+  void compute() final
   {
     const auto type = options_.template get<std::string>("type");
     const XT::Common::Configuration default_opts = MatrixInverterOptions<MatrixType>::options(type);

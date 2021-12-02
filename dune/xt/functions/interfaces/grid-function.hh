@@ -119,7 +119,7 @@ public:
 
   GridFunctionInterface(ThisType&) = default;
 
-  virtual ~GridFunctionInterface() = default;
+  ~GridFunctionInterface() override = default;
 
   ThisType& operator=(const ThisType&) = delete;
 

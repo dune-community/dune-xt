@@ -98,27 +98,27 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       post_bind_(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return order_(parsed_param);
     }
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
-                             const Common::Parameter& param = {}) const override final
+                             const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return evaluate_(point_in_local_coordinates, parsed_param);
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       auto local_jacobian = jacobian_(point_in_local_coordinates, parsed_param);
@@ -137,7 +137,7 @@ private:
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                          const DomainType& point_in_local_coordinates,
-                                         const Common::Parameter& param = {}) const override final
+                                         const Common::Parameter& param = {}) const final
     {
       DUNE_THROW(Dune::NotImplemented,
                  "This function should also transform the derivatives (like the jacobian method), go ahead and "
@@ -219,12 +219,12 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalGenericGridFunction>(
         order_, post_bind_, evaluate_, this->parameter_type(), jacobian_, derivative_);
