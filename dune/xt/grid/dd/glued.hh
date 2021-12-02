@@ -512,8 +512,7 @@ public:
     assert_macro_grid_state();
     if (layer == Layers::leaf)
       return -1;
-    else
-      return local_grid(macro_entity).grid().maxLevel();
+    return local_grid(macro_entity).grid().maxLevel();
   }
 
   int max_local_level(const size_t macro_entity_index) const
@@ -521,8 +520,7 @@ public:
     assert_macro_grid_state();
     if (layer == Layers::leaf)
       return -1;
-    else
-      return local_grid(macro_entity_index).grid().maxLevel();
+    return local_grid(macro_entity_index).grid().maxLevel();
   }
 
   const std::vector<std::pair<MicroEntityType, std::vector<int>>>&

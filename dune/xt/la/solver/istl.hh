@@ -145,12 +145,14 @@ public:
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
       return iterative_options;
-    } else if (tp == "bicgstab.ilut" || tp == "bicgstab.ssor") {
+    }
+    if (tp == "bicgstab.ilut" || tp == "bicgstab.ssor") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
       return iterative_options;
 #if HAVE_UMFPACK
-    } else if (tp == "umfpack") {
+    }
+    if (tp == "umfpack") {
       return general_opts;
 #endif
 #if HAVE_SUPERLU

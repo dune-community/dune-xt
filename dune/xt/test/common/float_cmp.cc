@@ -84,8 +84,7 @@ typename std::enable_if<XT::Common::is_vector<T>::value, T>::type make_type(cons
   using Vec = XT::Common::VectorAbstraction<T>;
   if (Vec::has_static_size)
     return Vec::create(Vec::static_size, number);
-  else
-    return Vec::create(VECSIZE, number);
+  return Vec::create(VECSIZE, number);
 }
 
 template <class T, class S>
@@ -94,8 +93,7 @@ typename std::enable_if<XT::Common::is_matrix<T>::value, T>::type make_type(cons
   using Mat = XT::Common::MatrixAbstraction<T>;
   if (Mat::has_static_size)
     return Mat::create(Mat::static_rows, Mat::static_cols, number);
-  else
-    return Mat::create(VECSIZE, NUMCOLS, number);
+  return Mat::create(VECSIZE, NUMCOLS, number);
 }
 
 template <class T,

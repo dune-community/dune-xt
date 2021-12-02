@@ -45,8 +45,8 @@ size_t sub_entity_index(const Dune::Mapper<G, MapperImp, IndexType>& mapper,
                     Common::Exceptions::index_out_of_range,
                     "element.subEntities(" << codim << ") = " << element.subEntities(codim) << "\n   i = " << i);
       return Common::numeric_cast<size_t>(mapper.index(element.template subEntity<cd>(Common::numeric_cast<int>(i))));
-    } else
-      return sub_entity_index<G, MapperImp, IndexType, dim, GridImp, EntityImp, cd - 1>(mapper, element, codim, i);
+    }
+    return sub_entity_index<G, MapperImp, IndexType, dim, GridImp, EntityImp, cd - 1>(mapper, element, codim, i);
   }
 }
 

@@ -88,10 +88,8 @@ bool ParameterType::operator==(const ParameterType& other) const
       return this_single_element.second == other_single_element.second;
     }
     return false;
-
-  } else {
-    return this->dict_ == other.dict_;
   }
+  return this->dict_ == other.dict_;
 } // ... operator==(...)
 
 bool ParameterType::operator!=(const ParameterType& other) const

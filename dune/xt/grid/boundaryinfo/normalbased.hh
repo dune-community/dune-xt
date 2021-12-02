@@ -222,8 +222,8 @@ public:
       if (XT::Common::FloatCmp::eq(outer_normal, normal, tol_)) {
         LOG_(debug) << "  registered normal " << normal << " matches, returning " << *type_ptr << std::endl;
         return *type_ptr;
-      } else
-        LOG_(debug) << "  registered normal " << normal << " does not match" << std::endl;
+      }
+      LOG_(debug) << "  registered normal " << normal << " does not match" << std::endl;
     }
     LOG_(debug) << "  no registered normal matched, returning " << *default_boundary_type_ << std::endl;
     return *default_boundary_type_;

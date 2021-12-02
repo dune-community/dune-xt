@@ -91,8 +91,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
       const auto center = element.geometry().center();
       if (Common::FloatCmp::le(lower_left_, center) && Common::FloatCmp::lt(center, upper_right_))
         return 1;
-      else
-        return 0;
+      return 0;
     }
 
     size_t find_subdomain(const ElementType& element) const

@@ -603,8 +603,7 @@ public:
     assert(jj < cols());
     if (these_are_valid_indices(ii, jj))
       return backend_->operator[](ii)[jj][0][0];
-    else
-      return ScalarType(0);
+    return ScalarType(0);
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
@@ -685,16 +684,16 @@ public:
     SparsityPatternDefault ret(rows());
     if (prune) {
       return pruned_pattern_from_backend(*backend_, eps);
-    } else {
-      for (size_t ii = 0; ii < rows(); ++ii) {
-        if (backend_->getrowsize(ii) > 0) {
-          const auto& row = backend_->operator[](ii);
-          const auto it_end = row.end();
-          for (auto it = row.begin(); it != it_end; ++it)
-            ret.insert(ii, it.index());
-        }
+    }
+    for (size_t ii = 0; ii < rows(); ++ii) {
+      if (backend_->getrowsize(ii) > 0) {
+        const auto& row = backend_->operator[](ii);
+        const auto it_end = row.end();
+        for (auto it = row.begin(); it != it_end; ++it)
+          ret.insert(ii, it.index());
       }
     }
+
     ret.sort();
     return ret;
   } // ... pattern(...)

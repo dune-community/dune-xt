@@ -86,11 +86,9 @@ public:
   {
     if (!intersection.neighbor())
       return true;
-    else {
-      const auto inside_element = intersection.inside();
-      const auto outside_element = intersection.outside();
-      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    }
+    const auto inside_element = intersection.inside();
+    const auto outside_element = intersection.outside();
+    return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
   }
 }; // class AllIntersectionsOnce
 
@@ -198,8 +196,8 @@ public:
       const auto inside_index = grid_layer.indexSet().index(inside_element);
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       return inside_index < outside_index;
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class InnerIntersectionsOnce
 
@@ -263,10 +261,9 @@ public:
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
         return false;
-      else
-        return true;
-    } else
-      return false;
+      return true;
+    }
+    return false;
   }
 
   const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;
@@ -307,8 +304,8 @@ public:
       if (!PartitionSetType::contains(intersection.outside().partitionType()))
         return true;
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class PartitionSetInnerIntersectionsOnce
 
@@ -443,9 +440,8 @@ public:
       const auto inside_element = intersection.inside();
       const auto outside_element = intersection.outside();
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else {
-      return false;
     }
+    return false;
   }
 }; // class PeriodicBoundaryIntersectionsOnce
 
@@ -490,11 +486,9 @@ public:
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
         return false;
-      else
-        return true;
-    } else {
-      return false;
+      return true;
     }
+    return false;
   }
 
   const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;

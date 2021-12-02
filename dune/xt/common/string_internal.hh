@@ -101,8 +101,7 @@ struct Helper<bool>
       return true;
     if (ss_lower_case == "false")
       return false;
-    else
-      return convert_safely<bool>(ss);
+    return convert_safely<bool>(ss);
   }
 }; // struct Helper< bool, ... >
 

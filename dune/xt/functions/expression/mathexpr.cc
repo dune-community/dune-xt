@@ -1424,8 +1424,7 @@ int ROperation::NMembers() const // Number of members for an operation like a,b,
     return 1;
   if (mmb2 == NULL)
     return 0;
-  else
-    return 1 + mmb2->NMembers();
+  return 1 + mmb2->NMembers();
 }
 
 ROperation ROperation::NthMember(int n) const
@@ -1444,8 +1443,7 @@ ROperation ROperation::NthMember(int n) const
       return *this;
     if (mmb1 != NULL)
       return *mmb1;
-    else
-      return ErrVal;
+    return ErrVal;
   };
   if (op != Juxt)
     return ErrVal;

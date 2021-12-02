@@ -338,10 +338,9 @@ std::string Configuration::find_common_prefix(const BaseType& subtree, const std
     if (previous_prefix.empty())
       return find_common_prefix(subtree.sub(subkeys[0]), subkeys[0]);
     return find_common_prefix(subtree.sub(subkeys[0]), previous_prefix + "." + subkeys[0]);
-  } else {
-    // end of the recursion, return the previous prefix
-    return previous_prefix;
   }
+  // end of the recursion, return the previous prefix
+  return previous_prefix;
 } // ... find_common_prefix(...)
 
 void Configuration::report_flatly(const BaseType& subtree, const std::string& prefix, std::ostream& out) const

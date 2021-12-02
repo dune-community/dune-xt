@@ -166,8 +166,7 @@ private:
       return 0.0;
     if (point > 0.0)
       return 1.0;
-    else
-      return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
+    return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
   } // ... phi_left(...)
 
   RangeFieldType phi_right(const RangeFieldType& point) const
@@ -176,8 +175,7 @@ private:
       return 1.0;
     if (point > 1.0)
       return 0.0;
-    else
-      return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
+    return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
   } // ... phi_right(...)
 
   const DomainType lower_left_;

@@ -65,8 +65,7 @@ std::string ConvergenceStudy::lfill(const std::string& id, const size_t len) con
     return id;
   if (id.size() > len)
     return id.substr(0, len - 1) + ".";
-  else /*if (id.size() < len_)*/
-    return std::string(len - id.size(), ' ') + id;
+  return std::string(len - id.size(), ' ') + id;
 }
 
 std::string ConvergenceStudy::cfill(const std::string& id, const size_t len) const

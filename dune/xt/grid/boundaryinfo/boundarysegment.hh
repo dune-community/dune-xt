@@ -97,12 +97,11 @@ public:
         id = element.first;
     if (id == "dirichlet")
       return dirichlet_boundary;
-    else if (id == "neumann")
+    if (id == "neumann")
       return neumann_boundary;
-    else if (id == "robin")
+    if (id == "robin")
       return robin_boundary;
-    else
-      return unknown_boundary;
+    return unknown_boundary;
   } // ... type(...)
 
 private:

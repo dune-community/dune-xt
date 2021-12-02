@@ -37,15 +37,14 @@ public:
   {
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return alldirichlet_boundaryinfo_default_config();
-    else if (type == AllNeumannBoundaryInfo<I>::static_id())
+    if (type == AllNeumannBoundaryInfo<I>::static_id())
       return allneumann_boundaryinfo_default_config();
-    else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
+    if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return boundarysegment_boundaryinfo_default_config();
-    else if (type == NormalBasedBoundaryInfo<I>::static_id())
+    if (type == NormalBasedBoundaryInfo<I>::static_id())
       return normalbased_boundaryinfo_default_config<I::Entity::dimension>();
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
+    DUNE_THROW(Common::Exceptions::wrong_input_given,
+               "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<BoundaryInfo<I>> create(const Common::Configuration& config)
@@ -53,15 +52,14 @@ public:
     const auto type = config.get<std::string>("type");
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return make_alldirichlet_boundaryinfo<I>(config);
-    else if (type == AllNeumannBoundaryInfo<I>::static_id())
+    if (type == AllNeumannBoundaryInfo<I>::static_id())
       return make_allneumann_boundaryinfo<I>(config);
-    else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
+    if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return make_boundarysegment_boundaryinfo<I>(config);
-    else if (type == NormalBasedBoundaryInfo<I>::static_id())
+    if (type == NormalBasedBoundaryInfo<I>::static_id())
       return make_normalbased_boundaryinfo<I>(config);
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
+    DUNE_THROW(Common::Exceptions::wrong_input_given,
+               "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
   } // ... create(...)
 
   static std::unique_ptr<BoundaryInfo<I>> create(const std::string& type = available().at(0))
