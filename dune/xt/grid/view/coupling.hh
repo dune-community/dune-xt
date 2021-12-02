@@ -321,14 +321,15 @@ public:
         return index_pair.second;
       }
     }
+    DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Could not find matching inside index!");
   }
 
   int size(int codim) const
   {
     if (codim == 0)
-      return inside_elements_->size();
+      return XT::Common::numeric_cast<int>(inside_elements_->size());
     if (codim == 1)
-      return coupling_size_;
+      return XT::Common::numeric_cast<int>(coupling_size_);
     DUNE_THROW(NotImplemented, "");
   }
 
@@ -383,7 +384,7 @@ private:
   const MacroIntersectionType macro_intersection_;
   const MacroGridViewType& macro_grid_view_;
   const LocalGridProviderType& local_inside_grid_;
-  int coupling_size_;
+  size_t coupling_size_;
   std::shared_ptr<std::vector<LocalElementType>> inside_elements_;
   std::shared_ptr<std::vector<int>> inside_elements_ids_;
   std::shared_ptr<

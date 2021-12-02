@@ -39,7 +39,7 @@ public:
   static bound_type bind(pybind11::module& m,
                          const std::string& grid_id = grid_name<G>::value(),
                          const std::string& layer_id = "",
-                         const std::string& class_id = "bounding_box_functor", )
+                         const std::string& class_id = "bounding_box_functor")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;

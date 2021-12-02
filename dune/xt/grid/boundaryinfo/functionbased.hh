@@ -110,8 +110,8 @@ public:
   } // ... type(...)
 
 private:
-  const std::unique_ptr<BoundaryType> default_boundary_type_;
   const double tol_;
+  const std::unique_ptr<BoundaryType> default_boundary_type_;
   std::list<std::tuple<std::unique_ptr<FunctionType>,
                        std::unique_ptr<BoundaryType>,
                        std::unique_ptr<typename FunctionType::LocalFunctionType>>>
