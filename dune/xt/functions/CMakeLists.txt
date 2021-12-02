@@ -12,5 +12,5 @@
 #   Tobias Leibner  (2016, 2018 - 2020)
 # ~~~
 
-set(lib_dune_xt_functions_sources expression/mathexpr.cc)
-dune_library_add_sources(dunext SOURCES ${lib_dune_xt_functions_sources})
+set(_lib_dune_xt_functions_sources expression/mathexpr.cc)
+dune_library_add_sources(dunext SOURCES ${_lib_dune_xt_functions_sources})

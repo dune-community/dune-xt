@@ -23,14 +23,14 @@ macro(ADD_IF_SUPPORTED dest)
 endmacro(ADD_IF_SUPPORTED)
 
 macro(INCLUDE_SYS_DIR)
-  foreach(ARG ${ARGN})
-    if(IS_DIRECTORY ${ARG})
-      include_directories(SYSTEM ${ARG}) # due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129  we have to filter
-                                         # what to sys-include includes
-    else(IS_DIRECTORY ${ARG})
-      message(STATUS "Include directory ${ARG} does not exist")
-    endif(IS_DIRECTORY ${ARG})
-  endforeach(ARG)
+  foreach(arg ${ARGN})
+    if(IS_DIRECTORY ${arg})
+      # due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129  we have to filter what to sys-include includes
+      include_directories(SYSTEM ${arg})
+    else(IS_DIRECTORY ${arg})
+      message(STATUS "Include directory ${arg} does not exist")
+    endif(IS_DIRECTORY ${arg})
+  endforeach(arg)
 endmacro(INCLUDE_SYS_DIR)
 
 include(CheckCXXSourceCompiles)

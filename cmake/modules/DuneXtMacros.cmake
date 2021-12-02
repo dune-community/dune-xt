@@ -38,7 +38,7 @@ set(DS_REQUIRED_BOOST_LIBS
     system
     thread
     timer)
-set(BOOST_ROOT_HINTS "$ENV{BOOST_ROOT}" ${root_hints})
+set(_boost_root_hints "$ENV{BOOST_ROOT}" ${root_hints})
 # check if any hints are provided by user
 if(DEFINED BOOST_ROOT
    OR DEFINED BOOOST_INCLUDEDIR
@@ -49,13 +49,13 @@ else(
   OR DEFINED BOOOST_INCLUDEDIR
   OR DEFINED BOOST_LIBRARYDIR)
   # FindBoost can only take a single hint directory from BOOST_ROOT, so we loop over all hints
-  foreach(BOOST_ROOT_HINT ${BOOST_ROOT_HINTS})
-    set(BOOST_ROOT ${BOOST_ROOT_HINT})
+  foreach(boost_root_hint ${_boost_root_hints})
+    set(BOOST_ROOT ${boost_root_hint})
     find_package(Boost 1.48.0 COMPONENTS ${DS_REQUIRED_BOOST_LIBS})
     if(${Boost_FOUND})
       break()
     endif()
-  endforeach(BOOST_ROOT_HINT ${BOOST_ROOT_HINTS})
+  endforeach(boost_root_hint ${_boost_root_hints})
   # check for Boost again with REQUIRED keyword to make boost mandatory
   find_package(Boost 1.48.0 REQUIRED COMPONENTS ${DS_REQUIRED_BOOST_LIBS})
 endif(
@@ -69,15 +69,15 @@ endif(${Boost_INCLUDE_DIRS})
 if(TARGET Boost::headers)
   dune_register_package_flags(LIBRARIES Boost::headers)
 endif(TARGET Boost::headers)
-foreach(_boost_lib ${DS_REQUIRED_BOOST_LIBS})
-  set(_BOOST_LIB "")
-  string(TOUPPER "${_boost_lib}" _BOOST_LIB)
-  if(TARGET Boost::${_boost_lib})
-    dune_register_package_flags(LIBRARIES Boost::${_boost_lib})
-  else(TARGET Boost::${_boost_lib})
-    dune_register_package_flags(LIBRARIES ${Boost_${_BOOST_LIB}_LIBRARY})
-  endif(TARGET Boost::${_boost_lib})
-endforeach(_boost_lib ${DS_REQUIRED_BOOST_LIBS})
+foreach(boost_lib ${DS_REQUIRED_BOOST_LIBS})
+  set(_boost_lib "")
+  string(TOUPPER "${boost_lib}" _boost_lib)
+  if(TARGET Boost::${boost_lib})
+    dune_register_package_flags(LIBRARIES Boost::${boost_lib})
+  else(TARGET Boost::${boost_lib})
+    dune_register_package_flags(LIBRARIES ${Boost_${_boost_lib}_LIBRARY})
+  endif(TARGET Boost::${boost_lib})
+endforeach(boost_lib ${DS_REQUIRED_BOOST_LIBS})
 
 find_package(Eigen3 3.2.0)
 if(EIGEN3_FOUND)

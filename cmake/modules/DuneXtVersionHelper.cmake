@@ -1,6 +1,18 @@
-macro(dune_xt_module_version_from_git TARGET_MODULE)
+# ~~~
+# This file is part of the dune-xt project:
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   René Fritze     (2021)
+# ~~~
 
-  dune_module_to_uppercase(TARGET_MODULE_UPPER ${TARGET_MODULE})
+# cmake-lint: disable=C0103,W0106
+macro(DUNE_XT_MODULE_VERSION_FROM_GIT target_module)
+
+  dune_module_to_uppercase(TARGET_MODULE_UPPER ${target_module})
 
   if(dune-xt_MODULE_PATH)
     set(VERSIONEER_DIR ${dune-xt_MODULE_PATH})
@@ -8,12 +20,12 @@ macro(dune_xt_module_version_from_git TARGET_MODULE)
     set(VERSIONEER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
   endif()
 
-  if(${TARGET_MODULE}_SOURCE_DIR)
+  if(${target_module}_SOURCE_DIR)
     # the "self" case
-    set(_MODULE_SOURCE_DIR ${${TARGET_MODULE}_SOURCE_DIR})
+    set(_MODULE_SOURCE_DIR ${${target_module}_SOURCE_DIR})
   else()
     # the "other module" case
-    set(_MODULE_SOURCE_DIR ${${TARGET_MODULE}_PPREFIX})
+    set(_MODULE_SOURCE_DIR ${${target_module}_PPREFIX})
   endif()
 
   execute_process(
@@ -27,14 +39,14 @@ macro(dune_xt_module_version_from_git TARGET_MODULE)
     message(FATAL_ERROR "Extracting version information failed: ${GIT_DESCRIBE_ERROR}")
   endif()
 
-  foreach(_MOD_VAR ${TARGET_MODULE} ${TARGET_MODULE_UPPER})
-    set(${_MOD_VAR}_VERSION ${GIT_DESCRIBE_VERSION})
+  foreach(mod_var ${target_module} ${TARGET_MODULE_UPPER})
+    set(${mod_var}_VERSION ${GIT_DESCRIBE_VERSION})
     # Reset variables from dune-common/cmake/modules/DuneMacros.cmake:dune_module_information
     extract_major_minor_version("${GIT_DESCRIBE_VERSION}" DUNE_VERSION)
-    set(${_MOD_VAR}_VERSION_MAJOR "${DUNE_VERSION_MAJOR}")
-    set(${_MOD_VAR}_VERSION_MINOR "${DUNE_VERSION_MINOR}")
-    set(${_MOD_VAR}_VERSION_REVISION "${DUNE_VERSION_REVISION}")
-  endforeach(_MOD_VAR)
+    set(${mod_var}_VERSION_MAJOR "${DUNE_VERSION_MAJOR}")
+    set(${mod_var}_VERSION_MINOR "${DUNE_VERSION_MINOR}")
+    set(${mod_var}_VERSION_REVISION "${DUNE_VERSION_REVISION}")
+  endforeach(mod_var)
   set(CPACK_PACKAGE_NAME "${DUNE_MOD_NAME}")
   set(CPACK_PACKAGE_VERSION "${DUNE_VERSION_MAJOR}.${DUNE_VERSION_MINOR}.${DUNE_VERSION_REVISION}")
   set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
@@ -67,4 +79,4 @@ macro(dune_xt_module_version_from_git TARGET_MODULE)
   endif()
   configure_file(${CONFIG_VERSION_FILE} ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake @ONLY)
 
-endmacro(dune_xt_module_version_from_git)
+endmacro(DUNE_XT_MODULE_VERSION_FROM_GIT)

@@ -11,7 +11,7 @@
 #   Tobias Leibner  (2017 - 2020)
 # ~~~
 
-set(lib_dune_xt_common_sources
+set(_lib_dune_xt_common_sources
     bisect.cc
     cblas.cc
     color.cc
@@ -38,6 +38,4 @@ set(lib_dune_xt_common_sources
     timedlogging.cc
     timings.cc)
 
-dune_library_add_sources(dunext SOURCES ${lib_dune_xt_common_sources})
-
-add_analyze(${lib_dune_xt_common_sources})
+dune_library_add_sources(dunext SOURCES ${_lib_dune_xt_common_sources})

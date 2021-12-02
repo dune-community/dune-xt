@@ -11,12 +11,12 @@
 #   Tobias Leibner  (2016 - 2020)
 # ~~~
 
-set(lib_dune_xt_la_sources container/pattern.cc eigen-solver/internal/numpy.cc)
+set(_lib_dune_xt_la_sources container/pattern.cc eigen-solver/internal/numpy.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(
     APPEND
-    lib_dune_xt_la_sources
+    _lib_dune_xt_la_sources
     container/common.cc
     container/eigen/dense.cc
     container/eigen/sparse.cc
@@ -26,4 +26,4 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
     solver/istl.cc)
 endif()
 
-dune_library_add_sources(dunext SOURCES ${lib_dune_xt_la_sources})
+dune_library_add_sources(dunext SOURCES ${_lib_dune_xt_la_sources})

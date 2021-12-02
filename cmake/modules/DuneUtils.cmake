@@ -12,18 +12,19 @@
 #   Tobias Leibner  (2015 - 2020)
 # ~~~
 
+# cmake-lint: disable=C0103
 include(CheckCXXSourceCompiles)
 include(DuneXtMacros)
 include(CTest)
 include(DunePybindxiInstallPythonPackage)
 
-function(TO_LIST_SPACES _LIST_NAME OUTPUT_VAR)
-  set(NEW_LIST_SPACE)
-  foreach(ITEM ${${_LIST_NAME}})
-    set(NEW_LIST_SPACE ${NEW_LIST_SPACE} ${ITEM})
+function(to_list_spaces list_name output_var)
+  set(new_list_space)
+  foreach(item ${${list_name}})
+    set(new_list_space ${new_list_space} ${item})
   endforeach()
-  set(${OUTPUT_VAR}
-      "${NEW_LIST_SPACE}"
+  set(${output_var}
+      "${new_list_space}"
       PARENT_SCOPE)
 endfunction()
 
@@ -42,7 +43,7 @@ enable_testing()
 
 include(DuneXTTesting)
 
-macro(add_header_listing) # header
+macro(ADD_HEADER_LISTING)
   file(
     GLOB_RECURSE
     current_module_header
@@ -55,33 +56,33 @@ macro(add_header_listing) # header
   set(COMMON_HEADER ${current_module_header} ${DUNE_HEADERS})
 
   # add header of dependent modules for header listing
-  foreach(_mod ${ALL_DEPENDENCIES})
+  foreach(mod ${ALL_DEPENDENCIES})
     file(
       GLOB_RECURSE
       HEADER_LIST
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hh"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.pbh"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hxx"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hh"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.pbh"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hxx")
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/dune/*.hh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/dune/*.pbh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/dune/*.hxx"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/python/*.hh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/python/*.pbh"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../${mod}/python/*.hxx")
     list(APPEND COMMON_HEADER ${HEADER_LIST})
-  endforeach(_mod DEPENDENCIES)
+  endforeach(mod DEPENDENCIES)
   set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
   add_custom_target(all_header SOURCES ${COMMON_HEADER})
-endmacro(add_header_listing)
+endmacro(ADD_HEADER_LISTING)
 
-macro(make_dependent_modules_sys_included) # disable most warnings from dependent modules
-  foreach(_mod ${ALL_DEPENDENCIES})
-    if(${_mod}_INCLUDE_DIRS)
-      foreach(_idir ${${_mod}_INCLUDE_DIRS})
-        include_sys_dir(${_idir})
-      endforeach(_idir)
-    endif(${_mod}_INCLUDE_DIRS)
-  endforeach(_mod DEPENDENCIES)
-endmacro(make_dependent_modules_sys_included)
+macro(MAKE_DEPENDENT_MODULES_SYS_INCLUDED) # disable most warnings from dependent modules
+  foreach(mod ${ALL_DEPENDENCIES})
+    if(${mod}_INCLUDE_DIRS)
+      foreach(idir ${${mod}_INCLUDE_DIRS})
+        include_sys_dir(${idir})
+      endforeach(idir)
+    endif(${mod}_INCLUDE_DIRS)
+  endforeach(mod DEPENDENCIES)
+endmacro(MAKE_DEPENDENT_MODULES_SYS_INCLUDED)
 
-macro(add_pylicense)
+macro(ADD_PYLICENSE)
   file(GLOB configs ${PROJECT_SOURCE_DIR}/.pylicense*.py)
   foreach(cfg ${configs})
     string(REGEX REPLACE ".*/([^/]*)" "\\1" cfg_target ${cfg})
@@ -95,19 +96,19 @@ macro(add_pylicense)
       VERBATIM USES_TERMINAL)
   endforeach(cfg ${configs})
   add_custom_target(license DEPENDS ${cfg_targets})
-endmacro(add_pylicense)
+endmacro(ADD_PYLICENSE)
 
 function(dump_cmake_variables)
   get_cmake_property(_variableNames VARIABLES)
   list(SORT _variableNames)
-  foreach(_variableName ${_variableNames})
+  foreach(variable_name ${_variableNames})
     if(ARGV0)
       unset(MATCHED)
-      string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
+      string(REGEX MATCH ${ARGV0} MATCHED ${variable_name})
       if(NOT MATCHED)
         continue()
       endif()
     endif()
-    message(STATUS "${_variableName}=${${_variableName}}")
+    message(STATUS "${variable_name}=${${variable_name}}")
   endforeach()
 endfunction()

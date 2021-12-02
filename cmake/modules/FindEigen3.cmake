@@ -13,6 +13,7 @@
 # Redistribution and use is allowed according to the terms of the 2-clause BSD license.
 # ~~~
 
+# cmake-lint: disable=C0103
 include(Hints)
 
 if(NOT Eigen3_FIND_VERSION)

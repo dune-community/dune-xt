@@ -12,21 +12,18 @@
 
 include(Hints)
 
-set(mkl_hints $ENV{MKLROOT} ${MKLROOT} ${root_hints})
-set(mkl_lib_hints "")
-set(mkl_include_hints "")
-list(APPEND mkl_hints
-            "/opt/intel/mkl/"
-            "$ENV{HOME}/intel/mkl/"
-            "/opt/intel/oneapi/mkl/latest/")
-append_to_each("${mkl_hints}" "/lib/" mkl_lib_hints)
-append_to_each("${mkl_hints}" "/lib/intel64/" mkl_lib_hints_intel)
-list(APPEND mkl_lib_hints ${mkl_lib_hints_intel})
-append_to_each("${mkl_hints}" "/include/" mkl_include_hints)
+set(_mkl_hints $ENV{MKLROOT} ${MKLROOT} ${root_hints})
+set(_mkl_lib_hints "")
+set(_mkl_include_hints "")
+list(APPEND _mkl_hints "/opt/intel/mkl/" "$ENV{HOME}/intel/mkl/" "/opt/intel/oneapi/mkl/latest/")
+append_to_each("${_mkl_hints}" "/lib/" _mkl_lib_hints)
+append_to_each("${_mkl_hints}" "/lib/intel64/" mkl_lib_hints_intel)
+list(APPEND _mkl_lib_hints ${mkl_lib_hints_intel})
+append_to_each("${_mkl_hints}" "/include/" _mkl_include_hints)
 
-find_library(MKL_LP64_LIBRARY mkl_intel_lp64 HINTS ${mkl_lib_hints})
-find_library(MKL_SEQUENTIAL_LIBRARY mkl_sequential HINTS ${mkl_lib_hints})
-find_library(MKL_CORE_LIBRARY mkl_core HINTS ${mkl_lib_hints})
+find_library(MKL_LP64_LIBRARY mkl_intel_lp64 HINTS ${_mkl_lib_hints})
+find_library(MKL_SEQUENTIAL_LIBRARY mkl_sequential HINTS ${_mkl_lib_hints})
+find_library(MKL_CORE_LIBRARY mkl_core HINTS ${_mkl_lib_hints})
 
 set(MKL_FOUND 0)
 if("${MKL_LP64_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
@@ -49,8 +46,8 @@ else("${MKL_LP64_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
 endif("${MKL_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
 
 message("-- checking for mkl.h header")
-# message(FATAL_ERROR ${mkl_include_hints})
-find_path(MKL_INCLUDE_DIRS mkl.h HINTS ${mkl_include_hints})
+# message(FATAL_ERROR ${_mkl_include_hints})
+find_path(MKL_INCLUDE_DIRS mkl.h HINTS ${_mkl_include_hints})
 if("${MKL_INCLUDE_DIRS}" MATCHES "MKL_INCLUDE_DIRS-NOTFOUND")
   message("--   mkl.h header not found")
 else("${MKL_INCLUDE_DIRS}" MATCHES "MKL_INCLUDE_DIRS-NOTFOUND")
