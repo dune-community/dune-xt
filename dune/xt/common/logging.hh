@@ -40,6 +40,10 @@ private:
 public:
   ~Logging();
 
+  // satisfy stricter warnings wrt copying
+  Logging(const Logging&) = delete;
+  Logging& operator=(const Logging&) = delete;
+
   /** \brief setup loglevel, logfilename
    *  \param logflags any OR'd combination of flags
    *  \param logfile filename for log, can contain paths, but creation will fail if dir is non-existant
@@ -138,9 +142,6 @@ private:
   EmptyLogStream emptyLogStream_;
 
   friend Logging& Logger();
-  // satisfy stricter warnings wrt copying
-  Logging(const Logging&) = delete;
-  Logging& operator=(const Logging&) = delete;
 };
 
 DUNE_EXPORT inline Logging& Logger()

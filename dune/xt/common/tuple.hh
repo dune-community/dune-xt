@@ -13,6 +13,7 @@
 #ifndef DUNE_XT_COMMON_TUPLE_HH
 #define DUNE_XT_COMMON_TUPLE_HH
 
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -305,7 +306,7 @@ namespace internal {
 template <std::size_t>
 struct Any
 {
-  Any(...) = default;
+  Any(...){}; // NOLINT(modernize-use-equals-default)
 };
 
 template <typename T>

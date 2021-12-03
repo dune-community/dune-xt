@@ -52,6 +52,7 @@ public:
   static constexpr PriorityType default_suspend_priority = 0;
 
   SuspendableStrBuffer(int loglevel, int& logflags);
+  SuspendableStrBuffer(const SuspendableStrBuffer&) = delete;
 
   /** \brief stop accepting input into the buffer
    * the suspend_priority_ mechanism provides a way to silence streams from 'higher' modules
@@ -76,8 +77,6 @@ private:
   {
     return (!is_suspended_) && (logflags_ & loglevel_);
   }
-
-  SuspendableStrBuffer(const SuspendableStrBuffer&) = delete;
 
   int& logflags_;
   int loglevel_;
@@ -150,12 +149,11 @@ class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_tr
 
 public:
   TimedPrefixedStreamBuffer(const Timer& timer, std::string prefix, std::ostream& out = std::cout);
+  TimedPrefixedStreamBuffer(const TimedPrefixedStreamBuffer&) = delete;
 
   int sync() override;
 
 private:
-  TimedPrefixedStreamBuffer(const TimedPrefixedStreamBuffer&) = delete;
-
   std::string elapsed_time_str() const;
 
   const Timer& timer_;
