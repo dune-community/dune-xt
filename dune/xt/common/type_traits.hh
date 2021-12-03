@@ -34,7 +34,7 @@
   template <>                                                                                                          \
   struct Typename<NAME>                                                                                                \
   {                                                                                                                    \
-    static const std::string value(bool /*fail_wo_typeid*/ = false)                                                    \
+    static std::string value(bool /*fail_wo_typeid*/ = false)                                                          \
     {                                                                                                                  \
       return #NAME;                                                                                                    \
     }                                                                                                                  \
@@ -212,7 +212,7 @@ constexpr size_t default_max_highlight_level{1000};
 template <class T>
 void real_type_id(T& obj, const std::string& name = "", size_t maxlevel = default_max_highlight_level)
 {
-  std::cout << name << (name == "" ? "" : "'s type is ") << highlight_template(demangled_type_id(obj), maxlevel)
+  std::cout << name << (name.empty() ? "" : "'s type is ") << highlight_template(demangled_type_id(obj), maxlevel)
             << std::endl;
 }
 

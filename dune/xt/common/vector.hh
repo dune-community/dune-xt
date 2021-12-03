@@ -166,9 +166,8 @@ struct VectorAbstraction<std::vector<T, Allocator>>
   , public internal::HasSubscriptOperatorForVectorAbstraction<std::vector<T, Allocator>, T>
 {
   static constexpr bool is_contiguous = true;
-  static constexpr bool static_size = std::numeric_limits<size_t>::max();
 
-  template <size_t SIZE = static_size>
+  template <size_t SIZE = std::numeric_limits<size_t>::max()>
   static inline std::vector<T, Allocator> create(const size_t sz, const T& val = T(0))
   {
     return std::vector<T, Allocator>(sz, val);

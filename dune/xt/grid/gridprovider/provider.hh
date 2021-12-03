@@ -57,7 +57,7 @@ public:
   using LeafGridViewType = typename Layer<GridType, Layers::leaf, Backends::view>::type;
 
 
-  static const std::string static_id()
+  static std::string static_id()
   {
     return "xt.grid.gridprovider";
   }

@@ -119,7 +119,7 @@ public:
       for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
         backend_->startVec(static_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
-        for (auto& column : columns) {
+        for (const auto& column : columns) {
 #  ifndef NDEBUG
           if (column >= cc)
             DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -129,7 +129,7 @@ public:
           backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(column));
         }
         // create entry (insertBackByOuterInner() can not handle empty rows)
-        if (columns.size() == 0)
+        if (columns.empty())
           backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), 0);
       }
       backend_->finalize();

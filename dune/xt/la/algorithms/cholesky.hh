@@ -220,7 +220,7 @@ struct CholeskySolver
       assert(size <= size_t(std::numeric_limits<int>::max()));
       int info = Common::Lapacke::dpotrf_work(
           lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
-      if (info)
+      if (info != 0)
         DUNE_THROW(Dune::MathError,
                    "Cholesky factorization using Lapacke::dpotrf failed with status " + Common::to_string(info) + "!");
 #endif // HAVE_MKL || HAVE_LAPACKE
@@ -284,7 +284,7 @@ struct LDLTSolver
                                          Common::data(subdiag),
                                          Common::data(rhs),
                                          is_row_major ? rhs_cols : static_cast<int>(size));
-      if (info)
+      if (info != 0)
         DUNE_THROW(Dune::MathError, "Lapack dpttrs failed!");
 #endif // HAVE_MKL || HAVE_LAPACKE
     } else {

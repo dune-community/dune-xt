@@ -156,7 +156,7 @@ template <class ComplexType>
 ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*cols*/ = 0)
 {
   boost::algorithm::trim(ss);
-  if (ss.size() < 1)
+  if (ss.empty())
     DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " (too short)");
   using namespace std;
   using T = typename ComplexType::value_type;

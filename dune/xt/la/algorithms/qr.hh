@@ -400,7 +400,7 @@ private:
     if (m != last_m || n != last_n) {
       // query workspace size
       Common::Lapacke::dgeqp3_work(matrix_layout, m, n, a, lda, jpvt, tau, work.data(), -1);
-      work.resize(static_cast<size_t>(work[0] + 0.5));
+      work.resize(static_cast<size_t>(work[0] + 0.1));
       last_m = m;
       last_n = n;
     }

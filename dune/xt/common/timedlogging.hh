@@ -256,15 +256,15 @@ public:
   static constexpr bool default_enable_warnings = true;
   static constexpr bool default_enable_colors = true;
 
-  static const std::string default_info_color()
+  static std::string default_info_color()
   {
     return "blue";
   }
-  static const std::string default_debug_color()
+  static std::string default_debug_color()
   {
     return "darkgray";
   }
-  static const std::string default_warning_color()
+  static std::string default_warning_color()
   {
     return "red";
   }

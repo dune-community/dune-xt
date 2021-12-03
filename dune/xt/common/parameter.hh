@@ -109,7 +109,7 @@ protected:
   {
     if (dict_.empty())
       return "{}";
-    DXT_ASSERT(keys_.size() > 0);
+    DXT_ASSERT(!keys_.empty());
     const auto whitespaced_prefix = whitespaceify(prefix);
     std::stringstream ss;
     ss << "{" << keys_[0] << ": " << dict_.at(keys_[0]);

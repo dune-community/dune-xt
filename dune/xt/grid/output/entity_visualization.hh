@@ -67,11 +67,11 @@ struct ElementVisualization
 
     virtual ~FunctorBase() = default;
 
-    const std::string filename() const
+    std::string filename() const
     {
       return filename_;
     }
-    const std::string dir() const
+    std::string dir() const
     {
       return dir_;
     }
