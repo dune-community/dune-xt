@@ -260,7 +260,7 @@ public:
   {
     // initialize variables
     inside_elements_ = std::make_shared<std::vector<LocalElementType>>();
-    inside_elements_ids_ = std::make_shared<std::vector<int>>();
+    inside_elements_ids_ = std::make_shared<std::vector<unsigned int>>();
     coupling_intersections_ = std::make_shared<
         std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>();
     local_to_inside_indices_ = std::make_shared<std::vector<std::pair<size_t, size_t>>>();
@@ -386,7 +386,7 @@ private:
   const LocalGridProviderType& local_inside_grid_;
   size_t coupling_size_;
   std::shared_ptr<std::vector<LocalElementType>> inside_elements_;
-  std::shared_ptr<std::vector<int>> inside_elements_ids_;
+  std::shared_ptr<std::vector<unsigned int>> inside_elements_ids_;
   std::shared_ptr<
       std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>
       coupling_intersections_;

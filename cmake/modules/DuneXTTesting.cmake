@@ -184,11 +184,11 @@ macro(ADD_SUBDIR_TESTS subdir)
   add_custom_target(${subdir}_test_templates SOURCES ${test_templates})
 
   # this excludes meta-ini variation test cases because there binary name != test name
-  foreach(test ${${subdir}_xt_test_binaries})
-    if(TARGET test)
+  foreach(test ${${subdir}_dxt_test_binaries})
+    if(TEST test)
       set_tests_properties(${test} PROPERTIES TIMEOUT ${DXT_TEST_TIMEOUT})
       set_tests_properties(${test} PROPERTIES LABELS ${subdir})
-    endif(TARGET test)
+    endif(TEST test)
   endforeach()
 
   add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries})
