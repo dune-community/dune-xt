@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <complex>
 #include <mutex>
@@ -201,7 +202,7 @@ public:
   {}
 
   explicit EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 

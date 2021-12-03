@@ -20,6 +20,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/grid/search.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 namespace internal {
@@ -217,18 +218,18 @@ public:
   CompositionFunction(const InnerType inner_function,
                       const OuterType outer_function,
                       const OuterGridViewType outer_grid_view,
-                      const std::string& nm = static_id())
+                      std::string nm = static_id())
     : inner_function_(inner_function)
     , outer_function_(outer_function)
     , element_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   // constructor without grid view, only makes sense if OuterType is derived from FunctionInterface
-  CompositionFunction(const InnerType local_func, const OuterType global_func, const std::string& nm = static_id())
+  CompositionFunction(const InnerType local_func, const OuterType global_func, std::string nm = static_id())
     : inner_function_(local_func)
     , outer_function_(global_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     static_assert(std::is_base_of<XT::Functions::FunctionInterface<OuterType::domain_dim,
                                                                    OuterType::range_dim,

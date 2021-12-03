@@ -26,7 +26,7 @@ namespace Dune::XT::Common {
 class LocalizationStudy
 {
 public:
-  LocalizationStudy(const std::vector<std::string>& only_these_indicators = {});
+  LocalizationStudy(std::vector<std::string> only_these_indicators = {});
 
   virtual ~LocalizationStudy();
 

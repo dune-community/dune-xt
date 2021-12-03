@@ -53,7 +53,7 @@ public:
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -63,27 +63,27 @@ public:
     , dynamic_evaluate_(static_to_dynamic_evaluate(evaluate_))
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(int ord,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
     , order_([=](const auto& /*param*/) { return ord; })
-    , evaluate_(evaluate_func)
+    , evaluate_(std::move(evaluate_func))
     , dynamic_evaluate_(static_to_dynamic_evaluate(evaluate_))
-    , jacobian_(jacobian_func)
-    , derivative_(derivative_func)
-    , name_(nm)
+    , jacobian_(std::move(jacobian_func))
+    , derivative_(std::move(derivative_func))
+    , name_(std::move(nm))
   {}
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -93,12 +93,12 @@ public:
     , dynamic_evaluate_(dynamic_evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(int ord,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -108,7 +108,7 @@ public:
     , dynamic_evaluate_(dynamic_evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(const ThisType&) = default;

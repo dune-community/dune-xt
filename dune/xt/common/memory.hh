@@ -16,6 +16,7 @@
 #include <memory>
 
 #include <dune/xt/common/debug.hh>
+#include <utility>
 
 namespace Dune::XT::Common {
 
@@ -87,7 +88,7 @@ public:
   {}
 
   explicit ConstAccessByPointer(std::shared_ptr<const T> tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   const T& access() const final
@@ -187,7 +188,7 @@ public:
   {}
 
   explicit AccessByPointer(std::shared_ptr<T> tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   T& access() final

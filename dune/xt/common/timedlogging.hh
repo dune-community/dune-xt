@@ -28,6 +28,7 @@
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/logstreams.hh>
 #include <dune/xt/common/string.hh>
+#include <utility>
 
 #ifndef DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
 #  ifndef NDEBUG
@@ -77,11 +78,11 @@ class DefaultLogger
 public:
   std::string prefix;
   std::array<bool, 3> state;
-  size_t copy_count;
+  size_t copy_count{0};
 
   DefaultLogger(const std::string& prfx = "",
                 const std::array<bool, 3>& initial_state = default_logger_state(),
-                const std::array<std::string, 3>& colors = {{"blue", "darkgray", "red"}},
+                std::array<std::string, 3> colors = {{"blue", "darkgray", "red"}},
                 bool global_timer = true);
 
   DefaultLogger(const DefaultLogger&);
@@ -302,7 +303,7 @@ private:
   std::string info_suffix_;
   std::string debug_suffix_;
   std::string warning_suffix_;
-  bool created_;
+  bool created_{false};
   std::atomic<ssize_t> current_level_;
   Timer timer_;
   std::mutex mutex_;
@@ -458,9 +459,9 @@ class ActiveEnableDebugLoggingForCtors
   using ThisType = ActiveEnableDebugLoggingForCtors<T>;
 
 public:
-  ActiveEnableDebugLoggingForCtors(const std::string& prefix, const std::string& class_id)
+  ActiveEnableDebugLoggingForCtors(const std::string& prefix, std::string class_id)
     : logger_(TimedLogger().get(prefix))
-    , class_id_(class_id)
+    , class_id_(std::move(class_id))
   {
     logger_.debug() << class_id_ << "(this=" << this << ")" << std::endl;
   }

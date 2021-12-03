@@ -16,16 +16,17 @@
 #include <boost/io/ios_state.hpp>
 
 #include <dune/xt/common/string.hh>
+#include <utility>
 
 #include "localization-study.hh"
 
 namespace Dune::XT::Common {
 
-LocalizationStudy::LocalizationStudy(const std::vector<std::string>& only_these_indicators)
-  : only_these_indicators_(only_these_indicators)
+LocalizationStudy::LocalizationStudy(std::vector<std::string> only_these_indicators)
+  : only_these_indicators_(std::move(only_these_indicators))
 {}
 
-LocalizationStudy::~LocalizationStudy() {}
+LocalizationStudy::~LocalizationStudy() = default;
 
 std::vector<std::string> LocalizationStudy::used_indicators() const
 {

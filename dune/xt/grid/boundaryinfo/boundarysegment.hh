@@ -16,6 +16,7 @@
 
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
+#include <utility>
 
 namespace Dune::XT::Grid {
 
@@ -80,10 +81,9 @@ public:
     return std::make_unique<ThisType>(default_type, id_map);
   } // ... create(...)
 
-  BoundarySegmentIndexBasedBoundaryInfo(const std::string& def,
-                                        const std::map<std::string, std::pair<size_t, size_t>>& id_map)
-    : default_(def)
-    , id_map_(id_map)
+  BoundarySegmentIndexBasedBoundaryInfo(std::string def, std::map<std::string, std::pair<size_t, size_t>> id_map)
+    : default_(std::move(def))
+    , id_map_(std::move(id_map))
   {}
 
   const BoundaryType& type(const IntersectionType& intersection) const final

@@ -48,8 +48,8 @@ MatrixType read_matrix_market_array_format(std::ifstream& matrix_file,
   boost::algorithm::split(
       matrix_dimensions, curr_line, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
   DUNE_THROW_IF(matrix_dimensions.size() != 2, Dune::IOError, "Could not read matrix dimensions!");
-  const size_t rows = XT::Common::from_string<size_t>(matrix_dimensions[0]);
-  const size_t cols = XT::Common::from_string<size_t>(matrix_dimensions[1]);
+  const auto rows = XT::Common::from_string<size_t>(matrix_dimensions[0]);
+  const auto cols = XT::Common::from_string<size_t>(matrix_dimensions[1]);
   MatrixType ret = M::create(rows, cols, 0., XT::LA::dense_pattern(rows, cols));
   DUNE_THROW_IF(!is_general && rows != cols,
                 Dune::InvalidStateException,
@@ -126,9 +126,9 @@ MatrixType read_matrix_market_coordinate_format(std::ifstream& matrix_file,
   boost::algorithm::split(
       matrix_dimensions, curr_line, boost::algorithm::is_space(), boost::algorithm::token_compress_on);
   DUNE_THROW_IF(matrix_dimensions.size() != 3, Dune::IOError, "Could not read matrix dimensions!");
-  const size_t rows = XT::Common::from_string<size_t>(matrix_dimensions[0]);
-  const size_t cols = XT::Common::from_string<size_t>(matrix_dimensions[1]);
-  const size_t nnz = XT::Common::from_string<size_t>(matrix_dimensions[2]);
+  const auto rows = XT::Common::from_string<size_t>(matrix_dimensions[0]);
+  const auto cols = XT::Common::from_string<size_t>(matrix_dimensions[1]);
+  const auto nnz = XT::Common::from_string<size_t>(matrix_dimensions[2]);
   // read entries
   std::vector<std::tuple<size_t, size_t, ScalarType>> entries(nnz);
   const size_t expected_entry_size = field_qualifier_is_complex ? 4 : 3;

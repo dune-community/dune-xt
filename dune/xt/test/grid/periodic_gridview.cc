@@ -52,8 +52,8 @@ struct PeriodicViewTest : public testing::Test
     Configuration grid_config = DXTC_CONFIG.sub("test_grid_periodicview");
     const bool is_simplex = Common::from_string<bool>(grid_config["is_simplex"]);
     const bool is_cube = !is_simplex;
-    const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
-    const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
+    const auto lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
+    const auto upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
     const auto num_elements = Common::from_string<std::array<unsigned int, dimDomain>>(grid_config["num_elements"]);
     for (const auto& elements : num_elements)
       if (elements != num_elements[0])
@@ -74,7 +74,7 @@ struct PeriodicViewTest : public testing::Test
     // create periodic grid_view
     std::bitset<dimDomain> periodic_directions;
     if (is_partially_periodic)
-      periodic_directions[0] = 1;
+      periodic_directions[0] = true;
     else if (!is_nonperiodic)
       periodic_directions.set();
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);

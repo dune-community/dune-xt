@@ -120,7 +120,7 @@ public:
       ret.insert(ret.begin(), "superlu");
 #endif
 #if HAVE_UMFPACK
-      ret.push_back("umfpack");
+      ret.emplace_back("umfpack");
 #endif
     }
     return ret;

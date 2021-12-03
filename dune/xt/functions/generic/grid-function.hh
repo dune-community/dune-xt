@@ -83,18 +83,18 @@ private:
     using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
         const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
-    LocalGenericGridFunction(const GenericOrderFunctionType& order_func,
-                             const GenericPostBindFunctionType& post_bind_func,
-                             const GenericEvaluateFunctionType& evaluate_func,
+    LocalGenericGridFunction(GenericOrderFunctionType order_func,
+                             GenericPostBindFunctionType post_bind_func,
+                             GenericEvaluateFunctionType evaluate_func,
                              const Common::ParameterType& param_type,
-                             const GenericJacobianFunctionType& jacobian_func,
-                             const GenericDerivativeFunctionType& derivative_func)
+                             GenericJacobianFunctionType jacobian_func,
+                             GenericDerivativeFunctionType derivative_func)
       : BaseType(param_type)
-      , order_(order_func)
-      , post_bind_(post_bind_func)
-      , evaluate_(evaluate_func)
-      , jacobian_(jacobian_func)
-      , derivative_(derivative_func)
+      , order_(std::move(order_func))
+      , post_bind_(std::move(post_bind_func))
+      , evaluate_(std::move(evaluate_func))
+      , jacobian_(std::move(jacobian_func))
+      , derivative_(std::move(derivative_func))
     {}
 
   protected:
@@ -175,32 +175,32 @@ public:
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericGridFunction",
+                      std::string nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
     , order_(default_order_lambda(ord))
-    , post_bind_(post_bind_func)
-    , evaluate_(evaluate_func)
-    , name_(nm)
-    , jacobian_(jacobian_func)
-    , derivative_(derivative_func)
+    , post_bind_(std::move(post_bind_func))
+    , evaluate_(std::move(evaluate_func))
+    , name_(std::move(nm))
+    , jacobian_(std::move(jacobian_func))
+    , derivative_(std::move(derivative_func))
   {}
 
   GenericGridFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericGridFunction",
+                      std::string nm = "GenericGridFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                       GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
     , order_(std::move(order_func))
-    , post_bind_(post_bind_func)
-    , evaluate_(evaluate_func)
-    , name_(nm)
-    , jacobian_(jacobian_func)
-    , derivative_(derivative_func)
+    , post_bind_(std::move(post_bind_func))
+    , evaluate_(std::move(evaluate_func))
+    , name_(std::move(nm))
+    , jacobian_(std::move(jacobian_func))
+    , derivative_(std::move(derivative_func))
   {}
 
   GenericGridFunction(const ThisType&) = default;

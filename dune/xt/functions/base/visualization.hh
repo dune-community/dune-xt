@@ -14,6 +14,7 @@
 #define DUNE_XT_FUNCTIONS_BASE_VISUALIZATION_HH
 
 #include <algorithm>
+#include <utility>
 
 #include <dune/grid/io/file/vtk/function.hh>
 
@@ -40,7 +41,8 @@ class VisualizerInterface
 public:
   using RangeType = typename RangeTypeSelector<R, r, rC>::type;
 
-  virtual ~VisualizerInterface(){};
+  virtual ~VisualizerInterface() = default;
+  ;
 
   virtual int ncomps() const = 0;
 
@@ -204,22 +206,22 @@ public:
   VisualizationAdapter(const GridFunctionType& grid_function,
                        const VisualizerInterface<range_dim, range_dim_cols, RangeField>& visualizer,
                        const std::string& nm = "",
-                       const XT::Common::Parameter& param = {})
+                       XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(visualizer)
     , name_(nm.empty() ? function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {}
 
   VisualizationAdapter(const GridFunctionType& grid_function,
                        const std::string& nm = "",
-                       const XT::Common::Parameter& param = {})
+                       XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<range_dim, range_dim_cols, RangeField>())
     , name_(nm.empty() ? function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {}
 
   int ncomps() const final
@@ -267,12 +269,12 @@ public:
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const VisualizerInterface<d, 1, RangeField>& visualizer,
                                const std::string& nm = "",
-                               const XT::Common::Parameter& param = {})
+                               XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(visualizer)
     , name_(nm.empty() ? "grad_ " + function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {
     if (range_dim > 1)
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
@@ -280,12 +282,12 @@ public:
 
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const std::string& nm = "",
-                               const XT::Common::Parameter& param = {})
+                               XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
     , name_(nm.empty() ? "grad_" + function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {
     if (range_dim > 1)
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");

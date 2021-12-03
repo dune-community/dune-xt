@@ -166,7 +166,7 @@ void trim(std::string& s);
 void trim(std::vector<std::string>& v);
 
 //! returns string with local time in current locale's format
-inline std::string stringFromTime(time_t cur_time = time(NULL))
+inline std::string stringFromTime(time_t cur_time = time(nullptr))
 {
   return ctime(&cur_time);
 }

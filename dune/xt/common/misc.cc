@@ -13,8 +13,8 @@
 
 #include "misc.hh"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <unordered_map>
 #include <algorithm>
 #include <dune/xt/common/string.hh>

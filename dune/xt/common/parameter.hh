@@ -243,7 +243,7 @@ private:
 
 public:
   /// \note this is somehow necessary to make clang 3.8 happy (and cannot be defaulted)
-  ~Parameter() {}
+  ~Parameter() = default;
 
   Parameter(const std::vector<std::pair<std::string, ValueType>>& key_value_pairs = {});
 
@@ -280,7 +280,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& mu);
 class ParametricInterface
 {
 public:
-  ParametricInterface(const ParameterType& param_type = {});
+  ParametricInterface(ParameterType param_type = {});
 
   ParametricInterface(const ParametricInterface& other) = default;
 

@@ -16,7 +16,7 @@
 
 #include <cstring>
 #include <map>
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <dune/common/version.hh>
 #include <dune/common/exceptions.hh>
@@ -31,7 +31,7 @@
 #include <cmath>
 #include <cerrno>
 #include <limits>
-#include <string.h>
+#include <cstring>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <sys/types.h>

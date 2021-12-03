@@ -60,12 +60,12 @@ struct ElementVisualization
   {
   public:
     using Element = extract_entity_t<GridViewType>;
-    FunctorBase(std::string filename = "Functor", const std::string& dirname = ".")
+    FunctorBase(std::string filename = "Functor", std::string dirname = ".")
       : filename_(std::move(filename))
-      , dir_(dirname)
+      , dir_(std::move(dirname))
     {}
 
-    virtual ~FunctorBase() {}
+    virtual ~FunctorBase() = default;
 
     const std::string filename() const
     {

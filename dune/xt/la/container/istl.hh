@@ -14,6 +14,7 @@
 #ifndef DUNE_XT_LA_CONTAINER_ISTL_HH
 #define DUNE_XT_LA_CONTAINER_ISTL_HH
 
+#include <utility>
 #include <vector>
 #include <initializer_list>
 #include <complex>
@@ -155,7 +156,7 @@ public:
   {}
 
   explicit IstlDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -466,7 +467,7 @@ public:
   {}
 
   explicit IstlRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 

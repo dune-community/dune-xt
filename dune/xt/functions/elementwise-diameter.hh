@@ -12,6 +12,7 @@
 #define DUNE_XT_FUNCTIONS_ELEMENTWISE_DIAMETER_HH
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -34,7 +35,7 @@ class ElementwiseDiameterFunction : public GridFunctionInterface<E>
 
     LocalFunction()
       : BaseType()
-      , diameter_(0)
+
     {}
 
   protected:
@@ -61,7 +62,7 @@ class ElementwiseDiameterFunction : public GridFunctionInterface<E>
     }
 
   private:
-    double diameter_;
+    double diameter_{0};
   }; // class LocalFunction
 
 public:
@@ -70,9 +71,9 @@ public:
   using BaseType::rC;
   using typename BaseType::LocalFunctionType;
 
-  ElementwiseDiameterFunction(const std::string& nm = "ElementwiseDiameterFunction")
+  ElementwiseDiameterFunction(std::string nm = "ElementwiseDiameterFunction")
     : BaseType()
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ElementwiseDiameterFunction(const ThisType&) = default;

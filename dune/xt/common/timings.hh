@@ -36,6 +36,7 @@
 #include <dune/common/parallel/mpihelper.hh>
 
 #include <dune/xt/common/parallel/threadstorage.hh>
+#include <utility>
 
 namespace Dune::XT::Common {
 
@@ -148,8 +149,8 @@ protected:
   const std::string section_name_;
 
 public:
-  explicit inline ScopedTiming(const std::string& section_name)
-    : section_name_(section_name)
+  explicit inline ScopedTiming(std::string section_name)
+    : section_name_(std::move(section_name))
   {
     timings().start(section_name_);
   }

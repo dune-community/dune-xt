@@ -16,6 +16,7 @@
 #include <limits>
 
 #include <dune/xt/common/parameter.hh>
+#include <utility>
 #include "dune/xt/functions/interfaces/function.hh"
 
 #include "base.hh"
@@ -61,10 +62,10 @@ public:
                                const Common::ParameterType& param_type,
                                const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
-                               const std::string& nm = static_id())
+                               std::string nm = static_id())
     : BaseType(param_type)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
     , num_parameter_variables_(0)
   {
     DUNE_THROW_IF(variable.empty(), Common::Exceptions::wrong_input_given, "Given variable must not be empty!");

@@ -116,9 +116,9 @@ public:
   } // ... defaults(...)
 
   IndicatorGridFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> values,
-                        const std::string& name_in = "IndicatorGridFunction")
-    : subdomain_and_value_tuples_(values)
-    , name_(name_in)
+                        std::string name_in = "IndicatorGridFunction")
+    : subdomain_and_value_tuples_(std::move(values))
+    , name_(std::move(name_in))
   {}
 
   /**
@@ -208,9 +208,9 @@ public:
   using typename BaseType::RangeReturnType;
 
   IndicatorFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>> values,
-                    const std::string& nm = "IndicatorFunction")
-    : subdomain_and_value_tuples_(values)
-    , name_(nm)
+                    std::string nm = "IndicatorFunction")
+    : subdomain_and_value_tuples_(std::move(values))
+    , name_(std::move(nm))
   {}
 
   IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>& values,

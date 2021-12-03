@@ -37,7 +37,7 @@ public:
                         GenericApplyFunctionType apply_func,
                         GenericFinalizeFunctionType finalize_func)
     : prepare_func_(std::move(prepare_func))
-    , apply_func_(apply_func)
+    , apply_func_(std::move(apply_func))
     , finalize_func_(std::move(finalize_func))
   {}
 
@@ -87,7 +87,7 @@ public:
                              GenericApplyFunctionType apply_func,
                              GenericFinalizeFunctionType finalize_func)
     : prepare_func_(std::move(prepare_func))
-    , apply_func_(apply_func)
+    , apply_func_(std::move(apply_func))
     , finalize_func_(std::move(finalize_func))
   {}
 

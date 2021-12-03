@@ -23,6 +23,7 @@
 #include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/functors/bounding-box.hh>
 #include <dune/xt/grid/walker.hh>
+#include <utility>
 
 namespace Dune::XT::Grid {
 
@@ -101,10 +102,10 @@ class PgfEntityFunctorIntersections : public ElementAndIntersectionFunctor<GridV
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,
                                 std::ostream& file,
-                                const std::string& color = "black",
+                                std::string color = "black",
                                 const bool print_entityIndex = false)
     : file_(file)
-    , color_(color)
+    , color_(std::move(color))
     , print_entityIndex_(print_entityIndex)
     , grid_view_(grid_view)
   {}

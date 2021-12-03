@@ -19,6 +19,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/grid/common/partitionset.hh>
+#include <utility>
 
 #include "base.hh"
 
@@ -129,7 +130,7 @@ public:
   using GenericFunctionType = std::function<bool(const GridViewType&, const ElementType&)>;
 
   explicit GenericFilteredElements(GenericFunctionType lambda)
-    : filter_(lambda)
+    : filter_(std::move(lambda))
   {}
 
   ElementFilter<GridViewType>* copy() const final

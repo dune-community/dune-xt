@@ -16,6 +16,7 @@
 
 #include <mutex>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include <dune/common/dynvector.hh>
@@ -55,8 +56,8 @@ public:
   using RangeFieldType = RangeField;
   static constexpr size_t range_dim = rangeDim;
 
-  MathExpressionBase(const std::string& var, const Common::FieldVector<std::string, range_dim>& exprs)
-    : variable_(var)
+  MathExpressionBase(std::string var, const Common::FieldVector<std::string, range_dim>& exprs)
+    : variable_(std::move(var))
     , expressions_(exprs)
   {
     setup();

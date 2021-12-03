@@ -27,7 +27,7 @@ namespace LA {
 template <class Vector>
 class ListVectorArray
 {
-  static_assert(is_vector<Vector>::value, "");
+  static_assert(is_vector<Vector>::value);
 
 public:
   using ThisType = ListVectorArray;

@@ -82,7 +82,7 @@ public:
   friend iterator;
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
-  ~VectorInterface() override {}
+  ~VectorInterface() override = default;
 
   template <class Vector>
   std::enable_if_t<Common::is_vector<Vector>::value, derived_type&> assign_from(const Vector& other)

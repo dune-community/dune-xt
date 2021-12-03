@@ -22,6 +22,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/print.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <utility>
 #include <dune/xt/grid/print.hh>
 
 #include "base.hh"
@@ -511,7 +512,7 @@ public:
   using GenericFunctionType = std::function<bool(const GridViewType&, const IntersectionType&)>;
 
   explicit GenericFilteredIntersections(GenericFunctionType func)
-    : filter_(func)
+    : filter_(std::move(func))
   {}
 
   IntersectionFilter<GridViewType>* copy() const final
@@ -559,12 +560,12 @@ public:
   {}
 
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                       const std::shared_ptr<BoundaryType>& boundary_type,
+                                       std::shared_ptr<BoundaryType> boundary_type,
                                        const std::string& logging_prefix = "",
                                        const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix, logging_state)
     , boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(std::move(boundary_type))
   {}
 
   CustomBoundaryIntersections(const ThisType& other)
@@ -618,9 +619,9 @@ public:
   {}
 
   explicit CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                                 const std::shared_ptr<BoundaryType>& boundary_type)
+                                                 std::shared_ptr<BoundaryType> boundary_type)
     : boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(std::move(boundary_type))
   {}
 
   IntersectionFilter<GridViewType>* copy() const final

@@ -18,6 +18,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/numeric_cast.hh>
+#include <utility>
 
 #include "parameter.hh"
 
@@ -212,8 +213,8 @@ std::ostream& operator<<(std::ostream& out, const Parameter& mu)
 // ===============================
 // ===== ParametricInterface =====
 // ===============================
-ParametricInterface::ParametricInterface(const ParameterType& param_type)
-  : parameter_type_(param_type)
+ParametricInterface::ParametricInterface(ParameterType param_type)
+  : parameter_type_(std::move(param_type))
 {}
 
 bool ParametricInterface::is_parametric() const

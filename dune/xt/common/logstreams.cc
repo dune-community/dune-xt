@@ -16,6 +16,7 @@
 #include <boost/format.hpp>
 
 #include <dune/xt/common/string.hh>
+#include <utility>
 
 #include "logstreams.hh"
 
@@ -78,9 +79,9 @@ int SuspendableStrBuffer::pubsync()
   return 0;
 }
 
-TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out)
+TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, std::string prefix, std::ostream& out)
   : timer_(timer)
-  , prefix_(prefix)
+  , prefix_(std::move(prefix))
   , out_(out)
   , prefix_needed_(true)
 {}

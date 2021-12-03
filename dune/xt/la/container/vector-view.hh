@@ -100,8 +100,7 @@ public:
                            const ScalarType /*value*/ = ScalarType(0),
                            const size_t /*num_mutexes*/ = 1)
     : vector_(internal::empty_vector_ref<VectorImp>())
-    , first_entry_(0)
-    , past_last_entry_(0)
+
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for VectorView");
   }
@@ -254,8 +253,8 @@ private:
   friend class VectorInterface<internal::ConstVectorViewTraits<VectorImp>, ScalarType>;
 
   const Vector& vector_;
-  const size_t first_entry_;
-  const size_t past_last_entry_;
+  const size_t first_entry_{0};
+  const size_t past_last_entry_{0};
 }; // class ConstVectorView
 
 

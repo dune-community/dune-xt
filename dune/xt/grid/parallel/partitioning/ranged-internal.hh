@@ -48,10 +48,10 @@ namespace Dune::XT::Grid {
 
       //! construct
       RangedPartitioning(const GridView &gv, Size partitions) {
-        const Iterator end = gv.template end<0, pit>();
+        const auto end = gv.template end<0, pit>();
         // GridView's size() would return the wrong count for non AllPartition Views/Iterators
         const auto totalsize = std::distance(gv.template begin<0, pit>(), end);
-        Iterator it = gv.template begin<0, pit>();
+        auto it = gv.template begin<0, pit>();
         entry_points_.reserve(partitions + 1);
         stride_ = totalsize / partitions;
         overflow_ = totalsize % partitions;

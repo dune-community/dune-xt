@@ -17,6 +17,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 namespace internal {
@@ -151,11 +152,11 @@ private:
 public:
   ElementwiseMinimumFunction(GridFunction<E, r_, rC_> some_func,
                              const int search_quadrature_order,
-                             const std::string& nm = "ElementwiseMinimumFunction")
+                             std::string nm = "ElementwiseMinimumFunction")
     : BaseType()
     , some_func_(some_func.copy_as_grid_function())
     , search_quadrature_order_(search_quadrature_order)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     DUNE_THROW_IF(!some_func_->parameter_type().empty(),
                   Exceptions::parameter_error,

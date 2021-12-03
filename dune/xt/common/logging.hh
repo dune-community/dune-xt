@@ -134,7 +134,7 @@ private:
   StreamMap streammap_;
   using IdVec = std::vector<int>;
   IdVec streamIDs_;
-  int logflags_;
+  int logflags_{LOG_NONE};
   EmptyLogStream emptyLogStream_;
 
   friend Logging& Logger();

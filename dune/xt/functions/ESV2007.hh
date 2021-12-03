@@ -29,6 +29,7 @@
 #include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 
 namespace Dune::XT::Functions::ESV2007 {
@@ -72,9 +73,9 @@ public:
   } // ... defaults(...)
 
   Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
-                 const std::string& nm = "ESV2007Testcase1Force")
+                 std::string nm = "ESV2007Testcase1Force")
     : order_(static_cast<int>(ord))
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   Testcase1Force(const ThisType&) = default;
@@ -170,9 +171,9 @@ public:
   } // ... defaults(...)
 
   Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
-                         const std::string& nm = "ESV2007Testcase1ExactSolution")
+                         std::string nm = "ESV2007Testcase1ExactSolution")
     : order_(static_cast<int>(ord))
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   Testcase1ExactSolution(const ThisType&) = default;
@@ -353,11 +354,11 @@ public:
 
   CutoffFunction(GridFunction<E, d, d, R> diffusion,
                  const RangeFieldType poincare_constant = 1.0 / (M_PI * M_PI),
-                 const std::string& nm = "ESV2007CutoffFunction")
+                 std::string nm = "ESV2007CutoffFunction")
     : BaseType(diffusion.parameter_type())
     , diffusion_(diffusion.copy_as_grid_function())
     , poincare_constant_(poincare_constant)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   CutoffFunction(const ThisType& other)

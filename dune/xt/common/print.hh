@@ -13,8 +13,9 @@
 #ifndef DUNE_XT_COMMON_PRINT_HH
 #define DUNE_XT_COMMON_PRINT_HH
 
-#include <string>
 #include <iostream>
+#include <string>
+#include <utility>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/filesystem.hh>
@@ -100,9 +101,9 @@ class VectorPrinter : public internal::DefaultPrinter<T, use_repr>
 public:
   const std::string class_name;
 
-  VectorPrinter(const T& val, const Configuration& cfg = {}, const std::string& clss_nm = Typename<T>::value())
+  VectorPrinter(const T& val, const Configuration& cfg = {}, std::string clss_nm = Typename<T>::value())
     : internal::DefaultPrinter<T, use_repr>(val, cfg)
-    , class_name(clss_nm)
+    , class_name(std::move(clss_nm))
   {}
 
   void repr(std::ostream& out) const override
@@ -150,9 +151,9 @@ class MatrixPrinter : public internal::DefaultPrinter<T, use_repr>
 public:
   const std::string class_name;
 
-  MatrixPrinter(const T& val, const Configuration& cfg = {}, const std::string& clss_nm = Typename<T>::value())
+  MatrixPrinter(const T& val, const Configuration& cfg = {}, std::string clss_nm = Typename<T>::value())
     : internal::DefaultPrinter<T, use_repr>(val, cfg)
-    , class_name(clss_nm)
+    , class_name(std::move(clss_nm))
   {}
 
   void repr(std::ostream& out) const override
@@ -481,9 +482,9 @@ public:
   using reference = T;
   using iterator_category = std::output_iterator_tag;
 
-  PrefixOutputIterator(std::ostream& o, std::string const& p = "")
+  PrefixOutputIterator(std::ostream& o, std::string p = "")
     : ostream(o)
-    , prefix(p)
+    , prefix(std::move(p))
     , first(true)
   {}
 

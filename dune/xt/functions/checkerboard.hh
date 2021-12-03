@@ -16,6 +16,7 @@
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -52,7 +53,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
       , lower_left_(lower_left)
       , upper_right_(upper_right)
       , num_elements_(num_elements)
-      , values_(values)
+      , values_(std::move(values))
     {}
 
   protected:
@@ -90,8 +91,8 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     {
       const auto center = element.geometry().center();
       if (Common::FloatCmp::le(lower_left_, center) && Common::FloatCmp::lt(center, upper_right_))
-        return 1;
-      return 0;
+        return true;
+      return false;
     }
 
     size_t find_subdomain(const ElementType& element) const
@@ -155,12 +156,12 @@ public:
                        const DomainType& upper_right,
                        const FieldVector<size_t, domain_dim>& num_elements,
                        std::shared_ptr<std::vector<RangeType>> values,
-                       const std::string& nm = "CheckerboardFunction")
+                       std::string nm = "CheckerboardFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , num_elements_(num_elements)
-    , values_(values)
-    , name_(nm)
+    , values_(std::move(values))
+    , name_(std::move(nm))
   {
 #ifndef NDEBUG
     // checks

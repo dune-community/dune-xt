@@ -110,7 +110,7 @@ public:
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
   ContainerInterface() = default;
-  virtual ~ContainerInterface() {}
+  virtual ~ContainerInterface() = default;
 
   ThisType& operator=(const ThisType& other)
   {

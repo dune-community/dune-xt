@@ -149,7 +149,7 @@ class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_tr
   using BaseType = std::basic_stringbuf<char, std::char_traits<char>>;
 
 public:
-  TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out = std::cout);
+  TimedPrefixedStreamBuffer(const Timer& timer, std::string prefix, std::ostream& out = std::cout);
 
   int sync() override;
 

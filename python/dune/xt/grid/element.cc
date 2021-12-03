@@ -79,7 +79,7 @@ public:
     });
     c.def_property_readonly("corners", [](type& self) {
       using XT::Common::numeric_cast;
-      const size_t num_corners = numeric_cast<size_t>(self.geometry().corners());
+      const auto num_corners = numeric_cast<size_t>(self.geometry().corners());
       py::array_t<double> result(/*shape=*/{num_corners, d});
       auto access_to_result = result.mutable_unchecked<2>();
       for (size_t cc = 0; cc < num_corners; ++cc) {

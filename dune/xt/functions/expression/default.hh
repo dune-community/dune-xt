@@ -23,6 +23,7 @@
 
 #include "base.hh"
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -106,11 +107,11 @@ public:
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     for (size_t cc = 0; cc < r; ++cc) {
       gradients_.emplace_back(std::vector<MathExpressionGradientType>());
@@ -129,11 +130,11 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ExpressionFunction(const ThisType& other)
@@ -307,11 +308,11 @@ public:
                      const Common::FieldVector<std::string, r>& expressions,
                      const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     for (size_t rr = 0; rr < r; ++rr)
       gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expressions[rr]));
@@ -324,11 +325,11 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldVector<std::string, r>& expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ExpressionFunction(const ThisType& other)

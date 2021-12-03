@@ -188,15 +188,15 @@ public:
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(default_dynamic_evaluate_function())
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_func)
     , dynamic_jacobian_(default_dynamic_jacobian_function())
   {}
@@ -204,15 +204,15 @@ public:
   GenericFluxFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(default_dynamic_evaluate_function())
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_func)
     , dynamic_jacobian_(default_dynamic_jacobian_function())
   {}
@@ -220,15 +220,15 @@ public:
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_from_dynamic_evaluate(evaluate_func))
     , dynamic_evaluate_(evaluate_func)
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_from_dynamic_jacobian(jacobian_func))
     , dynamic_jacobian_(jacobian_func)
   {}
@@ -236,15 +236,15 @@ public:
   GenericFluxFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
     : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_from_dynamic_evaluate(evaluate_func))
     , dynamic_evaluate_(evaluate_func)
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_from_dynamic_jacobian(jacobian_func))
     , dynamic_jacobian_(jacobian_func)
   {}

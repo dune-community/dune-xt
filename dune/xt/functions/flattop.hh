@@ -16,6 +16,7 @@
 #include <dune/xt/common/configuration.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -72,12 +73,12 @@ public:
                   const DomainType& upper_right,
                   const DomainType& boundary_layer,
                   const RangeReturnType& value = RangeReturnType(1),
-                  const std::string& name_in = "FlatTopFunction")
+                  std::string name_in = "FlatTopFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , boundary_layer_(boundary_layer)
     , value_(value)
-    , name_(name_in)
+    , name_(std::move(name_in))
   {
     check_input();
   }

@@ -40,6 +40,7 @@
 #include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Grid::DD {
 namespace Exceptions {
@@ -556,7 +557,7 @@ public:
               //              logger.debug() << "local_intersection: " << local_intersection.indexInInside() << ":" <<
               //              std::endl;
               const auto local_intersection_geometry = local_intersection.geometry();
-              const size_t num_corners = boost::numeric_cast<size_t>(local_intersection_geometry.corners());
+              const auto num_corners = boost::numeric_cast<size_t>(local_intersection_geometry.corners());
               // ** Check if all corners of the intersection lie on the domain boundary (aka the boundary intersection
               // of
               //    the macro entity this local grid belongs to. Therefore
@@ -1073,9 +1074,9 @@ public:
     prepare_local_vtk_writers();
   } // GluedVTKWriter(...)
 
-  GluedVTKWriter(const GluedGridType& glued_grid, const std::vector<int>& local_levels)
+  GluedVTKWriter(const GluedGridType& glued_grid, std::vector<int> local_levels)
     : glued_grid_(glued_grid)
-    , local_levels_(local_levels)
+    , local_levels_(std::move(local_levels))
   {
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       if (local_levels_[ss] < 0)
