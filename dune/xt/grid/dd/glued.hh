@@ -31,9 +31,11 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/timedlogging.hh>
+#include <dune/xt/functions/base/function-as-grid-function.hh>
 #include <dune/xt/functions/base/visualization.hh>
-#include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/constant.hh>
+#include <dune/xt/functions/grid-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
@@ -721,7 +723,7 @@ public:
     for (size_t subdomain = 0; subdomain < macro_leaf_view_size_; ++subdomain) {
       if (std::find(subdomains.begin(), subdomains.end(), subdomain) != subdomains.end()) {
         auto visualization_adapter = std::make_shared<XT::Functions::VisualizationAdapter<LocalViewType, 1, 1, double>>(
-            func.template as_grid_function<typename LocalViewType::template Codim<0>::Entity>(), func.name());
+            XT::Functions::make_grid_function<typename LocalViewType::template Codim<0>::Entity>(func), func.name());
         vtk_writer.addVertexData(subdomain, visualization_adapter);
       }
     }

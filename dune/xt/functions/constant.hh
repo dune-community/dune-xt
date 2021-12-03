@@ -18,6 +18,7 @@
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/functions/base/function-as-flux-function.hh>
+#include <dune/xt/functions/base/function-as-grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/flux-function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>

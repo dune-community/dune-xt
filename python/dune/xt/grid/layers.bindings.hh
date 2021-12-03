@@ -40,16 +40,6 @@ struct backend_name<Backends::view>
 };
 
 
-template <Layers layer>
-struct layer_name
-{
-  [[deprecated("use layer_names[layer] directly. 2018/7/2")]] static std::string value()
-  {
-    return layer_names[layer];
-  }
-};
-
-
 } // namespace Dune::XT::Grid::bindings
 
 #endif // DUNE_XT_GRID_LAYERS_BINDINGS_HH

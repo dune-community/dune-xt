@@ -53,11 +53,6 @@ template <class, class>
 class FractionFunction;
 
 
-// remove this once removing as_grid_function
-template <class, size_t, size_t, class>
-class FunctionAsGridFunctionWrapper;
-
-
 /**
  * \brief Interface for functions (in the C^\infty sense) which can thus be evaluated in global coordinates.
  *
@@ -308,75 +303,6 @@ public:
     DerivativeRangeSelector::convert(this->derivative(alpha, point_in_reference_element, param), result);
   }
 
-  /**
-   * \}
-   * \name ´´These methods are provided.''
-   * \{
-   **/
-
-  /**
-   * \note This function keeps a map of all wrappers in a local static map, to avoid temporaries.
-   * \todo Check if this implementation is thread safe!
-   */
-  // When removing this, also remove
-  // * the dune/xt/functions/base/function-as-grid-function.hh include below and
-  // * the FunctionAsGridFunctionWrapper forward above!
-  template <class E>
-  [[deprecated("Use make_grid_function instead (18.09.2020)!")]] const typename std::
-      enable_if<XT::Grid::is_entity<E>::value && E::dimension == d, FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
-      as_grid_function() const
-  {
-    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
-    if (wrappers.find(this) == wrappers.end())
-      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
-    return *(wrappers[this]);
-  }
-
-  // When removing this, also remove
-  // * the dune/xt/functions/base/function-as-grid-function.hh include below and
-  // * the FunctionAsGridFunctionWrapper forward above!
-  template <class ViewTraits>
-  [[deprecated("Use make_grid_function instead (18.09.2020)!")]] const typename std::enable_if<
-      (ViewTraits::Grid::dimension == d),
-      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
-  as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
-  {
-    return this->as_grid_function<typename ViewTraits::template Codim<0>::Entity>();
-  }
-
-  /**
-   * \copydoc GridFunctionInterface::visualize
-   */
-  template <class GridLayerType>
-  [[deprecated("Use visualize(*this, ...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]]
-  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
-  visualize(const GridLayerType& grid_layer,
-            const std::string path,
-            const bool subsampling = true,
-            const VTK::OutputType vtk_output_type = VTK::appendedraw) const
-  {
-    this->as_grid_function<XT::Grid::extract_entity_t<GridLayerType>>().visualize(
-        grid_layer, path, subsampling, vtk_output_type);
-  }
-
-  /**
-   * \copydoc GridFunctionInterface::visualize_gradient
-   */
-  template <class GridLayerType>
-  [[deprecated("Use visualize_gradient(*this, ...) from <dune/xt/functions/visualization.hh> instead (24.09.2020)!")]]
-  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
-  visualize_gradient(const GridLayerType& grid_layer,
-                     const std::string path,
-                     const bool subsampling = true,
-                     const VTK::OutputType vtk_output_type = VTK::appendedraw) const
-  {
-    this->as_grid_function<XT::Grid::extract_entity_t<GridLayerType>>().visualize_gradient(
-        grid_layer, path, subsampling, vtk_output_type);
-  }
-
-  /**
-   * \}
-   **/
 protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   static void assert_correct_dims(const size_t row, const size_t col, const std::string& caller)
@@ -440,6 +366,5 @@ private:
 
 
 #include <dune/xt/functions/base/combined-functions.hh>
-#include <dune/xt/functions/base/function-as-grid-function.hh> // remove this once removing as_grid_function
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_FUNCTION_HH
