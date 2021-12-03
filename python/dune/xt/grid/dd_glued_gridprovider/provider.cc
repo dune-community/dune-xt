@@ -214,7 +214,6 @@ public:
                          const std::string& grid_id = grid_name<typename CGV::MacroGridType>::value(),
                          const std::string& class_id = "coupling_grid_provider")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     const std::string class_name = class_id + "_" + grid_id;
@@ -239,7 +238,6 @@ struct MacroGridBasedBoundaryInfo
                          const std::string& grid_id = grid_name<G>::value(),
                          const std::string& class_id = "macro_grid_based_boundary_info")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);

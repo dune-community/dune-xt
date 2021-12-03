@@ -69,7 +69,6 @@ class ExpressionFunction
 
     static void factory(pybind11::module& m, const std::string& ClassId)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       m.def(
@@ -128,7 +127,6 @@ class ExpressionFunction
 
     static void factory(pybind11::module& m, const std::string& ClassId)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       m.def(
@@ -197,7 +195,6 @@ class ExpressionFunction
 
     static void factory(pybind11::module& m, const std::string& ClassId)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       m.def(
@@ -237,7 +234,6 @@ class ExpressionFunction
 public:
   static bound_type bind(pybind11::module& m, const std::string& class_id = "expression_function")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     std::string class_name = class_id + "_" + Common::to_string(d) + "_to_" + Common::to_string(r);

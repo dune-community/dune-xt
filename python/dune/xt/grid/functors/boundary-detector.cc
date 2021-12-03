@@ -81,7 +81,6 @@ public:
 
   static void bind_leaf_factory(pybind11::module& m, const std::string& class_id = "boundary_detector_functor")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
@@ -95,12 +94,11 @@ public:
         "boundary_info"_a,
         "boundary_type"_a,
         "logging_prefix"_a = "",
-        py::keep_alive<0, 2>());
+        pybind11::keep_alive<0, 2>());
   } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m, const std::string& class_id = "boundary_detector_functor")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
@@ -114,7 +112,7 @@ public:
         "boundary_info"_a,
         "boundary_type"_a,
         "logging_prefix"_a = "",
-        py::keep_alive<0, 2>());
+        pybind11::keep_alive<0, 2>());
   } // ... bind_coupling_factory(...)
 }; // class BoundaryDetectorFunctor
 

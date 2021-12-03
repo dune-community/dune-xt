@@ -26,7 +26,6 @@
 #include <dune/xt/common/fmatrix.hh>
 
 using namespace Dune;
-using XT::Common::create;
 using XT::Common::FloatCmp::Style;
 
 // add operator+= for std::array and std::vector

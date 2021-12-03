@@ -70,7 +70,6 @@ private:
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       // without dimRange
@@ -169,7 +168,6 @@ private:
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       // without dimRange
@@ -336,7 +334,6 @@ private:
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       // without dimRange
@@ -468,7 +465,6 @@ private:
 
     static void factory(pybind11::module& m, const std::string& FactoryName)
     {
-      namespace py = pybind11;
       using namespace pybind11::literals;
 
       // we have the scalar variants ...

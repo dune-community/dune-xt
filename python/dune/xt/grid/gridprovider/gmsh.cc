@@ -31,7 +31,6 @@ struct make_gmsh_grid
 
   static void bind(pybind11::module& m)
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     m.def(

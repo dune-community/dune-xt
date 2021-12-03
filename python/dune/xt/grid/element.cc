@@ -47,7 +47,7 @@ public:
                          const std::string& grid_id = XT::Grid::bindings::grid_name<G>::value(),
                          const std::string& layer_id = "")
   {
-    namespace py = pybind11;
+    namespace py = pybind11; // NOLINT(misc-unused-alias-decls)
     using namespace pybind11::literals;
 
     std::string class_name = class_id;

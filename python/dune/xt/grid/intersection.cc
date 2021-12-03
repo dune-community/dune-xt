@@ -54,7 +54,6 @@ public:
                          const std::string& layer_id = "",
                          const std::string& class_id = "intersection")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     std::string class_name = class_id;
@@ -85,9 +84,9 @@ public:
       return ss.str();
     });
     c.def(
-        "__eq__", [](type& self, const type& other) { return self == other; }, py::is_operator());
+        "__eq__", [](type& self, const type& other) { return self == other; }, pybind11::is_operator());
     c.def(
-        "__neq__", [](type& self, const type& other) { return self != other; }, py::is_operator());
+        "__neq__", [](type& self, const type& other) { return self != other; }, pybind11::is_operator());
 
     // methods
     c.def(

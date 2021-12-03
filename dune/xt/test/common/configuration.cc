@@ -38,7 +38,6 @@
 std::ostream& test_out = DXTC_LOG.devnull();
 
 using namespace Dune::XT::Common;
-using Dune::XT::Common::Exceptions::results_are_not_as_expected;
 using namespace Dune::XT::Common::FloatCmp;
 
 struct CreateByOperator
