@@ -27,7 +27,7 @@ void dump_environment(boost::filesystem::ofstream& file, const std::string& csv_
 {
   using namespace std;
   vector<string> header, values;
-  for (char** current = environ; *current; current++) {
+  for (char** current = environ; *current != nullptr; current++) {
     string line(*current);
     const auto tokens = tokenize(line, "=");
     if (tokens.size() == 2) {

@@ -129,7 +129,7 @@ struct PeriodicViewTest : public testing::Test
           const auto global_intersection_coords = intersection.geometry().center();
           const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
           size_t coord_difference_count = 0;
-          size_t differing_coordinate;
+          size_t differing_coordinate = 0;
           for (size_t ii = 0; ii < dimDomain; ++ii) {
             if (Dune::XT::Common::FloatCmp::ne(global_outside_intersection_coords[ii],
                                                global_intersection_coords[ii])) {
@@ -189,17 +189,24 @@ struct PeriodicViewTest : public testing::Test
     // the nonperiodic grid has (elements_per_direction-1)**dimDomain inner vertices
     size_t expected_num_vertices = std::pow(elements_per_direction - 1, dimDomain);
     // add number of vertices on faces (codim 1)
-    expected_num_vertices += std::pow(elements_per_direction - 1, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
+    expected_num_vertices +=
+        static_cast<size_t>(std::pow(elements_per_direction - 1, dimDomain - 1)) * (num_faces - num_periodic_faces / 2);
     // add number of vertices on edges (codim 2)
     const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
-    size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces * std::pow(2, dimDomain - 1) : num_edges;
-    if (is_nonperiodic)
-      num_periodic_edges = 0;
-    expected_num_vertices +=
-        dimDomain == 1
-            ? 0
-            : std::pow(elements_per_direction - 1, dimDomain - 2)
-                  * ((num_edges - num_periodic_edges) + num_periodic_edges / (is_partially_periodic ? 2 : 4));
+    if constexpr (dimDomain == 1)
+      expected_num_vertices += 0;
+    else {
+      size_t num_periodic_edges;
+      if (is_nonperiodic)
+        num_periodic_edges = 0;
+      else if (is_partially_periodic)
+        num_periodic_edges = num_periodic_faces * std::pow(2, dimDomain - 1);
+      else
+        num_periodic_edges = num_edges;
+      expected_num_vertices +=
+          static_cast<size_t>(std::pow(elements_per_direction - 1, dimDomain - 2))
+          * ((num_edges - num_periodic_edges) + num_periodic_edges / (is_partially_periodic ? 2 : 4));
+    }
     // add vertices on corners (codim 3) of grid
     if constexpr (dimDomain == 3)
       expected_num_vertices += is_partially_periodic ? 4 : (is_nonperiodic ? 8 : 1);

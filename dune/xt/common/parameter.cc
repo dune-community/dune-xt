@@ -41,10 +41,6 @@ template class SimpleDict<std::vector<double>>;
 // =========================
 // ===== ParameterType =====
 // =========================
-ParameterType::ParameterType()
-  : BaseType()
-{}
-
 ParameterType::ParameterType(const std::string& key)
   : BaseType(key, 1)
 {}

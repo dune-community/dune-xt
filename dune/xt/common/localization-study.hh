@@ -40,7 +40,7 @@ public:
 
   std::vector<std::string> used_indicators() const;
 
-  /*std::map< std::string, std::vector< double > >*/ void run(std::ostream& out = std::cout);
+  /*std::map< std::string, std::vector< double > >*/ void run(std::ostream& out = std::cout) const;
 
 private:
   const std::vector<std::string> only_these_indicators_;

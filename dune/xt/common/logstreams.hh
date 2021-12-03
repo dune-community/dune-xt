@@ -75,7 +75,7 @@ protected:
 private:
   inline bool enabled() const
   {
-    return (!is_suspended_) && (logflags_ & loglevel_);
+    return (!is_suspended_) && ((logflags_ & loglevel_) != 0);
   }
 
   int& logflags_;
@@ -185,7 +185,7 @@ public:
   }
 
   //! dump buffer into file/stream and clear it
-  virtual LogStream& flush();
+  LogStream& flush();
 
   /** \brief forwards suspend to buffer
    * the suspend_priority_ mechanism provides a way to silence streams from 'higher' modules

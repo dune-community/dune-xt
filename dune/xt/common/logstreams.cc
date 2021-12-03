@@ -95,7 +95,7 @@ int TimedPrefixedStreamBuffer::sync()
     prefix_needed_ = false;
   }
   auto lines = tokenize(tmp_str, "\n", boost::algorithm::token_compress_off);
-  DXT_ASSERT(lines.size() > 0);
+  DXT_ASSERT(!lines.empty());
   out_ << lines[0];
   for (size_t ii = 1; ii < lines.size() - 1; ++ii)
     out_ << "\n" << elapsed_time_str() << prefix_ << lines[ii];

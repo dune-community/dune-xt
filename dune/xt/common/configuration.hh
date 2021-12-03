@@ -90,8 +90,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
   Configuration(const std::vector<std::string>& keys,
                 const std::initializer_list<T> values_in,
                 const ConfigurationDefaults& defaults = ConfigurationDefaults())
-    : BaseType()
-    , warn_on_default_access_(defaults.warn_on_default_access)
+    : warn_on_default_access_(defaults.warn_on_default_access)
     , log_on_exit_(defaults.log_on_exit)
     , logfile_(defaults.logfile)
   {

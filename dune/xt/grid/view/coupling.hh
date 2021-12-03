@@ -229,7 +229,6 @@ public:
   struct Codim : public Traits::template Codim<cd>
   {};
 
-public:
   CouplingGridViewWrapper(const MacroElementType& ss,
                           const MacroElementType& nn,
                           GridGlueType& dd_grid,

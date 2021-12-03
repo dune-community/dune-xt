@@ -41,7 +41,7 @@ struct ValidationTest : public testing::Test
   const int eps_fac = 4;
   const S scalar_eps = Epsilon<S>::value;
 
-  void all()
+  void all() const
   {
     using namespace boost::assign;
     {

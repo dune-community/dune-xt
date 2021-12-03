@@ -41,7 +41,7 @@ std::string to_camel_case(const std::string& ss)
 {
   std::stringstream out;
   for (auto&& word : tokenize(ss, "_", boost::algorithm::token_compress_on)) {
-    if (word.size() > 0) {
+    if (!word.empty()) {
       out << to_upper(word.substr(0, 1));
       out << word.substr(1);
     }

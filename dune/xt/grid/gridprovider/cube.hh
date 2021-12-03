@@ -179,7 +179,7 @@ public:
     std::array<unsigned int, d> overlap_size_array;
     if (overlap_size.size() >= d) {
       overlap_size_array = Common::make_array<unsigned int, d>(overlap_size);
-    } else if (overlap_size.size() >= 1) {
+    } else if (!overlap_size.empty()) {
       overlap_size_array = Common::make_array<unsigned int, d>(overlap_size);
     } else {
       DUNE_THROW(Common::Exceptions::wrong_input_given,
@@ -199,7 +199,7 @@ public:
     std::array<unsigned int, d> num_elements_array;
     if (num_elements.size() >= d) {
       num_elements_array = Common::make_array<unsigned int, d>(num_elements);
-    } else if (num_elements.size() >= 1) {
+    } else if (!num_elements.empty()) {
       num_elements_array = Common::make_array<unsigned int, d>(num_elements);
     } else {
       DUNE_THROW(Common::Exceptions::wrong_input_given,

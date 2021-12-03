@@ -178,7 +178,7 @@ class ParameterType : public internal::SimpleDict<size_t>
   using BaseType = internal::SimpleDict<size_t>;
 
 public:
-  ParameterType();
+  ParameterType() = default;
 
   ParameterType(const ParameterType& other) = default;
 
