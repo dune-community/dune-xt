@@ -129,7 +129,7 @@ public:                                                                         
   {                                                                                                                    \
     return value;                                                                                                      \
   }                                                                                                                    \
-  operator type &&()&&                                                                                                 \
+  operator type&&()&&                                                                                                  \
   {                                                                                                                    \
     return std::move(value);                                                                                           \
   }                                                                                                                    \
@@ -446,8 +446,11 @@ struct string_caster
 #endif
     }
 
-    auto utfNbytes = reinterpret_steal<object>(
-        PyUnicode_AsEncodedString(load_src.ptr(), UTF_N == 8 ? "utf-8" : UTF_N == 16 ? "utf-16" : "utf-32", nullptr));
+    auto utfNbytes = reinterpret_steal<object>(PyUnicode_AsEncodedString(load_src.ptr(),
+                                                                         UTF_N == 8    ? "utf-8"
+                                                                         : UTF_N == 16 ? "utf-16"
+                                                                                       : "utf-32",
+                                                                         nullptr));
     if (!utfNbytes) {
       PyErr_Clear();
       return false;
@@ -484,9 +487,9 @@ private:
   static handle decode_utfN(const char* buffer, ssize_t nbytes)
   {
 #if !defined(PYPY_VERSION)
-    return UTF_N == 8 ? PyUnicode_DecodeUTF8(buffer, nbytes, nullptr)
-                      : UTF_N == 16 ? PyUnicode_DecodeUTF16(buffer, nbytes, nullptr, nullptr)
-                                    : PyUnicode_DecodeUTF32(buffer, nbytes, nullptr, nullptr);
+    return UTF_N == 8    ? PyUnicode_DecodeUTF8(buffer, nbytes, nullptr)
+           : UTF_N == 16 ? PyUnicode_DecodeUTF16(buffer, nbytes, nullptr, nullptr)
+                         : PyUnicode_DecodeUTF32(buffer, nbytes, nullptr, nullptr);
 #else
     // PyPy segfaults when on PyUnicode_DecodeUTF16 (and possibly on PyUnicode_DecodeUTF32 as well),
     // so bypass the whole thing by just passing the encoding as a string value, which works properly:
@@ -1117,13 +1120,13 @@ object cast(T&& value, return_value_policy policy = return_value_policy::automat
 {
   using no_ref_T = typename std::remove_reference<T>::type;
   if (policy == return_value_policy::automatic)
-    policy = std::is_pointer<no_ref_T>::value
-                 ? return_value_policy::take_ownership
-                 : std::is_lvalue_reference<T>::value ? return_value_policy::copy : return_value_policy::move;
+    policy = std::is_pointer<no_ref_T>::value     ? return_value_policy::take_ownership
+             : std::is_lvalue_reference<T>::value ? return_value_policy::copy
+                                                  : return_value_policy::move;
   else if (policy == return_value_policy::automatic_reference)
-    policy = std::is_pointer<no_ref_T>::value
-                 ? return_value_policy::reference
-                 : std::is_lvalue_reference<T>::value ? return_value_policy::copy : return_value_policy::move;
+    policy = std::is_pointer<no_ref_T>::value     ? return_value_policy::reference
+             : std::is_lvalue_reference<T>::value ? return_value_policy::copy
+                                                  : return_value_policy::move;
   return reinterpret_steal<object>(detail::make_caster<T>::cast(std::forward<T>(value), policy, parent));
 }
 

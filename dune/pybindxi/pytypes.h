@@ -1748,9 +1748,9 @@ public:
   template <typename T, detail::enable_if_t<std::is_integral<T>::value, int> = 0>
   operator T() const
   {
-    return std::is_unsigned<T>::value
-               ? detail::as_unsigned<T>(m_ptr)
-               : sizeof(T) <= sizeof(long) ? (T)PyLong_AsLong(m_ptr) : (T)PYBIND11_LONG_AS_LONGLONG(m_ptr);
+    return std::is_unsigned<T>::value  ? detail::as_unsigned<T>(m_ptr)
+           : sizeof(T) <= sizeof(long) ? (T)PyLong_AsLong(m_ptr)
+                                       : (T)PYBIND11_LONG_AS_LONGLONG(m_ptr);
   }
 };
 

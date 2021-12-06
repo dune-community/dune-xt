@@ -1759,8 +1759,9 @@ broadcast_trivial broadcast(const std::array<buffer_info, N>& buffers, ssize_t& 
     }
   }
 
-  return trivial_broadcast_c ? broadcast_trivial::c_trivial
-                             : trivial_broadcast_f ? broadcast_trivial::f_trivial : broadcast_trivial::non_trivial;
+  return trivial_broadcast_c   ? broadcast_trivial::c_trivial
+         : trivial_broadcast_f ? broadcast_trivial::f_trivial
+                               : broadcast_trivial::non_trivial;
 }
 
 template <typename T>
