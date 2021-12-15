@@ -161,20 +161,18 @@ struct PeriodicViewTest : public testing::Test
     }
 
     // the cube/rectangle grid has 2*dimDomain faces
-    const size_t num_faces = 2 * dimDomain;
+    constexpr size_t num_faces = 2 * dimDomain;
     /* on each face, there are elements_per_direction**(dimDomain-1) intersections. For a simplex grid in 3 dimensions,
      * there are twice as
      * much. */
     size_t num_intersections_on_face = std::pow(elements_per_direction, dimDomain - 1);
-    assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
-    const auto domainDim = Common::from_string<int>(grid_config["dimDomain"]);
-    if (is_simplex && domainDim == 3) // use dimDomain from config here to avoid "code will never be executed" warning
-      num_intersections_on_face *= 2;
+    if constexpr (dimDomain == 3) {
+      if (is_simplex)
+        num_intersections_on_face *= 2;
+    }
     /* In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
      * two faces are periodic. In a nonperiodic grid, no intersections are periodic. */
-    size_t num_periodic_faces = is_partially_periodic ? 2 : num_faces;
-    if (is_nonperiodic)
-      num_periodic_faces *= 0;
+    const size_t num_periodic_faces = is_nonperiodic ? 0 : (is_partially_periodic ? 2 : num_faces);
     const size_t expected_num_periodic_intersections = num_periodic_faces * num_intersections_on_face;
     EXPECT_EQ(expected_num_periodic_intersections, periodic_count);
     // The boundary count should be the number of interfaces on the boundary without the periodic interfaces
@@ -191,11 +189,9 @@ struct PeriodicViewTest : public testing::Test
     // add number of vertices on faces (codim 1)
     expected_num_vertices +=
         static_cast<size_t>(std::pow(elements_per_direction - 1, dimDomain - 1)) * (num_faces - num_periodic_faces / 2);
-    // add number of vertices on edges (codim 2)
-    const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
-    if constexpr (dimDomain == 1)
-      expected_num_vertices += 0;
-    else {
+    if constexpr (dimDomain > 1) {
+      // add number of vertices on edges (codim 2)
+      constexpr size_t num_edges = dimDomain == 2 ? 4 : 12;
       size_t num_periodic_edges;
       if (is_nonperiodic)
         num_periodic_edges = 0;
