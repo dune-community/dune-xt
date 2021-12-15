@@ -109,7 +109,7 @@ protected:
   {
     if (dict_.empty())
       return "{}";
-    DXT_ASSERT(keys_.size() > 0);
+    DXT_ASSERT(!keys_.empty());
     const auto whitespaced_prefix = whitespaceify(prefix);
     std::stringstream ss;
     ss << "{" << keys_[0] << ": " << dict_.at(keys_[0]);
@@ -178,7 +178,7 @@ class ParameterType : public internal::SimpleDict<size_t>
   using BaseType = internal::SimpleDict<size_t>;
 
 public:
-  ParameterType();
+  ParameterType() = default;
 
   ParameterType(const ParameterType& other) = default;
 
@@ -243,7 +243,7 @@ private:
 
 public:
   /// \note this is somehow necessary to make clang 3.8 happy (and cannot be defaulted)
-  ~Parameter() {}
+  ~Parameter() = default;
 
   Parameter(const std::vector<std::pair<std::string, ValueType>>& key_value_pairs = {});
 
@@ -280,7 +280,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& mu);
 class ParametricInterface
 {
 public:
-  ParametricInterface(const ParameterType& param_type = {});
+  ParametricInterface(ParameterType param_type = {});
 
   ParametricInterface(const ParametricInterface& other) = default;
 

@@ -14,6 +14,7 @@
 #include <ostream>
 
 #include <boost/format.hpp>
+#include <utility>
 
 #include "memory.hh"
 #include "exceptions.hh"
@@ -25,12 +26,11 @@ namespace Dune::XT::Common {
 
 DefaultLogger::DefaultLogger(const std::string& prfx,
                              const std::array<bool, 3>& initial_state,
-                             const std::array<std::string, 3>& colors,
+                             std::array<std::string, 3> colors,
                              bool global_timer)
   : prefix(prfx)
   , state(initial_state)
-  , copy_count(0)
-  , colors_(colors)
+  , colors_(std::move(colors))
   , global_timer_(global_timer)
   , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                    build_prefix(prfx.empty() ? "info" : prfx, copy_count, colors_[0]),
@@ -223,7 +223,6 @@ TimedLogging::TimedLogging()
   , info_suffix_(enable_colors_ ? StreamModifiers::normal : "")
   , debug_suffix_(enable_colors_ ? StreamModifiers::normal : "")
   , warning_suffix_(enable_colors_ ? StreamModifiers::normal : "")
-  , created_(false)
   , current_level_(-1)
 {
   update_colors();

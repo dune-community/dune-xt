@@ -16,6 +16,7 @@
 #include <limits>
 
 #include <dune/xt/common/parameter.hh>
+#include <utility>
 #include "dune/xt/functions/interfaces/function.hh"
 
 #include "base.hh"
@@ -61,10 +62,10 @@ public:
                                const Common::ParameterType& param_type,
                                const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
-                               const std::string& nm = static_id())
+                               std::string nm = static_id())
     : BaseType(param_type)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
     , num_parameter_variables_(0)
   {
     DUNE_THROW_IF(variable.empty(), Common::Exceptions::wrong_input_given, "Given variable must not be empty!");
@@ -112,18 +113,18 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     RangeReturnType ret(0.);
     Common::Parameter parsed_param;
@@ -181,7 +182,7 @@ public:
   } // ... evaluate(...)
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }

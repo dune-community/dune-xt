@@ -49,7 +49,7 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       current_value_ = 0.;
       const auto center = element.geometry().center();
@@ -62,20 +62,20 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     } // ... post_bind(...)
 
   public:
-    int order(const Common::Parameter& /*param*/ = {}) const override final
+    int order(const Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                             const Common::Parameter& /*param*/ = {}) const override final
+                             const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return current_value_;
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                       const Common::Parameter& /*param*/ = {}) const override final
+                                       const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return DerivativeRangeReturnType();
@@ -116,9 +116,9 @@ public:
   } // ... defaults(...)
 
   IndicatorGridFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> values,
-                        const std::string& name_in = "IndicatorGridFunction")
-    : subdomain_and_value_tuples_(values)
-    , name_(name_in)
+                        std::string name_in = "IndicatorGridFunction")
+    : subdomain_and_value_tuples_(std::move(values))
+    , name_(std::move(name_in))
   {}
 
   /**
@@ -163,12 +163,12 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalIndicatorGridFunction>(subdomain_and_value_tuples_);
   }
@@ -208,9 +208,9 @@ public:
   using typename BaseType::RangeReturnType;
 
   IndicatorFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>> values,
-                    const std::string& nm = "IndicatorFunction")
-    : subdomain_and_value_tuples_(values)
-    , name_(nm)
+                    std::string nm = "IndicatorFunction")
+    : subdomain_and_value_tuples_(std::move(values))
+    , name_(std::move(nm))
   {}
 
   IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>& values,
@@ -239,7 +239,7 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return 0;
   }
@@ -261,7 +261,7 @@ public:
     return config;
   } // ... defaults(...)
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -269,7 +269,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType value(0.);
     for (const auto& subdomain_and_value_tuple : *subdomain_and_value_tuples_) {
@@ -285,7 +285,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     return DerivativeRangeReturnType(); // <- defaults to 0
   }

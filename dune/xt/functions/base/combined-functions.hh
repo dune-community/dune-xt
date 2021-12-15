@@ -125,24 +125,24 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     return Helper::order(*left_, *right_, param);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return Helper::evaluate(*left_, *right_, point_in_global_coordinates, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return Helper::jacobian(*left_, *right_, point_in_global_coordinates, param);
   }

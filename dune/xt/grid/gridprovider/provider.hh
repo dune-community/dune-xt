@@ -35,6 +35,7 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/output/entity_visualization.hh>
+#include <utility>
 
 namespace Dune::XT::Grid {
 
@@ -56,7 +57,7 @@ public:
   using LeafGridViewType = typename Layer<GridType, Layers::leaf, Backends::view>::type;
 
 
-  static const std::string static_id()
+  static std::string static_id()
   {
     return "xt.grid.gridprovider";
   }
@@ -69,7 +70,7 @@ public:
   {}
 
   GridProvider(std::shared_ptr<GridType> grd_ptr)
-    : grid_ptr_(grd_ptr)
+    : grid_ptr_(std::move(grd_ptr))
   {}
 
 #if DUNE_VERSION_EQUAL(DUNE_COMMON, 2, 7)

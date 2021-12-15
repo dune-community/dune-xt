@@ -12,7 +12,7 @@
 #ifndef DUNE_XT_COMMON_SIGNALS
 #define DUNE_XT_COMMON_SIGNALS
 
-#include <signal.h>
+#include <csignal>
 
 namespace Dune::XT::Common {
 
@@ -25,7 +25,7 @@ void reset_signal(int signal);
 void handle_interrupt(int signal);
 
 //! type of handler functions
-typedef void handler_type(int);
+using handler_type = void(int);
 
 //! calling this from your main() will install handler as callback when signal is received
 void install_signal_handler(int signal = SIGINT, handler_type handler = handle_interrupt);

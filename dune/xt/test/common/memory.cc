@@ -65,7 +65,7 @@ struct ScopeTest : public testing::Test
     CSP{e};
   }
 };
-constexpr typename ScopeTest::T ScopeTest::constant;
+
 
 TEST_F(ScopeTest, All)
 {

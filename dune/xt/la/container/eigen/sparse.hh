@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <complex>
 #include <mutex>
@@ -118,7 +119,7 @@ public:
       for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
         backend_->startVec(static_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
-        for (auto& column : columns) {
+        for (const auto& column : columns) {
 #  ifndef NDEBUG
           if (column >= cc)
             DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -128,7 +129,7 @@ public:
           backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(column));
         }
         // create entry (insertBackByOuterInner() can not handle empty rows)
-        if (columns.size() == 0)
+        if (columns.empty())
           backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), 0);
       }
       backend_->finalize();
@@ -201,7 +202,7 @@ public:
   {}
 
   explicit EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -364,7 +365,8 @@ public:
         if (col == jj) {
           backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
-        } else if (col > jj)
+        }
+        if (col > jj)
           break;
       }
     }
@@ -402,7 +404,8 @@ public:
           else
             backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
-        } else if (col > jj)
+        }
+        if (col > jj)
           break;
       }
     }
@@ -421,7 +424,7 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return backend_->nonZeros();
   }
@@ -451,7 +454,7 @@ public:
     return ret;
   } // ... pattern(...)
 
-  ThisType pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  ThisType pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return ThisType(*backend_, true, eps);
   }
@@ -516,7 +519,7 @@ private:
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
-        else if ((row > ii) && (col > jj))
+        if ((row > ii) && (col > jj))
           return false;
       }
     }

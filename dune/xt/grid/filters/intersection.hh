@@ -22,6 +22,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/print.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <utility>
 #include <dune/xt/grid/print.hh>
 
 #include "base.hh"
@@ -46,12 +47,12 @@ public:
 
   explicit AllIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new AllIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const final
   {
     return true;
   }
@@ -77,20 +78,18 @@ public:
 
   explicit AllIntersectionsOnce() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new AllIntersectionsOnce<GridViewType>();
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (!intersection.neighbor())
       return true;
-    else {
-      const auto inside_element = intersection.inside();
-      const auto outside_element = intersection.outside();
-      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    }
+    const auto inside_element = intersection.inside();
+    const auto outside_element = intersection.outside();
+    return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
   }
 }; // class AllIntersectionsOnce
 
@@ -112,12 +111,12 @@ public:
 
   explicit NoIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new NoIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const final
   {
     return false;
   }
@@ -147,12 +146,12 @@ public:
 
   explicit InnerIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new InnerIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     return intersection.neighbor() && !intersection.boundary();
   }
@@ -185,12 +184,12 @@ public:
 
   explicit InnerIntersectionsOnce() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new InnerIntersectionsOnce<GridViewType>();
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (intersection.neighbor() && !intersection.boundary()) {
       const auto inside_element = intersection.inside();
@@ -198,8 +197,8 @@ public:
       const auto inside_index = grid_layer.indexSet().index(inside_element);
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       return inside_index < outside_index;
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class InnerIntersectionsOnce
 
@@ -249,12 +248,12 @@ public:
     : outside_indices_to_ignore_(outside_indices_to_ignore)
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new InnerIntersectionsOnceMap<GridViewType>(outside_indices_to_ignore_);
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (intersection.neighbor() && !intersection.boundary()) {
       const auto inside_element = intersection.inside();
@@ -263,10 +262,9 @@ public:
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
         return false;
-      else
-        return true;
-    } else
-      return false;
+      return true;
+    }
+    return false;
   }
 
   const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;
@@ -293,12 +291,12 @@ public:
 
   explicit PartitionSetInnerIntersectionsOnce() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new PartitionSetInnerIntersectionsOnce<GridViewType, PartitionSetType>();
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (intersection.neighbor() && !intersection.boundary()
         && PartitionSetType::contains(intersection.inside().partitionType())) {
@@ -307,8 +305,8 @@ public:
       if (!PartitionSetType::contains(intersection.outside().partitionType()))
         return true;
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class PartitionSetInnerIntersectionsOnce
 
@@ -330,12 +328,12 @@ public:
 
   explicit BoundaryIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new BoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     return intersection.boundary();
   }
@@ -359,12 +357,12 @@ public:
 
   explicit NonPeriodicBoundaryIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new NonPeriodicBoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     return intersection.boundary() && !intersection.neighbor();
   }
@@ -394,12 +392,12 @@ public:
 
   explicit PeriodicBoundaryIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new PeriodicBoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     return intersection.neighbor() && intersection.boundary();
   }
@@ -432,20 +430,19 @@ public:
 
   explicit PeriodicBoundaryIntersectionsOnce() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new PeriodicBoundaryIntersectionsOnce<GridViewType>();
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (intersection.neighbor() && intersection.boundary()) {
       const auto inside_element = intersection.inside();
       const auto outside_element = intersection.outside();
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else {
-      return false;
     }
+    return false;
   }
 }; // class PeriodicBoundaryIntersectionsOnce
 
@@ -476,12 +473,12 @@ public:
     : outside_indices_to_ignore_(outside_indices_to_ignore)
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new PeriodicBoundaryIntersectionsOnceMap<GridViewType>(outside_indices_to_ignore_);
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     if (intersection.neighbor() && intersection.boundary()) {
       const auto inside_element = intersection.inside();
@@ -490,11 +487,9 @@ public:
       const auto outside_index = grid_layer.indexSet().index(outside_element);
       if (outside_indices_to_ignore_.at(inside_index).count(outside_index))
         return false;
-      else
-        return true;
-    } else {
-      return false;
+      return true;
     }
+    return false;
   }
 
   const std::map<size_t, std::set<size_t>>& outside_indices_to_ignore_;
@@ -517,15 +512,15 @@ public:
   using GenericFunctionType = std::function<bool(const GridViewType&, const IntersectionType&)>;
 
   explicit GenericFilteredIntersections(GenericFunctionType func)
-    : filter_(func)
+    : filter_(std::move(func))
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new GenericFilteredIntersections<GridViewType>(filter_);
   }
 
-  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const final
   {
     return filter_(grid_layer, intersection);
   }
@@ -565,12 +560,12 @@ public:
   {}
 
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                       const std::shared_ptr<BoundaryType>& boundary_type,
+                                       std::shared_ptr<BoundaryType> boundary_type,
                                        const std::string& logging_prefix = "",
                                        const std::array<bool, 3>& logging_state = Common::default_logger_state())
     : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix, logging_state)
     , boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(std::move(boundary_type))
   {}
 
   CustomBoundaryIntersections(const ThisType& other)
@@ -579,12 +574,12 @@ public:
     , boundary_type_(other.boundary_type_)
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new CustomBoundaryIntersections<GridViewType>(*this);
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     LOG_(debug) << "contains(intersection=" << print(intersection)
                 << "):\n  boundary_info_.type(intersection) = " << boundary_info_.type(intersection)
@@ -624,17 +619,17 @@ public:
   {}
 
   explicit CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                                 const std::shared_ptr<BoundaryType>& boundary_type)
+                                                 std::shared_ptr<BoundaryType> boundary_type)
     : boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(std::move(boundary_type))
   {}
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new CustomBoundaryAndProcessIntersections<GridViewType>(boundary_info_, boundary_type_);
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     const bool process_boundary = !intersection.neighbor() && !intersection.boundary();
     const bool physical_boundary = boundary_info_.type(intersection) == *boundary_type_;
@@ -664,12 +659,12 @@ public:
 
   explicit ProcessIntersections() = default;
 
-  IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const final
   {
     return new ProcessIntersections<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const final
   {
     return (!intersection.neighbor() && !intersection.boundary());
   }

@@ -80,7 +80,7 @@ public:
   static constexpr bool sparse = Traits::sparse;
   static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value);
 
-  virtual ~MatrixInterface() = default;
+  ~MatrixInterface() override = default;
 
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
   /// \{

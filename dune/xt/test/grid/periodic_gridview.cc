@@ -52,8 +52,8 @@ struct PeriodicViewTest : public testing::Test
     Configuration grid_config = DXTC_CONFIG.sub("test_grid_periodicview");
     const bool is_simplex = Common::from_string<bool>(grid_config["is_simplex"]);
     const bool is_cube = !is_simplex;
-    const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
-    const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
+    const auto lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
+    const auto upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
     const auto num_elements = Common::from_string<std::array<unsigned int, dimDomain>>(grid_config["num_elements"]);
     for (const auto& elements : num_elements)
       if (elements != num_elements[0])
@@ -74,7 +74,7 @@ struct PeriodicViewTest : public testing::Test
     // create periodic grid_view
     std::bitset<dimDomain> periodic_directions;
     if (is_partially_periodic)
-      periodic_directions[0] = 1;
+      periodic_directions[0] = true;
     else if (!is_nonperiodic)
       periodic_directions.set();
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
@@ -129,7 +129,7 @@ struct PeriodicViewTest : public testing::Test
           const auto global_intersection_coords = intersection.geometry().center();
           const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
           size_t coord_difference_count = 0;
-          size_t differing_coordinate;
+          size_t differing_coordinate = 0;
           for (size_t ii = 0; ii < dimDomain; ++ii) {
             if (Dune::XT::Common::FloatCmp::ne(global_outside_intersection_coords[ii],
                                                global_intersection_coords[ii])) {
@@ -161,20 +161,18 @@ struct PeriodicViewTest : public testing::Test
     }
 
     // the cube/rectangle grid has 2*dimDomain faces
-    const size_t num_faces = 2 * dimDomain;
+    constexpr size_t num_faces = 2 * dimDomain;
     /* on each face, there are elements_per_direction**(dimDomain-1) intersections. For a simplex grid in 3 dimensions,
      * there are twice as
      * much. */
     size_t num_intersections_on_face = std::pow(elements_per_direction, dimDomain - 1);
-    assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
-    const auto domainDim = Common::from_string<int>(grid_config["dimDomain"]);
-    if (is_simplex && domainDim == 3) // use dimDomain from config here to avoid "code will never be executed" warning
-      num_intersections_on_face *= 2;
+    if constexpr (dimDomain == 3) {
+      if (is_simplex)
+        num_intersections_on_face *= 2;
+    }
     /* In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
      * two faces are periodic. In a nonperiodic grid, no intersections are periodic. */
-    size_t num_periodic_faces = is_partially_periodic ? 2 : num_faces;
-    if (is_nonperiodic)
-      num_periodic_faces *= 0;
+    const size_t num_periodic_faces = is_nonperiodic ? 0 : (is_partially_periodic ? 2 : num_faces);
     const size_t expected_num_periodic_intersections = num_periodic_faces * num_intersections_on_face;
     EXPECT_EQ(expected_num_periodic_intersections, periodic_count);
     // The boundary count should be the number of interfaces on the boundary without the periodic interfaces
@@ -189,17 +187,22 @@ struct PeriodicViewTest : public testing::Test
     // the nonperiodic grid has (elements_per_direction-1)**dimDomain inner vertices
     size_t expected_num_vertices = std::pow(elements_per_direction - 1, dimDomain);
     // add number of vertices on faces (codim 1)
-    expected_num_vertices += std::pow(elements_per_direction - 1, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
-    // add number of vertices on edges (codim 2)
-    const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
-    size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces * std::pow(2, dimDomain - 1) : num_edges;
-    if (is_nonperiodic)
-      num_periodic_edges = 0;
     expected_num_vertices +=
-        dimDomain == 1
-            ? 0
-            : std::pow(elements_per_direction - 1, dimDomain - 2)
-                  * ((num_edges - num_periodic_edges) + num_periodic_edges / (is_partially_periodic ? 2 : 4));
+        static_cast<size_t>(std::pow(elements_per_direction - 1, dimDomain - 1)) * (num_faces - num_periodic_faces / 2);
+    if constexpr (dimDomain > 1) {
+      // add number of vertices on edges (codim 2)
+      constexpr size_t num_edges = dimDomain == 2 ? 4 : 12;
+      size_t num_periodic_edges;
+      if (is_nonperiodic)
+        num_periodic_edges = 0;
+      else if (is_partially_periodic)
+        num_periodic_edges = num_periodic_faces * std::pow(2, dimDomain - 1);
+      else
+        num_periodic_edges = num_edges;
+      expected_num_vertices +=
+          static_cast<size_t>(std::pow(elements_per_direction - 1, dimDomain - 2))
+          * ((num_edges - num_periodic_edges) + num_periodic_edges / (is_partially_periodic ? 2 : 4));
+    }
     // add vertices on corners (codim 3) of grid
     if constexpr (dimDomain == 3)
       expected_num_vertices += is_partially_periodic ? 4 : (is_nonperiodic ? 8 : 1);

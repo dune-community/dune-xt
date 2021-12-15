@@ -61,7 +61,7 @@ public:
       compute();
   }
 
-  void compute() override final
+  void compute() final
   {
     using M = Common::MatrixAbstraction<MatrixType>;
     const auto type = options_.template get<std::string>("type");

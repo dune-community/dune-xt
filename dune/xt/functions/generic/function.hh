@@ -53,7 +53,7 @@ public:
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -63,27 +63,27 @@ public:
     , dynamic_evaluate_(static_to_dynamic_evaluate(evaluate_))
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(int ord,
                   GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
     , order_([=](const auto& /*param*/) { return ord; })
-    , evaluate_(evaluate_func)
+    , evaluate_(std::move(evaluate_func))
     , dynamic_evaluate_(static_to_dynamic_evaluate(evaluate_))
-    , jacobian_(jacobian_func)
-    , derivative_(derivative_func)
-    , name_(nm)
+    , jacobian_(std::move(jacobian_func))
+    , derivative_(std::move(derivative_func))
+    , name_(std::move(nm))
   {}
 
   GenericFunction(GenericOrderFunctionType order_func,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -93,12 +93,12 @@ public:
     , dynamic_evaluate_(dynamic_evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(int ord,
                   GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
-                  const std::string& nm = "smooth_lambda_function",
+                  std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
                   GenericDerivativeFunctionType derivative_func = default_derivative_function())
@@ -108,7 +108,7 @@ public:
     , dynamic_evaluate_(dynamic_evaluate_func)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GenericFunction(const ThisType&) = default;
@@ -127,38 +127,38 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return evaluate_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   void evaluate(const DomainType& point_in_global_coordinates,
                 DynamicRangeType& ret,
-                const Common::Parameter& param = {}) const override final
+                const Common::Parameter& param = {}) const final
   {
     dynamic_evaluate_(point_in_global_coordinates, ret, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return jacobian_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_global_coordinates,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
   {
     return derivative_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

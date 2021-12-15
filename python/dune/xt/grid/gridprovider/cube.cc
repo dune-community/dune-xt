@@ -28,7 +28,6 @@ struct make_cube_grid
 {
   static void bind(pybind11::module& m)
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     using D = typename G::ctype;
     static constexpr size_t d = G::dimension;
@@ -60,7 +59,6 @@ struct make_cube_grid<G, void>
 {
   static void bind(pybind11::module& m)
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     using D = typename G::ctype;
     static constexpr size_t d = G::dimension;

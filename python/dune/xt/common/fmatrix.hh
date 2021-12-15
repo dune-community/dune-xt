@@ -60,7 +60,7 @@ struct FieldMatrix_type_caster
   {
     list l(ROWS);
     for (size_t ii = 0; ii < src.size(); ++ii) {
-      object val = reinterpret_steal<object>(row_conv::cast(src[ii], policy, parent));
+      auto val = reinterpret_steal<object>(row_conv::cast(src[ii], policy, parent));
       if (!val)
         return handle();
       PyList_SET_ITEM(l.ptr(), ii, val.release().ptr()); // steals a reference

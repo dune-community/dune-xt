@@ -54,7 +54,7 @@ struct LockGuard
   LockGuard(std::vector<std::mutex>& mutexes, const size_t ii, const size_t container_size)
     : mutexes_(mutexes)
   {
-    if (mutexes_.size()) {
+    if (!mutexes_.empty()) {
       index_ = ii * mutexes_.size() / container_size;
       mutexes_[index_].lock();
     }
@@ -62,7 +62,7 @@ struct LockGuard
 
   ~LockGuard()
   {
-    if (mutexes_.size())
+    if (!mutexes_.empty())
       mutexes_[index_].unlock();
   }
 
@@ -110,7 +110,7 @@ public:
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
   ContainerInterface() = default;
-  virtual ~ContainerInterface() {}
+  virtual ~ContainerInterface() = default;
 
   ThisType& operator=(const ThisType& other)
   {

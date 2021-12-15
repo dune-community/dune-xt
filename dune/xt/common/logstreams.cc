@@ -16,6 +16,7 @@
 #include <boost/format.hpp>
 
 #include <dune/xt/common/string.hh>
+#include <utility>
 
 #include "logstreams.hh"
 
@@ -78,9 +79,9 @@ int SuspendableStrBuffer::pubsync()
   return 0;
 }
 
-TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out)
+TimedPrefixedStreamBuffer::TimedPrefixedStreamBuffer(const Timer& timer, std::string prefix, std::ostream& out)
   : timer_(timer)
-  , prefix_(prefix)
+  , prefix_(std::move(prefix))
   , out_(out)
   , prefix_needed_(true)
 {}
@@ -94,7 +95,7 @@ int TimedPrefixedStreamBuffer::sync()
     prefix_needed_ = false;
   }
   auto lines = tokenize(tmp_str, "\n", boost::algorithm::token_compress_off);
-  DXT_ASSERT(lines.size() > 0);
+  DXT_ASSERT(!lines.empty());
   out_ << lines[0];
   for (size_t ii = 1; ii < lines.size() - 1; ++ii)
     out_ << "\n" << elapsed_time_str() << prefix_ << lines[ii];
@@ -126,7 +127,7 @@ std::string TimedPrefixedStreamBuffer::elapsed_time_str() const
     return (boost::format("%02dw %02dd %02d:%02d:%02d|") % weeks % days % hours % minutes % seconds).str();
   if (elapsed > secs_per_day) // less than a week, more than a day
     return (boost::format("%02dd %02d:%02d:%02d|") % days % hours % minutes % seconds).str();
-  else if (elapsed > secs_per_hour) // less than a day, more than one hour
+  if (elapsed > secs_per_hour) // less than a day, more than one hour
     return (boost::format("%02d:%02d:%02d|") % hours % minutes % seconds).str();
   else // less than one hour
     return (boost::format("%02d:%02d|") % minutes % seconds).str();

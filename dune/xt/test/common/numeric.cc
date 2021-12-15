@@ -22,12 +22,12 @@ GTEST_TEST(MoveIfTest, All)
   double expected3 = 39916800; // 11!
   EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 0.), expected1);
   EXPECT_EQ(Dune::XT::Common::transform_reduce(vals1.begin(), vals1.end(), vals2.begin(), 0.), expected1);
-  EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 0., std::plus<double>()), expected1);
+  EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 0., std::plus<>()), expected1);
   EXPECT_EQ(Dune::XT::Common::transform_reduce(
-                vals1.begin(), vals1.end(), vals2.begin(), 0., std::plus<double>(), std::multiplies<double>()),
+                vals1.begin(), vals1.end(), vals2.begin(), 0., std::plus<>(), std::multiplies<>()),
             expected1);
-  EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 1., std::multiplies<double>()), expected2);
+  EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 1., std::multiplies<>()), expected2);
   EXPECT_EQ(Dune::XT::Common::transform_reduce(
-                vals1.begin(), vals1.end(), vals2.begin(), 1., std::multiplies<double>(), std::plus<double>()),
+                vals1.begin(), vals1.end(), vals2.begin(), 1., std::multiplies<>(), std::plus<>()),
             expected3);
 }

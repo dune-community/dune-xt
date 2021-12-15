@@ -183,7 +183,7 @@ struct GluedDdGridTest : public ::testing::Test
     ASSERT_NE(macro_grid_, nullptr) << "This should not happen!";
     ASSERT_NE(dd_grid_, nullptr) << "This should not happen!";
 
-    for (int ss = 0; ss < dd_grid_->num_subdomains(); ss++) {
+    for (size_t ss = 0; ss < dd_grid_->num_subdomains(); ss++) {
       auto local_grid = dd_grid_->local_grid(ss);
       EXPECT_EQ(macro_grid_->dimDomain, local_grid.dimDomain);
     }

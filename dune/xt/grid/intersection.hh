@@ -184,17 +184,6 @@ bool contains(const Dune::Intersection<G, I>& intersection,
 
 
 } // namespace XT::Grid
-
-
-// DXT_DEPRECATED_MSG did not work here
-template <class G, class I>
-[[deprecated("Use out << print(intersection) from <dune/xt/grid/print.hh> instead (05.07.2020)!")]] void
-operator<<(std::ostream& /*out*/, const Dune::Intersection<G, I>& intersection)
-{
-  XT::Common::print(intersection);
-}
-
-
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_INTERSECTION_HH

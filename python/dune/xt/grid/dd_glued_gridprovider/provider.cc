@@ -61,14 +61,14 @@ public:
     , macro_boundary_info_(macro_boundary_info)
   {}
 
-  const Dune::XT::Grid::BoundaryType& type(const IntersectionType& intersection) const override final
+  const Dune::XT::Grid::BoundaryType& type(const IntersectionType& intersection) const final
   {
     // find out if this micro intersection lies within the macro element or on a macro intersection
     for (auto&& macro_intersection : intersections(macro_grid_view_, macro_element_)) {
-      const size_t num_corners = intersection.geometry().corners();
-      size_t num_corners_inside = 0;
-      size_t num_corners_outside = 0;
-      for (size_t cc = 0; cc < num_corners; ++cc) {
+      const int num_corners = intersection.geometry().corners();
+      int num_corners_inside = 0;
+      int num_corners_outside = 0;
+      for (int cc = 0; cc < num_corners; ++cc) {
         const auto micro_corner = intersection.geometry().corner(cc);
         if (XT::Grid::contains(macro_intersection, micro_corner))
           ++num_corners_inside;
@@ -177,6 +177,7 @@ public:
                             "ss = " << ss << "\n   nn = " << nn);
             }
           }
+          DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Did not find correct inside macro element!");
         },
         "ss"_a,
         "nn"_a);
@@ -193,6 +194,7 @@ public:
                   self.macro_grid_view(), macro_element, macro_boundary_info);
             }
           }
+          DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Did not find correct macro element!");
         },
         "ss"_a,
         "macro_boundary_info"_a);
@@ -212,7 +214,6 @@ public:
                          const std::string& grid_id = grid_name<typename CGV::MacroGridType>::value(),
                          const std::string& class_id = "coupling_grid_provider")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     const std::string class_name = class_id + "_" + grid_id;
@@ -237,7 +238,6 @@ struct MacroGridBasedBoundaryInfo
                          const std::string& grid_id = grid_name<G>::value(),
                          const std::string& class_id = "macro_grid_based_boundary_info")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);

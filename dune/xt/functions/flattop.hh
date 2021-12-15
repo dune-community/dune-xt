@@ -16,6 +16,7 @@
 #include <dune/xt/common/configuration.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -72,12 +73,12 @@ public:
                   const DomainType& upper_right,
                   const DomainType& boundary_layer,
                   const RangeReturnType& value = RangeReturnType(1),
-                  const std::string& name_in = "FlatTopFunction")
+                  std::string name_in = "FlatTopFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , boundary_layer_(boundary_layer)
     , value_(value)
-    , name_(name_in)
+    , name_(std::move(name_in))
   {
     check_input();
   }
@@ -98,7 +99,7 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -109,7 +110,7 @@ public:
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret = value_;
     for (size_t dd = 0; dd < domain_dim; ++dd) {
@@ -166,8 +167,7 @@ private:
       return 0.0;
     if (point > 0.0)
       return 1.0;
-    else
-      return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
+    return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
   } // ... phi_left(...)
 
   RangeFieldType phi_right(const RangeFieldType& point) const
@@ -176,8 +176,7 @@ private:
       return 1.0;
     if (point > 1.0)
       return 0.0;
-    else
-      return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
+    return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
   } // ... phi_right(...)
 
   const DomainType lower_left_;

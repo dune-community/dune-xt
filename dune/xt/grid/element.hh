@@ -33,8 +33,8 @@ sub_entity_center(const Dune::Entity<0, dim, GridImp, EntityImp> element, const 
                     Common::Exceptions::index_out_of_range,
                     "element.subEntities(" << codim << ") = " << element.subEntities(codim) << "\n   i = " << i);
       return element.template subEntity<cd>(Common::numeric_cast<int>(i)).geometry().center();
-    } else
-      return sub_entity_center<dim, GridImp, EntityImp, cd - 1>(element, codim, i);
+    }
+    return sub_entity_center<dim, GridImp, EntityImp, cd - 1>(element, codim, i);
   }
 }
 

@@ -82,10 +82,6 @@ public:
                            const ScalarType /*value*/ = ScalarType(0),
                            const size_t /*num_mutexes*/ = 1)
     : matrix_(internal::empty_matrix_ref<MatrixImp>())
-    , first_row_(0)
-    , past_last_row_(0)
-    , first_col_(0)
-    , past_last_col_(0)
     , pattern_(nullptr)
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
@@ -97,10 +93,6 @@ public:
                   const SparsityPatternDefault& /*pattern*/,
                   const size_t /*num_mutexes*/ = 1)
     : matrix_(internal::empty_matrix_ref<MatrixImp>())
-    , first_row_(0)
-    , past_last_row_(0)
-    , first_col_(0)
-    , past_last_col_(0)
     , pattern_(nullptr)
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
@@ -126,10 +118,6 @@ public:
   // However, the MatrixInterface does not compile for non-copyable types, so we fail at runtime here.
   ConstMatrixView(const ThisType& other)
     : matrix_(other.matrix_)
-    , first_row_(0)
-    , past_last_row_(0)
-    , first_col_(0)
-    , past_last_col_(0)
     , pattern_(nullptr)
   {
     DUNE_THROW(Dune::NotImplemented, "Copying is disabled, simply create a new view!");
@@ -251,7 +239,7 @@ public:
     return true;
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     RealType ret = 0;
     for (size_t ii = 0; ii < rows(); ++ii)
@@ -262,7 +250,7 @@ public:
 
   SparsityPatternDefault pattern(const bool prune = false,
                                  const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     SparsityPatternDefault ret(rows());
     auto matrix_patt = matrix_.pattern(prune, eps);
@@ -292,10 +280,10 @@ public:
 
 private:
   const Matrix& matrix_;
-  const size_t first_row_;
-  const size_t past_last_row_;
-  const size_t first_col_;
-  const size_t past_last_col_;
+  const size_t first_row_{0};
+  const size_t past_last_row_{0};
+  const size_t first_col_{0};
+  const size_t past_last_col_{0};
   std::shared_ptr<std::once_flag> pattern_init_flag_;
   mutable std::shared_ptr<SparsityPatternDefault> pattern_;
 }; // class ConstMatrixView
@@ -463,14 +451,14 @@ public:
     return const_matrix_view_.valid();
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     return const_matrix_view_.sup_norm();
   } // ... sup_norm(...)
 
   SparsityPatternDefault pattern(const bool prune = false,
                                  const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return const_matrix_view_.pattern(prune, eps);
   } // ... pattern(...)

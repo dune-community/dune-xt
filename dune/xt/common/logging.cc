@@ -24,7 +24,6 @@ namespace Dune::XT::Common {
 
 Logging::Logging()
   : streamIDs_({LOG_ERROR, LOG_DEBUG, LOG_INFO})
-  , logflags_(LOG_NONE)
   , emptyLogStream_(logflags_)
 {
   for (const auto id : streamIDs_)

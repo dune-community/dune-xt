@@ -199,24 +199,24 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     if (do_post_bind_)
       func_.access().bind(element);
   }
 
 public:
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     return Select::order(func_.access().order(param));
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Select::evaluate(func_.access(), xx, param);
   }
 
-  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Select::jacobian(func_.access(), xx, param);
   }

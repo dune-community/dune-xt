@@ -35,8 +35,7 @@ struct MatrixInverterTest : public ::testing::Test
   using ScalarType = typename M::ScalarType;
 
   MatrixInverterTest()
-    : all_matrices_and_inverse_matrices_are_computed_(false)
-    , broken_matrix_(M::create(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
+    : broken_matrix_(M::create(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
     , unit_matrix_(
           eye_matrix<MatrixType>(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
   {
@@ -145,7 +144,7 @@ struct MatrixInverterTest : public ::testing::Test
   }
 
 
-  bool all_matrices_and_inverse_matrices_are_computed_;
+  bool all_matrices_and_inverse_matrices_are_computed_{false};
   MatrixType broken_matrix_;
   MatrixType unit_matrix_;
   MatrixType matrix_;

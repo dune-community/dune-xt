@@ -173,7 +173,7 @@ public:
 
   NormalBasedBoundaryInfo(ThisType&& source) = default;
 
-  void repr(std::ostream& out) const override final
+  void repr(std::ostream& out) const final
   {
     out << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_;
     if (normal_to_type_map_.size() > 0)
@@ -205,7 +205,7 @@ public:
     normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(boundary_type));
   } // ... void register_new_normal(...)
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     LOG_(debug) << "type(intersection=" << print(intersection) << "):" << std::endl;
     if (!intersection.boundary()) {
@@ -222,8 +222,8 @@ public:
       if (XT::Common::FloatCmp::eq(outer_normal, normal, tol_)) {
         LOG_(debug) << "  registered normal " << normal << " matches, returning " << *type_ptr << std::endl;
         return *type_ptr;
-      } else
-        LOG_(debug) << "  registered normal " << normal << " does not match" << std::endl;
+      }
+      LOG_(debug) << "  registered normal " << normal << " does not match" << std::endl;
     }
     LOG_(debug) << "  no registered normal matched, returning " << *default_boundary_type_ << std::endl;
     return *default_boundary_type_;

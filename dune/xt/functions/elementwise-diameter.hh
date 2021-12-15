@@ -12,6 +12,7 @@
 #define DUNE_XT_FUNCTIONS_ELEMENTWISE_DIAMETER_HH
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -34,34 +35,34 @@ class ElementwiseDiameterFunction : public GridFunctionInterface<E>
 
     LocalFunction()
       : BaseType()
-      , diameter_(0)
+
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       diameter_ = Grid::diameter(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return diameter_;
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
-                                       const XT::Common::Parameter& /*param*/ = {}) const override final
+                                       const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return DerivativeRangeReturnType();
     }
 
   private:
-    double diameter_;
+    double diameter_{0};
   }; // class LocalFunction
 
 public:
@@ -70,9 +71,9 @@ public:
   using BaseType::rC;
   using typename BaseType::LocalFunctionType;
 
-  ElementwiseDiameterFunction(const std::string& nm = "ElementwiseDiameterFunction")
+  ElementwiseDiameterFunction(std::string nm = "ElementwiseDiameterFunction")
     : BaseType()
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ElementwiseDiameterFunction(const ThisType&) = default;
@@ -91,12 +92,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

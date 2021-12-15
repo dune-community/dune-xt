@@ -467,14 +467,6 @@ struct extract_iterator<T, c, pit, false, true>
 template <class T, int c = 0, PartitionIteratorType pit = All_Partition>
 using extract_iterator_t = typename extract_iterator<T, c, pit>::type;
 
-template <class T, PartitionIteratorType pit, int c = 0, bool view = is_view<T>::value, bool part = is_part<T>::value>
-struct [[deprecated("Use extract_iterator instead (24.04.2018)!")]] extract_partition_iterator
-  : public extract_iterator<T, c, pit, view, part>{};
-
-template <class T, PartitionIteratorType pit, int c = 0>
-using extract_partition_iterator_t [[deprecated("Use extract_iterator_t instead (24.04.2018)!")]] =
-    extract_iterator_t<T, c, pit>;
-
 //! struct to be used as comparison function e.g. in a std::map<Entity, EntityLess>
 template <class GV>
 struct EntityLess

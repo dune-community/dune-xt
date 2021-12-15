@@ -47,7 +47,7 @@ public:
                          const std::string& grid_id = XT::Grid::bindings::grid_name<G>::value(),
                          const std::string& layer_id = "")
   {
-    namespace py = pybind11;
+    namespace py = pybind11; // NOLINT(misc-unused-alias-decls)
     using namespace pybind11::literals;
 
     std::string class_name = class_id;
@@ -70,7 +70,7 @@ public:
     c.def_property_readonly("affine", [](type& self) { return self.geometry().affine(); });
     c.def_property_readonly("volume", [](type& self) { return self.geometry().volume(); });
     c.def_property_readonly("center", [](type& self) {
-      py::array_t<double> result(/*shape=*/{d});
+      py::array_t<double> result(/*shape=*/d);
       auto access_to_result = result.mutable_unchecked<1>();
       const auto center = self.geometry().center();
       for (size_t ii = 0; ii < d; ++ii)
@@ -79,7 +79,7 @@ public:
     });
     c.def_property_readonly("corners", [](type& self) {
       using XT::Common::numeric_cast;
-      const size_t num_corners = numeric_cast<size_t>(self.geometry().corners());
+      const auto num_corners = numeric_cast<size_t>(self.geometry().corners());
       py::array_t<double> result(/*shape=*/{num_corners, d});
       auto access_to_result = result.mutable_unchecked<2>();
       for (size_t cc = 0; cc < num_corners; ++cc) {
@@ -123,7 +123,7 @@ public:
             for (size_t dd = 0; dd < d; ++dd)
               x_local_dune[dd] = access_to_x_local(dd);
             const auto x_global = self.geometry().global(x_local_dune);
-            result = py::array_t<double>(/*shape=*/{d});
+            result = py::array_t<double>(/*shape=*/d);
             auto access_to_result = result.mutable_unchecked<1>();
             for (size_t dd = 0; dd < d; ++dd)
               access_to_result(dd) = x_global[dd];
@@ -165,7 +165,7 @@ public:
             for (size_t dd = 0; dd < d; ++dd)
               x_global_dune[dd] = access_to_x_global(dd);
             const auto x_local = self.geometry().local(x_global_dune);
-            result = py::array_t<double>(/*shape=*/{d});
+            result = py::array_t<double>(/*shape=*/d);
             auto access_to_result = result.mutable_unchecked<1>();
             for (size_t dd = 0; dd < d; ++dd)
               access_to_result(dd) = x_local[dd];
@@ -206,7 +206,7 @@ public:
             XT::Common::FieldVector<double, d> x_local_dune;
             for (size_t dd = 0; dd < d; ++dd)
               x_local_dune[dd] = access_to_x_local(dd);
-            result = py::array_t<double>(/*shape=*/{1});
+            result = py::array_t<double>(/*shape=*/1);
             auto access_to_result = result.mutable_unchecked<1>();
             access_to_result(0) = self.geometry().integrationElement(x_local_dune);
           } else if (x_local.ndim() == 2) {

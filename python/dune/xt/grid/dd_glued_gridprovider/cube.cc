@@ -28,10 +28,7 @@ struct make_cube_dd_grid
 {
   static void bind(pybind11::module& m)
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
-    using D = typename G::ctype;
-    static const size_t d = G::dimension;
 
     m.def(
         "make_cube_dd_grid",
@@ -41,7 +38,7 @@ struct make_cube_dd_grid
         },
         "macro_grid"_a,
         "num_refinements"_a = 0,
-        py::keep_alive<0, 1>());
+        pybind11::keep_alive<0, 1>());
   } // ... bind(...)
 }; // struct make_cube_dd_grid<...>
 

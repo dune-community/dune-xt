@@ -89,7 +89,7 @@ public:
 
   virtual void repr(std::ostream& out) const
   {
-    out << "BoundaryInfo(\?\?\?)";
+    out << R"(BoundaryInfo(???))";
   }
 
   virtual std::string str() const

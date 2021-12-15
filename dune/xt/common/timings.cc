@@ -73,7 +73,7 @@ void Timings::start(const std::string& section_name)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  const KnownTimersMap::iterator section = known_timers_map_.find(section_name);
+  const auto section = known_timers_map_.find(section_name);
   if (section != known_timers_map_.end()) {
     if (section->second.first) // timer currently running
       return;
@@ -112,7 +112,7 @@ TimingData::TimeType Timings::walltime(std::string section_name) const
 
 TimingData::DeltaType Timings::delta(const std::string& section_name) const
 {
-  DeltaMap::const_iterator section = commited_deltas_.find(section_name);
+  auto section = commited_deltas_.find(section_name);
   if (section == commited_deltas_.end()) {
     // timer might still be running
     const auto& timer_it = known_timers_map_.find(section_name);

@@ -47,13 +47,13 @@ public:
   {
     std::vector<std::string> tps;
     if (Common::Lapacke::available())
-      tps.push_back("lapack");
+      tps.emplace_back("lapack");
 #if HAVE_EIGEN
-    tps.push_back("eigen");
+    tps.emplace_back("eigen");
 #endif
     if (internal::numpy_eigensolver_available())
-      tps.push_back("numpy");
-    tps.push_back("shifted_qr");
+      tps.emplace_back("numpy");
+    tps.emplace_back("shifted_qr");
     return tps;
   }
 
@@ -106,7 +106,7 @@ public:
   {}
 
 protected:
-  void compute() const override final
+  void compute() const final
   {
     const auto type = options_->template get<std::string>("type");
 #if HAVE_LAPACKE || HAVE_MKL
@@ -148,34 +148,36 @@ protected:
       }
     } else
 #endif // HAVE_EIGEN
-        if (type == "numpy") {
-      if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
-        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
-        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
-        internal::compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
-            matrix_, *eigenvalues_, *eigenvectors_);
-      }
-    } else if (type == "shifted_qr") {
-      if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
-        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
-        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
-        std::vector<XT::Common::real_t<K>> real_eigenvalues(SIZE);
-        auto real_eigenvectors = std::make_unique<Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>>();
-        internal::compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
-            matrix_, real_eigenvalues, *real_eigenvectors);
-        for (size_t ii = 0; ii < SIZE; ++ii) {
-          (*eigenvalues_)[ii] = real_eigenvalues[ii];
-          for (size_t jj = 0; jj < SIZE; ++jj)
-            (*eigenvectors_)[ii][jj] = (*real_eigenvectors)[ii][jj];
+      if (type == "numpy") {
+        if (options_->template get<bool>("compute_eigenvalues")
+            || options_->template get<bool>("compute_eigenvectors")) {
+          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+          eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+          internal::compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
+              matrix_, *eigenvalues_, *eigenvectors_);
         }
-      }
-    } else
-      DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type
-                                << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
-                                   "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
-                                << "\n\nThese are the available types:\n\n"
-                                << EigenSolverOptions<MatrixType>::types());
+      } else if (type == "shifted_qr") {
+        if (options_->template get<bool>("compute_eigenvalues")
+            || options_->template get<bool>("compute_eigenvectors")) {
+          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+          eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+          std::vector<XT::Common::real_t<K>> real_eigenvalues(SIZE);
+          auto real_eigenvectors = std::make_unique<Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>>();
+          internal::compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
+              matrix_, real_eigenvalues, *real_eigenvectors);
+          for (size_t ii = 0; ii < SIZE; ++ii) {
+            (*eigenvalues_)[ii] = real_eigenvalues[ii];
+            for (size_t jj = 0; jj < SIZE; ++jj)
+              (*eigenvectors_)[ii][jj] = (*real_eigenvectors)[ii][jj];
+          }
+        }
+      } else
+        DUNE_THROW(Common::Exceptions::internal_error,
+                   "Given type '" << type
+                                  << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
+                                     "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
+                                  << "\n\nThese are the available types:\n\n"
+                                  << EigenSolverOptions<MatrixType>::types());
   } //... compute(...)
 
   using BaseType::eigenvalues_;

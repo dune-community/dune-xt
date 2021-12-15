@@ -26,6 +26,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/generic/function.hh>
 #include <dune/xt/functions/generic/grid-function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -132,13 +133,13 @@ public:
   using GenericFunctionType = GenericFunction<d, r, rC>;
 
   GridFunction(const typename RangeTypeSelector<R, r, rC>::type& value,
-               const std::string& nm = "GridFunction",
+               std::string nm = "GridFunction",
                const std::string& logging_prefix = "")
     : BaseType({},
                logging_prefix.empty() ? "GridFunction" : logging_prefix,
                {{!logging_prefix.empty(), !logging_prefix.empty(), true}})
     , function_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(new ConstantFunction<d, r, rC, R>(value)))
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GridFunction(const FunctionInterface<d, r, rC, R>& func, const std::string& logging_prefix = "")
@@ -174,14 +175,14 @@ public:
   {}
 
   GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType> order_evaluate,
-               const std::string& nm = "GridFunction",
+               std::string nm = "GridFunction",
                const std::string& logging_prefix = "")
     : BaseType({},
                logging_prefix.empty() ? "GridFunction" : logging_prefix,
                {{!logging_prefix.empty(), !logging_prefix.empty(), true}})
     , function_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
           new GenericFunctionType(std::get<0>(order_evaluate), std::get<1>(order_evaluate))))
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType, const std::string&>
@@ -248,12 +249,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -480,12 +481,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -681,13 +682,13 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     LOG_(info) << "GridFunction<1,1>::local_function()" << std::endl;
     return function_->local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

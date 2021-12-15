@@ -224,7 +224,7 @@ struct TriangularSolver
     } else if (Common::Cblas::available()
                && (storage_layout == Common::StorageLayout::dense_row_major
                    || storage_layout == Common::StorageLayout::dense_column_major)
-               && num_rows) {
+               && (num_rows != 0)) {
       const int blas_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                           ? Common::Cblas::row_major()
                                           : Common::Cblas::col_major();

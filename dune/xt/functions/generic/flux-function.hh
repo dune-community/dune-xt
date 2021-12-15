@@ -100,13 +100,13 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       post_bind_(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return order_(parsed_param);
@@ -114,7 +114,7 @@ private:
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
                              const StateType& u,
-                             const Common::Parameter& param = {}) const override final
+                             const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return evaluate_(point_in_local_coordinates, u, parsed_param);
@@ -122,7 +122,7 @@ private:
 
     JacobianRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
                                      const StateType& u,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return jacobian_(point_in_local_coordinates, u, parsed_param);
@@ -131,7 +131,7 @@ private:
     void evaluate(const DomainType& point_in_local_coordinates,
                   const StateType& u,
                   DynamicRangeType& ret,
-                  const Common::Parameter& param = {}) const override final
+                  const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       dynamic_evaluate_(point_in_local_coordinates, u, ret, parsed_param);
@@ -140,14 +140,14 @@ private:
     void jacobian(const DomainType& point_in_local_coordinates,
                   const StateType& u,
                   DynamicJacobianRangeType& ret,
-                  const Common::Parameter& param = {}) const override final
+                  const Common::Parameter& param = {}) const final
     {
       auto parsed_param = this->parse_parameter(param);
       return dynamic_jacobian_(point_in_local_coordinates, u, ret, parsed_param);
     }
 
 
-    const Common::ParameterType& parameter_type() const override final
+    const Common::ParameterType& parameter_type() const final
     {
       return param_type_;
     }
@@ -188,15 +188,15 @@ public:
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(default_dynamic_evaluate_function())
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_func)
     , dynamic_jacobian_(default_dynamic_jacobian_function())
   {}
@@ -204,15 +204,15 @@ public:
   GenericFluxFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , dynamic_evaluate_(default_dynamic_evaluate_function())
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_func)
     , dynamic_jacobian_(default_dynamic_jacobian_function())
   {}
@@ -220,15 +220,15 @@ public:
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_from_dynamic_evaluate(evaluate_func))
     , dynamic_evaluate_(evaluate_func)
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_from_dynamic_jacobian(jacobian_func))
     , dynamic_jacobian_(jacobian_func)
   {}
@@ -236,30 +236,30 @@ public:
   GenericFluxFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func,
                       GenericDynamicEvaluateFunctionType evaluate_func,
-                      const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string& nm = "GenericFluxFunction",
+                      Common::ParameterType param_type = Common::ParameterType(),
+                      std::string nm = "GenericFluxFunction",
                       GenericDynamicJacobianFunctionType jacobian_func = default_dynamic_jacobian_function())
     : order_(std::move(order_func))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_from_dynamic_evaluate(evaluate_func))
     , dynamic_evaluate_(evaluate_func)
-    , param_type_(param_type)
-    , name_(nm)
+    , param_type_(std::move(param_type))
+    , name_(std::move(nm))
     , jacobian_(jacobian_from_dynamic_jacobian(jacobian_func))
     , dynamic_jacobian_(jacobian_func)
   {}
 
-  const Common::ParameterType& parameter_type() const override final
+  const Common::ParameterType& parameter_type() const final
   {
     return param_type_;
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalGenericFluxFunction>(
         order_, post_bind_, evaluate_, dynamic_evaluate_, param_type_, jacobian_, dynamic_jacobian_);

@@ -19,6 +19,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/grid/common/partitionset.hh>
+#include <utility>
 
 #include "base.hh"
 
@@ -42,12 +43,12 @@ public:
 
   explicit AllElements() = default;
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new AllElements<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const final
   {
     return true;
   }
@@ -71,12 +72,12 @@ public:
 
   explicit NoElements() = default;
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new NoElements<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const final
   {
     return false;
   }
@@ -100,12 +101,12 @@ public:
 
   explicit BoundaryElements() = default;
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new BoundaryElements<GridViewType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const final
   {
     return element.hasBoundaryIntersections();
   }
@@ -129,15 +130,15 @@ public:
   using GenericFunctionType = std::function<bool(const GridViewType&, const ElementType&)>;
 
   explicit GenericFilteredElements(GenericFunctionType lambda)
-    : filter_(lambda)
+    : filter_(std::move(lambda))
   {}
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new GenericFilteredElements<GridViewType>(filter_);
   }
 
-  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const final
   {
     return filter_(grid_layer, element);
   }
@@ -164,12 +165,12 @@ public:
 
   explicit PartitionSetElements() = default;
 
-  ElementFilter<GridViewType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const final
   {
     return new PartitionSetElements<GridViewType, PartitionSetType>();
   }
 
-  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const final
   {
     return PartitionSetType::contains(element.partitionType());
   }

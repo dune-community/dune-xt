@@ -35,8 +35,7 @@ ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
 {}
 
 Configuration::Configuration()
-  : BaseType()
-  , warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
+  : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
   , log_on_exit_(ConfigurationDefaults().log_on_exit)
   , logfile_(ConfigurationDefaults().logfile)
 {
@@ -62,11 +61,8 @@ Configuration::Configuration(const ParameterTree& tree_in, const std::string& su
 }
 
 Configuration::Configuration(const Configuration& other)
-  : BaseType(other)
-  , warn_on_default_access_(other.warn_on_default_access_)
-  , log_on_exit_(other.log_on_exit_)
-  , logfile_(other.logfile_)
-{}
+
+    = default;
 
 Configuration::Configuration(const std::initializer_list<std::pair<std::string, std::string>>& key_value_pairs)
   : warn_on_default_access_(ConfigurationDefaults().warn_on_default_access)
@@ -203,9 +199,9 @@ void Configuration::report(std::ostream& out, const std::string& prefix) const
   if (empty())
     return;
 
-  if (getSubKeys().size() == 0) {
+  if (getSubKeys().empty()) {
     report_as_sub(out, prefix, "");
-  } else if (getValueKeys().size() == 0) {
+  } else if (getValueKeys().empty()) {
     const std::string common_prefix = find_common_prefix(*this, "");
     if (!common_prefix.empty()) {
       out << prefix << "[" << common_prefix << "]" << std::endl;
@@ -323,7 +319,7 @@ void Configuration::report_as_sub(std::ostream& out, const std::string& prefix, 
   }
   for (const auto& subkey : getSubKeys()) {
     Configuration sub_tree(sub(subkey));
-    if (sub_tree.getValueKeys().size())
+    if (!sub_tree.getValueKeys().empty())
       out << prefix << "[" << sub_path << subkey << "]" << std::endl;
     sub_tree.report_as_sub(out, prefix, sub_path + subkey + ".");
   }
@@ -333,15 +329,14 @@ std::string Configuration::find_common_prefix(const BaseType& subtree, const std
 {
   const auto& valuekeys = subtree.getValueKeys();
   const auto& subkeys = subtree.getSubKeys();
-  if (valuekeys.size() == 0 && subkeys.size() == 1) {
+  if (valuekeys.empty() && subkeys.size() == 1) {
     // we append the subs name
     if (previous_prefix.empty())
       return find_common_prefix(subtree.sub(subkeys[0]), subkeys[0]);
     return find_common_prefix(subtree.sub(subkeys[0]), previous_prefix + "." + subkeys[0]);
-  } else {
-    // end of the recursion, return the previous prefix
-    return previous_prefix;
   }
+  // end of the recursion, return the previous prefix
+  return previous_prefix;
 } // ... find_common_prefix(...)
 
 void Configuration::report_flatly(const BaseType& subtree, const std::string& prefix, std::ostream& out) const

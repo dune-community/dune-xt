@@ -51,7 +51,7 @@ public:
 
   size_t num_refinements() const
   {
-    assert(levels_.size() > 0);
+    assert(!levels_.empty());
     return levels_.size() - 1;
   }
 

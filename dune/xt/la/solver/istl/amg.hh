@@ -115,7 +115,8 @@ public:
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
       return stats;
-    } else if (smoother_type == "ssor") {
+    }
+    if (smoother_type == "ssor") {
       using PreconditionerType_SSOR = Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType_SSOR, CommunicatorType>;
       PreconditionerType_SSOR preconditioner(matrix_operator, amg_criterion, smoother_parameters_ILU, communicator_);
 
@@ -136,8 +137,8 @@ public:
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
       return stats;
-    } else
-      DUNE_THROW(Common::Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
+    }
+    DUNE_THROW(Common::Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
   } // ... call(...)
 protected:
   const MatrixType& matrix_;

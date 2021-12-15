@@ -147,7 +147,7 @@ void bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
 template <class G>
 auto bind_Spe10Model2Function(pybind11::module& m, const std::string& grid_id)
 {
-  static_assert(G::dimension == 3, "");
+  static_assert(G::dimension == 3);
   namespace py = pybind11;
   using namespace pybind11::literals;
 

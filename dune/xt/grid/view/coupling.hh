@@ -229,7 +229,6 @@ public:
   struct Codim : public Traits::template Codim<cd>
   {};
 
-public:
   CouplingGridViewWrapper(const MacroElementType& ss,
                           const MacroElementType& nn,
                           GridGlueType& dd_grid,
@@ -260,7 +259,7 @@ public:
   {
     // initialize variables
     inside_elements_ = std::make_shared<std::vector<LocalElementType>>();
-    inside_elements_ids_ = std::make_shared<std::vector<int>>();
+    inside_elements_ids_ = std::make_shared<std::vector<unsigned int>>();
     coupling_intersections_ = std::make_shared<
         std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>();
     local_to_inside_indices_ = std::make_shared<std::vector<std::pair<size_t, size_t>>>();
@@ -321,14 +320,15 @@ public:
         return index_pair.second;
       }
     }
+    DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Could not find matching inside index!");
   }
 
   int size(int codim) const
   {
     if (codim == 0)
-      return inside_elements_->size();
+      return XT::Common::numeric_cast<int>(inside_elements_->size());
     if (codim == 1)
-      return coupling_size_;
+      return XT::Common::numeric_cast<int>(coupling_size_);
     DUNE_THROW(NotImplemented, "");
   }
 
@@ -383,9 +383,9 @@ private:
   const MacroIntersectionType macro_intersection_;
   const MacroGridViewType& macro_grid_view_;
   const LocalGridProviderType& local_inside_grid_;
-  int coupling_size_;
+  size_t coupling_size_;
   std::shared_ptr<std::vector<LocalElementType>> inside_elements_;
-  std::shared_ptr<std::vector<int>> inside_elements_ids_;
+  std::shared_ptr<std::vector<unsigned int>> inside_elements_ids_;
   std::shared_ptr<
       std::vector<std::set<CorrectedCouplingIntersectionType, CompareType<CorrectedCouplingIntersectionType>>>>
       coupling_intersections_;

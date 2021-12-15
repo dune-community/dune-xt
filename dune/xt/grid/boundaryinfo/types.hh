@@ -28,12 +28,12 @@ namespace Dune::XT::Grid {
 class NoBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "no_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new NoBoundary();
   }
@@ -43,12 +43,12 @@ public:
 class UnknownBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "unknown_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new UnknownBoundary();
   }
@@ -58,12 +58,12 @@ public:
 class DirichletBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "dirichlet_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new DirichletBoundary();
   }
@@ -73,12 +73,12 @@ public:
 class NeumannBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "neumann_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new NeumannBoundary();
   }
@@ -88,12 +88,12 @@ public:
 class RobinBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "robin_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new RobinBoundary();
   }
@@ -103,12 +103,12 @@ public:
 class ReflectingBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "reflecting_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new ReflectingBoundary();
   }
@@ -118,12 +118,12 @@ public:
 class AbsorbingBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "absorbing_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new AbsorbingBoundary();
   }
@@ -133,12 +133,12 @@ public:
 class InflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "inflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new InflowBoundary();
   }
@@ -148,12 +148,12 @@ public:
 class OutflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "outflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new OutflowBoundary();
   }
@@ -163,12 +163,12 @@ public:
 class InflowOutflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "inflow_outflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new InflowOutflowBoundary();
   }
@@ -178,12 +178,12 @@ public:
 class ImpermeableBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "impermeable_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new ImpermeableBoundary();
   }
@@ -199,30 +199,29 @@ static inline BoundaryType* make_boundary_type(const std::string& id)
 {
   if (id == NoBoundary().id())
     return new NoBoundary();
-  else if (id == UnknownBoundary().id())
+  if (id == UnknownBoundary().id())
     return new UnknownBoundary();
-  else if (id == DirichletBoundary().id())
+  if (id == DirichletBoundary().id())
     return new DirichletBoundary();
-  else if (id == NeumannBoundary().id())
+  if (id == NeumannBoundary().id())
     return new NeumannBoundary();
-  else if (id == RobinBoundary().id())
+  if (id == RobinBoundary().id())
     return new RobinBoundary();
-  else if (id == ReflectingBoundary().id())
+  if (id == ReflectingBoundary().id())
     return new ReflectingBoundary();
-  else if (id == InflowBoundary().id())
+  if (id == InflowBoundary().id())
     return new InflowBoundary();
-  else if (id == OutflowBoundary().id())
+  if (id == OutflowBoundary().id())
     return new OutflowBoundary();
-  else if (id == InflowBoundary().id())
+  if (id == InflowBoundary().id())
     return new InflowBoundary();
-  else if (id == InflowOutflowBoundary().id())
+  if (id == InflowOutflowBoundary().id())
     return new InflowOutflowBoundary();
-  else if (id == ImpermeableBoundary().id())
+  if (id == ImpermeableBoundary().id())
     return new ImpermeableBoundary();
-  else {
-    DUNE_THROW(Exceptions::boundary_type_error, "id: " << id);
-    return new UnknownBoundary();
-  }
+  DUNE_THROW(Exceptions::boundary_type_error, "id: " << id);
+  return new UnknownBoundary();
+
 } // ... make_boundary_type(...)
 
 

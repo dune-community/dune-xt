@@ -92,7 +92,7 @@ public:
                  std::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
                  DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
-    if (Dune::MPIHelper::isFake)
+    if (Dune::MPIHelper::isFake) // NOLINT(readability-implicit-bool-conversion)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
 #  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
@@ -107,7 +107,7 @@ public:
                     const std::array<unsigned int, dim>& elements,
                     DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
-    if (Dune::MPIHelper::isFake)
+    if (Dune::MPIHelper::isFake) // NOLINT(readability-implicit-bool-conversion)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
 #  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
@@ -141,7 +141,7 @@ public:
     }
     if (warn || sum >= dim)
       DXTC_LOG_INFO << "Ignoring non-default overlap for alberta cube creation";
-    if (Dune::MPIHelper::isFake)
+    if (Dune::MPIHelper::isFake) // NOLINT(readability-implicit-bool-conversion)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
 #  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
@@ -156,7 +156,7 @@ public:
                     const std::array<unsigned int, dim>& elements,
                     DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
-    if (Dune::MPIHelper::isFake)
+    if (Dune::MPIHelper::isFake) // NOLINT(readability-implicit-bool-conversion)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
 #  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
@@ -184,7 +184,7 @@ public:
                  std::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
                  DXTC_MPI_ONLY Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
-    if (Dune::MPIHelper::isFake)
+    if (Dune::MPIHelper::isFake) // NOLINT(readability-implicit-bool-conversion)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
 #  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)

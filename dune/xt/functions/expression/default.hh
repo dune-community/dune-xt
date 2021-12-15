@@ -23,6 +23,7 @@
 
 #include "base.hh"
 #include <dune/xt/functions/interfaces/function.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 
@@ -106,11 +107,11 @@ public:
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     for (size_t cc = 0; cc < r; ++cc) {
       gradients_.emplace_back(std::vector<MathExpressionGradientType>());
@@ -129,11 +130,11 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ExpressionFunction(const ThisType& other)
@@ -162,12 +163,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
@@ -175,7 +176,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret(0.);
     Common::FieldVector<RangeFieldType, r * rC> tmp_vector_;
@@ -193,7 +194,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
@@ -307,11 +308,11 @@ public:
                      const Common::FieldVector<std::string, r>& expressions,
                      const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     for (size_t rr = 0; rr < r; ++rr)
       gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expressions[rr]));
@@ -324,11 +325,11 @@ public:
   ExpressionFunction(const std::string& variable,
                      const Common::FieldVector<std::string, r>& expressions,
                      const size_t ord,
-                     const std::string& nm = static_id())
+                     std::string nm = static_id())
     : BaseType()
     , function_(variable, expressions)
     , order_(ord)
-    , name_(nm)
+    , name_(std::move(nm))
   {}
 
   ExpressionFunction(const ThisType& other)
@@ -354,12 +355,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
@@ -367,7 +368,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret(0.);
     function_.evaluate(point_in_global_coordinates, ret);
@@ -378,7 +379,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");

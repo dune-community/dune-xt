@@ -126,7 +126,7 @@ public:
 
   CombinedGridFunction(ThisType&& source) = default;
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     LOG_(debug) << "local_function()" << std::endl;
     using LeftLF = typename LeftType::LocalFunctionType;
@@ -148,7 +148,7 @@ public:
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

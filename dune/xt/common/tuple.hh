@@ -13,6 +13,7 @@
 #ifndef DUNE_XT_COMMON_TUPLE_HH
 #define DUNE_XT_COMMON_TUPLE_HH
 
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -194,10 +195,10 @@ struct Combine
     using u_next = typename next<UIterator>::type;
     using v_next = typename next<VIterator>::type;
 
-    typedef
+    using type =
         typename if_<std::is_same<v_next, v_end>,
                      typename if_<std::is_same<u_next, u_end>, end_of_recursion_tag, Generate<u_next, v_begin>>::type,
-                     Generate<UIterator, v_next>>::type type;
+                     Generate<UIterator, v_next>>::type;
   };
 
   //  this class run test on generated types in thos round and go to next*/
@@ -305,7 +306,7 @@ namespace internal {
 template <std::size_t>
 struct Any
 {
-  Any(...) {}
+  Any(...){}; // NOLINT(modernize-use-equals-default)
 };
 
 template <typename T>

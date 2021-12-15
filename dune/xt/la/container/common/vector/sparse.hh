@@ -302,8 +302,7 @@ public:
     auto it = std::lower_bound(indices_->begin(), indices_->end(), ii);
     if (it == indices_->end() || *it != ii)
       return ScalarType(0.);
-    else
-      return (*entries_)[std::distance(indices_->begin(), it)];
+    return (*entries_)[std::distance(indices_->begin(), it)];
   }
 
 protected:
@@ -315,13 +314,13 @@ protected:
       indices_->push_back(ii);
       entries_->push_back(0.);
       return entries_->back();
-    } else if (*it != ii) {
+    }
+    if (*it != ii) {
       indices_->insert(it, ii);
       entries_->insert(entries_->begin() + index, 0.);
       return (*entries_)[index];
-    } else {
-      return (*entries_)[index];
     }
+    return (*entries_)[index];
   }
 
   inline const ScalarType& get_unchecked_ref(const size_t ii) const
@@ -332,13 +331,13 @@ protected:
       indices_->push_back(ii);
       entries_->push_back(0.);
       return entries_->back();
-    } else if (*it != ii) {
+    }
+    if (*it != ii) {
       indices_->insert(it, ii);
       entries_->insert(entries_->begin() + index, 0.);
       return (*entries_)[index];
-    } else {
-      return (*entries_)[index];
     }
+    return (*entries_)[index];
   }
 
 public:
@@ -383,7 +382,7 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const final
   {
     assert(other.size() == size());
     const auto& indices = *indices_;
@@ -404,7 +403,7 @@ public:
     return ret;
   } // ... dot(...)
 
-  RealType l1_norm() const override final
+  RealType l1_norm() const final
   {
     using Dune::XT::Common::abs;
     return std::accumulate(entries_->begin(),
@@ -413,7 +412,7 @@ public:
                            [](const RealType& a, const ScalarType& b) { return a + abs(b); });
   }
 
-  RealType l2_norm() const override final
+  RealType l2_norm() const final
   {
     using Dune::XT::Common::abs;
     return std::sqrt(
@@ -422,7 +421,7 @@ public:
         }));
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     using Dune::XT::Common::abs;
     auto it = std::max_element(
@@ -430,7 +429,7 @@ public:
     return entries_->size() > 0 ? abs(*it) : 0.;
   }
 
-  ThisType add(const ThisType& other) const override final
+  ThisType add(const ThisType& other) const final
   {
     ThisType ret = this->copy();
     ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
@@ -439,12 +438,12 @@ public:
     return ret;
   } // ... add(...)
 
-  void add(const ThisType& other, ThisType& result) const override final
+  void add(const ThisType& other, ThisType& result) const final
   {
     result.deep_copy(add(other));
   } // ... add(...)
 
-  ThisType sub(const ThisType& other) const override final
+  ThisType sub(const ThisType& other) const final
   {
     ThisType ret = this->copy();
     ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
@@ -453,17 +452,17 @@ public:
     return ret;
   } // ... sub(...)
 
-  void sub(const ThisType& other, ThisType& result) const override final
+  void sub(const ThisType& other, ThisType& result) const final
   {
     result.deep_copy(sub(other));
   } // ... add(...)
 
-  void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) final
   {
     axpy(ScalarType(1), other);
   } // ... iadd(...)
 
-  void isub(const ThisType& other) override final
+  void isub(const ThisType& other) final
   {
     axpy(ScalarType(-1), other);
   } // ... isub(...)

@@ -37,26 +37,26 @@ public:
                         GenericApplyFunctionType apply_func,
                         GenericFinalizeFunctionType finalize_func)
     : prepare_func_(std::move(prepare_func))
-    , apply_func_(apply_func)
+    , apply_func_(std::move(apply_func))
     , finalize_func_(std::move(finalize_func))
   {}
 
-  BaseType* copy() override final
+  BaseType* copy() final
   {
     return new GenericElementFunctor<GL>(*this);
   }
 
-  void prepare() override final
+  void prepare() final
   {
     prepare_func_();
   }
 
-  void apply_local(const ElementType& element) override final
+  void apply_local(const ElementType& element) final
   {
     apply_func_(element);
   }
 
-  void finalize() override final
+  void finalize() final
   {
     finalize_func_();
   }
@@ -87,28 +87,28 @@ public:
                              GenericApplyFunctionType apply_func,
                              GenericFinalizeFunctionType finalize_func)
     : prepare_func_(std::move(prepare_func))
-    , apply_func_(apply_func)
+    , apply_func_(std::move(apply_func))
     , finalize_func_(std::move(finalize_func))
   {}
 
-  BaseType* copy() override final
+  BaseType* copy() final
   {
     return new GenericIntersectionFunctor(*this);
   }
 
-  void prepare() override final
+  void prepare() final
   {
     prepare_func_();
   }
 
   void apply_local(const IntersectionType& intersection,
                    const ElementType& inside_element,
-                   const ElementType& outside_element) override final
+                   const ElementType& outside_element) final
   {
     apply_func_(intersection, inside_element, outside_element);
   }
 
-  void finalize() override final
+  void finalize() final
   {
     finalize_func_();
   }
@@ -146,24 +146,24 @@ public:
     , finalize_func_(std::move(finalize_func))
   {}
 
-  void prepare() override final
+  void prepare() final
   {
     prepare_func_();
   }
 
-  void apply_local(const ElementType& element) override final
+  void apply_local(const ElementType& element) final
   {
     element_apply_func_(element);
   }
 
   void apply_local(const IntersectionType& intersection,
                    const ElementType& inside_element,
-                   const ElementType& outside_element) override final
+                   const ElementType& outside_element) final
   {
     intersection_apply_func_(intersection, inside_element, outside_element);
   }
 
-  void finalize() override final
+  void finalize() final
   {
     finalize_func_();
   }

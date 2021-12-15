@@ -18,6 +18,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/numeric_cast.hh>
+#include <utility>
 
 #include "parameter.hh"
 
@@ -40,10 +41,6 @@ template class SimpleDict<std::vector<double>>;
 // =========================
 // ===== ParameterType =====
 // =========================
-ParameterType::ParameterType()
-  : BaseType()
-{}
-
 ParameterType::ParameterType(const std::string& key)
   : BaseType(key, 1)
 {}
@@ -88,10 +85,8 @@ bool ParameterType::operator==(const ParameterType& other) const
       return this_single_element.second == other_single_element.second;
     }
     return false;
-
-  } else {
-    return this->dict_ == other.dict_;
   }
+  return this->dict_ == other.dict_;
 } // ... operator==(...)
 
 bool ParameterType::operator!=(const ParameterType& other) const
@@ -214,8 +209,8 @@ std::ostream& operator<<(std::ostream& out, const Parameter& mu)
 // ===============================
 // ===== ParametricInterface =====
 // ===============================
-ParametricInterface::ParametricInterface(const ParameterType& param_type)
-  : parameter_type_(param_type)
+ParametricInterface::ParametricInterface(ParameterType param_type)
+  : parameter_type_(std::move(param_type))
 {}
 
 bool ParametricInterface::is_parametric() const

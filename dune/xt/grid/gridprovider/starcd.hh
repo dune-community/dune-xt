@@ -65,7 +65,7 @@ class StarCDGridProviderFactory
 public:
   static constexpr bool available = true;
 
-  static const std::string static_id()
+  static std::string static_id()
   {
     return starcd_gridprovider_id();
   }

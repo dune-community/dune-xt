@@ -112,8 +112,12 @@ struct op_
     cl.def(op::name(), &op::execute, is_operator(), extra...);
 #if PY_MAJOR_VERSION < 3
     if (id == op_truediv || id == op_itruediv)
-      cl.def(
-          id == op_itruediv ? "__idiv__" : ot == op_l ? "__div__" : "__rdiv__", &op::execute, is_operator(), extra...);
+      cl.def(id == op_itruediv ? "__idiv__"
+             : ot == op_l      ? "__div__"
+                               : "__rdiv__",
+             &op::execute,
+             is_operator(),
+             extra...);
 #endif
   }
   template <typename Class, typename... Extra>
@@ -126,8 +130,12 @@ struct op_
     cl.def(op::name(), &op::execute_cast, is_operator(), extra...);
 #if PY_MAJOR_VERSION < 3
     if (id == op_truediv || id == op_itruediv)
-      cl.def(
-          id == op_itruediv ? "__idiv__" : ot == op_l ? "__div__" : "__rdiv__", &op::execute, is_operator(), extra...);
+      cl.def(id == op_itruediv ? "__idiv__"
+             : ot == op_l      ? "__div__"
+                               : "__rdiv__",
+             &op::execute,
+             is_operator(),
+             extra...);
 #endif
   }
 };
@@ -231,15 +239,15 @@ PYBIND11_BINARY_OPERATOR(mul, rmul, operator*, l* r)
 PYBIND11_BINARY_OPERATOR(truediv, rtruediv, operator/, l / r)
 PYBIND11_BINARY_OPERATOR(mod, rmod, operator%, l % r)
 PYBIND11_BINARY_OPERATOR(lshift, rlshift, operator<<, l << r)
-PYBIND11_BINARY_OPERATOR(rshift, rrshift, operator>>, l>> r)
+PYBIND11_BINARY_OPERATOR(rshift, rrshift, operator>>, l >> r)
 PYBIND11_BINARY_OPERATOR(and, rand, operator&, l& r)
 PYBIND11_BINARY_OPERATOR(xor, rxor, operator^, l ^ r)
 PYBIND11_BINARY_OPERATOR(eq, eq, operator==, l == r)
 PYBIND11_BINARY_OPERATOR(ne, ne, operator!=, l != r)
 PYBIND11_BINARY_OPERATOR(or, ror, operator|, l | r)
-PYBIND11_BINARY_OPERATOR(gt, lt, operator>, l> r)
+PYBIND11_BINARY_OPERATOR(gt, lt, operator>, l > r)
 PYBIND11_BINARY_OPERATOR(ge, le, operator>=, l >= r)
-PYBIND11_BINARY_OPERATOR(lt, gt, operator<, l<r)
+PYBIND11_BINARY_OPERATOR(lt, gt, operator<, l < r)
 PYBIND11_BINARY_OPERATOR(le, ge, operator<=, l <= r)
 // PYBIND11_BINARY_OPERATOR(pow,       rpow,         pow,          std::pow(l,  r))
 PYBIND11_INPLACE_OPERATOR(iadd, operator+=, l += r)
@@ -252,14 +260,14 @@ PYBIND11_INPLACE_OPERATOR(irshift, operator>>=, l >>= r)
 PYBIND11_INPLACE_OPERATOR(iand, operator&=, l &= r)
 PYBIND11_INPLACE_OPERATOR(ixor, operator^=, l ^= r)
 PYBIND11_INPLACE_OPERATOR(ior, operator|=, l |= r)
-PYBIND11_UNARY_OPERATOR(neg, operator-, - l)
-PYBIND11_UNARY_OPERATOR(pos, operator+, + l)
+PYBIND11_UNARY_OPERATOR(neg, operator-, -l)
+PYBIND11_UNARY_OPERATOR(pos, operator+, +l)
 // WARNING: This usage of `abs` should only be done for existing STL overloads.
 // Adding overloads directly in to the `std::` namespace is advised against:
 // https://en.cppreference.com/w/cpp/language/extending_std
 PYBIND11_UNARY_OPERATOR(abs, abs, std::abs(l))
 PYBIND11_UNARY_OPERATOR(hash, hash, std::hash<L>()(l))
-PYBIND11_UNARY_OPERATOR(invert, operator~,(~l))
+PYBIND11_UNARY_OPERATOR(invert, operator~, (~l))
 PYBIND11_UNARY_OPERATOR(bool, operator!, !!l)
 PYBIND11_UNARY_OPERATOR(int, int_, (int)l)
 PYBIND11_UNARY_OPERATOR(float, float_, (double)l)

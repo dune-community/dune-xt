@@ -82,16 +82,16 @@ void type_call()
   if constexpr (std::tuple_size_v<Tuple> == 3) {
     using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
     using Type = typename TupleElement::type;
-    static_assert(std::is_same<TupleElement, tplA<int, int>>::value, "");
-    static_assert(std::is_same<Type, int>::value, "");
+    static_assert(std::is_same<TupleElement, tplA<int, int>>::value);
+    static_assert(std::is_same<Type, int>::value);
   } else if constexpr (std::tuple_size_v<Tuple> == 2) {
     using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
     using Type = typename TupleElement::type;
-    static_assert(std::is_same<TupleElement, tplB<int, int>>::value, "");
-    static_assert(std::is_same<Type, int>::value, "");
+    static_assert(std::is_same<TupleElement, tplB<int, int>>::value);
+    static_assert(std::is_same<Type, int>::value);
   } else if constexpr (std::tuple_size_v<Tuple> == 1) {
     using TupleElement = typename Dune::XT::Common::list_content<Tuple>::template head<int, int>;
-    static_assert(std::is_same<TupleElement, int>::value, "");
+    static_assert(std::is_same<TupleElement, int>::value);
   }
 
   using Tail = typename Tuple::template tail_type<int, int>;

@@ -166,7 +166,7 @@ void trim(std::string& s);
 void trim(std::vector<std::string>& v);
 
 //! returns string with local time in current locale's format
-inline std::string stringFromTime(time_t cur_time = time(NULL))
+inline std::string stringFromTime(time_t cur_time = time(nullptr))
 {
   return ctime(&cur_time);
 }
@@ -196,7 +196,10 @@ static inline char** vector_to_main_args(const std::vector<std::string>& args)
   char** argv = new char*[args.size()];
   for (auto ii : value_range(args.size())) {
     argv[ii] = new char[args[ii].length() + 1];
-    strcpy(argv[ii], args[ii].c_str());
+    // clang-tidy complains that strcpy is insecure because it does not provide bounding of the memory buffer.
+    // However, the usage here seems fine and I did not find a more secure standard replacement, so we just
+    // silence the warning here.
+    strcpy(argv[ii], args[ii].c_str()); // NOLINT(clang-analyzer-security.insecureAPI.strcpy)
   }
   return argv;
 } // ... vector_to_main_args(...)

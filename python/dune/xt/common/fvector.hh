@@ -56,7 +56,7 @@ struct FieldVector_type_caster
   {
     list l(SZ);
     for (size_t ii = 0; ii < src.size(); ++ii) {
-      object val = reinterpret_steal<object>(value_conv::cast(src[ii], policy, parent));
+      auto val = reinterpret_steal<object>(value_conv::cast(src[ii], policy, parent));
       if (!val)
         return handle();
       PyList_SET_ITEM(l.ptr(), ii, val.release().ptr()); // steals a reference

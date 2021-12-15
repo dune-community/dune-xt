@@ -101,8 +101,7 @@ struct Helper<bool>
       return true;
     if (ss_lower_case == "false")
       return false;
-    else
-      return convert_safely<bool>(ss);
+    return convert_safely<bool>(ss);
   }
 }; // struct Helper< bool, ... >
 
@@ -157,7 +156,7 @@ template <class ComplexType>
 ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*cols*/ = 0)
 {
   boost::algorithm::trim(ss);
-  if (ss.size() < 1)
+  if (ss.empty())
     DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " (too short)");
   using namespace std;
   using T = typename ComplexType::value_type;
@@ -218,7 +217,7 @@ VectorType vector_from_string(std::string vector_str, const size_t size, DXTC_DE
   const size_t automatic_size = (size == 0 ? 1 : size);
   const size_t actual_size =
       VectorAbstraction<VectorType>::has_static_size ? VectorAbstraction<VectorType>::static_size : automatic_size;
-  if (actual_size > automatic_size && automatic_size != 1)
+  if (actual_size > automatic_size && automatic_size != 1) // NOLINT(misc-redundant-expression)
     DUNE_THROW(Exceptions::conversion_error,
                "Vector expression (see below) has only " << automatic_size << " elements but " << actual_size
                                                          << " elements are required for this VectorType ("

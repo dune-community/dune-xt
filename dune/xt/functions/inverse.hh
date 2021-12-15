@@ -109,18 +109,18 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     func_.access().bind(element);
   }
 
 public:
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Helper::compute(func_.access().evaluate(xx, param));
   }
@@ -183,12 +183,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_function_impl());
   }
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Helper::compute(func_.evaluate(xx, param));
   }
@@ -257,13 +257,13 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     using LocalFunction = InverseElementFunction<typename GridFunctionType::LocalFunctionType>;
     return std::make_unique<LocalFunction>(func_->local_function(), order_);
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

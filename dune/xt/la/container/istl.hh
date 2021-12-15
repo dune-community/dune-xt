@@ -14,6 +14,7 @@
 #ifndef DUNE_XT_LA_CONTAINER_ISTL_HH
 #define DUNE_XT_LA_CONTAINER_ISTL_HH
 
+#include <utility>
 #include <vector>
 #include <initializer_list>
 #include <complex>
@@ -155,7 +156,7 @@ public:
   {}
 
   explicit IstlDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -302,7 +303,7 @@ public:
   /// \name These methods override default implementations from VectorInterface..
   /// \{
 
-  ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -310,22 +311,22 @@ public:
     return backend().dot(other.backend());
   } // ... dot(...)
 
-  RealType l1_norm() const override final
+  RealType l1_norm() const final
   {
     return backend().one_norm();
   }
 
-  RealType l2_norm() const override final
+  RealType l2_norm() const final
   {
     return backend().two_norm();
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     return backend().infinity_norm();
   }
 
-  void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -334,7 +335,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  void isub(const ThisType& other) override final
+  void isub(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -466,7 +467,7 @@ public:
   {}
 
   explicit IstlRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
+    : backend_(std::move(backend_ptr))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -603,8 +604,7 @@ public:
     assert(jj < cols());
     if (these_are_valid_indices(ii, jj))
       return backend_->operator[](ii)[jj][0][0];
-    else
-      return ScalarType(0);
+    return ScalarType(0);
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
@@ -673,34 +673,34 @@ public:
    * \attention Use and interprete with care, since the Dune::BCRSMatrix is known to report strange things here,
    * depending on its state!
    */
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return backend_->nonzeroes();
   }
 
   SparsityPatternDefault pattern(const bool prune = false,
                                  const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     SparsityPatternDefault ret(rows());
     if (prune) {
       return pruned_pattern_from_backend(*backend_, eps);
-    } else {
-      for (size_t ii = 0; ii < rows(); ++ii) {
-        if (backend_->getrowsize(ii) > 0) {
-          const auto& row = backend_->operator[](ii);
-          const auto it_end = row.end();
-          for (auto it = row.begin(); it != it_end; ++it)
-            ret.insert(ii, it.index());
-        }
+    }
+    for (size_t ii = 0; ii < rows(); ++ii) {
+      if (backend_->getrowsize(ii) > 0) {
+        const auto& row = backend_->operator[](ii);
+        const auto it_end = row.end();
+        for (auto it = row.begin(); it != it_end; ++it)
+          ret.insert(ii, it.index());
       }
     }
+
     ret.sort();
     return ret;
   } // ... pattern(...)
 
   ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return ThisType(*backend_, true, eps);
   }

@@ -20,6 +20,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/float_cmp.hh>
+#include <utility>
 
 namespace Dune::XT::Common {
 
@@ -60,7 +61,7 @@ class ValidateAny : public ValidatorInterface<T, ValidateAny<T>>
   using BaseType = ValidatorInterface<T, ThisType>;
 
 public:
-  inline ValidateAny() {}
+  inline ValidateAny() = default;
   inline ValidateAny(const ThisType&) {}
 
   inline bool operator()(const T&) const
@@ -84,8 +85,8 @@ class ValidateInList : public ValidatorInterface<T, ValidateInList<T, ListImp>>
   ListType valid_list_;
 
 public:
-  explicit ValidateInList(const ListType& valid_list)
-    : valid_list_(valid_list)
+  explicit ValidateInList(ListType valid_list)
+    : valid_list_(std::move(valid_list))
   {}
 
   inline bool operator()(const T& rhs) const

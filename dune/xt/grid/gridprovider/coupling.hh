@@ -30,7 +30,7 @@ public:
 
   using CouplingGridViewType = CouplingGridViewImp;
 
-  static const std::string static_id()
+  static std::string static_id()
   {
     return "xt.grid.couplinggridprovider";
   }

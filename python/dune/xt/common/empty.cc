@@ -12,6 +12,7 @@
 #include "config.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <dune/common/parallel/mpihelper.hh>
@@ -25,8 +26,8 @@
 
 struct Pet
 {
-  Pet(const std::string& name_)
-    : name(name_)
+  Pet(std::string name_)
+    : name(std::move(name_))
   {}
   void setName(const std::string& name_)
   {

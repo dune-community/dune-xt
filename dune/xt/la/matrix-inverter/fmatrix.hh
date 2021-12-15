@@ -78,7 +78,7 @@ public:
       compute();
   }
 
-  void compute() override final
+  void compute() final
   {
     const auto type = options_.template get<std::string>("type");
     if (type == "direct") {

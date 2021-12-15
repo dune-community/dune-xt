@@ -25,7 +25,6 @@
 
 PYBIND11_MODULE(logging, m)
 {
-  namespace py = pybind11;
   using namespace pybind11::literals;
   using namespace Dune::XT::Common;
 

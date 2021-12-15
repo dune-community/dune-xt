@@ -17,6 +17,10 @@ cmake_minimum_required(VERSION 3.13)
 
 project("dune-xt" CXX)
 
+if("${TRAVIS}" EQUAL "1")
+  add_compile_options(-Werror -Wno-error=unknown-pragmas -Wno-error=pedantic)
+endif()
+
 # local environment
 set(ENV{PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/bin:$ENV{PATH}")
 set(ENV{LD_LIBRARY_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib:$ENV{LD_LIBRARY_PATH}")
@@ -99,6 +103,7 @@ add_subdirectory(dune)
 add_subdirectory("cmake/modules")
 add_subdirectory(doc/doxygen)
 
+add_tidy(${CMAKE_CURRENT_SOURCE_DIR})
 add_pylicense()
 
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)

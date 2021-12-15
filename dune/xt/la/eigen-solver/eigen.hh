@@ -40,8 +40,8 @@ public:
   {
     std::vector<std::string> tps = {"eigen"};
     if (Common::Lapacke::available())
-      tps.push_back("lapack");
-    tps.push_back("shifted_qr");
+      tps.emplace_back("lapack");
+    tps.emplace_back("shifted_qr");
     return tps;
   }
 
@@ -77,7 +77,7 @@ public:
   {}
 
 protected:
-  void compute() const override final
+  void compute() const final
   {
     const auto type = options_->template get<std::string>("type", EigenSolverOptions<EigenDenseMatrix<S>>::types()[0]);
     const size_t N = matrix_.rows();

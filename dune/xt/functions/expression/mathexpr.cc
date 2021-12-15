@@ -1424,8 +1424,7 @@ int ROperation::NMembers() const // Number of members for an operation like a,b,
     return 1;
   if (mmb2 == NULL)
     return 0;
-  else
-    return 1 + mmb2->NMembers();
+  return 1 + mmb2->NMembers();
 }
 
 ROperation ROperation::NthMember(int n) const
@@ -1444,8 +1443,7 @@ ROperation ROperation::NthMember(int n) const
       return *this;
     if (mmb1 != NULL)
       return *mmb1;
-    else
-      return ErrVal;
+    return ErrVal;
   };
   if (op != Juxt)
     return ErrVal;
@@ -1552,7 +1550,7 @@ ROperation ROperation::Diff(const RVar& var) const
         ppop1 = new ROperation*[j];
         for (i = 0; i < j; i++)
           ppop1[i] = new ROperation(NthMember(i + 1).Diff(var));
-        op2 = ApplyOperator(pfunc->nvars, ppop1, &operator,);
+        op2 = ApplyOperator(pfunc->nvars, ppop1, &operator, );
         for (i = 0; i < pfunc->nvars; i++)
           delete ppop1[i];
         delete[] ppop1;

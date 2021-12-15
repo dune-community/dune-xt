@@ -115,11 +115,6 @@ void check_eoc_study_for_success(
     const double& zero_tolerance = 1e-15);
 
 
-[[deprecated("Does not make any sense with the new ConvergenceStudy (25.01.2019)!")]] void
-print_collected_eoc_study_results(const std::map<std::string, std::vector<double>>& results,
-                                  std::ostream& out = std::cout);
-
-
 // returns unsigned int on purpose, see GridProvider
 unsigned int grid_elements();
 

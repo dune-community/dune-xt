@@ -135,7 +135,7 @@ struct ElementFunctionSetInterface_for_all_grids
       for_all_r_and_rC<Dune::XT::Common::tuple_tail_t<Dims>>::bind_interface(m);
     }
 
-    static void bind_combined(pybind11::module& m)
+    static void bind_combined(pybind11::module& /*m*/)
     {
 #if 0
       for_all_rC<r>::bind_combined(m);
@@ -160,7 +160,7 @@ struct ElementFunctionSetInterface_for_all_grids
     ElementFunctionSetInterface_for_all_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind_interface(m);
   }
 
-  static void bind_combined(pybind11::module& m)
+  static void bind_combined(pybind11::module& /*m*/)
   {
 #if 0
     for_all_r_and_rC<>::bind_combined(m);

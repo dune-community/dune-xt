@@ -69,7 +69,7 @@ public:
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;
 
-  void prepare() override final
+  void prepare() final
   {
     found_ = 0;
   }
@@ -86,7 +86,7 @@ public:
 
   void apply_local(const IntersectionType& intersection,
                    const ElementType& inside_element,
-                   const ElementType& outside_element) override final
+                   const ElementType& outside_element) final
   {
     LOG_(debug) << "apply_local(intersection=" << print(intersection) << "): calling compute_locally()" << std::endl;
     found_ += compute_locally(intersection, inside_element, outside_element);
@@ -97,12 +97,12 @@ public:
     return found_;
   }
 
-  void finalize() override final
+  void finalize() final
   {
     Propagator::finalize_imp();
   }
 
-  BaseType* copy() override final
+  BaseType* copy() final
   {
     return Propagator::copy_imp();
   }

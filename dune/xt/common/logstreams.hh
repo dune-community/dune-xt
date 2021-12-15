@@ -52,6 +52,7 @@ public:
   static constexpr PriorityType default_suspend_priority = 0;
 
   SuspendableStrBuffer(int loglevel, int& logflags);
+  SuspendableStrBuffer(const SuspendableStrBuffer&) = delete;
 
   /** \brief stop accepting input into the buffer
    * the suspend_priority_ mechanism provides a way to silence streams from 'higher' modules
@@ -68,16 +69,14 @@ public:
 
 protected:
   friend class CombinedBuffer;
-  virtual std::streamsize xsputn(const char_type* s, std::streamsize count);
-  virtual int_type overflow(int_type ch = traits_type::eof());
+  std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+  int_type overflow(int_type ch = traits_type::eof()) override;
 
 private:
   inline bool enabled() const
   {
-    return (!is_suspended_) && (logflags_ & loglevel_);
+    return (!is_suspended_) && ((logflags_ & loglevel_) != 0);
   }
-
-  SuspendableStrBuffer(const SuspendableStrBuffer&) = delete;
 
   int& logflags_;
   int loglevel_;
@@ -101,7 +100,7 @@ private:
   std::mutex sync_mutex_;
 
 protected:
-  virtual int sync();
+  int sync() override;
 }; // class FileBuffer
 
 class CombinedBuffer : public SuspendableStrBuffer
@@ -118,9 +117,9 @@ public:
   int pubsync();
 
 protected:
-  virtual std::streamsize xsputn(const char_type* s, std::streamsize count);
-  virtual int_type overflow(int_type ch = traits_type::eof());
-  virtual int sync();
+  std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+  int_type overflow(int_type ch = traits_type::eof()) override;
+  int sync() override;
 
 private:
   std::list<std::unique_ptr<SuspendableStrBuffer>> buffer_;
@@ -136,7 +135,7 @@ public:
   {}
 
 protected:
-  virtual int sync();
+  int sync() override;
 }; // class EmptyBuffer
 
 /**
@@ -149,13 +148,12 @@ class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_tr
   using BaseType = std::basic_stringbuf<char, std::char_traits<char>>;
 
 public:
-  TimedPrefixedStreamBuffer(const Timer& timer, const std::string& prefix, std::ostream& out = std::cout);
-
-  virtual int sync();
-
-private:
+  TimedPrefixedStreamBuffer(const Timer& timer, std::string prefix, std::ostream& out = std::cout);
   TimedPrefixedStreamBuffer(const TimedPrefixedStreamBuffer&) = delete;
 
+  int sync() override;
+
+private:
   std::string elapsed_time_str() const;
 
   const Timer& timer_;
@@ -181,13 +179,13 @@ public:
     , BaseType(&this->access())
   {}
 
-  virtual ~LogStream()
+  ~LogStream() override
   {
     flush();
   }
 
   //! dump buffer into file/stream and clear it
-  virtual LogStream& flush();
+  LogStream& flush();
 
   /** \brief forwards suspend to buffer
    * the suspend_priority_ mechanism provides a way to silence streams from 'higher' modules
@@ -240,7 +238,7 @@ class TimedPrefixedLogStream
 public:
   TimedPrefixedLogStream(const Timer& timer, const std::string& prefix, std::ostream& outstream);
 
-  virtual ~TimedPrefixedLogStream();
+  ~TimedPrefixedLogStream() override;
 }; // TimedPrefixedLogStream
 
 //! ostream compatible class wrapping file and console output

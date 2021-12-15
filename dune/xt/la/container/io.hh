@@ -92,7 +92,7 @@ typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::strin
     max_col = std::max(max_col, jj);
     values.emplace_back(std::tuple<size_t, size_t, R>(ii, jj, value));
   }
-  if (rows.size() == 0)
+  if (rows.empty())
     DUNE_THROW(IOError, "Given file '" << filename << "' must not be empty!");
   const size_t matrix_rows = std::max(min_rows, ssize_t(max_row) + 1);
   const size_t matrix_cols = std::max(min_cols, ssize_t(max_col) + 1);

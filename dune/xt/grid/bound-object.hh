@@ -36,14 +36,14 @@ public:
     : /*DebugLogging("dune.xt.grid", "ElementBoundObject")
     ,*/
     element_(nullptr)
-    , is_bound_(false)
+
   {}
 
   ElementBoundObject(const ThisType& other)
     : /*DebugLogging(other)
     ,*/
     element_(nullptr)
-    , is_bound_(false)
+
   {
     if (other.element_) {
       element_ = std::make_unique<ElementType>(*other.element_);
@@ -108,7 +108,7 @@ private:
   std::unique_ptr<ElementType> element_;
 
 protected:
-  bool is_bound_;
+  bool is_bound_{false};
 }; // class ElementBoundObject
 
 
@@ -124,12 +124,12 @@ public:
 
   IntersectionBoundObject()
     : intersection_(nullptr)
-    , is_bound_(false)
+
   {}
 
   IntersectionBoundObject(const ThisType& other)
     : intersection_(nullptr)
-    , is_bound_(false)
+
   {
     if (other.intersection_) {
       intersection_ = std::make_unique<IntersectionType>(*other.intersection_);
@@ -187,7 +187,7 @@ private:
   std::unique_ptr<IntersectionType> intersection_;
 
 protected:
-  bool is_bound_;
+  bool is_bound_{false};
 }; // class IntersectionBoundObject
 
 

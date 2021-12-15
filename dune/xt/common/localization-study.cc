@@ -16,16 +16,17 @@
 #include <boost/io/ios_state.hpp>
 
 #include <dune/xt/common/string.hh>
+#include <utility>
 
 #include "localization-study.hh"
 
 namespace Dune::XT::Common {
 
-LocalizationStudy::LocalizationStudy(const std::vector<std::string>& only_these_indicators)
-  : only_these_indicators_(only_these_indicators)
+LocalizationStudy::LocalizationStudy(std::vector<std::string> only_these_indicators)
+  : only_these_indicators_(std::move(only_these_indicators))
 {}
 
-LocalizationStudy::~LocalizationStudy() {}
+LocalizationStudy::~LocalizationStudy() = default;
 
 std::vector<std::string> LocalizationStudy::used_indicators() const
 {
@@ -40,13 +41,13 @@ std::vector<std::string> LocalizationStudy::used_indicators() const
 
 } // ... used_indicators(...)
 
-void LocalizationStudy::run(std::ostream& out)
+void LocalizationStudy::run(std::ostream& out) const
 {
   boost::io::ios_all_saver guard(out);
-  if (provided_indicators().size() == 0)
+  if (provided_indicators().empty())
     DUNE_THROW(Dune::InvalidStateException, "You have to provide at least one indicator!");
   const auto actually_used_indicators = used_indicators();
-  if (actually_used_indicators.size() == 0)
+  if (actually_used_indicators.empty())
     DUNE_THROW(Dune::InvalidStateException,
                "There are no common indicators in 'provided_indicators()' and 'only_these_indicators'!");
 
@@ -78,7 +79,7 @@ void LocalizationStudy::run(std::ostream& out)
   out << thick_delimiter << std::endl;
   // comput reference indicators
   const auto reference_indicators = compute_reference_indicators();
-  if (reference_indicators.size() == 0)
+  if (reference_indicators.empty())
     DUNE_THROW(Exceptions::requirements_not_met, "Given reference indicators must not be empty!");
   // loop over all indicators
   for (size_t ind = 0; ind < actually_used_indicators.size(); ++ind) {

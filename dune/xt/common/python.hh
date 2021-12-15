@@ -24,14 +24,6 @@ namespace Dune::XT::Common::bindings {
 void guarded_bind(const std::function<void()>& registrar);
 
 
-[[deprecated("This is not required any more (08.08.2019)!")]] void
-add_initialization(pybind11::module& /*m*/, const std::string& /*logger_name*/, const std::string& /*so_name*/ = "");
-
-
-[[deprecated("use guarded_bind() instead (08.08.2019)!")]] void
-try_register(pybind11::module& m, const std::function<void(pybind11::module&)>& registrar);
-
-
 } // namespace Dune::XT::Common::bindings
 
 #endif // DUNE_XT_COMMON_PYTHON_HH

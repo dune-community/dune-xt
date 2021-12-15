@@ -60,18 +60,18 @@ struct ElementVisualization
   {
   public:
     using Element = extract_entity_t<GridViewType>;
-    FunctorBase(std::string filename = "Functor", const std::string& dirname = ".")
+    FunctorBase(std::string filename = "Functor", std::string dirname = ".")
       : filename_(std::move(filename))
-      , dir_(dirname)
+      , dir_(std::move(dirname))
     {}
 
-    virtual ~FunctorBase() {}
+    virtual ~FunctorBase() = default;
 
-    const std::string filename() const
+    std::string filename() const
     {
       return filename_;
     }
-    const std::string dir() const
+    std::string dir() const
     {
       return dir_;
     }
@@ -170,7 +170,7 @@ struct ElementVisualization
                       << std::endl;
     }
 
-    double operator()(const Element&) const
+    double operator()(const Element&) const override
     {
       return -1;
     }
@@ -196,18 +196,18 @@ struct ElementVisualization
       , boundaryInfo_(boundaryInfo)
     {}
 
-    double operator()(const Element& entity) const
+    double operator()(const Element& entity) const override
     {
       static constexpr DirichletBoundary dirichlet_type{};
       static constexpr NeumannBoundary neumann_type{};
       for (auto intersectionIt = gridview_.ibegin(entity); intersectionIt != gridview_.iend(entity); ++intersectionIt) {
         if (type_ == "dirichlet") {
           return (boundaryInfo_.type(*intersectionIt) == dirichlet_type);
-        } else if (type_ == "neumann") {
-          return (boundaryInfo_.type(*intersectionIt) == neumann_type);
-        } else {
-          DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type_ << "'!");
         }
+        if (type_ == "neumann") {
+          return (boundaryInfo_.type(*intersectionIt) == neumann_type);
+        }
+        DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type_ << "'!");
       }
       return 0;
     }
@@ -303,7 +303,7 @@ struct ElementVisualization
       , gridview_(view)
     {}
 
-    double operator()(const Element& entity) const
+    double operator()(const Element& entity) const override
     {
       return gridview_.indexSet().index(entity);
     }

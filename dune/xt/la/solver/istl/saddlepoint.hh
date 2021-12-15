@@ -69,10 +69,9 @@ public:
     iterative_options += general_opts;
     if (tp == "direct")
       return general_opts;
-    else if (tp == "cg_direct_schurcomplement" || tp == "cg_cg_schurcomplement")
+    if (tp == "cg_direct_schurcomplement" || tp == "cg_cg_schurcomplement")
       return iterative_options;
-    else
-      return general_opts;
+    return general_opts;
   } // ... options(...)
 
   void apply(const Vector& f, const Vector& g, Vector& u, Vector& p) const

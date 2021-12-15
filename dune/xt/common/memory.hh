@@ -16,6 +16,7 @@
 #include <memory>
 
 #include <dune/xt/common/debug.hh>
+#include <utility>
 
 namespace Dune::XT::Common {
 
@@ -56,12 +57,12 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByReference<T>(tt_);
   }
@@ -87,15 +88,15 @@ public:
   {}
 
   explicit ConstAccessByPointer(std::shared_ptr<const T> tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return *tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByPointer<T>(tt_);
   }
@@ -112,12 +113,16 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  explicit ConstAccessByValue(const T& tt)
+    : tt_(tt)
+  {}
+
+  const T& access() const final
   {
     return tt_;
   }
 
-  ConstAccessInterface<T>* copy() const override final
+  ConstAccessInterface<T>* copy() const final
   {
     return new ConstAccessByValue<T>(T(tt_));
   }
@@ -151,17 +156,17 @@ public:
     : tt_(tt)
   {}
 
-  T& access() override final
+  T& access() final
   {
     return tt_;
   }
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  AccessInterface<T>* copy() override final
+  AccessInterface<T>* copy() final
   {
     return new AccessByReference<T>(tt_);
   }
@@ -187,20 +192,20 @@ public:
   {}
 
   explicit AccessByPointer(std::shared_ptr<T> tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
-  T& access() override final
+  T& access() final
   {
     return *tt_;
   }
 
-  const T& access() const override final
+  const T& access() const final
   {
     return *tt_;
   }
 
-  AccessInterface<T>* copy() override final
+  AccessInterface<T>* copy() final
   {
     return new AccessByPointer<T>(tt_);
   }
@@ -217,17 +222,17 @@ public:
     : tt_(tt)
   {}
 
-  const T& access() const override final
+  const T& access() const final
   {
     return tt_;
   }
 
-  T& access() override final
+  T& access() final
   {
     return tt_;
   }
 
-  AccessInterface<T>* copy() const override final
+  AccessInterface<T>* copy() const final
   {
     return new AccessByValue<T>(T(tt_));
   }
@@ -318,7 +323,7 @@ public:
   // We have to disable this constructor if T is not a complete type to avoid compilation failures
   template <class S, typename std::enable_if_t<std::is_constructible<T, S&&>::value, bool> = true>
   explicit ConstStorageProvider(S&& tt)
-    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
+    : storage_(new internal::ConstAccessByValue<T>(std::forward<S>(tt)))
   {}
 
   explicit ConstStorageProvider(std::shared_ptr<const T> tt)

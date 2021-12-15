@@ -33,7 +33,7 @@ public:
     : internal::DefaultPrinter<T, use_repr>(val, cfg)
   {}
 
-  void repr(std::ostream& out) const override final
+  void repr(std::ostream& out) const final
   {
     const auto& geometry = this->value.geometry();
     const auto num_corners = geometry.corners();
@@ -43,7 +43,7 @@ public:
     out << ", normal=" << this->value.centerUnitOuterNormal() << "}";
   }
 
-  void str(std::ostream& out) const override final
+  void str(std::ostream& out) const final
   {
     const auto& geometry = this->value.geometry();
     const auto num_corners = geometry.corners();
@@ -69,7 +69,7 @@ public:
     : internal::DefaultPrinter<T, use_repr>(val, cfg)
   {}
 
-  void repr(std::ostream& out) const override final
+  void repr(std::ostream& out) const final
   {
     const auto& geometry = this->value.geometry();
     const auto num_corners = geometry.corners();
@@ -82,7 +82,7 @@ public:
     out << "}";
   }
 
-  void str(std::ostream& out) const override final
+  void str(std::ostream& out) const final
   {
     const auto& geometry = this->value.geometry();
     const auto num_corners = geometry.corners();

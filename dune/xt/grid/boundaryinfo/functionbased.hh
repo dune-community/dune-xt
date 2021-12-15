@@ -65,7 +65,7 @@ public:
 
   FunctionBasedBoundaryInfo(ThisType&& source) = default;
 
-  void repr(std::ostream& out) const override final
+  void repr(std::ostream& out) const final
   {
     out << "FunctionBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_ << ")";
   }
@@ -79,7 +79,7 @@ public:
         {std::move(fct_ptr), std::move(bt_ptr), std::move(local_fct_ptr)});
   } // ... register_new_function(...)
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     LOG_(debug) << "type(intersection=" << print(intersection) << "):" << std::endl;
     if (!intersection.boundary()) {
@@ -110,8 +110,8 @@ public:
   } // ... type(...)
 
 private:
-  const std::unique_ptr<BoundaryType> default_boundary_type_;
   const double tol_;
+  const std::unique_ptr<BoundaryType> default_boundary_type_;
   std::list<std::tuple<std::unique_ptr<FunctionType>,
                        std::unique_ptr<BoundaryType>,
                        std::unique_ptr<typename FunctionType::LocalFunctionType>>>

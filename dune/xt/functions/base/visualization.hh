@@ -14,6 +14,7 @@
 #define DUNE_XT_FUNCTIONS_BASE_VISUALIZATION_HH
 
 #include <algorithm>
+#include <utility>
 
 #include <dune/grid/io/file/vtk/function.hh>
 
@@ -40,7 +41,8 @@ class VisualizerInterface
 public:
   using RangeType = typename RangeTypeSelector<R, r, rC>::type;
 
-  virtual ~VisualizerInterface(){};
+  virtual ~VisualizerInterface() = default;
+  ;
 
   virtual int ncomps() const = 0;
 
@@ -57,12 +59,12 @@ class DefaultVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return helper<>::ncomps();
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     return helper<>::evaluate(comp, val);
   }
@@ -115,12 +117,12 @@ class SumVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return 1;
   }
 
-  double evaluate(DXTC_DEBUG_ONLY const int& comp, const RangeType& val) const override final
+  double evaluate(DXTC_DEBUG_ONLY const int& comp, const RangeType& val) const final
   {
     assert(comp == 0);
     return Common::reduce(val.begin(), val.end(), 0.);
@@ -141,12 +143,12 @@ public:
     : comp_(comp)
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return 1;
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     DUNE_THROW_IF(comp != 0, Dune::InvalidStateException, "This visualizer plots only a single component!");
     return val[comp_];
@@ -171,12 +173,12 @@ public:
     , eval_(eval)
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return ncomps_;
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     return eval_(comp, val);
   }
@@ -204,35 +206,35 @@ public:
   VisualizationAdapter(const GridFunctionType& grid_function,
                        const VisualizerInterface<range_dim, range_dim_cols, RangeField>& visualizer,
                        const std::string& nm = "",
-                       const XT::Common::Parameter& param = {})
+                       XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(visualizer)
     , name_(nm.empty() ? function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {}
 
   VisualizationAdapter(const GridFunctionType& grid_function,
                        const std::string& nm = "",
-                       const XT::Common::Parameter& param = {})
+                       XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<range_dim, range_dim_cols, RangeField>())
     , name_(nm.empty() ? function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return visualizer_.access().ncomps();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
+  double evaluate(int comp, const EntityType& en, const DomainType& xx) const final
   {
     local_function_->bind(en);
     const auto value = local_function_->evaluate(xx, param_);
@@ -267,12 +269,12 @@ public:
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const VisualizerInterface<d, 1, RangeField>& visualizer,
                                const std::string& nm = "",
-                               const XT::Common::Parameter& param = {})
+                               XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(visualizer)
     , name_(nm.empty() ? "grad_ " + function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {
     if (range_dim > 1)
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
@@ -280,28 +282,28 @@ public:
 
   GradientVisualizationAdapter(const GridFunctionType& grid_function,
                                const std::string& nm = "",
-                               const XT::Common::Parameter& param = {})
+                               XT::Common::Parameter param = {})
     : function_(grid_function.copy_as_grid_function())
     , local_function_(function_->local_function())
     , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
     , name_(nm.empty() ? "grad_" + function_->name() : nm)
-    , param_(param)
+    , param_(std::move(param))
   {
     if (range_dim > 1)
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
   }
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return visualizer_.access().ncomps();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
+  double evaluate(int comp, const EntityType& en, const DomainType& xx) const final
   {
     local_function_->bind(en);
     const auto value = local_function_->jacobian(xx, param_);

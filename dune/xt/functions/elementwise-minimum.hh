@@ -17,6 +17,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <utility>
 
 namespace Dune::XT::Functions {
 namespace internal {
@@ -123,7 +124,7 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       some_lf_->bind(element);
       min_ = internal::ElementwiseMinimumFunctionHelper<typename SomeFunction::LocalFunctionType>::compute(
@@ -131,12 +132,12 @@ private:
     }
 
   public:
-    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+    int order(const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
-    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& /*xx*/, const XT::Common::Parameter& /*param*/ = {}) const final
     {
       return min_;
     }
@@ -151,11 +152,11 @@ private:
 public:
   ElementwiseMinimumFunction(GridFunction<E, r_, rC_> some_func,
                              const int search_quadrature_order,
-                             const std::string& nm = "ElementwiseMinimumFunction")
+                             std::string nm = "ElementwiseMinimumFunction")
     : BaseType()
     , some_func_(some_func.copy_as_grid_function())
     , search_quadrature_order_(search_quadrature_order)
-    , name_(nm)
+    , name_(std::move(nm))
   {
     DUNE_THROW_IF(!some_func_->parameter_type().empty(),
                   Exceptions::parameter_error,
@@ -183,12 +184,12 @@ public:
   {
     return std::unique_ptr<ThisType>(this->copy_as_grid_function_impl());
   }
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>(*some_func_, search_quadrature_order_);
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

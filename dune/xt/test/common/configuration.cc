@@ -38,7 +38,6 @@
 std::ostream& test_out = DXTC_LOG.devnull();
 
 using namespace Dune::XT::Common;
-using Dune::XT::Common::Exceptions::results_are_not_as_expected;
 using namespace Dune::XT::Common::FloatCmp;
 
 struct CreateByOperator
@@ -206,7 +205,7 @@ struct ConfigTest : public testing::Test
     , keys(boost::assign::list_of<std::string>().repeat_fun(values.size() - 1, key_gen))
   {}
 
-  virtual ~ConfigTest() {}
+  ~ConfigTest() override = default;
 
   void get()
   {

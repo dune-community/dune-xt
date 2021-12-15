@@ -43,8 +43,7 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
   using M = Common::MatrixAbstraction<MatrixType>;
 
   GeneralizedEigenSolverTest()
-    : all_matrices_and_expected_eigenvalues_and_vectors_are_computed_(false)
-    , broken_matrix_(M::create(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
+    : broken_matrix_(M::create(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
     , unit_matrix_(
           eye_matrix<MatrixType>(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
   {
@@ -195,7 +194,7 @@ struct GeneralizedEigenSolverTest : public ::testing::Test
     }
   } // ... gives_correct_eigenvalues(...)
 
-  bool all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
+  bool all_matrices_and_expected_eigenvalues_and_vectors_are_computed_{false};
   MatrixType broken_matrix_;
   MatrixType unit_matrix_;
   MatrixType matrix_;

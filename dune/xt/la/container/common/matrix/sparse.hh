@@ -414,7 +414,7 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return entries_->size();
   }
@@ -933,7 +933,7 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return entries_->size();
   }
@@ -1342,7 +1342,7 @@ public:
     return sparse_ ? sparse_matrix_.valid() : dense_matrix_.valid();
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return sparse_ ? sparse_matrix_.non_zeros() : dense_matrix_.non_zeros();
   }

@@ -108,7 +108,7 @@ public:
 
   ElementFluxFunctionSetInterface(ThisType&& source) = default;
 
-  virtual ~ElementFluxFunctionSetInterface() = default;
+  ~ElementFluxFunctionSetInterface() override = default;
 
   /**
    * \name ´´These methods have to be implemented.''
