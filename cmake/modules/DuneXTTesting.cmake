@@ -12,18 +12,11 @@
 #   Tobias Leibner  (2015 - 2020)
 # ~~~
 
-macro(DXT_HEADERCHECK_TARGET_NAME arg)
-  string(REGEX REPLACE ".*/([^/]*)" "\\1" simple ${arg})
-  string(REPLACE ${PROJECT_SOURCE_DIR} "" rel ${arg})
-  string(REGEX REPLACE "(.*)/[^/]*" "\\1" relpath ${rel})
-  string(REGEX REPLACE "/" "_" targname ${rel})
-  set(targname "headercheck_${targname}")
-endmacro(DXT_HEADERCHECK_TARGET_NAME)
+include(XtTooling)
 
 macro(GET_HEADERCHECK_TARGETS subdir)
   file(GLOB_RECURSE bindir_header "${CMAKE_BINARY_DIR}/*.hh")
   list(APPEND dxt_ignore_header ${bindir_header})
-
   if(ENABLE_HEADERCHECK)
     file(GLOB_RECURSE headerlist "${CMAKE_SOURCE_DIR}/dune/xt/${subdir}/*.hh"
          "${CMAKE_SOURCE_DIR}/dune/xt/test/${subdir}/*.hh" "${CMAKE_SOURCE_DIR}/python/dune/xt/${subdir}/*.hh")
@@ -34,7 +27,8 @@ macro(GET_HEADERCHECK_TARGETS subdir)
         continue()
       endif() # do some name conversion
       set(targname ${header})
-      dxt_headercheck_target_name(${targname})
+      dxt_path_to_headercheck_name(targname)
+      set(targname "headercheck_${targname}")
       list(APPEND ${subdir}_dxt_headercheck_targets "${targname}")
       add_dependencies(${subdir}_headercheck ${targname})
     endforeach(header ${headerlist})
