@@ -30,9 +30,9 @@ void busywait(const size_t ms)
   // "round" up to next full 10 ms to align with native timer res
   const size_t milliseconds = (ms / 10) * 10 + 10;
   timeval start, end;
-  gettimeofday(&start, NULL);
+  gettimeofday(&start, nullptr);
   do {
-    gettimeofday(&end, NULL);
+    gettimeofday(&end, nullptr);
   } while (((end.tv_sec - start.tv_sec) * 1e6) + ((end.tv_usec - start.tv_usec)) < milliseconds * 1000);
 } // ... busywait(...)
 
@@ -91,19 +91,19 @@ std::string get_unique_test_name()
   };
   std::string result;
   const auto* test_case_name = test_info->test_case_name();
-  if (test_case_name) {
+  if (test_case_name != nullptr) {
     result += replace_if(test_case_name);
   }
   const auto* name = test_info->name();
-  if (name) {
+  if (name != nullptr) {
     result += result.empty() ? "" : "." + replace_if(name);
   }
   const auto* type_param = test_info->type_param();
-  if (type_param) {
+  if (type_param != nullptr) {
     result += result.empty() ? "" : "." + replace_if(type_param);
   }
   const auto* value_param = test_info->value_param();
-  if (value_param) {
+  if (value_param != nullptr) {
     result += result.empty() ? "" : "." + replace_if(value_param);
   }
   std::replace(result.begin(), result.end(), '/', '.');

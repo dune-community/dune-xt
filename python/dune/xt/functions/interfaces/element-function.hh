@@ -324,7 +324,6 @@ public:
                          const std::string& layer_id = "",
                          const std::string& class_id = "element_function_set_interface")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     const auto ClassName = Common::to_camel_case(class_name(grid_id, layer_id, class_id));
