@@ -27,10 +27,7 @@
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 template <class MatrixType>
@@ -389,9 +386,6 @@ compute_eigenvalues_and_right_eigenvectors_using_lapack(MatrixType&& matrix,
 }
 
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH

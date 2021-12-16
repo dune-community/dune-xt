@@ -80,9 +80,7 @@ std::string convert_to_initializer_list_str(const std::map<F, S>& results)
 }
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class M, class L>
@@ -247,9 +245,7 @@ struct GluedDdGridTest : public ::testing::Test
   std::unique_ptr<DD::Glued<MacroGridType, LocalGridType, local_layer>> dd_grid_;
 }; // struct GluedDdGridTest
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // HAVE_DUNE_GRID_GLUE
 #endif // DUNE_XT_GRID_TEST_DD_GLUED_HH

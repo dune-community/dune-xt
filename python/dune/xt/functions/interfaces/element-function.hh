@@ -19,10 +19,7 @@
 
 #include <python/dune/xt/common/parameter.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <class E, size_t r = 1, size_t rC = 1, class R = double>
@@ -343,9 +340,6 @@ public:
 }; // class ElementFunctionSetInterface
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTION_HH

@@ -21,9 +21,7 @@
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // forward
@@ -248,9 +246,7 @@ protected:
 
 
 } // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_BASE_HH

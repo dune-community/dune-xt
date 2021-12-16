@@ -74,10 +74,8 @@ using BasicTypes = std::tuple<double,
 void busywait(const size_t ms);
 
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Test {
+namespace Dune::XT {
+namespace Common::Test {
 
 
 /**
@@ -88,8 +86,7 @@ namespace Test {
 std::string get_unique_test_name();
 
 
-} // namespace Test
-} // namespace Common
+} // namespace Common::Test
 namespace Test {
 namespace internal {
 
@@ -134,8 +131,7 @@ typename std::enable_if<!Common::is_vector<T>::value, T>::type init_bound(typena
 
 
 } // namespace Test
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 namespace std {
 
 

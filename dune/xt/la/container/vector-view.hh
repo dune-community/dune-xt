@@ -15,8 +15,7 @@
 
 #include "vector-interface.hh"
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -460,7 +459,6 @@ struct VectorAbstraction<LA::VectorView<VectorImp>>
 
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_VIEW_HH

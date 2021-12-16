@@ -25,9 +25,7 @@
 
 #include "../solver.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class MatrixImp, class CommunicatorType>
@@ -134,9 +132,7 @@ private:
 }; // class Solver< MatrixView< ... > >
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 #endif // DUNE_XT_LA_SOLVER_VIEW_HH

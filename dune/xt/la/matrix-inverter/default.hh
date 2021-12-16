@@ -18,9 +18,7 @@
 
 #include "internal/base.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class MatrixType>
@@ -88,9 +86,7 @@ protected:
 }; // class MatrixInverter<MatrixType, true>
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_DEFAULT_HH

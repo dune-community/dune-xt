@@ -15,9 +15,7 @@
 
 #if HAVE_DUNE_GRID_GLUE
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <>
@@ -156,9 +154,7 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, Alb
 
 #  endif // HAVE_ALBERTA
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 using namespace Dune;
