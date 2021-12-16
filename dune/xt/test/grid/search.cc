@@ -27,7 +27,7 @@ struct InLevelSearch : public testing::Test
     : grid_provider_(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>())
   {}
 
-  void check()
+  void check() const
   {
     const auto view = grid_provider_.leaf_view();
     const auto periodic_view = Dune::XT::Grid::make_periodic_grid_layer(view);

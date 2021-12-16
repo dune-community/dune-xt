@@ -40,7 +40,6 @@ public:
                          const std::string& layer_id = "",
                          const std::string& class_id = "boundary_info")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     std::string class_name = class_id;
