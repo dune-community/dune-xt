@@ -17,9 +17,9 @@ GTEST_TEST(MoveIfTest, All)
   std::vector<double> vals2(10);
   // fill vals2 with values [1, 2, ..., 10]
   std::iota(vals2.begin(), vals2.end(), 1);
-  double expected1 = (10 * 11) / 2; // sum of numbers up to 10
-  double expected2 = 3628800; // 10!
-  double expected3 = 39916800; // 11!
+  double expected1 = (10. * 11.) / 2.; // sum of numbers up to 10
+  double expected2 = 3628800.; // 10!
+  double expected3 = 39916800.; // 11!
   EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 0.), expected1);
   EXPECT_EQ(Dune::XT::Common::transform_reduce(vals1.begin(), vals1.end(), vals2.begin(), 0.), expected1);
   EXPECT_EQ(Dune::XT::Common::reduce(vals2.begin(), vals2.end(), 0., std::plus<>()), expected1);

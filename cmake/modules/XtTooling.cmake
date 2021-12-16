@@ -62,7 +62,7 @@ macro(ADD_TIDY)
       "${BASE}/*.c")
     list(APPEND _files ${_pyfiles})
     list(REMOVE_DUPLICATES _files)
-    set(TIDY_ARGS --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy -extra-arg-before='-includeconfig.h'
+    set(TIDY_ARGS --quiet --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy -extra-arg-before='-includeconfig.h'
                   -p=${CMAKE_BINARY_DIR})
     set(fix_tidy_commands)
     add_custom_target(tidy)
