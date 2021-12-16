@@ -17,7 +17,11 @@
 namespace Dune::XT::LA {
 
 
+// Without the NOLINTs, these declarations are removed by clang-tidy since they are unused used in some compilation
+// units (in particular the headerchecks)
+// NOLINTNEXTLINE(misc-unused-using-decls)
 using XT::Common::print;
+// NOLINTNEXTLINE(misc-unused-using-decls)
 using XT::Common::repr;
 
 

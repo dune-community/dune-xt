@@ -40,6 +40,7 @@ class EigenSolverOptions;
 namespace internal {
 
 
+// NOLINTNEXTLINE(clang-diagnostic-unneeded-internal-declaration)
 static inline void ensure_eigen_solver_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
@@ -52,6 +53,7 @@ static inline void ensure_eigen_solver_type(const std::string& type, const std::
 } // ... ensure_eigen_solver_type(...)
 
 
+// NOLINTNEXTLINE(clang-diagnostic-unused-function)
 static inline Common::Configuration default_eigen_solver_options()
 {
   Common::Configuration opts;

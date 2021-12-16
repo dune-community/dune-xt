@@ -42,6 +42,7 @@ static inline std::string cube_gridprovider_id()
 }
 
 
+// NOLINTNEXTLINE(clang-diagnostic-unneeded-internal-declaration)
 static inline Common::Configuration cube_gridprovider_default_config()
 {
   Common::Configuration config;
