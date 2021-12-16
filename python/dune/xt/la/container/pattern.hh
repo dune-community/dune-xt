@@ -25,7 +25,7 @@
 namespace Dune::XT::LA {
 
 
-pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::module& m)
+inline pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::module& m)
 {
   using C = SparsityPatternDefault;
 

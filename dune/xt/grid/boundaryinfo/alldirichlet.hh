@@ -21,7 +21,6 @@
 namespace Dune::XT::Grid {
 
 
-// NOLINTNEXTLINE(clang-diagnostic-unneeded-internal-declaration)
 static inline Common::Configuration alldirichlet_boundaryinfo_default_config()
 {
   return Common::Configuration({"type"}, {"xt.grid.boundaryinfo.alldirichlet"});

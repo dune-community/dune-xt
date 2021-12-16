@@ -27,10 +27,6 @@
 
 namespace Dune::XT::Grid {
 
-using TexColorArrayType = std::array<std::string, 7>;
-namespace {
-const TexColorArrayType texcolors_ = {{"black", "red", "blue", "green", "yellow", "cyan", "magenta"}};
-}
 
 //! A means to ensure we have exactly 2 coords for tikz to draw, even in 1D
 struct PgfCoordWrapper : Dune::FieldVector<double, 2>
@@ -278,8 +274,10 @@ public:
       using ViewType = typename GridType::LevelGridView;
       const ViewType& view = grid_.levelGridView(i);
       Walker<ViewType> gridWalk(view);
+      static const std::array<std::string, 7> texcolors = {
+          {"black", "red", "blue", "green", "yellow", "cyan", "magenta"}};
       PgfEntityFunctorIntersectionsWithShift<ViewType> pgf(
-          view, file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
+          view, file, texcolors[std::min(i, int(texcolors.size()))], i, true);
       gridWalk.append(pgf);
       gridWalk.walk();
       file << "%%%%%%%%%%%%%%%" << view.size(0) << "%%%%%%%%%%%%%%%%\n";

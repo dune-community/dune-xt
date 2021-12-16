@@ -58,7 +58,7 @@ inline int get_idx(const StlSequence& ct, const typename StlSequence::value_type
 
 //! type safe (this will not compile for degraded-to-pointer arrays) way of getting array length
 template <class T, size_t N>
-size_t array_length(T (&/*array*/)[N])
+size_t array_length(T (&/*array*/)[N]) // NOLINT(modernize-avoid-c-arrays)
 {
   return N;
 }

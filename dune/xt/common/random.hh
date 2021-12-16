@@ -84,8 +84,6 @@ namespace {
 const std::string alphanums("abcdefghijklmnopqrstuvwxyz"
                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                             "1234567890");
-const std::string other_printables("!@#$%^&*()"
-                                   "`~-_=+[{]{\\|;:'\",<.>/? ");
 } // namespace
 
 //! RNG that represents strings of given length
