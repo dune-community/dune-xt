@@ -19,9 +19,7 @@
 
 #include <dune/xt/la/container/container-interface.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 constexpr size_t max_python_print_rows{8};
 
@@ -108,8 +106,6 @@ auto bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, c
   }
 }
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_INTERFACE_PBH

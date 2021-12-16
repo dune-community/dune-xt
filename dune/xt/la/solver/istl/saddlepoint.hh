@@ -28,9 +28,7 @@
 #include "preconditioners.hh"
 #include "schurcomplement.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // Solver for saddle point system (A B1; B2^T C) (u; p) = (f; g) using the Schur complement, i.e., solve (B2^T A^{-1} B1
@@ -186,8 +184,6 @@ private:
 };
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_SOLVER_ISTL_SADDLEPOINT_HH

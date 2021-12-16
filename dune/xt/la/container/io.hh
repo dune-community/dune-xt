@@ -21,9 +21,7 @@
 #include "matrix-interface.hh"
 #include "vector-interface.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class M>
@@ -146,8 +144,6 @@ from_file(const std::string& filename, const ssize_t min_size = -1, const std::s
 } // ... from_file(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_IO_HH

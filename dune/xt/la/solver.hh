@@ -22,9 +22,7 @@
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -185,9 +183,7 @@ solve(const MatrixInterface<M, S>& A,
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #include "solver/common.hh"
 #include "solver/dense.hh"

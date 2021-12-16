@@ -16,8 +16,7 @@
 
 #include <dune/xt/common/print.hh>
 
-namespace Dune::XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 /// \sa Common::Printer
@@ -97,15 +96,6 @@ public:
 }; // class Printer<Entity<cd, dim, GridImp, EntityImp>, ...>
 
 
-} // namespace Common
-namespace Grid {
-
-
-using Common::print;
-using Common::repr;
-
-
-} // namespace Grid
-} // namespace Dune::XT
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_GRID_PRINT_HH

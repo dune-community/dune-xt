@@ -25,9 +25,7 @@
 
 #include <python/dune/xt/common/fvector.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -240,8 +238,6 @@ auto bind_Spe10Model2Function(pybind11::module& m, const std::string& grid_id)
 } // ... bind_Spe10Model2Function(...)
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_SPE10_HH
