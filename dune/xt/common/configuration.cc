@@ -221,7 +221,7 @@ std::string Configuration::report_string(const std::string& prefix) const
   return stream.str();
 } // ... report_string(...)
 
-void Configuration::read_command_line(int argc, char* argv[])
+void Configuration::read_command_line(int argc, char** argv)
 {
   if (argc < 2) {
     boost::format usage("usage: %s parameter.file *[-section.key override-value]");
@@ -234,7 +234,7 @@ void Configuration::read_command_line(int argc, char* argv[])
   setup_();
 } // readCommandLine
 
-void Configuration::read_options(int argc, char* argv[])
+void Configuration::read_options(int argc, char** argv)
 {
   Dune::ParameterTreeParser::readOptions(argc, argv, *this);
 }

@@ -77,13 +77,13 @@ public:
 
   double* data()
   {
-    return serialized_matrix_.get();
+    return serialized_matrix_.data();
   }
 
   static constexpr Common::StorageLayout storage_layout = Common::StorageLayout::dense_column_major;
 
 private:
-  std::unique_ptr<double[]> serialized_matrix_;
+  std::vector<double> serialized_matrix_;
 };
 
 

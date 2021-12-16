@@ -326,16 +326,15 @@ data(const VectorType& source)
 }
 
 
-template <class V, StorageLayout storage_layout = StorageLayout::dense_row_major>
-typename std::enable_if<is_vector<V>::value, std::unique_ptr<typename VectorAbstraction<V>::S[]>>::type
+template <class T, class V>
+typename std::enable_if<is_vector<V>::value && is_arithmetic<T>::value,
+                        std::vector<typename VectorAbstraction<V>::S>>::type
 serialize(const V& vec)
 {
   using S = typename VectorAbstraction<V>::S;
-  static_assert(storage_layout == StorageLayout::dense_row_major || storage_layout == StorageLayout::dense_column_major,
-                "You have to select either row_major or column_major as StorageLayout!");
   using Vec = VectorAbstraction<V>;
-  const size_t size = Vec::size(vec);
-  auto data = std::make_unique<S[]>(size);
+  const size_t size = vec.size();
+  std::vector<S> data(size);
   for (size_t ii = 0; ii < size; ++ii)
 #ifdef DXT_DISABLE_CHECKS
     data[ii] = numeric_cast<T>(Vec::get_entry(vec, ii));
@@ -343,6 +342,12 @@ serialize(const V& vec)
     data[ii] = Vec::get_entry(vec, ii);
 #endif
   return data;
+}
+
+template <class V>
+typename std::enable_if_t<is_vector<V>::value, std::vector<typename VectorAbstraction<V>::S>> serialize(const V& vec)
+{
+  return serialize<typename VectorAbstraction<V>::ScalarType>(vec);
 }
 
 

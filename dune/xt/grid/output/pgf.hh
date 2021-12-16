@@ -63,19 +63,19 @@ public:
     const auto& geo = ent.geometry();
     for (std::size_t i = 0; i < geo.corners(); ++i) {
       const PgfCoordWrapper corner(geo.corner(i));
-      char buffer[150] = {'\0'};
+      std::array<char, 150> buffer = {'\0'};
 #ifndef NDEBUG
       const int c =
 #endif
-          std::snprintf(buffer, 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
+          std::snprintf(buffer.data(), 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
       assert(c > 0);
       file_ << buffer;
     }
     // \draw (A)--(B)--(C)--cycle;
     file_ << "\\draw ";
     for (std::size_t i = 0; i < geo.corners(); ++i) {
-      char buffer[50] = {'\0'};
-      std::snprintf(buffer, 50, "(C_%d_%lu)--", ent_idx, i);
+      std::array<char, 50> buffer = {'\0'};
+      std::snprintf(buffer.data(), 50, "(C_%d_%lu)--", ent_idx, i);
       file_ << buffer;
     }
     file_ << "cycle;\n ";
@@ -122,8 +122,8 @@ public:
   {
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
-    char buffer[250] = {'\0'};
-    std::snprintf(buffer,
+    std::array<char, 250> buffer = {'\0'};
+    std::snprintf(buffer.data(),
                   250,
                   "\\draw[draw=%s,line width=\\gridlinewidth pt,line cap=round] (%f,%f)--(%f,%f);\n",
                   color_.c_str(),
@@ -145,8 +145,8 @@ public:
     if (!print_entityIndex_)
       return;
     PgfCoordWrapper center(entity.geometry().center());
-    char buffer[50] = {'\0'};
-    std::snprintf(buffer, 50, "\\node[circle] at (%f,%f) {%d};\n", center[0], center[1], idx);
+    std::array<char, 50> buffer = {'\0'};
+    std::snprintf(buffer.data(), 50, "\\node[circle] at (%f,%f) {%d};\n", center[0], center[1], idx);
     file_ << buffer;
   }
 
@@ -195,8 +195,8 @@ public:
     b_c *= fac;
     a += a_c;
     b += b_c;
-    char buffer[150] = {'\0'};
-    std::snprintf(buffer,
+    std::array<char, 150> buffer = {'\0'};
+    std::snprintf(buffer.data(),
                   150,
                   "\\draw[draw=%s,line width=\\gridlinewidth pt,line cap=round] (%f,%f)--(%f,%f);\n",
                   this->color_.c_str(),
@@ -316,8 +316,8 @@ public:
       using ViewType = typename GridType::LevelGridView;
       {
         const ViewType& view = grid_.levelGridView(i);
-        char buffer[80] = {'\0'};
-        std::snprintf(buffer, 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
+        std::array<char, 80> buffer = {'\0'};
+        std::snprintf(buffer.data(), 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
         file << buffer;
         Walker<ViewType> gridWalk(view);
         PgfEntityFunctorIntersections<ViewType> thisLevel(view, file, "black", true);
@@ -334,12 +334,12 @@ public:
 
       switch (int(GridType::dimensionworld)) {
         case 1: {
-          char buffer[80] = {'\0'};
+          std::array<char, 80> buffer = {'\0'};
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,0) {(%d)};\n";
-          std::snprintf(buffer, 80, format, minima[0] - offset, minima[0]);
+          std::snprintf(buffer.data(), 80, format, minima[0] - offset, minima[0]);
           file << buffer;
-          std::snprintf(buffer, 80, format, maxima[0] - offset, maxima[0]);
+          std::snprintf(buffer.data(), 80, format, maxima[0] - offset, maxima[0]);
           file << buffer;
           break;
         }
@@ -347,10 +347,10 @@ public:
         case 3: {
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,%f) {(%d,%d)};\n";
-          char buffer[100] = {'\0'};
-          std::snprintf(buffer, 100, format, minima[0] - offset, minima[1] - offset, minima[0], minima[1]);
+          std::array<char, 100> buffer = {'\0'};
+          std::snprintf(buffer.data(), 100, format, minima[0] - offset, minima[1] - offset, minima[0], minima[1]);
           file << buffer;
-          std::snprintf(buffer, 100, format, maxima[0] - offset, maxima[1] - offset, maxima[0], maxima[1]);
+          std::snprintf(buffer.data(), 100, format, maxima[0] - offset, maxima[1] - offset, maxima[0], maxima[1]);
           file << buffer;
           break;
         }

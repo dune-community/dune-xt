@@ -16,7 +16,8 @@
 
 #include <dune/xt/common/print.hh>
 
-namespace Dune::XT::Common {
+namespace Dune::XT {
+namespace Common {
 
 
 /// \sa Common::Printer
@@ -96,6 +97,19 @@ public:
 }; // class Printer<Entity<cd, dim, GridImp, EntityImp>, ...>
 
 
-} // namespace Dune::XT::Common
+} // namespace Common
+namespace Grid {
+
+
+// Without the NOLINTs, these declarations are removed by clang-tidy since they are unused used in some compilation
+// units (in particular in the headerchecks)
+// NOLINTNEXTLINE(misc-unused-using-decls)
+using Common::print;
+// NOLINTNEXTLINE(misc-unused-using-decls)
+using Common::repr;
+
+
+} // namespace Grid
+} // namespace Dune::XT
 
 #endif // DUNE_XT_GRID_PRINT_HH

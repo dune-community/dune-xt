@@ -31,7 +31,7 @@ using MatrixTypes =
 
 
 template <class Tuple>
-struct SerializeRowwiseTest : public ::testing::Test
+struct SerializeTest : public ::testing::Test
 {
   using MatrixType = typename std::tuple_element<0, Tuple>::type;
   using M = Dune::XT::Common::MatrixAbstraction<MatrixType>;
@@ -45,7 +45,7 @@ struct SerializeRowwiseTest : public ::testing::Test
       ? std::tuple_element<1, Tuple>::type::value * std::tuple_element < is_block_matrix ? 3 : 2,
                           Tuple > ::type::value : std::tuple_element<2, Tuple>::type::value;
 
-  SerializeRowwiseTest()
+  SerializeTest()
     : matrix_(M::create(rows, cols))
   {
     if constexpr (is_block_matrix) {
@@ -68,68 +68,78 @@ struct SerializeRowwiseTest : public ::testing::Test
   template <class T>
   void check_type()
   {
-    std::unique_ptr<T[]> data_ptr = Dune::XT::Common::serialize_rowwise<T>(matrix_);
+    auto data_rowwise = Dune::XT::Common::serialize_rowwise<T>(matrix_);
     size_t cc = 0;
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
-        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_ptr[cc++]);
+        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_rowwise[cc++]);
+    auto data_colwise = Dune::XT::Common::serialize_colwise<T>(matrix_);
+    cc = 0;
+    for (size_t jj = 0; jj < cols; ++jj)
+      for (size_t ii = 0; ii < rows; ++ii)
+        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_colwise[cc++]);
   }
 
   void check_default()
   {
-    auto data_ptr = Dune::XT::Common::serialize_rowwise(matrix_);
+    auto data_rowwise = Dune::XT::Common::serialize_rowwise(matrix_);
     size_t cc = 0;
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
-        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_ptr[cc++]);
+        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_rowwise[cc++]);
+    auto data_colwise = Dune::XT::Common::serialize_colwise(matrix_);
+    cc = 0;
+    for (size_t jj = 0; jj < cols; ++jj)
+      for (size_t ii = 0; ii < rows; ++ii)
+        EXPECT_EQ(M::get_entry(matrix_, ii, jj), data_colwise[cc++]);
   }
 
   MatrixType matrix_;
-}; // struct SerializeRowwiseTest
+}; // struct SerializeTest
 
 
-TYPED_TEST_SUITE(SerializeRowwiseTest, MatrixTypes);
-TYPED_TEST(SerializeRowwiseTest, default)
+TYPED_TEST_SUITE(SerializeTest, MatrixTypes);
+TYPED_TEST(SerializeTest, default)
 {
   this->check_default();
 }
-TYPED_TEST(SerializeRowwiseTest, int)
+TYPED_TEST(SerializeTest, int)
 {
   this->template check_type<int>();
 }
-TYPED_TEST(SerializeRowwiseTest, long_int)
+TYPED_TEST(SerializeTest, long_int)
 {
   this->template check_type<long int>();
 }
-TYPED_TEST(SerializeRowwiseTest, long_long_int)
+TYPED_TEST(SerializeTest, long_long_int)
 {
   this->template check_type<long long int>();
 }
-TYPED_TEST(SerializeRowwiseTest, ssize_t)
+TYPED_TEST(SerializeTest, ssize_t)
 {
   this->template check_type<ssize_t>();
 }
-TYPED_TEST(SerializeRowwiseTest, unsigned_int)
+TYPED_TEST(SerializeTest, unsigned_int)
 {
   this->template check_type<unsigned int>();
 }
-TYPED_TEST(SerializeRowwiseTest, unsigned_long_int)
+TYPED_TEST(SerializeTest, unsigned_long_int)
 {
   this->template check_type<unsigned long int>();
 }
-TYPED_TEST(SerializeRowwiseTest, unsigned_long_long_int)
+TYPED_TEST(SerializeTest, unsigned_long_long_int)
 {
   this->template check_type<unsigned long long int>();
 }
-TYPED_TEST(SerializeRowwiseTest, size_t)
+TYPED_TEST(SerializeTest, size_t)
 {
   this->template check_type<size_t>();
 }
-TYPED_TEST(SerializeRowwiseTest, float)
+TYPED_TEST(SerializeTest, float)
 {
   this->template check_type<float>();
 }
-TYPED_TEST(SerializeRowwiseTest, double)
+TYPED_TEST(SerializeTest, double)
 {
   this->template check_type<double>();
 }

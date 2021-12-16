@@ -259,10 +259,10 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
 
   /** get parameters from parameter file or key-value pairs given on the command line and store in Configuration (and
   load into fem parameter, if available) */
-  void read_command_line(int argc, char* argv[]);
+  void read_command_line(int argc, char** argv);
 
   //! search command line options for key-value pairs and add them to Configuration
-  void read_options(int argc, char* argv[]);
+  void read_options(int argc, char** argv);
 
 private:
   void setup_();
