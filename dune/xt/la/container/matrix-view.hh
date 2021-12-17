@@ -17,8 +17,7 @@
 
 #include "matrix-interface.hh"
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -567,7 +566,6 @@ struct MatrixAbstraction<LA::MatrixView<MatrixImp>>
 
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_VIEW_HH

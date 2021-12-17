@@ -19,9 +19,7 @@
 #include "container/eigen.hh"
 #include "container/istl.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class ScalarType, Backends backend = default_backend>
@@ -99,8 +97,6 @@ using AvailableSparseMatrixTypes = std::tuple<CommonSparseMatrix<S>,
                                               >;
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_HH

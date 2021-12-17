@@ -50,7 +50,18 @@ macro(ADD_TIDY)
       "${BASE}/*.cxx"
       "${BASE}/*.cpp"
       "${BASE}/*.c")
+    set(BASE ${PROJECT_SOURCE_DIR}/dune/gdt/)
+    file(
+      GLOB_RECURSE
+      _gdt_files
+      "${BASE}/*.hh"
+      "${BASE}/*.h"
+      "${BASE}/*.cc"
+      "${BASE}/*.cxx"
+      "${BASE}/*.cpp"
+      "${BASE}/*.c")
     set(BASE ${PROJECT_SOURCE_DIR}/python/)
+    list(APPEND _files ${_gdt_files})
     file(
       GLOB_RECURSE
       _pyfiles
@@ -62,7 +73,7 @@ macro(ADD_TIDY)
       "${BASE}/*.c")
     list(APPEND _files ${_pyfiles})
     list(REMOVE_DUPLICATES _files)
-    set(TIDY_ARGS --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy -extra-arg-before='-includeconfig.h'
+    set(TIDY_ARGS --quiet --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy -extra-arg-before='-includeconfig.h'
                   -p=${CMAKE_BINARY_DIR})
     set(fix_tidy_commands)
     add_custom_target(tidy)

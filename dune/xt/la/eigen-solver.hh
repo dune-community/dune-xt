@@ -26,9 +26,7 @@
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 /**
@@ -132,9 +130,7 @@ EigenSolver<M> make_eigen_solver(const M& matrix, const XT::Common::Configuratio
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #include "eigen-solver/default.hh"
 #include "eigen-solver/eigen.hh"

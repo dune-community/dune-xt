@@ -413,13 +413,13 @@ data(const MatrixType& source)
 
 
 template <class T, class M>
-typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>
+typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::vector<T>>
 serialize_rowwise(const M& mat)
 {
   using Mat = MatrixAbstraction<M>;
   const size_t rows = Mat::rows(mat);
   const size_t cols = Mat::cols(mat);
-  auto data = std::make_unique<T[]>(rows * cols);
+  std::vector<T> data(rows * cols);
   size_t ii = 0;
   for (size_t rr = 0; rr < rows; ++rr)
     for (size_t cc = 0; cc < cols; ++cc)
@@ -433,7 +433,7 @@ serialize_rowwise(const M& mat)
 
 
 template <class M>
-typename std::enable_if_t<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>
+typename std::enable_if_t<is_matrix<M>::value, std::vector<typename MatrixAbstraction<M>::S>>
 serialize_rowwise(const M& mat)
 {
   return serialize_rowwise<typename MatrixAbstraction<M>::ScalarType>(mat);
@@ -441,13 +441,13 @@ serialize_rowwise(const M& mat)
 
 
 template <class T, class M>
-typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::unique_ptr<T[]>>
+typename std::enable_if_t<is_matrix<M>::value && is_arithmetic<T>::value, std::vector<T>>
 serialize_colwise(const M& mat)
 {
   using Mat = MatrixAbstraction<M>;
   const size_t rows = Mat::rows(mat);
   const size_t cols = Mat::cols(mat);
-  auto data = std::make_unique<T[]>(rows * cols);
+  std::vector<T> data(rows * cols);
   size_t ii = 0;
   for (size_t cc = 0; cc < cols; ++cc)
     for (size_t rr = 0; rr < rows; ++rr)
@@ -461,7 +461,7 @@ serialize_colwise(const M& mat)
 
 
 template <class M>
-typename std::enable_if_t<is_matrix<M>::value, std::unique_ptr<typename MatrixAbstraction<M>::S[]>>
+typename std::enable_if_t<is_matrix<M>::value, std::vector<typename MatrixAbstraction<M>::S>>
 serialize_colwise(const M& mat)
 {
   return serialize_colwise<typename MatrixAbstraction<M>::ScalarType>(mat);

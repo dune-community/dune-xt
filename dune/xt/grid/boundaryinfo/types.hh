@@ -195,6 +195,7 @@ public:
 #endif
 
 
+// NOLINTNEXTLINE(clang-diagnostic-unused-function)
 static inline BoundaryType* make_boundary_type(const std::string& id)
 {
   if (id == NoBoundary().id())

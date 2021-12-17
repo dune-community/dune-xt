@@ -14,10 +14,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace Exceptions {
+namespace Dune::XT::LA::Exceptions {
 
 
 class not_available : public Dune::Exception
@@ -116,9 +113,6 @@ class matrix_invert_failed_bc_result_is_not_a_right_inverse : public matrix_inve
 {};
 
 
-} // namespace Exceptions
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::Exceptions
 
 #endif // DUNE_XT_LA_EXCEPTIONS_HH

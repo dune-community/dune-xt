@@ -101,7 +101,11 @@ public:
 namespace Grid {
 
 
+// Without the NOLINTs, these declarations are removed by clang-tidy since they are unused used in some compilation
+// units (in particular in the headerchecks)
+// NOLINTNEXTLINE(misc-unused-using-decls)
 using Common::print;
+// NOLINTNEXTLINE(misc-unused-using-decls)
 using Common::repr;
 
 

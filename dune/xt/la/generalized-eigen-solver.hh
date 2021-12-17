@@ -20,9 +20,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 /**
@@ -118,9 +116,7 @@ make_generalized_eigen_solver(const M& lhs_matrix, const M& rhs_matrix, const XT
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #include "generalized-eigen-solver/default.hh"
 

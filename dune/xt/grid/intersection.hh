@@ -33,8 +33,7 @@
 #include <dune/xt/grid/view/coupling.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT::Grid {
+namespace Dune::XT::Grid {
 
 
 /**
@@ -183,7 +182,6 @@ bool contains(const Dune::Intersection<G, I>& intersection,
 } // ... contains(...)
 
 
-} // namespace XT::Grid
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_INTERSECTION_HH

@@ -188,7 +188,7 @@ private:
       vararray_[ii] = var_arg_[ii];
     }
     for (size_t ii = 0; ii < range_dim; ++ii) {
-      op_[ii] = new ROperation(expressions_[ii].c_str(), domain_dim, vararray_);
+      op_[ii] = new ROperation(expressions_[ii].c_str(), domain_dim, vararray_.data());
     }
   } // ... setup(...)
 
@@ -207,10 +207,10 @@ private:
   Common::FieldVector<std::string, domain_dim> variables_;
   Common::FieldVector<std::string, range_dim> expressions_;
   size_t actualDimRange_;
-  mutable DomainFieldType* arg_[domain_dim];
-  RVar* var_arg_[domain_dim];
-  RVar* vararray_[domain_dim];
-  ROperation* op_[range_dim];
+  mutable std::array<DomainFieldType*, domain_dim> arg_;
+  std::array<RVar*, domain_dim> var_arg_;
+  std::array<RVar*, domain_dim> vararray_;
+  std::array<ROperation*, range_dim> op_;
   mutable std::mutex mutex_;
 }; // class MathExpressionBase
 
@@ -309,7 +309,7 @@ private:
       vararray_[ii] = var_arg_[ii];
     }
     for (size_t ii = 0; ii < range_dim; ++ii) {
-      op_[ii] = new ROperation(expressions_[ii].c_str(), maxDimDomain, vararray_);
+      op_[ii] = new ROperation(expressions_[ii].c_str(), maxDimDomain, vararray_.data());
     }
   } // void setup(const std::string& var, const std::vector< std::string >& expressions)
 
@@ -328,10 +328,10 @@ private:
   std::vector<std::string> variables_;
   std::vector<std::string> expressions_;
   size_t actualDimRange_;
-  mutable DomainFieldType* arg_[maxDimDomain];
-  RVar* var_arg_[maxDimDomain];
-  RVar* vararray_[maxDimDomain];
-  ROperation* op_[range_dim];
+  mutable std::array<DomainFieldType*, maxDimDomain> arg_;
+  std::array<RVar*, maxDimDomain> var_arg_;
+  std::array<RVar*, maxDimDomain> vararray_;
+  std::array<ROperation*, range_dim> op_;
   mutable std::mutex mutex_;
 }; // class DynamicMathExpressionBase
 

@@ -21,9 +21,7 @@
 
 #include <dune/xt/la/container/common/matrix/sparse.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 constexpr size_t min_lapack_factor_size{10};
@@ -455,8 +453,6 @@ solve_upper_triangular_transposed(const MatrixType& A, FirstVectorType& x, const
 } // void solve_upper_triangular_transposed(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_ALGORITHMS_SOLVE_LOWER_TRIANGULAR_HH

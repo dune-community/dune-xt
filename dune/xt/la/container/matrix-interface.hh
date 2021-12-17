@@ -35,9 +35,7 @@
 #include "pattern.hh"
 #include "vector-interface.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -638,8 +636,6 @@ private:
 
 
 } // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH

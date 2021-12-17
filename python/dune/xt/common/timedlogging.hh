@@ -29,7 +29,6 @@ public:
 
   static bound_type bind(pybind11::module& m, const std::string& class_id = "default_logger")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id);

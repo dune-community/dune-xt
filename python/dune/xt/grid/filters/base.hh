@@ -37,7 +37,6 @@ public:
                          const std::string& layer_id = "",
                          const std::string& class_id = "element_filter")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
@@ -71,7 +70,6 @@ public:
                          const std::string& layer_id = "",
                          const std::string& class_id = "intersection_filter")
   {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);

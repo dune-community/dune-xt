@@ -25,10 +25,7 @@
 
 #include <dune/common/typetraits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 #if HAVE_EIGEN
 
@@ -70,9 +67,6 @@ M compute_moore_penrose_inverse_using_eigen(const M& matrix,
 
 #endif // HAVE_EIGEN
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_INTERNAL_EIGEN_HH

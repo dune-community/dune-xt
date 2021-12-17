@@ -52,10 +52,8 @@ Dune::XT::Common::Configuration DXTC_TEST_CONFIG_SUB(const std::string& sub_key)
 }
 
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Test {
+namespace Dune::XT {
+namespace Common::Test {
 
 
 std::string get_unique_test_name()
@@ -86,8 +84,7 @@ std::string get_unique_test_name()
   auto replace_if = [&](const auto& id) {
     if (replacements.count(std::string(id)) > 0)
       return replacements.at(std::string(id));
-    else
-      return std::string(id);
+    return std::string(id);
   };
   std::string result;
   const auto* test_case_name = test_info->test_case_name();
@@ -111,8 +108,7 @@ std::string get_unique_test_name()
 }
 
 
-} // namespace Test
-} // namespace Common
+} // namespace Common::Test
 namespace Test {
 namespace internal {
 
@@ -269,5 +265,4 @@ unsigned int grid_elements()
 
 
 } // namespace Test
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT

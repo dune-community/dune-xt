@@ -14,10 +14,7 @@
 
 #include <dune/pybindxi/pybind11.h>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace bindings {
+namespace Dune::XT::LA::bindings {
 
 
 struct Common
@@ -37,9 +34,6 @@ struct Sparse
 {};
 
 
-} // namespace bindings
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::bindings
 
 #endif // PYTHON_DUNE_XT_LA_TRAITS_HH

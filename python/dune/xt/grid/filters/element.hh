@@ -21,10 +21,7 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <template <class> class Filter, class GV>
@@ -71,9 +68,6 @@ public:
 }; // class InitlessElementFilter
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // PYTHON_DUNE_XT_GRID_FILTERS_ELEMENT_HH

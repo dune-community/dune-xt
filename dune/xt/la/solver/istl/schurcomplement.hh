@@ -22,9 +22,7 @@
 #include <dune/xt/la/container/istl.hh>
 #include <dune/xt/la/solver.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // For a saddle point matrix (A B1; B2^T C) this models the Schur complement (B2^T A^{-1} B1 - C)
@@ -155,8 +153,6 @@ private:
 };
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_SOLVER_ISTL_SCHURCOMPLEMENT_HH

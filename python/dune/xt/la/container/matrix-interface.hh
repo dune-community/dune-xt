@@ -28,9 +28,7 @@
 #include <python/dune/xt/la/container/container-interface.hh>
 #include <python/dune/xt/la/container.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -316,8 +314,6 @@ void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class
 } // ... addbind_Matrix_Vector_interaction(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH

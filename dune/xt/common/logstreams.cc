@@ -129,8 +129,8 @@ std::string TimedPrefixedStreamBuffer::elapsed_time_str() const
     return (boost::format("%02dd %02d:%02d:%02d|") % days % hours % minutes % seconds).str();
   if (elapsed > secs_per_hour) // less than a day, more than one hour
     return (boost::format("%02d:%02d:%02d|") % hours % minutes % seconds).str();
-  else // less than one hour
-    return (boost::format("%02d:%02d|") % minutes % seconds).str();
+  // less than one hour
+  return (boost::format("%02d:%02d|") % minutes % seconds).str();
 } // ... elapsed_time(...)
 
 LogStream& LogStream::flush()

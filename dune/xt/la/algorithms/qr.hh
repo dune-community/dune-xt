@@ -23,9 +23,7 @@
 #include <dune/xt/la/algorithms/triangular_solves.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -639,8 +637,6 @@ void solve_by_qr_decomposition(
 } // void solve_by_qr_decomposition(BlockedFieldMatrix<...>)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_ALGORITHMS_QR_HH

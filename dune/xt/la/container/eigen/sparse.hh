@@ -42,8 +42,7 @@
 
 #include "dense.hh"
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -564,8 +563,7 @@ struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
 #endif // HAVE_EIGEN
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 
 // begin: this is what we need for the lib

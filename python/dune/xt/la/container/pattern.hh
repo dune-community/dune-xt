@@ -22,12 +22,10 @@
 
 #include <dune/xt/la/container/pattern.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
-pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::module& m)
+inline pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::module& m)
 {
   using C = SparsityPatternDefault;
 
@@ -59,8 +57,6 @@ pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::m
 } // ... bind_SparsityPatternDefault(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_PATTERN_PBH
