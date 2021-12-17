@@ -53,7 +53,7 @@ macro(ADD_TIDY)
     set(BASE ${PROJECT_SOURCE_DIR}/dune/gdt/)
     file(
       GLOB_RECURSE
-      _files
+      _gdt_files
       "${BASE}/*.hh"
       "${BASE}/*.h"
       "${BASE}/*.cc"
@@ -61,6 +61,7 @@ macro(ADD_TIDY)
       "${BASE}/*.cpp"
       "${BASE}/*.c")
     set(BASE ${PROJECT_SOURCE_DIR}/python/)
+    list(APPEND _files ${_gdt_files})
     file(
       GLOB_RECURSE
       _pyfiles
