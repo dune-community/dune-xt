@@ -188,7 +188,7 @@ private:
       vararray_[ii] = var_arg_[ii];
     }
     for (size_t ii = 0; ii < range_dim; ++ii) {
-      op_[ii] = new ROperation(expressions_[ii].c_str(), domain_dim, vararray_);
+      op_[ii] = new ROperation(expressions_[ii].c_str(), domain_dim, vararray_.data());
     }
   } // ... setup(...)
 
@@ -309,7 +309,7 @@ private:
       vararray_[ii] = var_arg_[ii];
     }
     for (size_t ii = 0; ii < range_dim; ++ii) {
-      op_[ii] = new ROperation(expressions_[ii].c_str(), maxDimDomain, vararray_);
+      op_[ii] = new ROperation(expressions_[ii].c_str(), maxDimDomain, vararray_.data());
     }
   } // void setup(const std::string& var, const std::vector< std::string >& expressions)
 
