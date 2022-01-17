@@ -60,8 +60,8 @@ if config.HAVE_K3D:
 
     class VTKPlot(k3dPlot):
 
-        def __init__(self, vtk_data, color_attribute_name='Data', color_map=k3d.basic_color_maps.CoolWarm, *args,
-                     **kwargs):
+        def __init__(self, vtk_data, color_attribute_name='Data', color_map=k3d.basic_color_maps.CoolWarm,
+                     interactive=False, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
             self.idx = 0
@@ -75,9 +75,14 @@ if config.HAVE_K3D:
                 vtk_data[0][1], color_attribute=(color_attribute_name, *self.value_minmax), color_map=color_map)
             self.timestep = vtk_data[0][0]
             self += self.mesh
-            self.camera_no_pan = True
-            self.camera_no_rotate = True
-            self.camera_no_zoom = True
+            if interactive:
+                self.camera_no_pan = False
+                self.camera_no_rotate = False
+                self.camera_no_zoom = False
+            else:
+                self.camera_no_pan = True
+                self.camera_no_rotate = True
+                self.camera_no_zoom = True
 
         def _goto_idx(self, idx):
             if idx > len(self.vtk_data) or idx < 0:
@@ -94,7 +99,7 @@ if config.HAVE_K3D:
             self._goto_idx(self.idx + 1)
 
 
-    def plot(vtkfile_path, color_attribute_name, color_map=get_cmap('viridis')):
+    def plot(vtkfile_path, color_attribute_name, interactive=False, color_map=get_cmap('viridis')):
         ''' Generate a k3d Plot and associated controls for VTK data from file
 
         :param vtkfile_path: the path to load vtk data from. Can be a single .vtu or a collection
@@ -125,25 +130,26 @@ if config.HAVE_K3D:
             grid_auto_fit=False,
             camera_auto_fit=False,
             color_map=color_map,
-            grid=combined_bounds)
+            grid=combined_bounds,
+            interactive=interactive)
         # display needs to have been called before changing camera/grid_visible
         vtkplot.display()
         # could be replaced with testing if the widget is'ready'
         time.sleep(0.5)
         vtkplot.grid_visible = False
-        try:
-            vtkplot.menu_visibility = False
-        except AttributeError:
-            pass     # k3d < 2.5.6
-        # guesstimate
-        fov_angle = 30
-        absx = np.abs(combined_bounds[0] - combined_bounds[3])
-        c_dist = np.sin((90 - fov_angle) * np.pi / 180) * absx / (2 * np.sin(fov_angle * np.pi / 180))
-        xhalf = (combined_bounds[0] + combined_bounds[3]) / 2
-        yhalf = (combined_bounds[1] + combined_bounds[4]) / 2
-        zhalf = (combined_bounds[2] + combined_bounds[5]) / 2
-        # camera[posx, posy, posz, targetx, targety, targetz, upx, upy, upz]
-        vtkplot.camera = (xhalf, yhalf, zhalf + c_dist, xhalf, yhalf, zhalf, 0, 1, 0)
+        if not interactive:
+            try:
+                vtkplot.menu_visibility = False
+            except AttributeError:
+                pass     # k3d < 2.5.6
+            # guesstimate
+            fov_angle = 30
+            absx = np.abs(combined_bounds[0] - combined_bounds[3])
+            c_dist = np.sin((90 - fov_angle) * np.pi / 180) * absx / (2 * np.sin(fov_angle * np.pi / 180))
+            xhalf = (combined_bounds[0] + combined_bounds[3]) / 2
+            yhalf = (combined_bounds[1] + combined_bounds[4]) / 2
+            zhalf = (combined_bounds[2] + combined_bounds[5]) / 2
+            vtkplot.camera = (xhalf, yhalf, zhalf + c_dist, xhalf, yhalf, zhalf, 0, 1, 0)
 
         if size > 1:
             play = Play(min=0, max=size - 1, step=1, value=0, description='Timestep:')
