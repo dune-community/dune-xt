@@ -42,16 +42,47 @@ for mod_name in (
 
 
 if config.HAVE_K3D:
-    from tempfile import NamedTemporaryFile
+    import os
+    import tempfile
     from dune.xt.common.vtk.plot import plot
     from dune.xt.functions._functions_gridfunction import GridFunction
 
-    def visualize_function(function, grid, subsampling=False):
-        assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
-        assert function.dim_range == 1, f'Not implemented yet for {function.dim_range}-dimensional functions!'
-        tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
-        try:
-            function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-        except AttributeError:
-            GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
-        return plot(tmpfile, color_attribute_name=function.name)
+    def visualize_function(functions, grid, interactive=False, subsampling=False):
+        if not isinstance(functions, (list, tuple)):
+            functions = (functions,)
+        # this is a (bad) implicit check that these are functions
+        dim_domain = functions[0].dim_domain
+        dim_range = functions[0].dim_range
+        name = functions[0].name
+        assert(all(f.dim_domain == dim_domain for f in functions))
+        assert(all(f.dim_range == dim_range for f in functions))
+        assert(all(f.name == name for f in functions))
+
+        def visualize_single(func, filename):
+            try:
+                func.visualize(grid, filename=filename, subsampling=subsampling)
+            except AttributeError:
+                GridFunction(grid, func).visualize(grid, filename=filename, subsampling=subsampling)
+
+        prefix = os.path.join(tempfile.gettempdir(), next(tempfile._get_candidate_names()))
+        suffix = 'vt{}'.format('p' if dim_domain == 1 else 'u')
+        if len(functions) == 0:
+            return
+        for ii, func in enumerate(functions):
+            visualize_single(func, f'{prefix}_{ii}')
+        if len(functions) == 1:
+            filename = f'{prefix}_0.{suffix}'
+        else:
+            with open(f'{prefix}.pvd', 'w') as pvd_file:
+                pvd_file.write('<?xml version=\'1.0\'?>\n')
+                pvd_file.write('<VTKFile type=\'Collection\' version=\'0.1\'>\n')
+                pvd_file.write('<Collection>\n')
+                for ii, func in enumerate(functions):
+                    pvd_file.write(
+            f'<DataSet timestep=\'{ii}\' part=\'1\' name=\'{name}\' file=\'{prefix}_{ii}.{suffix}\'/>\n')
+                pvd_file.write('</Collection>\n')
+                pvd_file.write('</VTKFile>\n')
+            filename = f'{prefix}.pvd'
+
+        return plot(filename, color_attribute_name=name, interactive=True)
+
