@@ -65,7 +65,6 @@ setup(name='dune-xt',
       install_requires=requires,
       extras_require=extras_require,
       scripts=['./scripts/generate_compare_functions.py',
-               './scripts/distribute_testing.py',
                './scripts/dxt_code_generation.py',
                './scripts/numa_speedup.py',
-             './wrapper/dune_xt_execute.py'])
+               './wrapper/dune_xt_execute.py'])
