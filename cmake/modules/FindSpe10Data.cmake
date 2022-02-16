@@ -40,7 +40,7 @@ if(NOT EXISTS "${DXT_DATA_BASEDIR}/perm_case1.dat")
     set(Spe10Data_FOUND 0)
     return()
   endif(NOT SPE10_FILE1_STATUS EQUAL 0)
-endif(NOT EXISTS ${DXT_DATA_BASEDIR}/perm_case1.dat)
+endif(NOT EXISTS "${DXT_DATA_BASEDIR}/perm_case1.dat")
 
 if(NOT EXISTS "${DXT_DATA_BASEDIR}/spe_perm.dat")
   # download file 2
