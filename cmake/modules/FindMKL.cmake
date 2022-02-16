@@ -12,7 +12,7 @@
 
 include(Hints)
 
-set(_mkl_hints $ENV{MKLROOT} ${MKLROOT} ${root_hints})
+set(_mkl_hints $ENV{MKL_ROOT} ${MKL_ROOT} ${root_hints})
 set(_mkl_lib_hints "")
 set(_mkl_include_hints "")
 list(APPEND _mkl_hints "/opt/intel/mkl/" "$ENV{HOME}/intel/mkl/" "/opt/intel/oneapi/mkl/latest/")
@@ -43,7 +43,7 @@ else("${MKL_LP64_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
       list(APPEND MKL_LIBRARIES ${MKL_CORE_LIBRARY})
     endif("${MKL_CORE_LIBRARY}" MATCHES "MKL_CORE_LIBRARY-NOTFOUND")
   endif("${MKL_SEQUENTIAL_LIBRARY}" MATCHES "MKL_SEQUENTIAL_LIBRARY-NOTFOUND")
-endif("${MKL_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
+endif("${MKL_LP64_LIBRARY}" MATCHES "MKL_LP64_LIBRARY-NOTFOUND")
 
 message("-- checking for mkl.h header")
 # message(FATAL_ERROR ${_mkl_include_hints})

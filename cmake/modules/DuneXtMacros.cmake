@@ -135,7 +135,9 @@ endif()
 # misc vars  #########################################################################
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
-set(DS_MAX_MIC_THREADS CACHE INTEGER 120)
+set(DS_MAX_MIC_THREADS
+    120
+    CACHE STRING "")
 set(DUNE_XT_COMMON_TEST_DIR ${dune-xt_SOURCE_DIR}/dune/xt/common/test)
 set(ENABLE_PERFMON
     0
