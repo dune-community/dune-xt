@@ -25,7 +25,7 @@ extras_require = {
                      'matplotlib',),
   'infrastructure': ('pylicense3>=0.4.1', 'pytest', 'pytest-cov',
                      'cmake_format==0.4.1', 'codecov', 'yapf==0.25',
-                     'jinja2', ),
+                     'jinja2', 'hypothesis'),
 }
 
 if '${HAVE_MPI}' == 'TRUE':
