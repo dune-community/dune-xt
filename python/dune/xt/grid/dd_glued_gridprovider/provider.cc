@@ -177,7 +177,11 @@ public:
                             "ss = " << ss << "\n   nn = " << nn);
             }
           }
-          DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Did not find correct inside macro element!");
+          DUNE_THROW(XT::Common::Exceptions::index_out_of_range,
+                     "Did not find correct inside macro element!"
+                         << "\n   ss = " << ss << "\n   nn = " << nn);
+          // we never reach the code below, just there to make the compiler happy
+          return std::unique_ptr<Dune::XT::Grid::CouplingGridProvider<CouplingGridViewType>>(nullptr);
         },
         "ss"_a,
         "nn"_a);
@@ -194,7 +198,12 @@ public:
                   self.macro_grid_view(), macro_element, macro_boundary_info);
             }
           }
-          DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Did not find correct macro element!");
+          DUNE_THROW(XT::Common::Exceptions::index_out_of_range,
+                     "Did not find correct macro element!"
+                         << "\n   ss = " << ss << "\n   self.num_subdomains() = " << self.num_subdomains());
+          // we never reach the code below, just there to make the compiler happy
+          return MacroGridBasedBoundaryInfo<MacroGV, GV>(
+              self.macro_grid_view(), *(self.macro_grid_view().template begin<0>()), macro_boundary_info);
         },
         "ss"_a,
         "macro_boundary_info"_a);
