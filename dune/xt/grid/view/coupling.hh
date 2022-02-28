@@ -265,7 +265,7 @@ public:
     local_to_inside_indices_ = std::make_shared<std::vector<std::pair<size_t, size_t>>>();
 
     auto& coupling = dd_grid_.coupling(inside_element_, -1, outside_element_, -1, true);
-    coupling_size_ = coupling.size();
+    coupling_size_ = Common::numeric_cast<size_t>(coupling.size());
     // Note: This iterator iterates over all interesctions in the coupling grid. Not only over all intersections w.r.t.
     //       a single element
     for (auto coupling_intersection_it = coupling.template ibegin<0>();
@@ -321,6 +321,7 @@ public:
       }
     }
     DUNE_THROW(XT::Common::Exceptions::index_out_of_range, "Could not find matching inside index!");
+    return size_t(0);
   }
 
   int size(int codim) const
