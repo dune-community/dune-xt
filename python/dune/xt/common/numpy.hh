@@ -16,6 +16,7 @@
 #include <dune/xt/common/numeric.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/string.hh>
+#include <dune/xt/common/ranges.hh>
 
 namespace Dune::XT::Common::bindings {
 
@@ -44,7 +45,7 @@ auto access_array(const pybind11::array_t<T>& array,
   bool all_good = true;
   if (numeric_cast<size_t>(array.ndim()) != ndim)
     all_good = false;
-  for (size_t ii = 0; ii < array.ndim(); ++ii)
+  for (auto ii : value_range(array.ndim()))
     if (numeric_cast<size_t>(array.shape(ii)) != required_shape[ii])
       all_good = false;
   // report
@@ -73,7 +74,7 @@ auto access_array(pybind11::array_t<T>& array,
   bool all_good = true;
   if (numeric_cast<size_t>(array.ndim()) != ndim)
     all_good = false;
-  for (size_t ii = 0; ii < array.ndim(); ++ii)
+  for (auto ii : value_range(array.ndim()))
     if (numeric_cast<size_t>(array.shape(ii)) != required_shape[ii])
       all_good = false;
   // report
