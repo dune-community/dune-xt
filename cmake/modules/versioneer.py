@@ -467,6 +467,8 @@ def render_pep440_pre(pieces):
         # this needs to stay distance, run_number is always non-zero
         if pieces["distance"]:
             rendered += ".post2.dev%d" % pieces["run_number"]
+        else:
+            rendered += ".%d" % pieces["run_number"]
     else:
         # exception #1
         rendered = "0.post2.dev%d" % pieces["distance"]
