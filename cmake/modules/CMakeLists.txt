@@ -12,17 +12,24 @@
 # ~~~
 
 install(
-  FILES DuneTBB.cmake
+  FILES DunePybindxiInstallPythonPackage.cmake
+        DunePybindxiUtils.cmake
+        DuneTBB.cmake
         DuneUtils.cmake
         DuneXtMacros.cmake
+        DuneXTTesting.cmake
         DuneXtVersionHelper.cmake
-        DunePybindxiMacros.cmake
-        DunePybindxiUtils.cmake
+        FindCBLAS.cmake
         FindClangTidy.cmake
         FindEigen3.cmake
         FindFASP.cmake
+        FindLAPACKE.cmake
         FindLIKWID.cmake
+        FindMKL.cmake
+        FindMPI4PY.cmake
+        FindSpe10Data.cmake
         GridUtils.cmake
+        Hints.cmake
         XtCompilerSupport.cmake
         XtTooling.cmake
   DESTINATION ${DUNE_INSTALL_MODULEDIR})

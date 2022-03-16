@@ -136,7 +136,7 @@ function(dune_pybindxi_install_python_package)
   #
 
   # Construct the wheel installation commandline
-  set(wheel_command ${PYTHON_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} ${pyinst_fullpath})
+  set(wheel_command ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} ${pyinst_fullpath})
 
   # Add the installation rule
   install(
