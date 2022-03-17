@@ -14,7 +14,7 @@
 # ~~~
 
 # cmake-lint: disable=C0103
-include(Hints)
+include(DuneXTHints)
 
 if(NOT Eigen3_FIND_VERSION)
   if(NOT Eigen3_FIND_VERSION_MAJOR)

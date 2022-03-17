@@ -10,7 +10,7 @@
 #   Tobias Leibner (2018, 2020)
 # ~~~
 
-include(Hints)
+include(DuneXTHints)
 
 message("-- checking for cblas library")
 find_library(CBLAS_LIBRARY cblas HINTS ${lib_hints})

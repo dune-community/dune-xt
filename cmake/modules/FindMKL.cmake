@@ -10,7 +10,7 @@
 #   Tobias Leibner (2017 - 2021)
 # ~~~
 
-include(Hints)
+include(DuneXTHints)
 
 set(_mkl_hints $ENV{MKL_ROOT} ${MKL_ROOT} ${root_hints})
 set(_mkl_lib_hints "")

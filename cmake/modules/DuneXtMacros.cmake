@@ -21,7 +21,7 @@ cmake_minimum_required(VERSION 3.8)
 
 include(XtCompilerSupport)
 include(XtTooling)
-include(Hints)
+include(DuneXTHints)
 
 set(DXT_DONT_LINK_PYTHON_LIB
     ${DXT_DONT_LINK_PYTHON_LIB}
