@@ -338,11 +338,7 @@ serialize(const V& vec)
   const size_t size = Vec::size(vec);
   auto data = std::make_unique<S[]>(size);
   for (size_t ii = 0; ii < size; ++ii)
-#ifdef DXT_DISABLE_CHECKS
-    data[ii] = numeric_cast<T>(Vec::get_entry(vec, ii));
-#else
     data[ii] = Vec::get_entry(vec, ii);
-#endif
   return data;
 }
 
@@ -354,14 +350,7 @@ convert_to(const SourceType& source)
   const size_t size = source.size();
   auto ret = create<RangeType>(size);
   for (size_t ii = 0; ii < size; ++ii)
-    ret[ii] =
-#ifndef DXT_DISABLE_CHECKS
-        numeric_cast<typename VectorAbstraction<RangeType>::S>(
-#endif
-            source[ii]
-#ifndef DXT_DISABLE_CHECKS
-#endif
-        );
+    ret[ii] = source[ii];
   return ret;
 } // ... convert_to(...)
 
