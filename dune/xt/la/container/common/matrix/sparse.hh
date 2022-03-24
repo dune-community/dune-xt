@@ -307,6 +307,8 @@ public:
     return num_cols_;
   }
 
+  using InterfaceType::mv;
+
   //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
   inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
@@ -324,6 +326,8 @@ public:
         yy_rr += entries[kk] * xx[column_indices[kk]];
     }
   }
+
+  using InterfaceType::mtv;
 
   //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
@@ -784,6 +788,8 @@ public:
     return num_cols_;
   }
 
+  using InterfaceType::mv;
+
   //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
   inline std::enable_if_t<!std::is_base_of<CommonSparseVector<ScalarType>, XX>::value
@@ -825,6 +831,8 @@ public:
       if (XT::Common::FloatCmp::ne(tmp_vec[cc], ScalarType(0.), 0., eps_))
         yy.set_new_entry(cc, tmp_vec[cc]);
   }
+
+  using InterfaceType::mtv;
 
   //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
@@ -1281,6 +1289,8 @@ public:
     return num_cols_;
   }
 
+  using InterfaceType::mv;
+
   //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
   inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
@@ -1289,6 +1299,8 @@ public:
   {
     sparse_ ? sparse_matrix_.mv(xx, yy) : dense_matrix_.mv(xx, yy);
   }
+
+  using InterfaceType::mtv;
 
   //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
