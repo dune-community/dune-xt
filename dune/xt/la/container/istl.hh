@@ -545,10 +545,18 @@ public:
     return backend_->M();
   }
 
+  using InterfaceType::mv;
+
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
+    DUNE_THROW_IF(xx.size() != this->cols(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "xx.size() = " << xx.size() << ", this->cols() = " << this->cols());
+    DUNE_THROW_IF(yy.size() != this->rows(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "yy.size() = " << yy.size() << ", this->rows() = " << this->rows());
     backend().mv(xx.backend(), yy.backend());
-  }
+  } // ... mv(...)
 
   template <class V1, class V2>
   inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value
@@ -556,19 +564,32 @@ public:
                           void>
   mv(const V1& xx, V2& yy) const
   {
+    DUNE_THROW_IF(xx.size() != this->cols(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "xx.size() = " << xx.size() << ", this->cols() = " << this->cols());
+    DUNE_THROW_IF(yy.size() != this->rows(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "yy.size() = " << yy.size() << ", this->rows() = " << this->rows());
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_istl.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_istl[ii]);
-  }
+  } // ... mv(...)
+
+  using InterfaceType::mtv;
 
   inline void mtv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    auto& backend_ref = backend();
-    backend_ref.mtv(xx.backend(), yy.backend());
-  }
+    DUNE_THROW_IF(xx.size() != this->rows(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "xx.size() = " << xx.size() << ", this->rows() = " << this->rows());
+    DUNE_THROW_IF(yy.size() != this->cols(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "yy.size() = " << yy.size() << ", this->cols() = " << this->cols());
+    backend().mtv(xx.backend(), yy.backend());
+  } // ... mtv(...)
 
   template <class V1, class V2>
   inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value
@@ -576,13 +597,19 @@ public:
                           void>
   mtv(const V1& xx, V2& yy) const
   {
+    DUNE_THROW_IF(xx.size() != this->rows(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "xx.size() = " << xx.size() << ", this->rows() = " << this->rows());
+    DUNE_THROW_IF(yy.size() != this->cols(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "yy.size() = " << yy.size() << ", this->cols() = " << this->cols());
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_istl.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mtv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_istl[ii]);
-  }
+  } // ... mtv(...)
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {

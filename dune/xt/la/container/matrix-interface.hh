@@ -96,15 +96,15 @@ public:
   }
 
   template <class XX, class YY>
-  inline void mv(const XX& xx, YY& yy) const
+  inline void mv(const VectorInterface<XX, ScalarType>& xx, VectorInterface<YY, ScalarType>& yy) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp().mv(xx, yy));
+    CHECK_AND_CALL_CRTP(this->as_imp().mv(xx.as_imp(), yy.as_imp()));
   }
 
-  template <class XX, class YY>
-  inline void mtv(const XX& xx, YY& yy) const
+  template <class YY, class XX>
+  inline void mtv(const VectorInterface<YY, ScalarType>& yy, VectorInterface<XX, ScalarType>& xx) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp().mtv(xx, yy));
+    CHECK_AND_CALL_CRTP(this->as_imp().mtv(yy.as_imp(), xx.as_imp()));
   }
 
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -157,6 +157,22 @@ public:
   /// \name Provided by the interface for convenience.
   /// \note Those marked with vitual should be overriden by any devired class that can do better.
   /// \{
+
+  template <class XX>
+  typename XX::derived_type mv(const VectorInterface<XX, ScalarType>& xx) const
+  {
+    typename XX::derived_type result(this->rows());
+    this->mv(xx, result);
+    return result;
+  }
+
+  template <class YY>
+  typename YY::derived_type mtv(const VectorInterface<YY, ScalarType>& yy) const
+  {
+    typename YY::derived_type result(this->cols());
+    this->mtv(yy, result);
+    return result;
+  }
 
   using BaseType::operator*;
 

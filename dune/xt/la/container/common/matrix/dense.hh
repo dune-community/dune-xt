@@ -364,6 +364,8 @@ public:
     return backend_->num_cols_;
   }
 
+  using InterfaceType::mv;
+
   template <class FirstVectorType, class SecondVectorType>
   inline void mv(const FirstVectorType& xx, SecondVectorType& yy) const
   {
@@ -387,6 +389,8 @@ public:
       }
     }
   }
+
+  using InterfaceType::mtv;
 
   template <class FirstVectorType, class SecondVectorType>
   inline void mtv(const FirstVectorType& xx, SecondVectorType& yy) const

@@ -570,6 +570,8 @@ public:
     return backend_->cols();
   }
 
+  using InterfaceType::mv;
+
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
@@ -586,6 +588,8 @@ public:
     for (size_t ii = 0; ii < yy.size(); ++ii)
       yy.set_entry(ii, yy_eigen[ii]);
   }
+
+  using InterfaceType::mtv;
 
   template <class T1, class T2>
   inline void mtv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
