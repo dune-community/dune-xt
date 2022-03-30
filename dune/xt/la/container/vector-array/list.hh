@@ -110,10 +110,13 @@ public:
   ListVectorArray(const ThisType& other)
     : dim_(other.dim_)
     , len_(other.len_)
-    , vectors_(other.vectors_)
+    // Workaround for deleted copy ctor storageprovider imp
+    , vectors_()
     , notes_(other.notes_)
     , pairs_()
   {
+    for (auto&& storage_provider : other.vectors_)
+      vectors_.emplace_back(new VectorType(storage_provider.access()));
     pairs_.reserve(len_);
     for (size_t ii = 0; ii < len_; ++ii)
       pairs_.emplace_back(vectors_, notes_, ii);
