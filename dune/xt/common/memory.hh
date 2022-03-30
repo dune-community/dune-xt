@@ -215,7 +215,7 @@ private:
 }; // class AccessByPointer
 
 template <class T>
-class AccessByValue : public ConstAccessInterface<T>
+class AccessByValue : public AccessInterface<T>
 {
 public:
   explicit AccessByValue(T&& tt)
@@ -232,7 +232,7 @@ public:
     return tt_;
   }
 
-  AccessInterface<T>* copy() const final
+  AccessInterface<T>* copy() final
   {
     return new AccessByValue<T>(T(tt_));
   }
@@ -402,7 +402,7 @@ public:
   {}
 
   explicit StorageProvider(T&& tt)
-    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
+    : storage_(new internal::AccessByValue<T>(std::move(tt)))
   {}
 
   explicit StorageProvider(std::shared_ptr<T> tt)
