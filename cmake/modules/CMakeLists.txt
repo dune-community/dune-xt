@@ -32,4 +32,5 @@ install(
         Hints.cmake
         XtCompilerSupport.cmake
         XtTooling.cmake
+        versioneer.py
   DESTINATION ${DUNE_INSTALL_MODULEDIR})

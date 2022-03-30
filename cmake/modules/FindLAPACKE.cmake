@@ -11,7 +11,7 @@
 #   Tobias Leibner  (2017 - 2018, 2020)
 # ~~~
 
-include(Hints)
+include(DuneXTHints)
 
 message("-- checking for lapacke library")
 find_library(LAPACKE_LIBRARY lapacke HINTS ${lib_hints})
