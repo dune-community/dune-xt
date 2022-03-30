@@ -115,9 +115,10 @@ public:
     , notes_(other.notes_)
     , pairs_()
   {
+    pairs_.reserve(len_);
+    vectors_.reserve(len_);
     for (auto&& storage_provider : other.vectors_)
       vectors_.emplace_back(new VectorType(storage_provider.access()));
-    pairs_.reserve(len_);
     for (size_t ii = 0; ii < len_; ++ii)
       pairs_.emplace_back(vectors_, notes_, ii);
   } // ListVectorArray(...)
