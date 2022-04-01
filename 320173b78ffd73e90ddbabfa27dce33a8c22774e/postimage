@@ -1,0 +1,70 @@
+# ~~~
+# This file is part of the dune-gdt project:
+#   https://github.com/dune-community/dune-gdt
+# Copyright 2010-2018 dune-gdt developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   Felix Schindler (2011 - 2014, 2016 - 2017)
+#   René Fritze     (2017 - 2018)
+# ~~~
+
+.vscode
+tags
+*.user
+*Makefile
+*Makefile.in
+aclocal.m4
+am
+*.cache
+build
+*.guess
+config.h
+config.h.in
+*~
+*.orig
+doxygen-tag
+*.log
+config.lt
+config.status
+config.sub
+configure
+depcomp
+dependencies.m4
+*Doxyfile
+*Doxyfile.in
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
+config.*
+!config.h.cmake
+dune-xt.pc
+*.swp
+CMakeLists.txt.user
+demos
+data
+.libs
+*.o
+*.la
+*.user
+cmake/modules/petsc
+.idea
+__pycache__
+dune/xt/test/gtest/lib
+data
+!dune/xt/data
+.libs
+*.o
+*.la
+*.user
+.idea
+cmake/modules/petsc
+*.pyc
+.idea
+tags
+.vscode
+compile_commands.json
+.cache

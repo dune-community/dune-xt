@@ -1,0 +1,109 @@
+# ~~~
+<<<<<<<
+# This file is part of the dune-gdt project:
+#   https://github.com/dune-community/dune-gdt
+# Copyright 2010-2018 dune-gdt developers and contributors. All rights reserved.
+=======
+# This file is part of the dune-xt project:
+#   https://zivgitlab.uni-muenster.de/ag-ohlberger/dune-community/dune-xt
+# Copyright 2009-2021 dune-xt developers and contributors. All rights reserved.
+>>>>>>>
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+<<<<<<<
+#   Felix Schindler (2011 - 2014, 2016 - 2017)
+#   René Fritze     (2017 - 2018)
+# ~~~
+
+.vscode
+tags
+*.user
+*Makefile
+*Makefile.in
+aclocal.m4
+am
+*.cache
+build
+*.guess
+config.h
+config.h.in
+*~
+*.log
+config.lt
+config.status
+config.sub
+configure
+depcomp
+dependencies.m4
+*Doxyfile
+*Doxyfile.in
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
+*.deps
+*.orig
+*.tmp
+demos
+demos-*
+*.param
+*.vtu
+*.pc
+build-*
+*.pyc
+.idea
+tags
+.vscode
+compile_commands.json
+=======
+#   Felix Schindler (2012 - 2013, 2016 - 2017)
+#   René Fritze     (2009 - 2012, 2015, 2017 - 2019)
+#   Tobias Leibner  (2018 - 2021)
+# ~~~
+
+doc/doxygen
+build*
+*~
+*.orig
+doxygen-tag
+*.log
+*BASE*
+*LOCAL*
+*REMOTE*
+doxy-header.html
+*.svn
+headertest*
+Makefile
+stamp-h1
+config.*
+!config.h.cmake
+dune-xt.pc
+*.swp
+CMakeLists.txt.user
+demos
+data
+.libs
+*.o
+*.la
+*.user
+cmake/modules/petsc
+.idea
+__pycache__
+dune/xt/test/gtest/lib
+data
+!dune/xt/data
+.libs
+*.o
+*.la
+*.user
+.idea
+cmake/modules/petsc
+*.pyc
+tags
+.vscode
+compile_commands.json
+.cache
+>>>>>>>
