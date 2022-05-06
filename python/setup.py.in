@@ -20,7 +20,7 @@ from setuptools.command.install import install
 requires=['ipython','numpy', 'scipy']
 
 extras_require = {
-  'visualisation': ( 'k3d', 'vtk', 'ipywidgets', 'lxml', 'xmljson',
+  'visualisation': ( 'k3d==2.6.6', 'vtk', 'ipywidgets', 'lxml', 'xmljson',
                      'matplotlib',),
   'infrastructure': ('pylicense3>=0.4.1', 'pytest', 'pytest-cov',
                      'cmake_format==0.4.1', 'codecov', 'yapf==0.25',
