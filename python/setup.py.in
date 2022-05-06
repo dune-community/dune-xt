@@ -24,7 +24,7 @@ extras_require = {
   'visualisation': ( 'k3d', 'vtk', 'ipywidgets', 'lxml', 'xmljson',
                      'matplotlib',),
   'infrastructure': ('pylicense3>=0.4.1', 'pytest', 'pytest-cov',
-                     'cmake_format==0.4.1', 'codecov', 'yapf==0.25',
+                     'cmake_format==0.4.1', 'codecov', 'yapf==0.32',
                      'jinja2', ),
 }
 
