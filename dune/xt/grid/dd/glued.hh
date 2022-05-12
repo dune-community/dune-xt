@@ -1237,6 +1237,13 @@ private:
 }; // class GluedVTKWriter
 
 
+template <class MG, class LG, Layers l>
+GluedVTKWriter<MG, LG, l> make_glued_vtk_writer(const Glued<MG, LG, l>& glued_grid, const int local_level = -1)
+{
+  return GluedVTKWriter<MG, LG, l>(glued_grid, local_level);
+}
+
+
 #else // HAVE_DUNE_GRID_GLUE
 
 
