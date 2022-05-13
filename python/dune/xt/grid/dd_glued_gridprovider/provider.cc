@@ -276,6 +276,7 @@ using GridGlue2dYaspYasp =
     Dune::XT::Grid::DD::Glued<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Dune::XT::Grid::Layers::leaf>;
 using CouplingGridView2dYaspYasp = Dune::XT::Grid::CouplingGridView<GridGlue2dYaspYasp>;
 #if HAVE_DUNE_ALUGRID
+    // TODO: also bind YASP-ALU ! see below
 using GridGlue2dAluSimplexConformingAluSimplexConforming =
     Dune::XT::Grid::DD::Glued<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Dune::XT::Grid::Layers::leaf>;
 using GridGlue2dAluConformingAluConforming =
@@ -298,11 +299,14 @@ using AvailableCouplingGridViewTypes = std::tuple<CouplingGridView2dYaspYasp
 template <class GridTypes = AvailableGridGlueGridTypes>
 struct GluedGridProvider_for_all_available_grids
 {
-  using G = Dune::XT::Common::tuple_head_t<GridTypes>;
+  using G_M = Dune::XT::Common::tuple_head_t<GridTypes>;
+
+  // TODO: Iterate over all local grids !
+  using G_L = G_M;
 
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::GluedGridProvider<G, G>::bind(m);
+    Dune::XT::Grid::bindings::GluedGridProvider<G_M, G_L>::bind(m);
     GluedGridProvider_for_all_available_grids<Dune::XT::Common::tuple_tail_t<GridTypes>>::bind(m);
   }
 };

@@ -22,8 +22,8 @@
 using namespace Dune;
 using namespace Dune::XT::Grid::bindings;
 
-// TODO: different macro and micro grids
-template <class G, class element_type>
+
+template <class G_M, class G_L, class local_element_type>
 struct make_cube_dd_grid
 {
   static void bind(pybind11::module& m)
@@ -32,13 +32,15 @@ struct make_cube_dd_grid
 
     m.def(
         "make_cube_dd_grid",
-        [](XT::Grid::GridProvider<G>& macro_grid, const unsigned int num_refinements) {
-          return std::make_unique<XT::Grid::DD::Glued<G, G, XT::Grid::Layers::leaf>>(
+        [](XT::Grid::GridProvider<G_M>& macro_grid,
+           const local_element_type&,
+           const unsigned int num_refinements) {
+          return std::make_unique<XT::Grid::DD::Glued<G_M, G_L, XT::Grid::Layers::leaf>>(
               macro_grid, num_refinements, false, true);
         },
         "macro_grid"_a,
-        "num_refinements"_a = 0,
-        pybind11::keep_alive<0, 1>());
+        "local_element_type"_a,
+        "num_refinements"_a = 0);
   } // ... bind(...)
 }; // struct make_cube_dd_grid<...>
 
@@ -52,10 +54,13 @@ PYBIND11_MODULE(_grid_dd_glued_gridprovider_cube, m)
   py::module::import("dune.xt.grid._grid_traits");
 
 #if HAVE_DUNE_GRID_GLUE
-  make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, Cube>::bind(m);
+  make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, YASP_2D_EQUIDISTANT_OFFSET, Cube>::bind(m);
 #  if HAVE_DUNE_ALUGRID
-  make_cube_dd_grid<ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
-  make_cube_dd_grid<ALU_2D_CUBE, Cube>::bind(m);
+  make_cube_dd_grid<ALU_2D_SIMPLEX_CONFORMING, ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
+  make_cube_dd_grid<YASP_2D_EQUIDISTANT_OFFSET, ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
+
+  make_cube_dd_grid<ALU_2D_CUBE, ALU_2D_CUBE, Cube>::bind(m);
+  make_cube_dd_grid<ALU_2D_CUBE, ALU_2D_SIMPLEX_CONFORMING, Simplex>::bind(m);
 #  endif
 #endif
 }
