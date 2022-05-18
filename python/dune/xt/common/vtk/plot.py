@@ -167,3 +167,24 @@ if config.HAVE_K3D:
             IPython.display.display(hbox)
 
         return vtkplot
+
+    def plot_all_subdomains(vtkfile_path, subdomains, color_attribute_name, color_map=get_cmap('viridis')):
+        ''' Generate a k3d Plot and associated controls for VTK data from file
+
+        :param vtkfile_path: the path to load vtk data from. Can be a single .vtu or a collection
+        :param color_attribute_name: which data array from vtk to use for plot coloring
+        :param color_map: a Matplotlib Colormap object or a K3D array((step, r, g, b))
+        :return: the generated Plot object
+        '''
+        # if isinstance(color_map, Colormap):
+        #     color_map = [(x, *color_map(x)[:3]) for x in np.linspace(0, 1, 256)]
+
+        import pyvista as pv
+
+        plotter = pv.Plotter(window_size=(1500, 1100))
+        for ss in subdomains:
+            # data.append(read_vtkfile(vtkfile_path + f'_{ss}.vtu'))
+            grid = pv.read(vtkfile_path + f'_{ss}.vtu')
+            plotter.add_mesh(grid)
+        plotter.camera_position = 'xy'
+        plotter.show()
