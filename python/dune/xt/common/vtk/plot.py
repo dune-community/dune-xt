@@ -185,6 +185,7 @@ if config.HAVE_K3D:
         for ss in subdomains:
             # data.append(read_vtkfile(vtkfile_path + f'_{ss}.vtu'))
             grid = pv.read(vtkfile_path + f'_{ss}.vtu')
-            plotter.add_mesh(grid)
+            plotter.add_mesh(grid, scalar_bar_args={'color': "black"})
+        plotter.set_background('white')
         plotter.camera_position = 'xy'
         plotter.show()
