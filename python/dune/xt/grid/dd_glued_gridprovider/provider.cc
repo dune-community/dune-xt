@@ -241,7 +241,7 @@ struct MacroGridBasedBoundaryInfo
   using E = Dune::XT::Grid::extract_entity_t<GV>;
   using type = Dune::XT::Grid::MacroGridBasedBoundaryInfo<GV, GV>; // assumes to have the same GV in micro und macro
   using base_type = Dune::XT::Grid::BoundaryInfo<I>;
-  using bound_type = pybind11::class_<type>;
+  using bound_type = pybind11::class_<type, base_type>;
 
   static bound_type bind(pybind11::module& m,
                          const std::string& grid_id = grid_name<G>::value(),
@@ -337,7 +337,7 @@ struct CouplingGridProvider_for_all_available_grids<Dune::XT::Common::tuple_null
 };
 
 
-template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+template <class GridTypes = Dune::XT::Grid::bindings::AvailableGridTypes>   // TODO: check if Grid::bindings is used everywhere !
 struct MacroGridBasedBoundaryInfo_for_all_grids
 {
   using G = Dune::XT::Common::tuple_head_t<GridTypes>;
