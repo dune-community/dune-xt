@@ -247,7 +247,7 @@ struct VectorAbstraction<Dune::FieldVector<K, SIZE>>
   static constexpr bool is_contiguous = true;
 
   template <size_t SZ = SIZE, class Field = K>
-  using VectorTypeTemplate = Dune::FieldVector<Field, SZ>;
+  using VectorTypeTemplate = Dune::FieldVector<K, SZ>;
 
   template <size_t SZ = SIZE>
   static inline VectorTypeTemplate<SZ> create(const size_t sz, const K& val = K(0))
