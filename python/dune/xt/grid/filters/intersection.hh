@@ -101,7 +101,10 @@ public:
           }),
           "boundary_info"_a,
           "boundary_type"_a,
-          "logging_prefix"_a = "");
+          "logging_prefix"_a = "",
+          py::keep_alive<0, 1>(),
+          py::keep_alive<0, 2>(),
+          py::keep_alive<0, 3>());
     c.def("__repr__", [ClassId](type&) { return ClassId + "(boundary_info=, boundary_type=, logging_prefix=)"; });
     c.def_readonly("logger", &type::logger);
 
@@ -111,6 +114,7 @@ public:
   static void bind_leaf_factory(pybind11::module& m,
                                 const std::string& class_id = "apply_on_custom_boundary_intersections")
   {
+    namespace py = pybind11;
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
@@ -121,12 +125,16 @@ public:
         "grid_provider"_a,
         "boundary_info"_a,
         "boundary_type"_a,
-        "logging_prefix"_a = "");
+        "logging_prefix"_a = "",
+        py::keep_alive<0, 1>(),
+        py::keep_alive<0, 2>(),
+        py::keep_alive<0, 3>());
   } // ... bind_leaf_factory(...)
 
   static void bind_coupling_factory(pybind11::module& m,
                                     const std::string& class_id = "apply_on_custom_boundary_intersections")
   {
+    namespace py = pybind11;
     using namespace pybind11::literals;
     m.def(
         Common::to_camel_case(class_id).c_str(),
@@ -137,7 +145,10 @@ public:
         "coupling_grid_provider"_a,
         "boundary_info"_a,
         "boundary_type"_a,
-        "logging_prefix"_a = "");
+        "logging_prefix"_a = "",
+        py::keep_alive<0, 1>(),
+        py::keep_alive<0, 2>(),
+	py::keep_alive<0, 3>());
   } // ... bind_coupling_factory(...)
 
 }; // class CustomBoundaryIntersectionsFilter
